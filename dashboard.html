@@ -133,20 +133,20 @@
             <!-- STEP 2: CATEGORY -->
             <div id="setup-step-2" class="step-container step-hidden-right">
                 <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">2. Store Category</p>
-                <!-- Category Grid -->
+                            <!-- Category Grid -->
                 <div class="grid grid-cols-2 gap-3" id="category-selection">
-                    <button type="button" onclick="selectCategory(this, 'Fashion')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Fashion & Lifestyle</button>
-                    <button type="button" onclick="selectCategory(this, 'Food')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Food & Beverages</button>
-                    <button type="button" onclick="selectCategory(this, 'Electronics')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Electronics</button>
-                    <button type="button" onclick="selectCategory(this, 'Pharmacy')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Health & Pharmacy</button>
-                    <button type="button" onclick="selectCategory(this, 'Services')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Services</button>
-                    <button type="button" onclick="selectCategory(this, 'Other')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Other / Misc</button>
+                    <button type="button" onclick="selectCategory(this, 'Fashion & Apparel')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Fashion & Apparel</button>
+                    <button type="button" onclick="selectCategory(this, 'Grocery & Daily Needs')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Grocery & Daily</button>
+                    <button type="button" onclick="selectCategory(this, 'Mobiles & Electronics')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Electronics & Tech</button>
+                    <button type="button" onclick="selectCategory(this, 'Health & Pharmacy')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Pharmacy & Health</button>
+                    <button type="button" onclick="selectCategory(this, 'Home & Hardware')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Home & Hardware</button>
+                    <button type="button" onclick="selectCategory(this, 'Beauty & Cosmetics')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Beauty & Makeup</button>
+                    <button type="button" onclick="selectCategory(this, 'Services & Repair')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Services & Repair</button>
+                    <button type="button" onclick="selectCategory(this, 'Toys & Stationery')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Toys & Stationery</button>
+                    <button type="button" onclick="selectCategory(this, 'Auto Parts & Garage')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Auto Parts & Garage</button>
+                    <button type="button" onclick="selectCategory(this, 'Other Categories')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Other</button>
                 </div>
-                <input type="hidden" id="selected-category">
-                <button type="button" onclick="nextSetupStep(3)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2">
-                    Next <i class="fas fa-arrow-right text-sm"></i>
-                </button>
-            </div>
+
 
             <!-- STEP 3: LOCATION & FINISH -->
             <div id="setup-step-3" class="step-container step-hidden-right">
@@ -165,7 +165,7 @@
                     </div>
                 </div>
                 
-                <button type="button" onclick="submitFinalStore()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_10px_20px_rgba(168,85,247,0.3)] flex justify-center items-center gap-2">
+                <button type="button" onclick="submitFinalStore(event)" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_10px_20px_rgba(168,85,247,0.3)] flex justify-center items-center gap-2">
                     Launch Store <i class="fas fa-rocket text-sm"></i>
                 </button>
             </div>
@@ -1792,19 +1792,84 @@
         }
 
         // Final Submit Button
-        function submitFinalStore() {
-            const shopName = document.getElementById('setup-shop-name').value;
+                async function submitFinalStore(event) {
+            const shopName = document.getElementById('setup-shop-name').value.trim();
+            const ownerName = document.getElementById('setup-owner-name').value.trim() || authTemp.name;
+            const desc = document.getElementById('setup-desc').value.trim();
             const category = document.getElementById('selected-category').value;
-            const address = document.getElementById('setup-address').value;
+            const address = document.getElementById('setup-address').value.trim();
             
-            if(!address.trim()) {
+            if(!address) {
                 alert("Please add store address!"); return;
             }
             
-            alert(`Store Created Successfully!\nName: ${shopName}\nCategory: ${category}`);
-            // यहाँ अपना Firebase सेव करने वाला लॉजिक डाल देना
+            // बटन को लोडिंग स्टेट में डालो (Launch Store बटन)
+            const btn = event ? event.currentTarget : document.querySelector('#setup-step-3 button');
+            const origHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Launching...`;
+            btn.disabled = true;
+
+            // दुकान का यूनिक ID (Slug) बनाना
+            const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
+            
+            const newShopData = { 
+                shopId: shopSlug, 
+                shopName: shopName, 
+                ownerName: ownerName, 
+                description: desc,
+                category: category,
+                address: address,
+                phone: authTemp.phone || "Unknown", 
+                password: authTemp.password || "google-verified", 
+                status: "active", 
+                createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+            };
+            
+            try {
+                // 1. Firebase में स्टोर सेव करना
+                await db.collection('shops').doc(shopSlug).set(newShopData);
+                localStorage.setItem('pixigenie_active_shop', shopSlug);
+                localStorage.setItem('pixigenie_owner_name', ownerName);
+                
+                // 2. Setup वाला Modal बंद करना
+                document.getElementById('store-setup-modal').classList.add('hidden');
+                
+                // 3. नया iOS Success Modal खोलना
+                const successModal = document.getElementById('store-success-modal');
+                const successContent = document.getElementById('store-success-content');
+                successModal.classList.remove('hidden');
+                setTimeout(() => {
+                    successContent.classList.remove('scale-90', 'opacity-0');
+                    successContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+
+                // 4. 2 सेकंड बाद सीधा डैशबोर्ड पर Redirect करना
+                setTimeout(() => {
+                    window.location.href = `dashboard.html?shop=${shopSlug}`;
+                }, 2000);
+
+            } catch (error) { 
+                alert("Error launching store: " + error.message); 
+                btn.innerHTML = origHtml; 
+                btn.disabled = false; 
+            }
         }
 
+   
     </script>
+    <!-- ✨ iOS STYLE STORE SUCCESS MODAL ✨ -->
+    <div id="store-success-modal" class="fixed inset-0 bg-[#111827]/60 backdrop-blur-md z-[150] hidden flex items-center justify-center p-4 transition-all duration-300">
+        <div class="bg-white rounded-[24px] shadow-2xl max-w-xs w-full p-8 text-center transform scale-90 opacity-0 transition-all duration-300" id="store-success-content">
+            <div class="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-5 shadow-sm border border-green-100">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3 class="text-2xl font-black text-gray-900 mb-2">Store Ready!</h3>
+            <p class="text-sm text-gray-500 font-medium mb-6">Your digital storefront has been created successfully.</p>
+            <button disabled class="w-full bg-gray-100 text-gray-500 font-bold py-3.5 rounded-xl flex justify-center items-center gap-2 text-sm">
+                <i class="fas fa-circle-notch fa-spin text-purple-600"></i> Opening Dashboard...
+            </button>
+        </div>
+    </div>
+
 </body>
 </html>
