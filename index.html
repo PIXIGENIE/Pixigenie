@@ -650,12 +650,24 @@
             }
         }
 
-        function loginWithGoogle() {
+                function loginWithGoogle() {
             auth.signInWithPopup(googleProvider).then((result) => {
                 const user = result.user;
+                
+                // Google se naam liya
                 authTemp.name = user.displayName;
+                
+                // ✨ FIX: Google phone number nahi deta, isliye email ko hi ID bana diya
+                authTemp.phone = user.email || user.uid; 
+                authTemp.password = "google-verified"; // Dummy password
+                
+                // Ab role selection wale page par bhej do
                 showStep('auth-step-2');
-            }).catch((error) => alert("Google Error: " + error.message));
+                
+            }).catch((error) => {
+                // Agar popup block ho ya koi error aaye toh pata chal jayega
+                alert("Google Login Error: " + error.message);
+            });
         }
 
         async function handleShopSubmit(e) {
