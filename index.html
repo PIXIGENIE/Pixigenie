@@ -468,18 +468,19 @@
 
         let authTemp = { phone: '', name: '' };
 
-                window.addEventListener('DOMContentLoaded', () => {
+                        window.addEventListener('DOMContentLoaded', () => {
             const isLoggedIn = updateUIBasedOnLogin();
             if (!isLoggedIn) {
                 setTimeout(openAuthModal, 500); 
             }
 
-            // ✨ FIX: Google Redirect Check ✨
+            // ✨ FIX: Google से लॉगिन के बाद सीधा Role Selection (Step 2) पर भेजेगा ✨
             auth.getRedirectResult().then(async (result) => {
                 if (result.user) {
                     const user = result.user;
-                    const userEmailOrId = user.email || user.uid; 
+                    const userEmailOrId = user.email || user.uid; // फ़ोन की जगह ईमेल यूज़ करेंगे
                     
+                    // 1. अगर पुराना कस्टमर है तो सीधा लॉगिन (बार-बार Role नहीं पूछेगा)
                     const custSnap = await db.collection('customers').doc(userEmailOrId).get();
                     if(custSnap.exists) {
                         const custData = custSnap.data();
@@ -490,6 +491,7 @@
                         return;
                     }
                     
+                    // 2. अगर पुराना दुकानदार है तो सीधा डैशबोर्ड 
                     const shopSnap = await db.collection('shops').where('phone', '==', userEmailOrId).get();
                     if(!shopSnap.empty) {
                         const shopData = shopSnap.docs[0].data();
@@ -499,11 +501,13 @@
                         return;
                     }
 
+                    // 3. ✨ अगर नया यूज़र है, तो पहला फॉर्म हटाकर सीधा Role Selection दिखाओ ✨
                     authTemp.name = user.displayName || "Google User";
-                    authTemp.phone = userEmailOrId;
+                    authTemp.phone = userEmailOrId; // ईमेल को ही आईडी बना दिया
                     authTemp.password = "google-verified";
-                    openAuthModal();
-                    showStep('auth-step-2');
+                    
+                    openAuthModal(); // पॉपअप खोलेगा
+                    showStep('auth-step-2'); // सीधा Customer / Shop Owner वाले पेज पर ले जाएगा
                 }
             }).catch((error) => {
                 console.error("Google Error:", error);
