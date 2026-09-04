@@ -45,77 +45,135 @@
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+           /* ✨ iOS Style Step Slider Animations ✨ */
+        .step-container {
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            width: 100%;
+        }
+        .step-hidden-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            position: absolute;
+            pointer-events: none;
+            visibility: hidden;
+        }
+        .step-hidden-right {
+            opacity: 0;
+            transform: translateX(40px);
+            position: absolute;
+            pointer-events: none;
+            visibility: hidden;
+        }
+        .step-active {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative;
+            visibility: visible;
+        }
+
     </style>
 </head>
 <body class="font-sans flex h-screen overflow-hidden text-[#111827]">
 
-    <!-- ✨ 1. SETUP WIZARD / EDIT STORE MODAL ✨ -->
-    <div id="setup-wizard" class="fixed inset-0 z-[100] bg-[#111827]/40 backdrop-blur-sm overflow-y-auto hidden flex items-start sm:items-center justify-center p-4">
-        <div class="w-full max-w-xl bg-white rounded-[24px] shadow-2xl border border-[#E5E7EB] p-5 sm:p-8 relative my-4 sm:my-8">
+ <!-- ✨ PREMIUM iOS SETUP MODAL ✨ -->
+<div id="store-setup-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300">
+    <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-md h-[90vh] sm:h-[85vh] flex flex-col relative overflow-hidden">
+        
+        <!-- HEADER & PROGRESS BAR -->
+        <div class="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0 z-20 bg-white">
             <div class="flex items-center justify-between mb-4">
-                <button onclick="window.location.href='index.html'" class="w-10 h-10 bg-[#F7F7F9] hover:bg-[#E5E7EB] text-[#111827] rounded-full flex items-center justify-center font-bold transition active:scale-95">
-    <i class="fas fa-arrow-left"></i>
-</button>
-
-                <div class="w-12 h-12 bg-[#F3E8FF] text-[#A855F7] rounded-[14px] flex items-center justify-center text-xl shadow-sm"><i class="fas fa-store"></i></div>
-                <div class="w-10 h-10"></div> 
+                <button id="setup-back-btn" onclick="prevSetupStep()" class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-800 active:scale-90 transition shadow-sm border border-gray-200">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-[14px] flex items-center justify-center text-xl shadow-sm border border-purple-100">
+                    <i class="fas fa-store"></i>
+                </div>
+                <div class="w-10"></div> <!-- Placeholder for balance -->
             </div>
-            <h2 id="setup-title" class="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight mb-2 text-center">Complete Your Store</h2>
-            <p id="setup-desc" class="text-[13px] sm:text-[14px] text-[#6B7280] mb-6 font-medium text-center">Let's set up your storefront so customers can find and order from you easily.</p>
-
-            <form onsubmit="submitStoreSetup(event)" class="space-y-6">
-                <div class="space-y-3">
-                    <h4 class="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider ml-1">1. Store Details</h4>
-                    <div class="ios-input flex items-center px-4"><i class="fas fa-store text-[#9CA3AF] w-6"></i><input type="text" id="setup-shop-name" placeholder="Shop Name" required class="w-full bg-transparent outline-none font-bold text-[#111827]"></div>
-                    <div class="ios-input flex items-center px-4"><i class="fas fa-user text-[#9CA3AF] w-6"></i><input type="text" id="setup-owner-name" placeholder="Owner Name" required class="w-full bg-transparent outline-none font-bold text-[#111827]"></div>
-                    <div class="ios-input flex items-start px-4 py-3 mt-3">
-                        <i class="fas fa-align-left text-[#9CA3AF] w-6 mt-1"></i>
-                        <textarea id="setup-shop-desc" placeholder="Shop Description" rows="3" class="w-full bg-transparent outline-none font-bold text-[#111827] placeholder-[#9CA3AF] resize-none"></textarea>
-                    </div>
+            
+            <h2 class="text-2xl font-black text-gray-900 text-center tracking-tight">Complete Your Store</h2>
+            <p class="text-[13px] text-gray-500 text-center mt-1 font-medium">Let's set up your storefront easily.</p>
+            
+            <!-- PROGRESS BAR -->
+            <div class="mt-5">
+                <div class="w-full bg-gray-100 rounded-full h-1.5 mb-1.5 overflow-hidden">
+                    <div id="setup-progress" class="bg-purple-600 h-full rounded-full transition-all duration-500 ease-out" style="width: 33%;"></div>
                 </div>
+                <p id="setup-step-text" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Step 1 of 3</p>
+            </div>
+        </div>
 
-                <div class="space-y-3 pt-4 border-t border-[#E5E7EB]">
-                    <h4 class="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider ml-1">2. Store Category</h4>
-                    <div class="grid grid-cols-2 gap-3 max-h-[200px] overflow-y-auto p-1 custom-scrollbar" id="category-grid">
-                        <button type="button" onclick="selectCategory(this, 'Fashion & Lifestyle')" class="cat-btn bg-[#F7F7F9] text-[#6B7280] border border-[#E5E7EB] font-bold py-2.5 px-2 rounded-[12px] text-[13px] leading-tight transition">Fashion & Lifestyle</button>
-                        <button type="button" onclick="selectCategory(this, 'Food & Beverages')" class="cat-btn bg-[#F7F7F9] text-[#6B7280] border border-[#E5E7EB] font-bold py-2.5 px-2 rounded-[12px] text-[13px] leading-tight transition">Food & Beverages</button>
-                        <button type="button" onclick="selectCategory(this, 'Health & Pharmacy')" class="cat-btn bg-[#F7F7F9] text-[#6B7280] border border-[#E5E7EB] font-bold py-2.5 px-2 rounded-[12px] text-[13px] leading-tight transition">Health & Pharmacy</button>
-                        <button type="button" onclick="selectCategory(this, 'Electronics & Gadgets')" class="cat-btn bg-[#F7F7F9] text-[#6B7280] border border-[#E5E7EB] font-bold py-2.5 px-2 rounded-[12px] text-[13px] leading-tight transition">Electronics & Gadgets</button>
-                        <button type="button" onclick="selectCategory(this, 'Home & Household')" class="cat-btn bg-[#F7F7F9] text-[#6B7280] border border-[#E5E7EB] font-bold py-2.5 px-2 rounded-[12px] text-[13px] leading-tight transition">Home & Household</button>
-                        <button type="button" onclick="selectCategory(this, 'Hardware & Tools')" class="cat-btn bg-[#F7F7F9] text-[#6B7280] border border-[#E5E7EB] font-bold py-2.5 px-2 rounded-[12px] text-[13px] leading-tight transition">Hardware & Tools</button>
-                        <button type="button" onclick="selectCategory(this, 'Services')" class="cat-btn bg-[#F7F7F9] text-[#6B7280] border border-[#E5E7EB] font-bold py-2.5 px-2 rounded-[12px] text-[13px] leading-tight transition">Services</button>
-                        <button type="button" onclick="selectCategory(this, 'Other')" class="cat-btn bg-[#F7F7F9] text-[#6B7280] border border-[#E5E7EB] font-bold py-2.5 px-2 rounded-[12px] text-[13px] leading-tight transition">Other / Misc</button>
+        <!-- FORM STEPS WRAPPER -->
+        <div class="flex-1 relative overflow-x-hidden overflow-y-auto custom-scrollbar p-6 bg-[#fcfcfd]">
+            
+            <!-- STEP 1: STORE DETAILS -->
+            <div id="setup-step-1" class="step-container step-active">
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">1. Store Details</p>
+                <div class="space-y-4">
+                    <div class="flex items-center bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden px-4 h-14">
+                        <i class="fas fa-store text-gray-400 mr-3"></i>
+                        <input type="text" id="setup-shop-name" placeholder="Shop Name" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900">
                     </div>
-                    <div id="custom-category-box" class="hidden ios-input flex items-center px-4 mt-2"><i class="fas fa-pen text-[#9CA3AF] w-6"></i><input type="text" id="custom-category-input" placeholder="Type category" class="w-full bg-transparent outline-none font-semibold text-sm text-[#111827]"></div>
-                    <input type="hidden" id="setup-category" value="">
-                </div>
-
-                <div class="space-y-3 pt-4 border-t border-[#E5E7EB]">
-                    <h4 class="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider ml-1">3. Location Setup</h4>
-                    <button type="button" id="gps-btn" onclick="fetchGPS()" class="w-full bg-[#E0E7FF] text-[#2563EB] font-bold h-[52px] rounded-[16px] active:scale-[0.98] transition flex items-center justify-center gap-2 border border-[#BFDBFE]">
-                        <i class="fas fa-location-arrow"></i> Auto-Fetch Location via GPS
-                    </button>
-                    <textarea id="setup-address" placeholder="Full Store Address..." required rows="2" class="w-full bg-[#F7F7F9] border border-[#E5E7EB] focus:bg-white focus:border-[#A855F7] rounded-[16px] p-4 outline-none text-sm font-semibold text-[#111827] resize-none transition-colors shadow-sm"></textarea>
-                    
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-[#E5E7EB] focus-within:border-[#A855F7] focus-within:bg-white transition-colors overflow-hidden px-4 h-[52px] shadow-sm">
-                        <i class="fas fa-map-pin text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
-                        <input type="text" id="setup-landmark" placeholder="Nearby Landmark (Optional)" class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#9CA3AF]">
+                    <div class="flex items-center bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden px-4 h-14">
+                        <i class="fas fa-user text-gray-400 mr-3"></i>
+                        <input type="text" id="setup-owner-name" placeholder="Owner Name" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900">
                     </div>
-                    <div class="mt-3">
-                        <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Google Maps Link</label>
-                        <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 py-3.5">
-                            <i class="fas fa-map-marked-alt text-gray-400 mr-3"></i>
-                            <input type="url" id="setup-map-link" placeholder="Paste Google Maps link here..." class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-gray-400">
+                    <div class="bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden p-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-align-left text-gray-400 mr-3 mt-1"></i>
+                            <textarea id="setup-desc" placeholder="Shop Description (e.g. Best grocery in town)" rows="3" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900 resize-none"></textarea>
                         </div>
                     </div>
                 </div>
+                <button type="button" onclick="nextSetupStep(2)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2">
+                    Next <i class="fas fa-arrow-right text-sm"></i>
+                </button>
+            </div>
 
-                <div class="flex flex-col gap-2 mt-8">
-                    <button type="submit" id="setup-submit-btn" class="w-full bg-[#111827] text-white font-bold h-[56px] rounded-[16px] text-base active:scale-[0.98] transition-transform shadow-lg flex justify-center items-center gap-2">Launch Store <i class="fas fa-rocket text-sm"></i></button>
+            <!-- STEP 2: CATEGORY -->
+            <div id="setup-step-2" class="step-container step-hidden-right">
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">2. Store Category</p>
+                <!-- Category Grid -->
+                <div class="grid grid-cols-2 gap-3" id="category-selection">
+                    <button type="button" onclick="selectCategory(this, 'Fashion')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Fashion & Lifestyle</button>
+                    <button type="button" onclick="selectCategory(this, 'Food')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Food & Beverages</button>
+                    <button type="button" onclick="selectCategory(this, 'Electronics')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Electronics</button>
+                    <button type="button" onclick="selectCategory(this, 'Pharmacy')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Health & Pharmacy</button>
+                    <button type="button" onclick="selectCategory(this, 'Services')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Services</button>
+                    <button type="button" onclick="selectCategory(this, 'Other')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Other / Misc</button>
                 </div>
-            </form>
+                <input type="hidden" id="selected-category">
+                <button type="button" onclick="nextSetupStep(3)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2">
+                    Next <i class="fas fa-arrow-right text-sm"></i>
+                </button>
+            </div>
+
+            <!-- STEP 3: LOCATION & FINISH -->
+            <div id="setup-step-3" class="step-container step-hidden-right">
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">3. Store Location</p>
+                <div class="space-y-4">
+                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3">
+                        <i class="fas fa-map-marker-alt text-blue-500 mt-0.5"></i>
+                        <div>
+                            <h4 class="text-sm font-bold text-blue-900">Add Store Address</h4>
+                            <p class="text-xs text-blue-700 mt-1">Customers nearby will find you easily.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden p-4">
+                        <textarea id="setup-address" placeholder="Full Store Address & Landmark" rows="3" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900 resize-none"></textarea>
+                    </div>
+                </div>
+                
+                <button type="button" onclick="submitFinalStore()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_10px_20px_rgba(168,85,247,0.3)] flex justify-center items-center gap-2">
+                    Launch Store <i class="fas fa-rocket text-sm"></i>
+                </button>
+            </div>
+            
         </div>
     </div>
+</div>
+
 
     <!-- ✨ 2. CONGRATULATIONS SCREEN ✨ -->
     <div id="congrats-screen" class="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-500">
@@ -1671,6 +1729,82 @@
                 window.location.href = "index.html"; 
             } 
         }
+          let currentSetupStep = 1;
+        const totalSetupSteps = 3;
+
+        // केटेगरी सिलेक्ट करने का इफ़ेक्ट
+        function selectCategory(btnElement, categoryName) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-50', 'border-purple-500', 'text-purple-700');
+                btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+            });
+            // Add active class to clicked button
+            btnElement.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+            btnElement.classList.add('bg-purple-50', 'border-purple-500', 'text-purple-700');
+            
+            document.getElementById('selected-category').value = categoryName;
+        }
+
+        function nextSetupStep(stepNumber) {
+            // Validation: अगर डिटेल्स नहीं भरी हैं तो आगे मत जाने दो
+            if (currentSetupStep === 1) {
+                if (!document.getElementById('setup-shop-name').value.trim()) {
+                    alert("Please enter Shop Name"); return;
+                }
+            } else if (currentSetupStep === 2) {
+                if (!document.getElementById('selected-category').value) {
+                    alert("Please select a Store Category"); return;
+                }
+            }
+
+            goToStep(stepNumber);
+        }
+
+        function prevSetupStep() {
+            if (currentSetupStep > 1) {
+                goToStep(currentSetupStep - 1);
+            } else {
+                // अगर Step 1 पर बैक दबाया, तो मॉडल बंद कर दो 
+                // (या अपनी ज़रुरत के हिसाब से होम पेज पर भेज दो)
+                document.getElementById('store-setup-modal').classList.add('hidden');
+            }
+        }
+
+        function goToStep(targetStep) {
+            const currentEl = document.getElementById(`setup-step-${currentSetupStep}`);
+            const targetEl = document.getElementById(`setup-step-${targetStep}`);
+            
+            // Animation Classes
+            if (targetStep > currentSetupStep) {
+                currentEl.className = 'step-container step-hidden-left'; // Move left
+            } else {
+                currentEl.className = 'step-container step-hidden-right'; // Move right
+            }
+            
+            targetEl.className = 'step-container step-active'; // Show new
+            currentSetupStep = targetStep;
+
+            // Update Progress Bar (33%, 66%, 100%)
+            const progressPercent = (currentSetupStep / totalSetupSteps) * 100;
+            document.getElementById('setup-progress').style.width = `${progressPercent}%`;
+            document.getElementById('setup-step-text').innerText = `Step ${currentSetupStep} of ${totalSetupSteps}`;
+        }
+
+        // Final Submit Button
+        function submitFinalStore() {
+            const shopName = document.getElementById('setup-shop-name').value;
+            const category = document.getElementById('selected-category').value;
+            const address = document.getElementById('setup-address').value;
+            
+            if(!address.trim()) {
+                alert("Please add store address!"); return;
+            }
+            
+            alert(`Store Created Successfully!\nName: ${shopName}\nCategory: ${category}`);
+            // यहाँ अपना Firebase सेव करने वाला लॉजिक डाल देना
+        }
+
     </script>
 </body>
 </html>
