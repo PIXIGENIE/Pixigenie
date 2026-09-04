@@ -687,10 +687,16 @@
             }
         }
 
-              function loginWithGoogle(event) {
-            if (event) event.currentTarget.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Please wait...`;
-            auth.signInWithRedirect(googleProvider);
+                      function loginWithGoogle(event) {
+            const btn = event ? event.currentTarget : null;
+            if (btn) btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Please wait...`;
+            
+            auth.signInWithRedirect(googleProvider).catch((error) => {
+                alert("Login Error: " + error.message);
+                if (btn) btn.innerHTML = `<img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Log in with Google`;
+            });
         }
+
 
 
         async function handleShopSubmit(e) {
