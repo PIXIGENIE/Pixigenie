@@ -468,19 +468,15 @@
 
         let authTemp = { phone: '', name: '' };
 
-                        window.addEventListener('DOMContentLoaded', () => {
-            const isLoggedIn = updateUIBasedOnLogin();
-            if (!isLoggedIn) {
-                setTimeout(openAuthModal, 500); 
-            }
-
-            // ✨ FIX: Google से लॉगिन के बाद सीधा Role Selection (Step 2) पर भेजेगा ✨
+                                window.addEventListener('DOMContentLoaded', () => {
+            // 1. सबसे पहले Google का इंतज़ार करो
             auth.getRedirectResult().then(async (result) => {
                 if (result.user) {
+                    // 🌟 Google Login Successful 🌟
                     const user = result.user;
-                    const userEmailOrId = user.email || user.uid; // फ़ोन की जगह ईमेल यूज़ करेंगे
+                    const userEmailOrId = user.email || user.uid;
                     
-                    // 1. अगर पुराना कस्टमर है तो सीधा लॉगिन (बार-बार Role नहीं पूछेगा)
+                    // चेक 1: क्या पुराना कस्टमर है?
                     const custSnap = await db.collection('customers').doc(userEmailOrId).get();
                     if(custSnap.exists) {
                         const custData = custSnap.data();
@@ -491,7 +487,7 @@
                         return;
                     }
                     
-                    // 2. अगर पुराना दुकानदार है तो सीधा डैशबोर्ड 
+                    // चेक 2: क्या पुराना दुकानदार है?
                     const shopSnap = await db.collection('shops').where('phone', '==', userEmailOrId).get();
                     if(!shopSnap.empty) {
                         const shopData = shopSnap.docs[0].data();
@@ -501,16 +497,31 @@
                         return;
                     }
 
-                    // 3. ✨ अगर नया यूज़र है, तो पहला फॉर्म हटाकर सीधा Role Selection दिखाओ ✨
+                    // चेक 3: एकदम नया यूज़र है! सीधा Role Selection पर भेजो
                     authTemp.name = user.displayName || "Google User";
-                    authTemp.phone = userEmailOrId; // ईमेल को ही आईडी बना दिया
+                    authTemp.phone = userEmailOrId; 
                     authTemp.password = "google-verified";
                     
-                    openAuthModal(); // पॉपअप खोलेगा
-                    showStep('auth-step-2'); // सीधा Customer / Shop Owner वाले पेज पर ले जाएगा
+                    openAuthModal();
+                    setTimeout(() => {
+                        showStep('auth-step-2'); // पहला फॉर्म छुपाकर सीधा Step 2 दिखाओ
+                    }, 50); // छोटा सा डिले ताकि एनीमेशन स्मूथ रहे
+                    
+                } else {
+                    // ❌ अगर यूज़र Google से नहीं आया है (नॉर्मल वेबसाइट खोली है)
+                    // तब चेक करो कि क्या वो पहले से लॉगिन है या नहीं
+                    const isLoggedIn = updateUIBasedOnLogin();
+                    if (!isLoggedIn) {
+                        setTimeout(openAuthModal, 500); 
+                    }
                 }
             }).catch((error) => {
-                console.error("Google Error:", error);
+                alert("Google Login Error: " + error.message);
+                // एरर आए तब भी नॉर्मल फॉर्म खोल दो
+                const isLoggedIn = updateUIBasedOnLogin();
+                if (!isLoggedIn) {
+                    setTimeout(openAuthModal, 500); 
+                }
             });
         });
 
