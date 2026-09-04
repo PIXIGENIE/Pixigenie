@@ -120,9 +120,10 @@
                 <h3 class="text-2xl font-bold text-[#111827] mb-1">Welcome Back</h3>
                 <p class="text-[13px] text-[#6B7280] mb-6">Log in to Pixigenie to continue</p>
 
-                <button onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-[#E5E7EB] hover:bg-[#F7F7F9] text-[#111827] font-semibold h-[52px] rounded-[16px] transition-colors mb-5 active:scale-[0.98]">
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Log in with Google
-                </button>
+              <button type="button" onclick="loginWithGoogle(event)" class="w-full flex items-center justify-center gap-3 bg-white border border-[#E5E7EB] hover:bg-[#F7F7F9] text-[#111827] font-semibold h-[52px] rounded-[16px] transition-colors mb-5 active:scale-[0.98]">
+    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Log in with Google
+</button>
+
 
                 <div class="flex items-center gap-3 mb-5">
                     <div class="h-px bg-[#E5E7EB] flex-1"></div>
@@ -465,12 +466,48 @@
 
         let authTemp = { phone: '', name: '' };
 
-        window.addEventListener('DOMContentLoaded', () => {
+                window.addEventListener('DOMContentLoaded', () => {
             const isLoggedIn = updateUIBasedOnLogin();
             if (!isLoggedIn) {
                 setTimeout(openAuthModal, 500); 
             }
+
+            // ✨ FIX: Google Redirect Check ✨
+            auth.getRedirectResult().then(async (result) => {
+                if (result.user) {
+                    const user = result.user;
+                    const userEmailOrId = user.email || user.uid; 
+                    
+                    const custSnap = await db.collection('customers').doc(userEmailOrId).get();
+                    if(custSnap.exists) {
+                        const custData = custSnap.data();
+                        localStorage.setItem('pixigenie_customer_name', custData.name);
+                        localStorage.setItem('pixigenie_customer_phone', custData.phone);
+                        closeAuthModal();
+                        updateUIBasedOnLogin();
+                        return;
+                    }
+                    
+                    const shopSnap = await db.collection('shops').where('phone', '==', userEmailOrId).get();
+                    if(!shopSnap.empty) {
+                        const shopData = shopSnap.docs[0].data();
+                        localStorage.setItem('pixigenie_active_shop', shopData.shopId);
+                        localStorage.setItem('pixigenie_owner_name', shopData.ownerName);
+                        window.location.href = `dashboard.html?shop=${shopData.shopId}`;
+                        return;
+                    }
+
+                    authTemp.name = user.displayName || "Google User";
+                    authTemp.phone = userEmailOrId;
+                    authTemp.password = "google-verified";
+                    openAuthModal();
+                    showStep('auth-step-2');
+                }
+            }).catch((error) => {
+                console.error("Google Error:", error);
+            });
         });
+
 
         // 🌟 SCROLL REVEAL ANIMATION 🌟
         function initScrollAnimations() {
@@ -650,25 +687,11 @@
             }
         }
 
-                function loginWithGoogle() {
-            auth.signInWithPopup(googleProvider).then((result) => {
-                const user = result.user;
-                
-                // Google se naam liya
-                authTemp.name = user.displayName;
-                
-                // ✨ FIX: Google phone number nahi deta, isliye email ko hi ID bana diya
-                authTemp.phone = user.email || user.uid; 
-                authTemp.password = "google-verified"; // Dummy password
-                
-                // Ab role selection wale page par bhej do
-                showStep('auth-step-2');
-                
-            }).catch((error) => {
-                // Agar popup block ho ya koi error aaye toh pata chal jayega
-                alert("Google Login Error: " + error.message);
-            });
+              function loginWithGoogle(event) {
+            if (event) event.currentTarget.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Please wait...`;
+            auth.signInWithRedirect(googleProvider);
         }
+
 
         async function handleShopSubmit(e) {
             e.preventDefault();
