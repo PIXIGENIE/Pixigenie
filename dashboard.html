@@ -45,29 +45,32 @@
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
-           /* ✨ iOS Style Step Slider Animations ✨ */
+            /* ✨ iOS Style Step Slider Animations (FIXED) ✨ */
+        .step-wrapper {
+            position: relative;
+            flex: 1;
+            overflow: hidden; /* बाहर का फालतू स्क्रॉल बंद */
+            background-color: #fcfcfd;
+        }
         .step-container {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            padding: 1.5rem; /* p-6 */
+            overflow-y: auto; /* सिर्फ अंदर का कंटेंट स्क्रॉल होगा */
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            width: 100%;
+            display: flex;
+            flex-direction: column;
         }
         .step-hidden-left {
-            opacity: 0;
-            transform: translateX(-40px);
-            position: absolute;
-            pointer-events: none;
-            visibility: hidden;
+            opacity: 0; transform: translateX(-100%);
+            pointer-events: none; visibility: hidden;
         }
         .step-hidden-right {
-            opacity: 0;
-            transform: translateX(40px);
-            position: absolute;
-            pointer-events: none;
-            visibility: hidden;
+            opacity: 0; transform: translateX(100%);
+            pointer-events: none; visibility: hidden;
         }
         .step-active {
-            opacity: 1;
-            transform: translateX(0);
-            position: relative;
+            opacity: 1; transform: translateX(0);
             visibility: visible;
         }
 
@@ -75,12 +78,12 @@
 </head>
 <body class="font-sans flex h-screen overflow-hidden text-[#111827]">
 
- <!-- ✨ PREMIUM iOS SETUP MODAL ✨ -->
+<!-- ✨ PREMIUM iOS SETUP MODAL (CLEAN & FIXED) ✨ -->
 <div id="store-setup-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300">
     <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-md h-[90vh] sm:h-[85vh] flex flex-col relative overflow-hidden">
         
-        <!-- HEADER & PROGRESS BAR -->
-        <div class="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0 z-20 bg-white">
+        <!-- FIXED HEADER & PROGRESS BAR (यह अपनी जगह से नहीं हिलेगा) -->
+        <div class="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0 z-20 bg-white relative shadow-sm">
             <div class="flex items-center justify-between mb-4">
                 <button id="setup-back-btn" onclick="prevSetupStep()" class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-800 active:scale-90 transition shadow-sm border border-gray-200">
                     <i class="fas fa-arrow-left"></i>
@@ -88,7 +91,7 @@
                 <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-[14px] flex items-center justify-center text-xl shadow-sm border border-purple-100">
                     <i class="fas fa-store"></i>
                 </div>
-                <div class="w-10"></div> <!-- Placeholder for balance -->
+                <div class="w-10"></div> <!-- गैप के लिए -->
             </div>
             
             <h2 class="text-2xl font-black text-gray-900 text-center tracking-tight">Complete Your Store</h2>
@@ -103,56 +106,69 @@
             </div>
         </div>
 
-        <!-- FORM STEPS WRAPPER -->
-        <div class="flex-1 relative overflow-x-hidden overflow-y-auto custom-scrollbar p-6 bg-[#fcfcfd]">
+        <!-- STEPS WRAPPER (सिर्फ इसके अंदर की चीज़ें स्क्रॉल होंगी) -->
+        <div class="step-wrapper">
             
             <!-- STEP 1: STORE DETAILS -->
             <div id="setup-step-1" class="step-container step-active">
-                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">1. Store Details</p>
-                <div class="space-y-4">
-                    <div class="flex items-center bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden px-4 h-14">
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 shrink-0">1. Store Details</p>
+                <div class="space-y-4 mb-auto">
+                    <div class="flex items-center bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden px-4 h-14 shrink-0">
                         <i class="fas fa-store text-gray-400 mr-3"></i>
                         <input type="text" id="setup-shop-name" placeholder="Shop Name" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900">
                     </div>
-                    <div class="flex items-center bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden px-4 h-14">
+                    <div class="flex items-center bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden px-4 h-14 shrink-0">
                         <i class="fas fa-user text-gray-400 mr-3"></i>
                         <input type="text" id="setup-owner-name" placeholder="Owner Name" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900">
                     </div>
-                    <div class="bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden p-4">
+                    <div class="bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden p-4 shrink-0">
                         <div class="flex items-start">
                             <i class="fas fa-align-left text-gray-400 mr-3 mt-1"></i>
                             <textarea id="setup-desc" placeholder="Shop Description (e.g. Best grocery in town)" rows="3" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900 resize-none"></textarea>
                         </div>
                     </div>
                 </div>
-                <button type="button" onclick="nextSetupStep(2)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2">
+                <!-- यहाँ सिर्फ एक Next बटन है -->
+                <button type="button" onclick="nextSetupStep(2)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2 shrink-0">
                     Next <i class="fas fa-arrow-right text-sm"></i>
                 </button>
             </div>
 
             <!-- STEP 2: CATEGORY -->
             <div id="setup-step-2" class="step-container step-hidden-right">
-                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">2. Store Category</p>
-                            <!-- Category Grid -->
-                <div class="grid grid-cols-2 gap-3" id="category-selection">
-                    <button type="button" onclick="selectCategory(this, 'Fashion & Apparel')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Fashion & Apparel</button>
-                    <button type="button" onclick="selectCategory(this, 'Grocery & Daily Needs')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Grocery & Daily</button>
-                    <button type="button" onclick="selectCategory(this, 'Mobiles & Electronics')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Electronics & Tech</button>
-                    <button type="button" onclick="selectCategory(this, 'Health & Pharmacy')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Pharmacy & Health</button>
-                    <button type="button" onclick="selectCategory(this, 'Home & Hardware')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Home & Hardware</button>
-                    <button type="button" onclick="selectCategory(this, 'Beauty & Cosmetics')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Beauty & Makeup</button>
-                    <button type="button" onclick="selectCategory(this, 'Services & Repair')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Services & Repair</button>
-                    <button type="button" onclick="selectCategory(this, 'Toys & Stationery')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Toys & Stationery</button>
-                    <button type="button" onclick="selectCategory(this, 'Auto Parts & Garage')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Auto Parts & Garage</button>
-                    <button type="button" onclick="selectCategory(this, 'Other Categories')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Other</button>
-                </div>
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 shrink-0">2. Store Category</p>
+                <div class="mb-auto space-y-4">
+                    <div class="grid grid-cols-2 gap-3" id="category-selection">
+                        <button type="button" onclick="selectCategory(this, 'Fashion & Apparel')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Fashion & Apparel</button>
+                        <button type="button" onclick="selectCategory(this, 'Grocery & Daily Needs')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Grocery & Daily</button>
+                        <button type="button" onclick="selectCategory(this, 'Mobiles & Electronics')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Electronics & Tech</button>
+                        <button type="button" onclick="selectCategory(this, 'Health & Pharmacy')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Pharmacy & Health</button>
+                        <button type="button" onclick="selectCategory(this, 'Home & Hardware')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Home & Hardware</button>
+                        <button type="button" onclick="selectCategory(this, 'Beauty & Cosmetics')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Beauty & Makeup</button>
+                        <button type="button" onclick="selectCategory(this, 'Services & Repair')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Services & Repair</button>
+                        <button type="button" onclick="selectCategory(this, 'Toys & Stationery')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Toys & Stationery</button>
+                        <button type="button" onclick="selectCategory(this, 'Auto Parts & Garage')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Auto Parts & Garage</button>
+                        <button type="button" onclick="selectCategory(this, 'Other')" class="cat-btn py-3 px-2 border border-gray-200 bg-white rounded-xl text-[12px] font-bold text-gray-600 hover:border-purple-500 hover:text-purple-600 transition active:scale-95">Other / Misc</button>
+                    </div>
 
+                    <!-- "Other" Input Box -->
+                    <div id="other-category-container" class="hidden transition-all duration-300">
+                        <input type="text" id="other-category-input" placeholder="Type your custom category..." class="w-full bg-white rounded-2xl border border-purple-300 focus:border-purple-600 outline-none text-sm font-bold text-gray-900 px-4 py-3.5 shadow-sm">
+                    </div>
+                    
+                    <input type="hidden" id="selected-category">
+                </div>
+                
+                <button type="button" onclick="nextSetupStep(3)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2 shrink-0">
+                    Next <i class="fas fa-arrow-right text-sm"></i>
+                </button>
+            </div>
 
             <!-- STEP 3: LOCATION & FINISH -->
             <div id="setup-step-3" class="step-container step-hidden-right">
-                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">3. Store Location</p>
-                <div class="space-y-4">
-                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3">
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 shrink-0">3. Store Location</p>
+                <div class="mb-auto space-y-4">
+                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3 shrink-0">
                         <i class="fas fa-map-marker-alt text-blue-500 mt-0.5"></i>
                         <div>
                             <h4 class="text-sm font-bold text-blue-900">Add Store Address</h4>
@@ -160,12 +176,12 @@
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden p-4">
+                    <div class="bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden p-4 shrink-0">
                         <textarea id="setup-address" placeholder="Full Store Address & Landmark" rows="3" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900 resize-none"></textarea>
                     </div>
                 </div>
                 
-                <button type="button" onclick="submitFinalStore(event)" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_10px_20px_rgba(168,85,247,0.3)] flex justify-center items-center gap-2">
+                <button type="button" onclick="submitFinalStore(event)" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_10px_20px_rgba(168,85,247,0.3)] flex justify-center items-center gap-2 shrink-0">
                     Launch Store <i class="fas fa-rocket text-sm"></i>
                 </button>
             </div>
@@ -723,22 +739,37 @@
             });
         }
 
+            // 2. प्रोफाइल एडिट करने का फंक्शन (FIXED: Edit Mode Text & Data)
         function openSettings() {
             closeProfileMenuIfOpen();
             isEditMode = true;
-            const wizard = document.getElementById('setup-wizard');
+            
+            const wizard = document.getElementById('store-setup-modal');
             if (wizard) wizard.classList.remove('hidden');
             
-            if (document.getElementById('setup-title')) document.getElementById('setup-title').innerText = "Edit Store Profile";
-            if (document.getElementById('setup-desc')) document.getElementById('setup-desc').innerText = "Update your storefront details below.";
-            if (document.getElementById('setup-submit-btn')) document.getElementById('setup-submit-btn').innerHTML = "Save Changes <i class='fas fa-save'></i>";
+            // ✨ टाइटल और बटन का नाम बदल दो ताकि पता चले कि "Edit" हो रहा है
+            const h2 = document.querySelector('#store-setup-modal h2');
+            if(h2) h2.innerText = "Edit Store Profile";
+            const p = document.querySelector('#store-setup-modal p');
+            if(p) p.innerText = "Update your store details below.";
+            const btn = document.querySelector('#setup-step-3 button');
+            if(btn) btn.innerHTML = `Save Changes <i class="fas fa-save text-sm"></i>`;
+            
+            currentSetupStep = 1;
+            document.querySelectorAll('.step-container').forEach(el => el.className = 'step-container step-hidden-right');
+            const step1 = document.getElementById('setup-step-1');
+            if(step1) step1.className = 'step-container step-active';
+            
+            const prog = document.getElementById('setup-progress');
+            if(prog) prog.style.width = '33%';
+            const stepTxt = document.getElementById('setup-step-text');
+            if(stepTxt) stepTxt.innerText = 'Step 1 of 3';
 
+            // डेटाबेस से पुरानी डिटेल्स फॉर्म में भर दो
             if (document.getElementById('setup-shop-name')) document.getElementById('setup-shop-name').value = globalShopData.shopName || '';
             if (document.getElementById('setup-owner-name')) document.getElementById('setup-owner-name').value = globalShopData.ownerName || '';
             if (document.getElementById('setup-address')) document.getElementById('setup-address').value = globalShopData.address || '';
-            if (document.getElementById('setup-landmark')) document.getElementById('setup-landmark').value = globalShopData.landmark || '';
-            if (document.getElementById('setup-shop-desc')) document.getElementById('setup-shop-desc').value = globalShopData.description || '';
-
+            if (document.getElementById('setup-desc')) document.getElementById('setup-desc').value = globalShopData.description || '';
 
             const existingCat = globalShopData.category || '';
             let foundMatch = false;
@@ -748,12 +779,15 @@
                     foundMatch = true; 
                 }
             });
+            
+            // अगर Other केटेगरी थी, तो बॉक्स खोलकर नाम भर दो
             if (!foundMatch && existingCat) {
                 const otherBtn = document.querySelector(`button[onclick="selectCategory(this, 'Other')"]`);
                 if (otherBtn) selectCategory(otherBtn, 'Other');
-                if (document.getElementById('custom-category-input')) document.getElementById('custom-category-input').value = existingCat;
+                if (document.getElementById('other-category-input')) document.getElementById('other-category-input').value = existingCat;
             }
         }
+
 
         function closeSettings() { 
             if(isEditMode) {
@@ -835,31 +869,51 @@
 
         function enterDashboard() { document.getElementById('congrats-screen').classList.add('hidden'); loadShopData(); }
 
-        // ==========================================
-        // 2. LOAD DATA & AUTO-MONTH LOGIC
-        // ==========================================
+           // 1. लोड डेटा फंक्शन (FIXED: बार-बार सेटअप आना बंद)
         async function loadShopData() {
             try {
                 const doc = await db.collection('shops').doc(currentShopId).get();
                 if (doc.exists) {
                     globalShopData = doc.data();
-                    if (!globalShopData.setupCompleted) {
-                        isEditMode = false; document.getElementById('main-dashboard').classList.add('hidden');
-                        document.getElementById('setup-wizard').classList.remove('hidden');
-                        document.getElementById('setup-shop-name').value = globalShopData.shopName;
-                        document.getElementById('setup-owner-name').value = globalShopData.ownerName;
-                        document.getElementById('setup-title').innerText = "Complete Your Store";
-                        document.getElementById('setup-desc').innerText = "Let's set up your storefront so customers can find and order from you easily.";
-                        document.getElementById('setup-submit-btn').innerHTML = "Launch Store <i class='fas fa-rocket text-sm'></i>";
+                    
+                    // ✨ जादुई फिक्स: अगर दुकान का नाम पहले से सेव है, तो बार-बार सेटअप मत पूछो!
+                    if (!globalShopData.shopName || !globalShopData.category) {
+                        isEditMode = false;
+                        document.getElementById('main-dashboard')?.classList.add('hidden');
+                        
+                        const wizard = document.getElementById('store-setup-modal');
+                        if (wizard) wizard.classList.remove('hidden');
+
+                        // नया स्टोर बनाते वक़्त टाइटल सेट करो
+                        const h2 = document.querySelector('#store-setup-modal h2');
+                        if(h2) h2.innerText = "Complete Your Store";
+                        const p = document.querySelector('#store-setup-modal p');
+                        if(p) p.innerText = "Let's set up your storefront easily.";
+                        const btn = document.querySelector('#setup-step-3 button');
+                        if(btn) btn.innerHTML = `Launch Store <i class="fas fa-rocket text-sm"></i>`;
+                        
+                        // पुरानी डिटेल्स भर दो
+                        if(document.getElementById('setup-shop-name')) document.getElementById('setup-shop-name').value = globalShopData.shopName || '';
+                        if(document.getElementById('setup-owner-name')) document.getElementById('setup-owner-name').value = globalShopData.ownerName || '';
+                        if(document.getElementById('setup-desc')) document.getElementById('setup-desc').value = globalShopData.description || '';
+                        if(document.getElementById('setup-address')) document.getElementById('setup-address').value = globalShopData.address || '';
+                        
                         return;
                     }
-                    document.getElementById('main-dashboard').classList.remove('hidden');
+                    
+                    // सब कुछ सही है तो सीधा डैशबोर्ड दिखाओ
+                    document.getElementById('main-dashboard')?.classList.remove('hidden');
                     document.getElementById('store-name-display').innerText = globalShopData.shopName;
                     document.getElementById('menu-owner-name').innerText = globalShopData.ownerName;
                     
                     fetchFirebaseData(); 
-                } else { alert("Store not found! Please register again."); logout(); }
-            } catch (error) { console.error("Error loading store:", error); }
+                } else { 
+                    alert("Store not found! Please register again."); 
+                    logout(); 
+                }
+            } catch (error) { 
+                console.error("Error loading store:", error); 
+            }
         }
 
         async function fetchFirebaseData() {
@@ -1729,131 +1783,175 @@
                 window.location.href = "index.html"; 
             } 
         }
-          let currentSetupStep = 1;
+         let currentSetupStep = 1;
         const totalSetupSteps = 3;
 
-        // केटेगरी सिलेक्ट करने का इफ़ेक्ट
+        // 1. कैटेगरी सेलेक्ट करने का फंक्शन
         function selectCategory(btnElement, categoryName) {
-            // Remove active class from all buttons
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.classList.remove('bg-purple-50', 'border-purple-500', 'text-purple-700');
                 btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
             });
-            // Add active class to clicked button
             btnElement.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
             btnElement.classList.add('bg-purple-50', 'border-purple-500', 'text-purple-700');
             
             document.getElementById('selected-category').value = categoryName;
+
+            // अगर Other सेलेक्ट किया है तो Box दिखाओ
+            const otherContainer = document.getElementById('other-category-container');
+            if (categoryName === 'Other') {
+                otherContainer.classList.remove('hidden');
+                setTimeout(() => document.getElementById('other-category-input').focus(), 100);
+            } else {
+                otherContainer.classList.add('hidden');
+                document.getElementById('other-category-input').value = '';
+            }
         }
 
+        // 2. Next दबाने पर चेकिंग 
         function nextSetupStep(stepNumber) {
-            // Validation: अगर डिटेल्स नहीं भरी हैं तो आगे मत जाने दो
             if (currentSetupStep === 1) {
                 if (!document.getElementById('setup-shop-name').value.trim()) {
                     alert("Please enter Shop Name"); return;
                 }
             } else if (currentSetupStep === 2) {
-                if (!document.getElementById('selected-category').value) {
+                const selectedCat = document.getElementById('selected-category').value;
+                if (!selectedCat) {
                     alert("Please select a Store Category"); return;
                 }
+                if (selectedCat === 'Other') {
+                    if (!document.getElementById('other-category-input').value.trim()) {
+                        alert("Please type your custom category name!"); return;
+                    }
+                }
             }
-
             goToStep(stepNumber);
         }
 
+        // 3. Back बटन का फंक्शन
         function prevSetupStep() {
             if (currentSetupStep > 1) {
                 goToStep(currentSetupStep - 1);
             } else {
-                // अगर Step 1 पर बैक दबाया, तो मॉडल बंद कर दो 
-                // (या अपनी ज़रुरत के हिसाब से होम पेज पर भेज दो)
                 document.getElementById('store-setup-modal').classList.add('hidden');
             }
         }
 
+        // 4. स्टेप बदलने और स्लाइड करने का जादुई फंक्शन (यही मिसिंग था!)
         function goToStep(targetStep) {
             const currentEl = document.getElementById(`setup-step-${currentSetupStep}`);
             const targetEl = document.getElementById(`setup-step-${targetStep}`);
             
-            // Animation Classes
             if (targetStep > currentSetupStep) {
-                currentEl.className = 'step-container step-hidden-left'; // Move left
+                currentEl.className = 'step-container step-hidden-left';
             } else {
-                currentEl.className = 'step-container step-hidden-right'; // Move right
+                currentEl.className = 'step-container step-hidden-right';
             }
             
-            targetEl.className = 'step-container step-active'; // Show new
+            targetEl.className = 'step-container step-active';
             currentSetupStep = targetStep;
 
-            // Update Progress Bar (33%, 66%, 100%)
             const progressPercent = (currentSetupStep / totalSetupSteps) * 100;
             document.getElementById('setup-progress').style.width = `${progressPercent}%`;
             document.getElementById('setup-step-text').innerText = `Step ${currentSetupStep} of ${totalSetupSteps}`;
         }
 
-        // Final Submit Button
-                async function submitFinalStore(event) {
+                   // 4. फाइनल सबमिट फंक्शन (FIXED: authTemp Crash & setupCompleted save)
+        async function submitFinalStore(event) {
+            // Safe Variables
+            const tempName = (typeof authTemp !== 'undefined' && authTemp.name) ? authTemp.name : "";
+            const tempPhone = (typeof authTemp !== 'undefined' && authTemp.phone) ? authTemp.phone : "Unknown";
+            const tempPass = (typeof authTemp !== 'undefined' && authTemp.password) ? authTemp.password : "google-verified";
+
             const shopName = document.getElementById('setup-shop-name').value.trim();
-            const ownerName = document.getElementById('setup-owner-name').value.trim() || authTemp.name;
+            const ownerName = document.getElementById('setup-owner-name').value.trim() || tempName || "Store Owner";
             const desc = document.getElementById('setup-desc').value.trim();
-            const category = document.getElementById('selected-category').value;
+            let category = document.getElementById('selected-category').value;
             const address = document.getElementById('setup-address').value.trim();
             
-            if(!address) {
-                alert("Please add store address!"); return;
+            if(category === 'Other') {
+                category = document.getElementById('other-category-input').value.trim();
             }
+
+            if(!address) { alert("Please add store address!"); return; }
             
-            // बटन को लोडिंग स्टेट में डालो (Launch Store बटन)
             const btn = event ? event.currentTarget : document.querySelector('#setup-step-3 button');
             const origHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Launching...`;
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> ${isEditMode ? 'Saving...' : 'Launching...'}`;
             btn.disabled = true;
 
-            // दुकान का यूनिक ID (Slug) बनाना
-            const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
-            
-            const newShopData = { 
-                shopId: shopSlug, 
-                shopName: shopName, 
-                ownerName: ownerName, 
-                description: desc,
-                category: category,
-                address: address,
-                phone: authTemp.phone || "Unknown", 
-                password: authTemp.password || "google-verified", 
-                status: "active", 
-                createdAt: firebase.firestore.FieldValue.serverTimestamp() 
-            };
-            
             try {
-                // 1. Firebase में स्टोर सेव करना
-                await db.collection('shops').doc(shopSlug).set(newShopData);
-                localStorage.setItem('pixigenie_active_shop', shopSlug);
-                localStorage.setItem('pixigenie_owner_name', ownerName);
-                
-                // 2. Setup वाला Modal बंद करना
-                document.getElementById('store-setup-modal').classList.add('hidden');
-                
-                // 3. नया iOS Success Modal खोलना
-                const successModal = document.getElementById('store-success-modal');
-                const successContent = document.getElementById('store-success-content');
-                successModal.classList.remove('hidden');
-                setTimeout(() => {
-                    successContent.classList.remove('scale-90', 'opacity-0');
-                    successContent.classList.add('scale-100', 'opacity-100');
-                }, 10);
+                if (isEditMode) {
+                    // अगर प्रोफाइल एडिट कर रहे हैं
+                    await db.collection('shops').doc(currentShopId).update({
+                        shopName: shopName, 
+                        ownerName: ownerName,
+                        description: desc,
+                        category: category,
+                        address: address,
+                        setupCompleted: true
+                    });
+                    
+                    globalShopData.shopName = shopName;
+                    globalShopData.ownerName = ownerName;
+                    globalShopData.description = desc;
+                    globalShopData.category = category;
+                    globalShopData.address = address;
+                    globalShopData.setupCompleted = true;
+                    
+                    localStorage.setItem('pixigenie_owner_name', ownerName);
+                    
+                    const wizard = document.getElementById('store-setup-modal');
+                    if (wizard) wizard.classList.add('hidden');
+                    
+                    document.getElementById('store-name-display').innerText = shopName;
+                    document.getElementById('menu-owner-name').innerText = ownerName;
+                    
+                    alert("Store details updated successfully!");
+                } else {
+                    // अगर एकदम नया स्टोर बना रहे हैं
+                    const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
+                    
+                    const newShopData = { 
+                        shopId: shopSlug, 
+                        shopName: shopName, 
+                        ownerName: ownerName, 
+                        description: desc,
+                        category: category,
+                        address: address,
+                        phone: tempPhone, 
+                        password: tempPass, 
+                        status: "active", 
+                        setupCompleted: true, // ✨ यह मिसिंग था
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+                    };
+                    
+                    await db.collection('shops').doc(shopSlug).set(newShopData);
+                    localStorage.setItem('pixigenie_active_shop', shopSlug);
+                    localStorage.setItem('pixigenie_owner_name', ownerName);
+                    
+                    document.getElementById('store-setup-modal').classList.add('hidden');
+                    
+                    const successModal = document.getElementById('store-success-modal');
+                    const successContent = document.getElementById('store-success-content');
+                    if(successModal) successModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        if(successContent) {
+                            successContent.classList.remove('scale-90', 'opacity-0');
+                            successContent.classList.add('scale-100', 'opacity-100');
+                        }
+                    }, 10);
 
-                // 4. 2 सेकंड बाद सीधा डैशबोर्ड पर Redirect करना
-                setTimeout(() => {
-                    window.location.href = `dashboard.html?shop=${shopSlug}`;
-                }, 2000);
-
+                    setTimeout(() => { window.location.href = `dashboard.html?shop=${shopSlug}`; }, 2000);
+                }
             } catch (error) { 
-                alert("Error launching store: " + error.message); 
+                alert("Error: " + error.message); 
+            } finally {
                 btn.innerHTML = origHtml; 
                 btn.disabled = false; 
             }
         }
+
 
    
     </script>
