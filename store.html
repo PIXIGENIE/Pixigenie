@@ -134,15 +134,8 @@
             </div>
             <div id="my-review-container" class="hidden mb-6 bg-purple-50/50 border border-purple-100/50 rounded-[20px] p-5 relative"></div>
             <div id="review-form-container" class="mb-8 hidden transition-all duration-300"></div>
-            <div id="logged-out-review-box" class="text-center py-8 bg-[#F7F7F9] rounded-[20px] border border-[#E5E7EB] mb-6">
-    <div class="w-12 h-12 bg-white text-[#9CA3AF] rounded-full flex items-center justify-center text-xl mx-auto mb-3 shadow-sm border border-[#E5E7EB]">
-        <i class="fas fa-lock"></i>
-    </div>
-    <p class="text-sm font-bold text-[#6B7280] mb-4">Log in to shop & post reviews</p>
-    <button onclick="goToCustomerLogin()" class="bg-[#111827] text-white font-bold py-3 px-8 rounded-xl text-sm active:scale-95 transition shadow-md">
-        Login / Sign Up
-    </button>
-</div>
+            
+ 
             <div id="reviews-list" class="space-y-4"><p class="text-center text-sm text-gray-400 py-4 font-semibold"><i class="fas fa-circle-notch fa-spin"></i> Loading reviews...</p></div>
             <button id="load-more-reviews-btn" onclick="loadReviews(true)" class="w-full mt-6 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-3.5 rounded-[16px] text-sm transition hidden active:scale-95">Load More</button>
         </div>
@@ -515,10 +508,22 @@
             const myReviewContainer = document.getElementById('my-review-container');
             
             if (!customerName || !customerPhone) {
-                formContainer.innerHTML = `<div class="bg-gray-50 p-5 rounded-[20px] text-center"><i class="fas fa-lock text-gray-300 text-2xl mb-2"></i><p class="text-[13px] font-bold text-gray-500">Log in as a customer to review</p></div>`;
-                formContainer.classList.remove('hidden'); myReviewContainer.classList.add('hidden'); return;
+                // ✨ जादुई लाइन: flex, items-center और mx-auto से ये एकदम सेंटर में आ जाएगा ✨
+                formContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center text-center py-8 bg-[#F7F7F9] rounded-[20px] border border-[#E5E7EB] mb-2 w-full">
+                        <div class="w-12 h-12 bg-white text-[#9CA3AF] rounded-full flex items-center justify-center text-xl mb-3 shadow-sm border border-[#E5E7EB]">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <p class="text-sm font-bold text-[#6B7280] mb-4">Log in as a customer to shop & post reviews</p>
+                        <button onclick="goToCustomerLogin()" class="mx-auto bg-[#111827] text-white font-bold py-3 px-8 rounded-xl text-sm active:scale-95 transition shadow-md">
+                            Login / Sign Up
+                        </button>
+                    </div>
+                `;
+                formContainer.classList.remove('hidden'); 
+                myReviewContainer.classList.add('hidden'); 
+                return;
             }
-
             try {
                 const doc = await db.collection('shops').doc(currentShopId).collection('reviews').doc(customerPhone).get();
                 if (doc.exists) {
