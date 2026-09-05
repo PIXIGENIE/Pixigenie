@@ -60,7 +60,21 @@
                 <div class="relative shrink-0">
                     <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 p-[3px] shadow-sm">
                         <div class="w-full h-full bg-white rounded-full p-0.5">
-                            <div id="shop-avatar-placeholder" class="w-full h-full bg-gray-50 rounded-full flex items-center justify-center text-gray-300 text-3xl"><i class="fas fa-store"></i></div>
+                         <!-- ✨ NAYA: Clickable Store Logo Upload ✨ -->
+<label class="relative w-full h-full bg-gray-50 rounded-full flex items-center justify-center text-gray-300 text-3xl cursor-pointer overflow-hidden group">
+    <i id="shop-avatar-icon" class="fas fa-store"></i>
+    <!-- यहाँ अपलोड की हुई फोटो दिखेगी -->
+    <img id="shop-avatar-img" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+    
+    <!-- होवर करने पर कैमरे का आइकॉन दिखेगा -->
+    <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center z-20 transition-all">
+        <i class="fas fa-camera text-white text-xl"></i>
+    </div>
+    
+    <!-- असली फाइल इनपुट -->
+    <input type="file" accept="image/*" class="hidden" onchange="uploadStoreLogo(event)">
+</label>
+
                         </div>
                     </div>
                 </div>
@@ -340,9 +354,18 @@
                     fullDesc = (shopData.description && shopData.description.trim() !== "") ? shopData.description : "Store description not provided.";
                     renderDescription();
 
-                    if (shopData.profileImage) {
-                        document.getElementById('shop-avatar-placeholder').innerHTML = `<img src="${shopData.profileImage}" class="w-full h-full rounded-full object-cover">`;
+                                       // ✨ NAYA: Load Store Logo ✨
+                    if (shopData.storeLogo || shopData.profileImage) {
+                        const logoUrl = shopData.storeLogo || shopData.profileImage;
+                        const imgEl = document.getElementById('shop-avatar-img');
+                        const iconEl = document.getElementById('shop-avatar-icon');
+                        if (imgEl && iconEl) {
+                            imgEl.src = logoUrl;
+                            imgEl.classList.remove('hidden');
+                            iconEl.style.display = 'none';
+                        }
                     }
+
 
                     const loggedInOwner = localStorage.getItem('pixigenie_active_shop');
                     if (loggedInOwner !== currentShopId) {
@@ -1040,6 +1063,61 @@
                 return false;
             }
             return true;
+        }
+        // ✨ NAYA: Store Logo Upload & Save Function ✨
+        async function uploadStoreLogo(event) {
+            // सिक्यूरिटी: सिर्फ दुकान का मालिक ही फोटो बदल सकता है
+            const loggedInOwner = localStorage.getItem('pixigenie_active_shop');
+            if (loggedInOwner !== currentShopId) {
+                alert("⚠️ Only the store owner can change this logo!");
+                return;
+            }
+
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const iconEl = document.getElementById('shop-avatar-icon');
+            const imgEl = document.getElementById('shop-avatar-img');
+            
+            iconEl.className = 'fas fa-spinner fa-spin text-gray-400 text-2xl'; 
+            imgEl.classList.add('hidden');
+            iconEl.style.display = 'block';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = async function() {
+                    // फोटो को 200px में Compress करना
+                    const canvas = document.createElement('canvas');
+                    let size = 200; 
+                    let w = img.width, h = img.height;
+                    
+                    if (w > h) { h = Math.round((h * size) / w); w = size; } 
+                    else { w = Math.round((w * size) / h); h = size; }
+                    
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+
+                    // तुरंत स्क्रीन पर दिखाओ
+                    imgEl.src = base64Image;
+                    imgEl.classList.remove('hidden');
+                    iconEl.style.display = 'none';
+
+                    try {
+                        // Firebase में storeLogo के नाम से सेव करो
+                        await db.collection('shops').doc(currentShopId).update({ storeLogo: base64Image });
+                        alert("Store Logo Updated Successfully! 🎉");
+                    } catch (err) {
+                        alert("Error saving image: " + err.message);
+                        iconEl.className = 'fas fa-store';
+                        iconEl.style.display = 'block';
+                        imgEl.classList.add('hidden');
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
     </script>
