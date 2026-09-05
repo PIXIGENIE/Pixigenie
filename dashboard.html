@@ -376,13 +376,14 @@
                             </div>
                         </div>
 
-                        <!-- ✨ TAB 2: INVENTORY ✨ -->
+                                         <!-- ✨ TAB 2: INVENTORY ✨ -->
                         <div id="tab-inventory" class="tab-content hidden space-y-8">
                             <div class="ios-card p-6 sm:p-8 border border-[#E5E7EB]">
                                 <div class="flex items-center gap-3 mb-6">
                                     <div class="w-10 h-10 bg-[#FEF3C7] text-[#D97706] rounded-[12px] flex items-center justify-center"><i class="fas fa-box-open"></i></div>
                                     <h3 class="text-xl font-bold text-[#111827]">Inventory</h3>
                                 </div>
+                                
                                 <form onsubmit="addProduct(event)" class="flex flex-col gap-3 mb-8 bg-[#F7F7F9] p-4 rounded-[20px] border border-[#E5E7EB]">
                                     <div class="flex flex-col sm:flex-row gap-3">
                                         <input type="text" id="prod-name" placeholder="Product Name (e.g. Amul Milk)" required class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] px-4 h-11 text-sm font-semibold outline-none focus:border-[#A855F7] transition">
@@ -405,21 +406,16 @@
                                             <button type="submit" class="bg-[#111827] text-white font-bold px-5 h-11 rounded-[12px] active:scale-95 transition flex justify-center items-center gap-1.5 shrink-0 text-[13px] shadow-md">Add <i class="fas fa-plus text-[10px]"></i></button>
                                         </div>
                                     </div>
-                                                                           <button type="submit" class="...">Add <i class="fas fa-plus text-[10px]"></i></button>
-                                        </div>
-                                    </div>
                                     
-                                    <!-- ✨ NEW: WhatsApp Upload Tip (यहाँ पेस्ट कर) ✨ -->
-                                    <div class="bg-blue-50 border border-blue-100 rounded-[12px] p-3 mt-2">
+                                    <!-- ✨ NEW: WhatsApp Upload Tip (PERFECTLY PLACED) ✨ -->
+                                    <div class="bg-blue-50 border border-blue-100 rounded-[12px] p-3 mt-1">
                                         <p class="text-[11px] text-blue-800 font-medium leading-relaxed">
                                             <i class="fas fa-lightbulb text-blue-600 mr-1.5 text-xs"></i> 
-                                            <strong>Solution:</strong> Agar image upload hone me time lag raha hai ya loading atak rahi hai, toh us photo ko pehle kisi ko <strong>WhatsApp par bhejein</strong>, phir wahan se download karke yahan upload karein. (Isse photo ka size chota ho jayega aur wo turant upload ho jayegi!)
+                                            <strong>Solution:</strong> Agar image upload hone me time lag raha hai, toh us photo ko pehle kisi ko <strong>WhatsApp par bhejein</strong>, phir wahan se download karke yahan upload karein. (Isse photo ka size chota ho jayega aur wo turant upload ho jayegi!)
                                         </p>
                                     </div>
+                                </form>
 
-                                </form> <!-- फॉर्म यहाँ बंद हो रहा है -->
-
-                                
                                 <div class="flex justify-between items-center border-b border-[#E5E7EB] pb-2 mb-4">
                                     <h4 class="text-[11px] text-[#6B7280] uppercase tracking-wider font-bold">Your Products</h4>
                                     <span id="inventory-count" class="text-xs font-bold text-[#D97706] bg-[#FEF3C7] px-2 py-0.5 rounded-full">0</span>
