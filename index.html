@@ -548,8 +548,7 @@
             const customerName = localStorage.getItem('pixigenie_customer_name');
             if (!activeShop && !customerName) openAuthModal();
         }
-
-        // ✨ 1. LOGIN LOGIC (No Name Needed)
+        // ✨ 1. LOGIN LOGIC (Photo Fetch Update)
         async function handleLoginSubmit(e) {
             e.preventDefault();
             const phone = document.getElementById('login-phone').value.trim();
@@ -560,22 +559,23 @@
             btn.disabled = true;
 
             try {
-                           // Check Shop
+                // Check Shop
                 const shopSnap = await db.collection('shops').where('phone', '==', phone).get();
                 if (!shopSnap.empty) {
                     const shopData = shopSnap.docs[0].data();
                     if (shopData.password === password) {
                         localStorage.setItem('pixigenie_active_shop', shopData.shopId);
                         localStorage.setItem('pixigenie_owner_name', shopData.ownerName);
-                        
-                        // ✨ NAYA: मर्चेंट का फ़ोन भी सेव करो ✨
                         localStorage.setItem('pixigenie_customer_phone', shopData.phone);
+                        
+                        // ✨ NAYA: Firebase se wapas photo load karo ✨
+                        if (shopData.storeLogo) {
+                            localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
+                        }
                         
                         window.location.href = `dashboard.html?shop=${shopData.shopId}`;
                         return;
-                    } 
-
- else {
+                    } else {
                         alert("⚠️ Incorrect Password for Shop Account!");
                         btn.innerHTML = `Log in <i class="fas fa-arrow-right text-xs"></i>`;
                         btn.disabled = false; return;
@@ -589,6 +589,12 @@
                     if (custData.password === password) {
                         localStorage.setItem('pixigenie_customer_name', custData.name);
                         localStorage.setItem('pixigenie_customer_phone', custData.phone);
+                        
+                        // ✨ NAYA: Firebase se wapas photo load karo ✨
+                        if (custData.profileImage) {
+                            localStorage.setItem('pixigenie_profile_img', custData.profileImage);
+                        }
+                        
                         closeAuthModal(); 
                         updateUIBasedOnLogin();
                         return;
@@ -662,7 +668,8 @@
             }
         }
 
-                          function loginWithGoogle(event) {
+                            // ✨ GOOGLE LOGIN LOGIC (Photo Fetch Update)
+        function loginWithGoogle(event) {
             const btn = event ? event.currentTarget : null;
             if (btn) btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Please wait...`;
             
@@ -676,25 +683,33 @@
                     const custData = custSnap.data();
                     localStorage.setItem('pixigenie_customer_name', custData.name);
                     localStorage.setItem('pixigenie_customer_phone', custData.phone);
+                    
+                    // ✨ NAYA: Firebase se wapas photo load karo ✨
+                    if (custData.profileImage) {
+                        localStorage.setItem('pixigenie_profile_img', custData.profileImage);
+                    }
+                    
                     closeAuthModal();
                     updateUIBasedOnLogin();
                     return;
                 }
                 
-                              // 2. अगर पुराना दुकानदार है तो सीधा डैशबोर्ड 
+                // 2. अगर पुराना दुकानदार है तो सीधा डैशबोर्ड 
                 const shopSnap = await db.collection('shops').where('phone', '==', userEmailOrId).get();
                 if(!shopSnap.empty) {
                     const shopData = shopSnap.docs[0].data();
                     localStorage.setItem('pixigenie_active_shop', shopData.shopId);
                     localStorage.setItem('pixigenie_owner_name', shopData.ownerName);
-                    
-                    // ✨ NAYA: मर्चेंट का ईमेल/फ़ोन भी सेव करो ✨
                     localStorage.setItem('pixigenie_customer_phone', shopData.phone || userEmailOrId);
+                    
+                    // ✨ NAYA: Firebase se wapas photo load karo ✨
+                    if (shopData.storeLogo) {
+                        localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
+                    }
                     
                     window.location.href = `dashboard.html?shop=${shopData.shopId}`;
                     return;
                 }
-
 
                 // 3. ✨ अगर नया यूज़र है, तो पहला फॉर्म हटाकर सीधा Role Selection दिखाओ ✨
                 authTemp.name = user.displayName || "Google User";
