@@ -1642,33 +1642,44 @@
             );
         }
 
-           // ✨ PROFILE MODAL TOGGLE & DATA BINDING ✨
+               // ✨ PROFILE MODAL TOGGLE & DATA BINDING ✨
         function toggleProfileModal() {
             const modal = document.getElementById('ios-profile-modal');
             const content = document.getElementById('ios-profile-content');
             
-            // पुराने ड्रॉपडाउन को बंद कर दो (अगर खुला हो)
             const oldDropdown = document.getElementById('profile-dropdown'); 
             if(oldDropdown) oldDropdown.classList.add('hidden');
 
             if (modal.classList.contains('hidden')) {
                 // बेसिक डेटा लोड करो
-                const name = localStorage.getItem('pixigenie_customer_name') || 'Customer';
-                const phone = localStorage.getItem('pixigenie_customer_phone') || 'N/A';
-                const email = localStorage.getItem('pixigenie_customer_email'); // अगर Google से लॉगिन है
+                const name = localStorage.getItem('pixigenie_customer_name') || localStorage.getItem('pixigenie_owner_name') || 'Customer';
+                const phoneStr = localStorage.getItem('pixigenie_customer_phone') || 'N/A'; 
+                const activeShop = localStorage.getItem('pixigenie_active_shop'); // मर्चेंट चेक करने के लिए
+                
+                // चेक करो कि ये ईमेल है या फ़ोन नंबर
+                const isEmail = phoneStr.includes('@');
 
                 document.getElementById('prof-name').innerText = name;
-                document.getElementById('prof-phone').innerText = '+91 ' + phone;
                 document.getElementById('prof-initial').innerText = name.charAt(0).toUpperCase();
 
-                if (email) {
-                    const emailEl = document.getElementById('prof-email');
-                    emailEl.innerText = email; emailEl.classList.remove('hidden');
+                // 1. अगर ईमेल है तो +91 मत लगाओ
+                if (isEmail) {
+                    document.getElementById('prof-phone').innerText = phoneStr;
+                } else {
+                    document.getElementById('prof-phone').innerText = phoneStr !== 'N/A' ? '+91 ' + phoneStr : 'N/A';
                 }
 
-                // सेव्ड एड्रेस डेटा लोड करो (ताकि एडिट किया जा सके)
+                // 2. मर्चेंट डैशबोर्ड बटन सिर्फ दुकानदारों को दिखाओ
+                const merchantBtn = document.getElementById('prof-merchant-btn');
+                if (activeShop) {
+                    merchantBtn.classList.remove('hidden');
+                } else {
+                    merchantBtn.classList.add('hidden');
+                }
+
+                // 3. सेव्ड एड्रेस डेटा लोड करो (अगर ईमेल है तो फ़ोन नंबर खाली छोड़ दो)
                 document.getElementById('saved-name').value = localStorage.getItem('pixigenie_saved_name') || name;
-                document.getElementById('saved-phone').value = localStorage.getItem('pixigenie_saved_phone') || phone;
+                document.getElementById('saved-phone').value = localStorage.getItem('pixigenie_saved_phone') || (isEmail ? '' : phoneStr);
                 document.getElementById('saved-landmark').value = localStorage.getItem('pixigenie_saved_landmark') || '';
                 document.getElementById('saved-address').value = localStorage.getItem('pixigenie_saved_address') || '';
 
@@ -1678,7 +1689,7 @@
                     modal.classList.remove('opacity-0'); 
                     content.classList.remove('translate-y-full', 'sm:scale-95'); 
                 }, 10);
-                document.body.style.overflow = 'hidden'; // पीछे का पेज स्क्रॉल होना बंद
+                document.body.style.overflow = 'hidden'; 
             } else {
                 // मॉडल बंद करो
                 modal.classList.add('opacity-0'); 
@@ -1749,10 +1760,11 @@
                     </div>
                 </div>
 
-                <!-- Dashboard Button -->
-                <button onclick="window.location.href='dashboard.html'" class="w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm">
+                           <!-- Dashboard Button -->
+                <button id="prof-merchant-btn" onclick="window.location.href='dashboard.html'" class="hidden w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm mb-4">
                     <i class="fas fa-store"></i> Merchant Dashboard
                 </button>
+
 
                 <!-- Saved Address Section -->
                 <div>
