@@ -547,6 +547,7 @@
             const activeShop = localStorage.getItem('pixigenie_active_shop');
             const customerName = localStorage.getItem('pixigenie_customer_name');
             if (!activeShop && !customerName) openAuthModal();
+            else toggleProfileModal(); // ⚡ NAYA: Modal open karega agar login hai
         }
 
         // ✨ 1. LOGIN LOGIC (No Name Needed)
@@ -567,10 +568,7 @@
                     if (shopData.password === password) {
                         localStorage.setItem('pixigenie_active_shop', shopData.shopId);
                         localStorage.setItem('pixigenie_owner_name', shopData.ownerName);
-                        
-                        // ✨ NAYA: मर्चेंट का फ़ोन भी सेव करो ✨
                         localStorage.setItem('pixigenie_customer_phone', shopData.phone);
-                        
                         window.location.href = `dashboard.html?shop=${shopData.shopId}`;
                         return;
                     } 
@@ -676,6 +674,15 @@
                     const custData = custSnap.data();
                     localStorage.setItem('pixigenie_customer_name', custData.name);
                     localStorage.setItem('pixigenie_customer_phone', custData.phone);
+                    
+                    // ⚡ IMAGE SET ⚡
+                    if (custData.profileImage) {
+                        localStorage.setItem('pixigenie_profile_img', custData.profileImage);
+                    } else if (user.photoURL) {
+                        localStorage.setItem('pixigenie_profile_img', user.photoURL);
+                        db.collection('customers').doc(userEmailOrId).update({ profileImage: user.photoURL });
+                    }
+                    
                     closeAuthModal();
                     updateUIBasedOnLogin();
                     return;
@@ -687,21 +694,30 @@
                     const shopData = shopSnap.docs[0].data();
                     localStorage.setItem('pixigenie_active_shop', shopData.shopId);
                     localStorage.setItem('pixigenie_owner_name', shopData.ownerName);
-                    
-                    // ✨ NAYA: मर्चेंट का ईमेल/फ़ोन भी सेव करो ✨
                     localStorage.setItem('pixigenie_customer_phone', shopData.phone || userEmailOrId);
                     
+                    // ⚡ IMAGE SET ⚡
+                    if (shopData.storeLogo) {
+                        localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
+                    } else if (user.photoURL) {
+                        localStorage.setItem('pixigenie_profile_img', user.photoURL);
+                        db.collection('shops').doc(shopData.shopId).update({ storeLogo: user.photoURL });
+                    }
+
                     window.location.href = `dashboard.html?shop=${shopData.shopId}`;
                     return;
                 }
-
 
                 // 3. ✨ अगर नया यूज़र है, तो पहला फॉर्म हटाकर सीधा Role Selection दिखाओ ✨
                 authTemp.name = user.displayName || "Google User";
                 authTemp.phone = userEmailOrId; 
                 authTemp.password = "google-verified";
                 
-                showStep('auth-step-2'); // सीधा Customer / Shop Owner वाले पेज पर ले जाएगा
+                if(user.photoURL) {
+                    localStorage.setItem('pixigenie_profile_img', user.photoURL);
+                }
+                
+                showStep('auth-step-2'); 
 
             }).catch((error) => {
                 console.error(error);
@@ -720,6 +736,7 @@
             btn.disabled = true;
 
             const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
+            
             const newShopData = { 
                 shopId: shopSlug, 
                 shopName: shopName, 
@@ -729,6 +746,9 @@
                 status: "active", 
                 createdAt: firebase.firestore.FieldValue.serverTimestamp() 
             };
+            
+            let photo = localStorage.getItem('pixigenie_profile_img');
+            if (photo) newShopData.storeLogo = photo;
             
             try {
                 await db.collection('shops').doc(shopSlug).set(newShopData);
@@ -799,6 +819,7 @@
             const authContainer = document.getElementById('auth-container');
             const heroContent = document.getElementById('hero-content');
             const searchInput = document.getElementById('search-input');
+            const savedImg = localStorage.getItem('pixigenie_profile_img');
 
             // --- 🍎 CUSTOMER "WHY CHOOSE US" SECTION 🍎 ---
             const customerWhyChooseUsSection = `
@@ -887,156 +908,122 @@
                 </div>
             `;
 
-            if (activeShop) {
-                // 🔹 SHOP OWNER
-                const initials = getInitials(shopOwnerName || 'My Store');
+            if (activeShop || customerName) {
+                const name = activeShop ? shopOwnerName || 'My Store' : customerName;
+                const initials = getInitials(name);
                 
-                authContainer.innerHTML = `
-                    <button onclick="toggleProfileModal()()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide">${initials}</button>
-                    <div id="profile-dropdown-menu" class="hidden absolute right-0 top-12 mt-2 w-56 sm:w-64 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
-                        <div class="p-5 bg-gray-50/50 border-b border-gray-100">
-                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Store Owner</p>
-                            <h4 class="font-black text-gray-900 text-lg leading-tight truncate">${shopOwnerName || 'My Store'}</h4>
-                        </div>
-                        <div class="p-2 space-y-1">
-                            <a href="dashboard.html?shop=${activeShop}" class="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-chart-line text-blue-500"></i> Dashboard</a>
-                            <button onclick="logoutUser()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                        </div>
-                    </div>
-                `;
+                // ⚡ NAYA: Update Auth Container with Image if available
+                if (savedImg) {
+                    authContainer.innerHTML = `
+                        <button onclick="toggleProfileModal()" class="w-9 h-9 rounded-full overflow-hidden border border-gray-200 shadow-sm active:scale-95 focus:outline-none transition">
+                            <img src="${savedImg}" class="w-full h-full object-cover">
+                        </button>
+                    `;
+                } else {
+                    authContainer.innerHTML = `
+                        <button onclick="toggleProfileModal()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide">${initials}</button>
+                    `;
+                }
 
-                heroContent.innerHTML = `
-                    <div class="opacity-0 fade-in-up inline-flex items-center gap-2 glass-card text-gray-800 rounded-full px-5 py-2 text-[11px] sm:text-xs font-bold tracking-widest mb-8 z-10 hover:scale-105 transition-transform duration-300">
-                        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span> MERCHANT HUB
-                    </div>
-                    
-                    <div class="relative w-full flex flex-col items-center justify-center z-10">
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] z-0 pointer-events-none flex items-center justify-center">
-                            <div class="w-full h-full bg-gradient-to-tr from-blue-300 via-indigo-200 to-blue-200 rounded-full filter blur-[90px] sm:blur-[120px] opacity-40 animate-pulse"></div>
+                if (activeShop) {
+                    // 🔹 SHOP OWNER HERO
+                    heroContent.innerHTML = `
+                        <div class="opacity-0 fade-in-up inline-flex items-center gap-2 glass-card text-gray-800 rounded-full px-5 py-2 text-[11px] sm:text-xs font-bold tracking-widest mb-8 z-10 hover:scale-105 transition-transform duration-300">
+                            <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span> MERCHANT HUB
                         </div>
                         
-                        <h1 class="relative z-10 opacity-0 fade-in-up delay-100 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter mb-2 sm:mb-4">Your Store,</h1>
-                        <h2 class="relative z-10 opacity-0 fade-in-up delay-200 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-400 mb-6 sm:mb-8 pb-2">Now Fully Automated.</h2>
-                    </div>
+                        <div class="relative w-full flex flex-col items-center justify-center z-10">
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] z-0 pointer-events-none flex items-center justify-center">
+                                <div class="w-full h-full bg-gradient-to-tr from-blue-300 via-indigo-200 to-blue-200 rounded-full filter blur-[90px] sm:blur-[120px] opacity-40 animate-pulse"></div>
+                            </div>
+                            
+                            <h1 class="relative z-10 opacity-0 fade-in-up delay-100 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter mb-2 sm:mb-4">Your Store,</h1>
+                            <h2 class="relative z-10 opacity-0 fade-in-up delay-200 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-400 mb-6 sm:mb-8 pb-2">Now Fully Automated.</h2>
+                        </div>
 
-                    <p class="relative z-10 opacity-0 fade-in-up delay-300 text-gray-500 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed font-medium px-4">Manage your digital storefront, accept App & WhatsApp orders directly, track smart billing, and grow effortlessly with powerful insights.</p>
-                    
-                    <div class="relative z-10 opacity-0 fade-in-up delay-300 w-full px-4 sm:px-0 max-w-xs mx-auto">
-                        <a href="dashboard.html?shop=${activeShop}" class="w-full bg-blue-600 text-white font-bold py-4 sm:py-5 rounded-2xl hover:bg-blue-700 hover:shadow-[0_15px_30px_rgba(37,99,235,0.3)] hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3 text-sm sm:text-base">
-                            <i class="fas fa-chart-line text-blue-200"></i> Open Dashboard
-                        </a>
-                      
-                        <!-- ✨ NAYA VISIT STORE BUTTON ✨ -->
-                        <a href="store.html?shop=${activeShop}" class="mt-3 mx-auto w-fit text-[#007AFF] font-semibold text-[14px] tracking-wide flex items-center justify-center gap-1.5 active:opacity-50 transition-opacity px-4 py-2 rounded-full hover:bg-[#007AFF]/10">
-                            Visit My Store <i class="fas fa-chevron-right text-[10px] mt-0.5"></i>
-                        </a>
-                    </div>
-                    </div>
-                    
-                    <!-- Clean iOS Outline Tags -->
-                    <div class="relative z-10 opacity-0 fade-in-up delay-300 mt-12 sm:mt-16 flex flex-wrap justify-center gap-4 sm:gap-6 text-[11px] sm:text-xs font-bold text-gray-600 tracking-wide px-4">
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                            </svg>
-                            Easy Orders
+                        <p class="relative z-10 opacity-0 fade-in-up delay-300 text-gray-500 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed font-medium px-4">Manage your digital storefront, accept App & WhatsApp orders directly, track smart billing, and grow effortlessly with powerful insights.</p>
+                        
+                        <div class="relative z-10 opacity-0 fade-in-up delay-300 w-full px-4 sm:px-0 max-w-xs mx-auto">
+                            <a href="dashboard.html?shop=${activeShop}" class="w-full bg-blue-600 text-white font-bold py-4 sm:py-5 rounded-2xl hover:bg-blue-700 hover:shadow-[0_15px_30px_rgba(37,99,235,0.3)] hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3 text-sm sm:text-base">
+                                <i class="fas fa-chart-line text-blue-200"></i> Open Dashboard
+                            </a>
+                            <a href="store.html?shop=${activeShop}" class="mt-3 mx-auto w-fit text-[#007AFF] font-semibold text-[14px] tracking-wide flex items-center justify-center gap-1.5 active:opacity-50 transition-opacity px-4 py-2 rounded-full hover:bg-[#007AFF]/10">
+                                Visit My Store <i class="fas fa-chevron-right text-[10px] mt-0.5"></i>
+                            </a>
                         </div>
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-indigo-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Smart Billing
+                        
+                        <div class="relative z-10 opacity-0 fade-in-up delay-300 mt-12 sm:mt-16 flex flex-wrap justify-center gap-4 sm:gap-6 text-[11px] sm:text-xs font-bold text-gray-600 tracking-wide px-4">
+                            <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
+                                <svg class="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                </svg>
+                                Easy Orders
+                            </div>
+                            <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
+                                <svg class="w-5 h-5 text-indigo-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Smart Billing
+                            </div>
+                            <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
+                                <svg class="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                                </svg>
+                                Deep Insights
+                            </div>
                         </div>
-                        <!-- ✨ CLEAN PIE CHART FOR DEEP INSIGHTS ✨ -->
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path>
-                            </svg>
-                            Deep Insights
+                        ${merchantWhyChooseUsSection}
+                    `;
+                    document.getElementById('section-title').innerText = "Live Local Shops";
+                    document.getElementById('section-subtitle').innerText = "Other businesses on Pixigenie.";
+                    searchInput.placeholder = "Search shops...";
+                    fetchLiveShops();
+                } else {
+                    // 🔹 CUSTOMER HERO
+                    heroContent.innerHTML = `
+                        <div class="opacity-0 fade-in-up inline-flex items-center gap-2 glass-card text-gray-800 rounded-full px-5 py-2 text-[11px] sm:text-xs font-bold tracking-widest mb-8 z-10 hover:scale-105 transition-transform duration-300">
+                            <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span> DIGITAL MALL
                         </div>
-                    </div>
+                        
+                        <div class="relative w-full flex flex-col items-center justify-center z-10">
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] z-0 pointer-events-none flex items-center justify-center">
+                                <div class="w-full h-full bg-gradient-to-tr from-purple-300 via-fuchsia-200 to-pink-300 rounded-full filter blur-[90px] sm:blur-[120px] opacity-40 animate-pulse"></div>
+                            </div>
+                            <h1 class="relative z-10 opacity-0 fade-in-up delay-100 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter mb-2 sm:mb-4 hover:scale-[1.02] transition-transform duration-300">Everything You Need.</h1>
+                            <h2 class="relative z-10 opacity-0 fade-in-up delay-200 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 mb-6 sm:mb-8 pb-2 hover:scale-[1.02] transition-transform duration-300">Right Around You.</h2>
+                        </div>
 
-                    ${merchantWhyChooseUsSection}
-                `;
-                
-                document.getElementById('section-title').innerText = "Live Local Shops";
-                document.getElementById('section-subtitle').innerText = "Other businesses on Pixigenie.";
-                searchInput.placeholder = "Search shops...";
-                fetchLiveShops();
+                        <p class="relative z-10 opacity-0 fade-in-up delay-300 text-gray-500 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed font-medium px-4">Discover trusted local stores, explore their products, and order effortlessly — all from one simple place.</p>
+                        
+                        <div class="relative z-10 opacity-0 fade-in-up delay-300 w-full px-4 sm:px-0 max-w-xs mx-auto">
+                            <button onclick="document.getElementById('marketplace').scrollIntoView()" class="w-full bg-gray-900 text-white font-bold py-4 sm:py-5 rounded-2xl hover:bg-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3 text-sm sm:text-base">
+                                Start Shopping
+                            </button>
+                        </div>
+
+                        <div class="relative z-10 opacity-0 fade-in-up delay-300 mt-12 sm:mt-16 flex flex-wrap justify-center gap-4 sm:gap-6 text-[11px] sm:text-xs font-bold text-gray-600 tracking-wide px-4">
+                            <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
+                                <svg class="w-5 h-5 text-purple-600 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+                                Verified Stores
+                            </div>
+                            <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
+                                <svg class="w-5 h-5 text-pink-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                                Fast Delivery
+                            </div>
+                            <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
+                                <svg class="w-5 h-5 text-green-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                Direct Chat
+                            </div>
+                        </div>
+                        ${customerWhyChooseUsSection}
+                    `;
+                    document.getElementById('section-title').innerText = "Trending Products";
+                    document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
+                    searchInput.placeholder = "Search products...";
+                    fetchGlobalProducts(); 
+                }
                 return true;
-
-            } else if (customerName) {
-                // 🔹 CUSTOMER
-                const initials = getInitials(customerName);
-                
-                authContainer.innerHTML = `
-                    <button onclick="toggleProfileModal()()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide">${initials}</button>
-                    <div id="profile-dropdown-menu" class="hidden absolute right-0 top-12 mt-2 w-56 sm:w-64 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
-                        <div class="p-5 bg-gray-50/50 border-b border-gray-100">
-                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Customer Profile</p>
-                            <h4 class="font-black text-gray-900 text-lg leading-tight truncate">${customerName}</h4>
-                            ${customerPhone ? `<p class="text-xs text-gray-500 mt-1.5 font-medium flex items-center gap-1.5"><i class="fas fa-phone-alt text-gray-400"></i> +91 ${customerPhone}</p>` : ''}
-                        </div>
-                        <div class="p-2">
-                            <button onclick="logoutUser()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                        </div>
-                    </div>
-                `;
-
-                heroContent.innerHTML = `
-                    <div class="opacity-0 fade-in-up inline-flex items-center gap-2 glass-card text-gray-800 rounded-full px-5 py-2 text-[11px] sm:text-xs font-bold tracking-widest mb-8 z-10 hover:scale-105 transition-transform duration-300">
-                        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span> DIGITAL MALL
-                    </div>
-                    
-                    <div class="relative w-full flex flex-col items-center justify-center z-10">
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] z-0 pointer-events-none flex items-center justify-center">
-                            <div class="w-full h-full bg-gradient-to-tr from-purple-300 via-fuchsia-200 to-pink-300 rounded-full filter blur-[90px] sm:blur-[120px] opacity-40 animate-pulse"></div>
-                        </div>
-
-                        <h1 class="relative z-10 opacity-0 fade-in-up delay-100 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter mb-2 sm:mb-4 hover:scale-[1.02] transition-transform duration-300">Everything You Need.</h1>
-                        <h2 class="relative z-10 opacity-0 fade-in-up delay-200 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 mb-6 sm:mb-8 pb-2 hover:scale-[1.02] transition-transform duration-300">Right Around You.</h2>
-                    </div>
-
-                    <p class="relative z-10 opacity-0 fade-in-up delay-300 text-gray-500 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed font-medium px-4">Discover trusted local stores, explore their products, and order effortlessly — all from one simple place.</p>
-                    
-                    <div class="relative z-10 opacity-0 fade-in-up delay-300 w-full px-4 sm:px-0 max-w-xs mx-auto">
-                        <button onclick="document.getElementById('marketplace').scrollIntoView()" class="w-full bg-gray-900 text-white font-bold py-4 sm:py-5 rounded-2xl hover:bg-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3 text-sm sm:text-base">
-                            Start Shopping
-                        </button>
-                    </div>
-
-                    <div class="relative z-10 opacity-0 fade-in-up delay-300 mt-12 sm:mt-16 flex flex-wrap justify-center gap-4 sm:gap-6 text-[11px] sm:text-xs font-bold text-gray-600 tracking-wide px-4">
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-purple-600 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline>
-                            </svg>
-                            Verified Stores
-                        </div>
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-pink-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                            </svg>
-                            Fast Delivery
-                        </div>
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-green-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            Direct Chat
-                        </div>
-                    </div>
-                    
-                    ${customerWhyChooseUsSection}
-                `;
-
-                document.getElementById('section-title').innerText = "Trending Products";
-                document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
-                searchInput.placeholder = "Search products...";
-                fetchGlobalProducts(); 
-                return true;
-
             } else {
-                
                 // 🔹 NOT LOGGED IN DEFAULT
                 authContainer.innerHTML = `
                     <button onclick="openAuthModal()" class="w-9 h-9 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-full flex items-center justify-center transition border border-gray-200 shadow-sm active:scale-95">
@@ -1054,12 +1041,10 @@
                             <div class="w-full h-full bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 rounded-full filter blur-[90px] sm:blur-[120px] opacity-40 animate-pulse"></div>
                         </div>
                         
-                        <!-- 🎯 NEW TITLE -->
                         <h1 class="relative z-10 opacity-0 fade-in-up delay-100 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter mb-2 sm:mb-4 hover:scale-[1.02] transition-transform duration-300">Everything You Need.</h1>
                         <h2 class="relative z-10 opacity-0 fade-in-up delay-200 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 mb-6 sm:mb-8 pb-2 hover:scale-[1.02] transition-transform duration-300">Right Around You.</h2>
                     </div>
 
-                    <!-- 🎯 NEW DESCRIPTION -->
                     <p class="relative z-10 opacity-0 fade-in-up delay-300 text-gray-500 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed font-medium px-4">Discover trusted local stores, explore their products, and order effortlessly — all from one simple place.</p>
                     
                     <div class="relative z-10 opacity-0 fade-in-up delay-300 w-full px-4 sm:px-0 max-w-xs mx-auto">
@@ -1110,17 +1095,27 @@
                             distanceHtml = `<span class="flex items-center gap-1 truncate"><i class="fas fa-location-arrow text-gray-400 opacity-70 text-[10px]"></i> Turn on GPS</span>`;
                         }
 
+                        // ⚡ NAYA: Shop Logo Fetch ⚡
+                        let logoHtml = '';
+                        if (shop.storeLogo) {
+                            logoHtml = `<img src="${shop.storeLogo}" class="w-full h-full object-cover">`;
+                        } else {
+                            logoHtml = `
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path>
+                                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                    <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path>
+                                    <path d="M2 7h20"></path>
+                                    <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"></path>
+                                </svg>
+                            `;
+                        }
+
                         return `
                         <div class="glass-card hover:bg-white rounded-[2rem] p-5 sm:p-6 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:-translate-y-2 transition-all duration-500 flex flex-col group relative overflow-hidden cursor-pointer active:scale-95 reveal">
                             <div class="flex items-start gap-4 mb-5 relative z-10">
-                                <div class="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 text-blue-500 rounded-[1.2rem] flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-500">
-                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path>
-                                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                                        <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path>
-                                        <path d="M2 7h20"></path>
-                                        <path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"></path>
-                                    </svg>
+                                <div class="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 text-blue-500 rounded-[1.2rem] flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-500 overflow-hidden">
+                                    ${logoHtml}
                                 </div>
                                 <div class="min-w-0 flex-1 mt-1">
                                     <h4 class="text-gray-900 font-bold text-lg leading-tight truncate">${shop.shopName}</h4>
@@ -1181,7 +1176,7 @@
                     const product = doc.data();
                     let shopName = "Local Shop";
                     let shopPhone = "";
-                    let shopId = ""; // ✨ Visit Store ke liye Shop ID nikalenge
+                    let shopId = ""; 
                     
                     if (doc.ref.parent && doc.ref.parent.parent) {
                         try {
@@ -1211,7 +1206,6 @@
             }
         }
 
-        // ✨ NAYA: Shop ID add kiya aur Visit Store ka button lagaya ✨
         function generateProductCard(name, price, shopName, shopPhone, image, shopId = "") {
             return `
             <div class="glass-card hover:bg-white rounded-[2rem] p-5 sm:p-6 hover:shadow-[0_20px_40px_rgba(168,85,247,0.08)] hover:-translate-y-2 transition-all duration-500 flex flex-col group cursor-pointer active:scale-95 reveal">
@@ -1700,13 +1694,12 @@
                 // बेसिक डेटा लोड करो
                 const name = localStorage.getItem('pixigenie_customer_name') || localStorage.getItem('pixigenie_owner_name') || 'Customer';
                 const phoneStr = localStorage.getItem('pixigenie_customer_phone') || 'N/A'; 
-                const activeShop = localStorage.getItem('pixigenie_active_shop'); // मर्चेंट चेक करने के लिए
-                
-                // चेक करो कि ये ईमेल है या फ़ोन नंबर
+                const activeShop = localStorage.getItem('pixigenie_active_shop'); 
                 const isEmail = phoneStr.includes('@');
 
                 document.getElementById('prof-name').innerText = name;
-                               // ✨ NAYA: Load Profile Image ✨
+                
+                // ⚡ NAYA: Load Profile Image ⚡
                 const savedImg = localStorage.getItem('pixigenie_profile_img');
                 const imgPreview = document.getElementById('prof-img-preview');
                 const initialText = document.getElementById('prof-initial');
@@ -1718,17 +1711,15 @@
                 } else {
                     imgPreview.classList.add('hidden');
                     initialText.style.display = 'flex';
+                    initialText.innerText = name.charAt(0).toUpperCase();
                 }
- document.getElementById('prof-initial').innerText = name.charAt(0).toUpperCase();
 
-                // 1. अगर ईमेल है तो +91 मत लगाओ
                 if (isEmail) {
                     document.getElementById('prof-phone').innerText = phoneStr;
                 } else {
                     document.getElementById('prof-phone').innerText = phoneStr !== 'N/A' ? '+91 ' + phoneStr : 'N/A';
                 }
 
-                // 2. मर्चेंट डैशबोर्ड बटन सिर्फ दुकानदारों को दिखाओ
                 const merchantBtn = document.getElementById('prof-merchant-btn');
                 if (activeShop) {
                     merchantBtn.classList.remove('hidden');
@@ -1736,13 +1727,11 @@
                     merchantBtn.classList.add('hidden');
                 }
 
-                // 3. सेव्ड एड्रेस डेटा लोड करो (अगर ईमेल है तो फ़ोन नंबर खाली छोड़ दो)
                 document.getElementById('saved-name').value = localStorage.getItem('pixigenie_saved_name') || name;
                 document.getElementById('saved-phone').value = localStorage.getItem('pixigenie_saved_phone') || (isEmail ? '' : phoneStr);
                 document.getElementById('saved-landmark').value = localStorage.getItem('pixigenie_saved_landmark') || '';
                 document.getElementById('saved-address').value = localStorage.getItem('pixigenie_saved_address') || '';
 
-                // मॉडल खोलो (iOS Animation)
                 modal.classList.remove('hidden');
                 setTimeout(() => { 
                     modal.classList.remove('opacity-0'); 
@@ -1750,7 +1739,6 @@
                 }, 10);
                 document.body.style.overflow = 'hidden'; 
             } else {
-                // मॉडल बंद करो
                 modal.classList.add('opacity-0'); 
                 content.classList.add('translate-y-full', 'sm:scale-95');
                 setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); 
@@ -1796,7 +1784,8 @@
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         }
-        // ✨ NAYA: Profile Image Upload & Save Function ✨
+        
+        // ⚡ IMAGE COMPRESS & UPLOAD FUNCTION ⚡
         async function uploadProfileImage(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1812,7 +1801,6 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = async function() {
-                    // फोटो को 200px में Compress करना (ताकि डेटाबेस न भरे)
                     const canvas = document.createElement('canvas');
                     let size = 200; 
                     let w = img.width, h = img.height;
@@ -1825,7 +1813,6 @@
                     
                     const base64Image = canvas.toDataURL('image/jpeg', 0.8);
 
-                    // स्क्रीन पर तुरंत दिखाओ
                     imgEl.src = base64Image;
                     imgEl.classList.remove('hidden');
                     initEl.style.display = 'none';
@@ -1834,17 +1821,18 @@
                         const activeShop = localStorage.getItem('pixigenie_active_shop');
                         const customerPhone = localStorage.getItem('pixigenie_customer_phone');
                         
-                        // LocalStorage में सेव करो ताकि हर पेज पर तुरंत मिल जाए
                         localStorage.setItem('pixigenie_profile_img', base64Image);
+                        
+                        // Update UI Header immediately
+                        updateUIBasedOnLogin();
 
-                        // Firebase में सेव करो
+                        // Firease Update
                         if (activeShop) {
                             await db.collection('shops').doc(activeShop).update({ storeLogo: base64Image });
                         } else if (customerPhone && !customerPhone.includes('@')) {
                             await db.collection('customers').doc(customerPhone).update({ profileImage: base64Image });
                         }
                         
-                        alert("Profile Image Updated Successfully! 🎉");
                     } catch (err) {
                         alert("Error saving image: " + err.message);
                         initEl.style.display = 'flex'; initEl.innerHTML = 'U';
@@ -1870,11 +1858,11 @@
             <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
                 <!-- Basic Info Card -->
                 <div class="bg-gray-50 rounded-2xl p-4 flex items-center gap-4 border border-gray-100">
-                <!-- ✨ NAYA: Clickable Profile/Store Logo Upload ✨ -->
+                <!-- ⚡ NAYA: Clickable Profile/Store Logo Upload ⚡ -->
 <label class="relative w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold cursor-pointer overflow-hidden group shrink-0 border border-indigo-200 shadow-sm">
     <span id="prof-initial">U</span>
     <!-- यहाँ अपलोड की हुई फोटो दिखेगी -->
-    <img id="prof-img-preview" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+    <img id="prof-img-preview" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10" referrerpolicy="no-referrer">
     
     <!-- होवर करने पर कैमरे का आइकॉन दिखेगा -->
     <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center z-20 transition-all">
@@ -1937,7 +1925,6 @@
 
                    <!-- Modal Footer (Logout) -->
             <div class="p-5 border-t border-gray-100 shrink-0">
-                <!-- यहाँ logout() को बदलकर logoutUser() कर दे 👇 -->
                 <button onclick="logoutUser()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
