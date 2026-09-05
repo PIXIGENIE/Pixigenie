@@ -1706,7 +1706,20 @@
                 const isEmail = phoneStr.includes('@');
 
                 document.getElementById('prof-name').innerText = name;
-                document.getElementById('prof-initial').innerText = name.charAt(0).toUpperCase();
+                               // ✨ NAYA: Load Profile Image ✨
+                const savedImg = localStorage.getItem('pixigenie_profile_img');
+                const imgPreview = document.getElementById('prof-img-preview');
+                const initialText = document.getElementById('prof-initial');
+                
+                if (savedImg) {
+                    imgPreview.src = savedImg;
+                    imgPreview.classList.remove('hidden');
+                    initialText.style.display = 'none';
+                } else {
+                    imgPreview.classList.add('hidden');
+                    initialText.style.display = 'flex';
+                }
+ document.getElementById('prof-initial').innerText = name.charAt(0).toUpperCase();
 
                 // 1. अगर ईमेल है तो +91 मत लगाओ
                 if (isEmail) {
@@ -1783,6 +1796,65 @@
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         }
+        // ✨ NAYA: Profile Image Upload & Save Function ✨
+        async function uploadProfileImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const initEl = document.getElementById('prof-initial');
+            const imgEl = document.getElementById('prof-img-preview');
+            
+            initEl.innerHTML = '<i class="fas fa-spinner fa-spin text-sm"></i>'; 
+            imgEl.classList.add('hidden');
+            initEl.style.display = 'flex';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = async function() {
+                    // फोटो को 200px में Compress करना (ताकि डेटाबेस न भरे)
+                    const canvas = document.createElement('canvas');
+                    let size = 200; 
+                    let w = img.width, h = img.height;
+                    
+                    if (w > h) { h = Math.round((h * size) / w); w = size; } 
+                    else { w = Math.round((w * size) / h); h = size; }
+                    
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    
+                    const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+
+                    // स्क्रीन पर तुरंत दिखाओ
+                    imgEl.src = base64Image;
+                    imgEl.classList.remove('hidden');
+                    initEl.style.display = 'none';
+
+                    try {
+                        const activeShop = localStorage.getItem('pixigenie_active_shop');
+                        const customerPhone = localStorage.getItem('pixigenie_customer_phone');
+                        
+                        // LocalStorage में सेव करो ताकि हर पेज पर तुरंत मिल जाए
+                        localStorage.setItem('pixigenie_profile_img', base64Image);
+
+                        // Firebase में सेव करो
+                        if (activeShop) {
+                            await db.collection('shops').doc(activeShop).update({ storeLogo: base64Image });
+                        } else if (customerPhone && !customerPhone.includes('@')) {
+                            await db.collection('customers').doc(customerPhone).update({ profileImage: base64Image });
+                        }
+                        
+                        alert("Profile Image Updated Successfully! 🎉");
+                    } catch (err) {
+                        alert("Error saving image: " + err.message);
+                        initEl.style.display = 'flex'; initEl.innerHTML = 'U';
+                        imgEl.classList.add('hidden');
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
 
     </script>
     <!-- ✨ iOS STYLE CUSTOMER PROFILE MODAL ✨ -->
@@ -1798,7 +1870,21 @@
             <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
                 <!-- Basic Info Card -->
                 <div class="bg-gray-50 rounded-2xl p-4 flex items-center gap-4 border border-gray-100">
-                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold" id="prof-initial">U</div>
+                <!-- ✨ NAYA: Clickable Profile/Store Logo Upload ✨ -->
+<label class="relative w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold cursor-pointer overflow-hidden group shrink-0 border border-indigo-200 shadow-sm">
+    <span id="prof-initial">U</span>
+    <!-- यहाँ अपलोड की हुई फोटो दिखेगी -->
+    <img id="prof-img-preview" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+    
+    <!-- होवर करने पर कैमरे का आइकॉन दिखेगा -->
+    <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center z-20 transition-all">
+        <i class="fas fa-camera text-white text-[14px]"></i>
+    </div>
+    
+    <!-- असली फाइल इनपुट जो छुपा हुआ है -->
+    <input type="file" accept="image/*" class="hidden" onchange="uploadProfileImage(event)">
+</label>
+
                     <div class="flex-1">
                         <h4 class="font-bold text-gray-900 text-[15px]" id="prof-name">Customer Name</h4>
                         <p class="text-xs text-gray-500 font-medium" id="prof-phone">+91 xxxxxxxxxx</p>
