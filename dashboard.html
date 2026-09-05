@@ -1085,12 +1085,13 @@
                 if(o.status === 'cancelled') sBg = "bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]";
 
                 let btns = '';
-                if(o.status === 'pending') {
-                    btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerId}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold py-3 rounded-[12px] text-sm hover:bg-black transition active:scale-95 shadow-md">Accept Order</button>
-                            <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerId}', '${o.customerName}')" class="flex-1 bg-white text-[#DC2626] border border-[#FECACA] hover:bg-[#FEF2F2] font-bold py-3 rounded-[12px] text-sm transition active:scale-95">Cancel</button>`;
+                                if(o.status === 'pending') {
+                    btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold py-3 rounded-[12px] text-sm hover:bg-black transition active:scale-95 shadow-md">Accept Order</button>
+                            <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-white text-[#DC2626] border border-[#FECACA] hover:bg-[#FEF2F2] font-bold py-3 rounded-[12px] text-sm transition active:scale-95">Cancel</button>`;
                 } else if(o.status === 'accepted') {
-                    btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerId}', '${o.customerName}')" class="w-full bg-[#16A34A] hover:bg-[#15803D] text-white font-bold py-3 rounded-[12px] text-sm transition active:scale-95 shadow-md"><i class="fas fa-check-circle mr-1"></i> Mark Delivered</button>`;
-                } else {
+                    btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" class="w-full bg-[#16A34A] hover:bg-[#15803D] text-white font-bold py-3 rounded-[12px] text-sm transition active:scale-95 shadow-md"><i class="fas fa-check-circle mr-1"></i> Mark Delivered</button>`;
+                }
+ else {
                     btns = `<div class="w-full text-center py-3 bg-[#F7F7F9] rounded-[12px] border border-[#E5E7EB] text-[#6B7280] text-xs font-black uppercase tracking-widest">Order ${o.status}</div>`;
                 }
 
@@ -1102,7 +1103,8 @@
                             <h4 class="text-[#111827] font-black text-xl leading-tight truncate max-w-[200px]">${o.customerName || 'Customer'}</h4>
                             <p class="text-[#6B7280] text-[11px] font-bold mt-1">ID: #${o.id.substring(0,8).toUpperCase()} • ${d}</p>
                         </div>
-                        <a href="tel:${o.customerId}" class="w-12 h-12 bg-[#F3E8FF] text-[#A855F7] rounded-full flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm border border-[#E9D5FF]"><i class="fas fa-phone-alt text-lg"></i></a>
+                        <a href="tel:${o.customerPhone}" class="w-12 h-12 bg-[#F3E8FF] text-[#A855F7] rounded-full flex items-center justify-center transition active:scale-95 shrink-0 shadow-sm border border-[#E9D5FF]"><i class="fas fa-phone-alt text-lg"></i></a>
+
                     </div>
                     
                     <div class="bg-[#F7F7F9] p-4 rounded-[16px] border border-[#E5E7EB] mb-4">
