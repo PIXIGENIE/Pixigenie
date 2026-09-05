@@ -724,22 +724,50 @@
             setTimeout(() => { btn.innerHTML = origHtml; btn.classList.replace('bg-green-500', 'bg-purple-50'); btn.classList.replace('text-white', 'text-purple-600'); }, 1000);
         }
 
-        function toggleCartModal() {
+                function toggleCartModal() {
             const modal = document.getElementById('cart-modal');
             const content = document.getElementById('cart-modal-content');
+            
             if(modal.classList.contains('hidden')) {
                 renderCartItems();
-                if(!document.getElementById('cart-cust-name').value) { document.getElementById('cart-cust-name').value = localStorage.getItem('pixigenie_customer_name') || ''; }
-                if(!document.getElementById('cart-cust-phone').value) { document.getElementById('cart-cust-phone').value = localStorage.getItem('pixigenie_customer_phone') || ''; }
+                
+                // ✨ SMART PRE-FILL LOGIC ✨
+                const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
+                let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
+                const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
+
+                // अगर ईमेल है, तो फोन का डब्बा खाली छोड़ो
+                if (savedPhone.includes('@')) {
+                    savedPhone = ''; 
+                }
+                
+                // फॉर्म में डाटा भरो (अगर पहले से खाली है)
+                if(!document.getElementById('cart-cust-name').value) {
+                    document.getElementById('cart-cust-name').value = savedName;
+                }
+                if(!document.getElementById('cart-cust-phone').value) {
+                    document.getElementById('cart-cust-phone').value = savedPhone;
+                }
+                if(!document.getElementById('cart-address').value && savedAddress) {
+                    document.getElementById('cart-address').value = savedAddress;
+                }
 
                 modal.classList.remove('hidden');
-                setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('translate-y-full', 'sm:scale-95'); }, 10);
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    content.classList.remove('translate-y-full', 'sm:scale-95');
+                }, 10);
                 document.body.style.overflow = 'hidden';
             } else {
-                modal.classList.add('opacity-0'); content.classList.add('translate-y-full', 'sm:scale-95');
-                setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); 
+                modal.classList.add('opacity-0');
+                content.classList.add('translate-y-full', 'sm:scale-95');
+                setTimeout(() => { 
+                    modal.classList.add('hidden'); 
+                    document.body.style.overflow = 'auto'; 
+                }, 300); 
             }
         }
+
 
         // ✨ IN-APP CART ORDER LOGIC ✨
         async function checkoutCartInApp() {
@@ -830,15 +858,30 @@
         // ==========================================
         let currentOrder = null;
 
-        function openOrderModal(itemName, itemPrice, shopName, shopPhone) {
-               if (!enforceCustomerLogin()) return;
+                function openOrderModal(itemName, itemPrice, shopName, shopPhone) {
             currentOrder = { itemName, itemPrice, shopName, shopPhone };
             document.getElementById('order-item-name').innerText = itemName;
             document.getElementById('order-item-price').innerText = `₹${itemPrice}`;
             document.getElementById('order-shop-name').innerText = shopName || 'Local Store';
             
-            document.getElementById('order-cust-name').value = localStorage.getItem('pixigenie_customer_name') || '';
-            document.getElementById('order-cust-phone').value = localStorage.getItem('pixigenie_customer_phone') || '';
+            // ✨ SMART PRE-FILL LOGIC (Email filter + Saved Address) ✨
+            const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
+            let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
+            const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
+
+            // अगर फोन में '@' है (यानी ईमेल है), तो इसे खाली छोड़ दो
+            if (savedPhone.includes('@')) {
+                savedPhone = '';
+            }
+
+            // फॉर्म में डाटा डाल दो
+            document.getElementById('order-cust-name').value = savedName;
+            document.getElementById('order-cust-phone').value = savedPhone;
+            document.getElementById('order-address').value = savedAddress;
+            
+            if (document.getElementById('order-shop-phone')) {
+                document.getElementById('order-shop-phone').value = shopPhone || '';
+            }
 
             const modal = document.getElementById('order-modal');
             const content = document.getElementById('order-modal-content');
@@ -851,6 +894,7 @@
             }, 10);
             document.body.style.overflow = 'hidden'; 
         }
+
 
         function closeOrderModal() {
             const modal = document.getElementById('order-modal');
