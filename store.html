@@ -768,22 +768,25 @@
             }
         }
 
-
-        // ✨ IN-APP CART ORDER LOGIC ✨
+        // ✨ IN-APP CART ORDER (FIXED FOR MY ORDERS) ✨
         async function checkoutCartInApp() {
             let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
             if(cart.length === 0) { alert("Cart is empty!"); return; }
             
             let address = document.getElementById('cart-address').value.trim();
             let custName = document.getElementById('cart-cust-name').value.trim();
-            let custPhone = document.getElementById('cart-cust-phone').value.trim();
+            let custWhatsApp = document.getElementById('cart-cust-phone').value.trim();
             
-            if(!custName || !custPhone) { alert("Please enter your name and WhatsApp number!"); return; }
+            if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
             if(!address) { alert("Please enter delivery address!"); return; }
+
+            // ✨ ASLI ACCOUNT ID YAHAN SE NIKALO ✨
+            const accountId = localStorage.getItem('pixigenie_customer_phone');
 
             const btn = document.getElementById('cart-main-btn');
             const origHTML = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Placing...`; btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Placing...`; 
+            btn.disabled = true;
             
             const ordersByShop = {};
             cart.forEach(item => {
@@ -799,9 +802,9 @@
                     const orderData = ordersByShop[phone];
                     
                     await db.collection('orders').add({
-                        customerId: custPhone,
+                        customerId: accountId, // ✨ FIXED: अब आर्डर हमेशा असली लॉगिन ID पे सेव होगा
                         customerName: custName,
-                        customerPhone: custPhone,
+                        customerPhone: custWhatsApp, // दुकानदार के लिए WhatsApp नंबर
                         customerAddress: address,
                         shopPhone: phone,
                         shopName: orderData.shopName,
@@ -815,10 +818,14 @@
                 localStorage.setItem('pixigenie_cart', JSON.stringify([]));
                 updateCartBadge();
                 toggleCartModal();
-                showOrderSuccessModal();
+                showOrderSuccessModal(); 
                 
-            } catch (error) { alert("Error placing order: " + error.message); } 
-            finally { btn.innerHTML = origHTML; btn.disabled = false; }
+            } catch (error) { 
+                alert("Error placing order: " + error.message); 
+            } finally { 
+                btn.innerHTML = origHTML; 
+                btn.disabled = false; 
+            }
         }
 
         // ✨ MANUAL WHATSAPP CART ORDER LOGIC ✨
@@ -905,25 +912,30 @@
             setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 500); 
         }
 
+         // ✨ IN-APP PLACE ORDER (FIXED FOR MY ORDERS) ✨
         async function submitOrder(e) {
             e.preventDefault();
             const qty = document.getElementById('order-qty').value;
             const custName = document.getElementById('order-cust-name').value.trim();
-            const custPhone = document.getElementById('order-cust-phone').value.trim();
+            const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); // फॉर्म वाला नंबर
             const address = document.getElementById('order-address').value.trim();
             
             const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
             const phone = currentOrder.shopPhone || '9876543210';
             
+            // ✨ ASLI ACCOUNT ID YAHAN SE NIKALO ✨
+            const accountId = localStorage.getItem('pixigenie_customer_phone');
+
             const btn = document.getElementById('main-order-btn');
             const origHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Placing...`; btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Placing...`;
+            btn.disabled = true;
 
             try {
                 await db.collection('orders').add({
-                    customerId: custPhone,
+                    customerId: accountId, // ✨ FIXED: अब आर्डर हमेशा असली लॉगिन ID पे सेव होगा
                     customerName: custName,
-                    customerPhone: custPhone,
+                    customerPhone: custWhatsApp, // दुकानदार के लिए WhatsApp नंबर
                     customerAddress: address,
                     shopPhone: phone,
                     shopName: currentOrder.shopName || 'Local Store',
@@ -936,8 +948,12 @@
                 closeOrderModal();
                 showOrderSuccessModal(); 
                 
-            } catch (error) { alert("Error placing order: " + error.message); } 
-            finally { btn.innerHTML = origHtml; btn.disabled = false; }
+            } catch (error) {
+                alert("Error placing order: " + error.message);
+            } finally {
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
+            }
         }
 
         function orderViaWhatsApp() {
