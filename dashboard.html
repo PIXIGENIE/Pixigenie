@@ -600,6 +600,11 @@
                     </select>
                 </div>
                 <div>
+                                                        <!-- ✨ NAYA: Edit Description Box ✨ -->
+                                    <div class="mb-4 mt-3">
+                                        <textarea id="edit-prod-desc" placeholder="Product Description (Optional)" rows="2" class="w-full bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] rounded-[12px] px-4 py-3 text-sm font-semibold outline-none focus:border-[#A855F7] transition resize-none"></textarea>
+                                    </div>
+
                     <label class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Update Image (Optional)</label>
                     <div class="h-11 bg-white border border-[#E5E7EB] rounded-[12px] flex items-center px-2 overflow-hidden">
                         <input type="file" id="edit-prod-image" accept="image/*" class="w-full text-[10px] text-[#6B7280] file:mr-2 file:py-1.5 file:px-3 file:rounded-[8px] file:border-0 file:text-[10px] file:font-bold file:bg-[#F3E8FF] file:text-[#A855F7] hover:file:bg-[#E9D5FF] cursor-pointer outline-none">
@@ -1612,7 +1617,8 @@
             document.getElementById('edit-prod-price').value = p.price; 
             document.getElementById('edit-prod-qty').value = p.qtySize !== undefined ? p.qtySize : (p.stock !== undefined ? p.stock : 1);
             document.getElementById('edit-prod-unit').value = p.unit || 'pcs';
-           document.getElementById('prod-desc').value = '';
+           document.getElementById('edit-prod-desc').value = p.description || '';
+
  document.getElementById('edit-prod-image').value = ''; 
             
             document.getElementById('edit-product-form').dataset.id = id;
@@ -1624,6 +1630,10 @@
         async function handleEditProduct(e) {
             e.preventDefault(); 
             const n = document.getElementById('edit-prod-name').value.trim(); 
+            const updatedDesc = document.getElementById('edit-prod-desc').value.trim();
+            
+
+
             const p = parseInt(document.getElementById('edit-prod-price').value); 
             const qtySize = parseFloat(document.getElementById('edit-prod-qty').value) || 1;
             const unit = document.getElementById('edit-prod-unit').value;
