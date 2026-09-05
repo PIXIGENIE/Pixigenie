@@ -881,7 +881,7 @@
                 const initials = getInitials(shopOwnerName || 'My Store');
                 
                 authContainer.innerHTML = `
-                    <button onclick="toggleProfileMenu()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide">${initials}</button>
+                    <button onclick="toggleProfileModal()()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide">${initials}</button>
                     <div id="profile-dropdown-menu" class="hidden absolute right-0 top-12 mt-2 w-56 sm:w-64 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
                         <div class="p-5 bg-gray-50/50 border-b border-gray-100">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Store Owner</p>
@@ -959,7 +959,7 @@
                 const initials = getInitials(customerName);
                 
                 authContainer.innerHTML = `
-                    <button onclick="toggleProfileMenu()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide">${initials}</button>
+                    <button onclick="toggleProfileModal()()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide">${initials}</button>
                     <div id="profile-dropdown-menu" class="hidden absolute right-0 top-12 mt-2 w-56 sm:w-64 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
                         <div class="p-5 bg-gray-50/50 border-b border-gray-100">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Customer Profile</p>
@@ -1204,7 +1204,8 @@
         function generateProductCard(name, price, shopName, shopPhone, image, shopId = "") {
             return `
             <div class="glass-card hover:bg-white rounded-[2rem] p-5 sm:p-6 hover:shadow-[0_20px_40px_rgba(168,85,247,0.08)] hover:-translate-y-2 transition-all duration-500 flex flex-col group cursor-pointer active:scale-95 reveal">
-                <div class="w-full h-48 bg-gray-50 rounded-[1.5rem] mb-5 flex items-center justify-center relative overflow-hidden group-hover:opacity-90 transition-opacity">
+                <div class="w-full aspect-square bg-gray-50 rounded-[1.5rem] mb-5 flex items-center justify-center relative overflow-hidden group-hover:opacity-90 transition-opacity">
+
                     ${image ? `<img src="${image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">` : `<i class="fas fa-box-open text-5xl text-gray-200 group-hover:scale-110 transition-transform duration-500"></i>`}
                     <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-sm font-black text-gray-900 shadow-sm border border-white/50">₹${price}</div>
                 </div>
@@ -1641,6 +1642,163 @@
             );
         }
 
+           // ✨ PROFILE MODAL TOGGLE & DATA BINDING ✨
+        function toggleProfileModal() {
+            const modal = document.getElementById('ios-profile-modal');
+            const content = document.getElementById('ios-profile-content');
+            
+            // पुराने ड्रॉपडाउन को बंद कर दो (अगर खुला हो)
+            const oldDropdown = document.getElementById('profile-dropdown'); 
+            if(oldDropdown) oldDropdown.classList.add('hidden');
+
+            if (modal.classList.contains('hidden')) {
+                // बेसिक डेटा लोड करो
+                const name = localStorage.getItem('pixigenie_customer_name') || 'Customer';
+                const phone = localStorage.getItem('pixigenie_customer_phone') || 'N/A';
+                const email = localStorage.getItem('pixigenie_customer_email'); // अगर Google से लॉगिन है
+
+                document.getElementById('prof-name').innerText = name;
+                document.getElementById('prof-phone').innerText = '+91 ' + phone;
+                document.getElementById('prof-initial').innerText = name.charAt(0).toUpperCase();
+
+                if (email) {
+                    const emailEl = document.getElementById('prof-email');
+                    emailEl.innerText = email; emailEl.classList.remove('hidden');
+                }
+
+                // सेव्ड एड्रेस डेटा लोड करो (ताकि एडिट किया जा सके)
+                document.getElementById('saved-name').value = localStorage.getItem('pixigenie_saved_name') || name;
+                document.getElementById('saved-phone').value = localStorage.getItem('pixigenie_saved_phone') || phone;
+                document.getElementById('saved-landmark').value = localStorage.getItem('pixigenie_saved_landmark') || '';
+                document.getElementById('saved-address').value = localStorage.getItem('pixigenie_saved_address') || '';
+
+                // मॉडल खोलो (iOS Animation)
+                modal.classList.remove('hidden');
+                setTimeout(() => { 
+                    modal.classList.remove('opacity-0'); 
+                    content.classList.remove('translate-y-full', 'sm:scale-95'); 
+                }, 10);
+                document.body.style.overflow = 'hidden'; // पीछे का पेज स्क्रॉल होना बंद
+            } else {
+                // मॉडल बंद करो
+                modal.classList.add('opacity-0'); 
+                content.classList.add('translate-y-full', 'sm:scale-95');
+                setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); 
+            }
+        }
+
+        // ✨ SAVE DETAILS FUNCTION ✨
+        function saveCustomerAddress() {
+            localStorage.setItem('pixigenie_saved_name', document.getElementById('saved-name').value.trim());
+            localStorage.setItem('pixigenie_saved_phone', document.getElementById('saved-phone').value.trim());
+            localStorage.setItem('pixigenie_saved_landmark', document.getElementById('saved-landmark').value.trim());
+            localStorage.setItem('pixigenie_saved_address', document.getElementById('saved-address').value.trim());
+
+            const btn = document.getElementById('save-addr-btn');
+            const orig = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-check-circle"></i> Details Saved!`;
+            btn.classList.replace('bg-gray-900', 'bg-green-500');
+            setTimeout(() => { btn.innerHTML = orig; btn.classList.replace('bg-green-500', 'bg-gray-900'); }, 2000);
+        }
+
+        // ✨ PROFILE GPS AUTO-FETCH ✨
+        function fetchProfileGPS() {
+            const btn = document.getElementById('prof-gps-btn'); 
+            const addrInput = document.getElementById('saved-address');
+            if (!navigator.geolocation) { alert("GPS not supported."); return; }
+            
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; btn.disabled = true;
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude; const lng = pos.coords.longitude;
+                    try {
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                        const data = await res.json();
+                        if (data && data.display_name) {
+                            addrInput.value = data.display_name;
+                            btn.innerHTML = `<i class="fas fa-check"></i>`;
+                            btn.classList.replace('text-blue-600', 'text-green-600'); btn.classList.replace('bg-blue-50', 'bg-green-50');
+                        }
+                    } catch(e) { addrInput.value = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`; btn.innerHTML = `<i class="fas fa-check"></i>`; }
+                    setTimeout(() => { btn.innerHTML = `<i class="fas fa-location-crosshairs"></i> Auto-Fetch`; btn.classList.replace('text-green-600', 'text-blue-600'); btn.classList.replace('bg-green-50', 'bg-blue-50'); btn.disabled = false; }, 3000);
+                },
+                (error) => { alert("Allow location access for GPS."); btn.innerHTML = `<i class="fas fa-location-crosshairs"></i> Auto-Fetch`; btn.disabled = false; },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
     </script>
+    <!-- ✨ iOS STYLE CUSTOMER PROFILE MODAL ✨ -->
+    <div id="ios-profile-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300 opacity-0">
+        <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-md h-[90vh] sm:h-auto sm:max-h-[90vh] flex flex-col transform translate-y-full sm:scale-95 sm:translate-y-0 transition-all duration-300 relative" id="ios-profile-content">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
+                <h3 class="font-black text-gray-900 text-xl">My Account</h3>
+                <button onclick="toggleProfileModal()" class="text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
+                <!-- Basic Info Card -->
+                <div class="bg-gray-50 rounded-2xl p-4 flex items-center gap-4 border border-gray-100">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold" id="prof-initial">U</div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-gray-900 text-[15px]" id="prof-name">Customer Name</h4>
+                        <p class="text-xs text-gray-500 font-medium" id="prof-phone">+91 xxxxxxxxxx</p>
+                        <p class="text-[11px] text-gray-400 font-bold mt-0.5 hidden" id="prof-email">email@gmail.com</p>
+                    </div>
+                </div>
+
+                <!-- Dashboard Button -->
+                <button onclick="window.location.href='dashboard.html'" class="w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm">
+                    <i class="fas fa-store"></i> Merchant Dashboard
+                </button>
+
+                <!-- Saved Address Section -->
+                <div>
+                    <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt text-gray-400"></i> Saved Delivery Details</h4>
+                    <p class="text-[11px] text-gray-500 mb-4 font-medium leading-relaxed">Save your details here so you don't have to type them every time you order.</p>
+                    
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Full Name</label>
+                                <input type="text" id="saved-name" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Phone</label>
+                                <input type="tel" id="saved-phone" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Landmark (Optional)</label>
+                            <input type="text" id="saved-landmark" placeholder="e.g. Near City Hospital" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Full Address</label>
+                                <button type="button" onclick="fetchProfileGPS()" id="prof-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition">
+                                    <i class="fas fa-location-crosshairs"></i> Auto-Fetch
+                                </button>
+                            </div>
+                            <textarea id="saved-address" placeholder="House No, Street, City..." rows="2" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition resize-none"></textarea>
+                        </div>
+                        
+                        <button onclick="saveCustomerAddress()" id="save-addr-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3.5 rounded-xl active:scale-95 transition text-sm shadow-md mt-2 flex justify-center items-center gap-2">
+                            Save Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer (Logout) -->
+            <div class="p-5 border-t border-gray-100 shrink-0">
+                <button onclick="logout()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
