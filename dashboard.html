@@ -79,7 +79,8 @@
 <body class="font-sans flex h-screen overflow-hidden text-[#111827]">
 
 <!-- ✨ PREMIUM iOS SETUP MODAL (CLEAN & FIXED) ✨ -->
-<div id="store-setup-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300">
+<div id="store-setup-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300">
+<!--  -->
     <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-md h-[90vh] sm:h-[85vh] flex flex-col relative overflow-hidden">
         
         <!-- FIXED HEADER & PROGRESS BAR (यह अपनी जगह से नहीं हिलेगा) -->
@@ -164,27 +165,50 @@
                 </button>
             </div>
 
-            <!-- STEP 3: LOCATION & FINISH -->
+                           <!-- STEP 3: LOCATION & FINISH -->
             <div id="setup-step-3" class="step-container step-hidden-right">
                 <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 shrink-0">3. Store Location</p>
-                <div class="mb-auto space-y-4">
-                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3 shrink-0">
-                        <i class="fas fa-map-marker-alt text-blue-500 mt-0.5"></i>
-                        <div>
-                            <h4 class="text-sm font-bold text-blue-900">Add Store Address</h4>
-                            <p class="text-xs text-blue-700 mt-1">Customers nearby will find you easily.</p>
+                <div class="mb-auto space-y-4 pb-12">
+                    
+                    
+                    <!-- ✨ GPS Button Banner ✨ -->
+                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col gap-3 shrink-0">
+                        <div class="flex gap-3">
+                            <i class="fas fa-map-marker-alt text-blue-500 mt-0.5"></i>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-bold text-blue-900">Add Store Address</h4>
+                                <p class="text-[11px] text-blue-700 mt-1 leading-snug">Customers nearby will find you easily using precise location.</p>
+                            </div>
                         </div>
+                        <button type="button" id="gps-btn" onclick="fetchGPS()" class="w-full bg-white border border-blue-200 text-blue-600 font-bold py-2.5 rounded-xl text-xs active:scale-95 transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fas fa-location-arrow"></i> Auto-Fetch Location
+                        </button>
                     </div>
                     
+                    <!-- ✨ Address Textarea ✨ -->
                     <div class="bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden p-4 shrink-0">
-                        <textarea id="setup-address" placeholder="Full Store Address & Landmark" rows="3" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900 resize-none"></textarea>
+                        <textarea id="setup-address" placeholder="Full Store Address (House No, Street, Area)" rows="2" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900 resize-none"></textarea>
                     </div>
+
+                    <!-- ✨ Landmark Input ✨ -->
+                    <div class="flex items-center bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden px-4 h-14 shrink-0">
+                        <i class="fas fa-map-pin text-gray-400 mr-3"></i>
+                        <input type="text" id="setup-landmark" placeholder="Nearby Landmark (Optional)" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900">
+                    </div>
+
+                    <!-- ✨ NEW: Google Map Link Input ✨ -->
+                    <div class="flex items-center bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 transition shadow-sm overflow-hidden px-4 h-14 shrink-0">
+                        <i class="fas fa-link text-gray-400 mr-3"></i>
+                        <input type="url" id="setup-map-link" placeholder="Google Map Link (Auto-fetches)" class="w-full bg-transparent outline-none text-sm font-bold text-gray-900 text-[#2563EB]">
+                    </div>
+
                 </div>
                 
-                <button type="button" onclick="submitFinalStore(event)" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_10px_20px_rgba(168,85,247,0.3)] flex justify-center items-center gap-2 shrink-0">
+                <button type="button" id="final-launch-btn" onclick="submitFinalStore(event)" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_10px_20px_rgba(168,85,247,0.3)] flex justify-center items-center gap-2 shrink-0">
                     Launch Store <i class="fas fa-rocket text-sm"></i>
                 </button>
             </div>
+
             
         </div>
     </div>
@@ -710,9 +734,12 @@
         let shopLat = null;
         let shopLng = null;
 
+        // ✨ 1. GPS फैच करने का अपडेटेड फंक्शन (मैप लिंक के साथ)
         function fetchGPS() {
             const btn = document.getElementById('gps-btn');
             const addr = document.getElementById('setup-address');
+            const mapLink = document.getElementById('setup-map-link'); // नया लिंक बॉक्स
+            
             if (!navigator.geolocation) { alert("GPS not supported."); return; }
             if(btn) btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Fetching...`;
             
@@ -720,14 +747,19 @@
                 shopLat = pos.coords.latitude;
                 shopLng = pos.coords.longitude;
                 
+                // ✨ जादुई लाइन: Google Maps का लिंक बनाकर बॉक्स में डालो
+                if(mapLink) {
+                    mapLink.value = `https://www.google.com/maps?q=${shopLat},${shopLng}`;
+                }
+                
                 try {
                     const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${shopLat}&lon=${shopLng}`);
                     const data = await res.json();
                     if(addr) addr.value = data.display_name;
                     if(btn) {
                         btn.innerHTML = `<i class="fas fa-check-circle"></i> Location Found`;
-                        btn.classList.replace('text-[#2563EB]', 'text-[#16A34A]');
-                        btn.classList.replace('bg-[#E0E7FF]', 'bg-[#DCFCE7]');
+                        btn.classList.replace('text-blue-600', 'text-green-600');
+                        btn.classList.replace('border-blue-200', 'border-green-200');
                     }
                 } catch(e) {
                     if(addr) addr.value = `Lat: ${shopLat.toFixed(4)}, Lng: ${shopLng.toFixed(4)}`;
@@ -739,7 +771,8 @@
             });
         }
 
-            // 2. प्रोफाइल एडिट करने का फंक्शन (FIXED: Edit Mode Text & Data)
+          
+        // ✨ 3. सेटिंग्स खोलना
         function openSettings() {
             closeProfileMenuIfOpen();
             isEditMode = true;
@@ -747,12 +780,9 @@
             const wizard = document.getElementById('store-setup-modal');
             if (wizard) wizard.classList.remove('hidden');
             
-            // ✨ टाइटल और बटन का नाम बदल दो ताकि पता चले कि "Edit" हो रहा है
             const h2 = document.querySelector('#store-setup-modal h2');
             if(h2) h2.innerText = "Edit Store Profile";
-            const p = document.querySelector('#store-setup-modal p');
-            if(p) p.innerText = "Update your store details below.";
-            const btn = document.querySelector('#setup-step-3 button');
+            const btn = document.getElementById('final-launch-btn');
             if(btn) btn.innerHTML = `Save Changes <i class="fas fa-save text-sm"></i>`;
             
             currentSetupStep = 1;
@@ -765,10 +795,11 @@
             const stepTxt = document.getElementById('setup-step-text');
             if(stepTxt) stepTxt.innerText = 'Step 1 of 3';
 
-            // डेटाबेस से पुरानी डिटेल्स फॉर्म में भर दो
             if (document.getElementById('setup-shop-name')) document.getElementById('setup-shop-name').value = globalShopData.shopName || '';
             if (document.getElementById('setup-owner-name')) document.getElementById('setup-owner-name').value = globalShopData.ownerName || '';
             if (document.getElementById('setup-address')) document.getElementById('setup-address').value = globalShopData.address || '';
+            if (document.getElementById('setup-landmark')) document.getElementById('setup-landmark').value = globalShopData.landmark || '';
+            if (document.getElementById('setup-map-link')) document.getElementById('setup-map-link').value = globalShopData.googleMapLink || '';
             if (document.getElementById('setup-desc')) document.getElementById('setup-desc').value = globalShopData.description || '';
 
             const existingCat = globalShopData.category || '';
@@ -780,7 +811,6 @@
                 }
             });
             
-            // अगर Other केटेगरी थी, तो बॉक्स खोलकर नाम भर दो
             if (!foundMatch && existingCat) {
                 const otherBtn = document.querySelector(`button[onclick="selectCategory(this, 'Other')"]`);
                 if (otherBtn) selectCategory(otherBtn, 'Other');
@@ -849,7 +879,20 @@
                     globalShopData.category = category; 
                     globalShopData.address = updatedAddress;
                     globalShopData.landmark = updatedLandmark;
-                    alert("Store details updated successfully!"); 
+                                       // ✨ नया iOS स्टाइल अपडेट पॉपअप खोलने का कोड ✨
+                    const updateModal = document.getElementById('update-success-modal');
+                    const updateContent = document.getElementById('update-success-content');
+                    if(updateModal) {
+                        updateModal.classList.remove('hidden');
+                        setTimeout(() => {
+                            updateModal.classList.remove('opacity-0');
+                            if(updateContent) {
+                                updateContent.classList.remove('scale-90');
+                                updateContent.classList.add('scale-100');
+                            }
+                        }, 10);
+                    }
+
                     
                     if(document.getElementById('store-name-display')) document.getElementById('store-name-display').innerText = updatedShopName;
                     if(document.getElementById('menu-owner-name')) document.getElementById('menu-owner-name').innerText = updatedOwnerName;
@@ -869,39 +912,37 @@
 
         function enterDashboard() { document.getElementById('congrats-screen').classList.add('hidden'); loadShopData(); }
 
-           // 1. लोड डेटा फंक्शन (FIXED: बार-बार सेटअप आना बंद)
+        // ✨ 2. लोड डेटा फंक्शन
         async function loadShopData() {
             try {
                 const doc = await db.collection('shops').doc(currentShopId).get();
                 if (doc.exists) {
                     globalShopData = doc.data();
-                    
-                    // ✨ जादुई फिक्स: अगर दुकान का नाम पहले से सेव है, तो बार-बार सेटअप मत पूछो!
-                    if (!globalShopData.shopName || !globalShopData.category) {
+                    const isSetupDone = globalShopData.setupCompleted === true || (globalShopData.shopName && globalShopData.category);
+
+                    if (!isSetupDone) {
                         isEditMode = false;
                         document.getElementById('main-dashboard')?.classList.add('hidden');
                         
                         const wizard = document.getElementById('store-setup-modal');
                         if (wizard) wizard.classList.remove('hidden');
 
-                        // नया स्टोर बनाते वक़्त टाइटल सेट करो
                         const h2 = document.querySelector('#store-setup-modal h2');
                         if(h2) h2.innerText = "Complete Your Store";
-                        const p = document.querySelector('#store-setup-modal p');
-                        if(p) p.innerText = "Let's set up your storefront easily.";
-                        const btn = document.querySelector('#setup-step-3 button');
+                        const btn = document.getElementById('final-launch-btn');
                         if(btn) btn.innerHTML = `Launch Store <i class="fas fa-rocket text-sm"></i>`;
                         
-                        // पुरानी डिटेल्स भर दो
                         if(document.getElementById('setup-shop-name')) document.getElementById('setup-shop-name').value = globalShopData.shopName || '';
                         if(document.getElementById('setup-owner-name')) document.getElementById('setup-owner-name').value = globalShopData.ownerName || '';
                         if(document.getElementById('setup-desc')) document.getElementById('setup-desc').value = globalShopData.description || '';
                         if(document.getElementById('setup-address')) document.getElementById('setup-address').value = globalShopData.address || '';
+                        if(document.getElementById('setup-landmark')) document.getElementById('setup-landmark').value = globalShopData.landmark || '';
+                        if(document.getElementById('setup-map-link')) document.getElementById('setup-map-link').value = globalShopData.googleMapLink || '';
                         
                         return;
                     }
                     
-                    // सब कुछ सही है तो सीधा डैशबोर्ड दिखाओ
+                    document.getElementById('store-setup-modal')?.classList.add('hidden');
                     document.getElementById('main-dashboard')?.classList.remove('hidden');
                     document.getElementById('store-name-display').innerText = globalShopData.shopName;
                     document.getElementById('menu-owner-name').innerText = globalShopData.ownerName;
@@ -1827,15 +1868,22 @@
             }
             goToStep(stepNumber);
         }
-
-        // 3. Back बटन का फंक्शन
+        // 1. बैक बटन का जादुई फिक्स (Blank Screen Solution)
         function prevSetupStep() {
             if (currentSetupStep > 1) {
                 goToStep(currentSetupStep - 1);
             } else {
-                document.getElementById('store-setup-modal').classList.add('hidden');
+                // अगर पहले स्टेप पर बैक दबाया...
+                if (isEditMode) {
+                    // अगर प्रोफाइल एडिट कर रहे थे, तो बस पॉपअप बंद कर दो (पीछे डैशबोर्ड दिखेगा)
+                    document.getElementById('store-setup-modal').classList.add('hidden');
+                } else {
+                    // अगर नया स्टोर बना रहे थे और बैक दबाया, तो होम पेज पर भेज दो (सफ़ेद स्क्रीन नहीं दिखेगी)
+                    window.location.href = "index.html";
+                }
             }
         }
+
 
         // 4. स्टेप बदलने और स्लाइड करने का जादुई फंक्शन (यही मिसिंग था!)
         function goToStep(targetStep) {
@@ -1857,8 +1905,7 @@
         }
 
                    // 4. फाइनल सबमिट फंक्शन (FIXED: authTemp Crash & setupCompleted save)
-        async function submitFinalStore(event) {
-            // Safe Variables
+async function submitFinalStore(event) {
             const tempName = (typeof authTemp !== 'undefined' && authTemp.name) ? authTemp.name : "";
             const tempPhone = (typeof authTemp !== 'undefined' && authTemp.phone) ? authTemp.phone : "Unknown";
             const tempPass = (typeof authTemp !== 'undefined' && authTemp.password) ? authTemp.password : "google-verified";
@@ -1868,6 +1915,8 @@
             const desc = document.getElementById('setup-desc').value.trim();
             let category = document.getElementById('selected-category').value;
             const address = document.getElementById('setup-address').value.trim();
+            const landmark = document.getElementById('setup-landmark') ? document.getElementById('setup-landmark').value.trim() : "";
+            const mapLink = document.getElementById('setup-map-link') ? document.getElementById('setup-map-link').value.trim() : "";
             
             if(category === 'Other') {
                 category = document.getElementById('other-category-input').value.trim();
@@ -1875,21 +1924,24 @@
 
             if(!address) { alert("Please add store address!"); return; }
             
-            const btn = event ? event.currentTarget : document.querySelector('#setup-step-3 button');
+            const btn = event ? event.currentTarget : document.getElementById('final-launch-btn');
             const origHtml = btn.innerHTML;
             btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> ${isEditMode ? 'Saving...' : 'Launching...'}`;
             btn.disabled = true;
 
             try {
                 if (isEditMode) {
-                    // अगर प्रोफाइल एडिट कर रहे हैं
                     await db.collection('shops').doc(currentShopId).update({
                         shopName: shopName, 
                         ownerName: ownerName,
                         description: desc,
                         category: category,
                         address: address,
-                        setupCompleted: true
+                        landmark: landmark,
+                        googleMapLink: mapLink, // लिंक डेटाबेस में सेव
+                        setupCompleted: true,
+                        latitude: typeof shopLat !== 'undefined' && shopLat !== null ? shopLat : (globalShopData.latitude || null),
+                        longitude: typeof shopLng !== 'undefined' && shopLng !== null ? shopLng : (globalShopData.longitude || null)
                     });
                     
                     globalShopData.shopName = shopName;
@@ -1897,6 +1949,10 @@
                     globalShopData.description = desc;
                     globalShopData.category = category;
                     globalShopData.address = address;
+                    globalShopData.landmark = landmark;
+                    globalShopData.googleMapLink = mapLink;
+                    if(typeof shopLat !== 'undefined' && shopLat !== null) globalShopData.latitude = shopLat;
+                    if(typeof shopLng !== 'undefined' && shopLng !== null) globalShopData.longitude = shopLng;
                     globalShopData.setupCompleted = true;
                     
                     localStorage.setItem('pixigenie_owner_name', ownerName);
@@ -1907,9 +1963,20 @@
                     document.getElementById('store-name-display').innerText = shopName;
                     document.getElementById('menu-owner-name').innerText = ownerName;
                     
-                    alert("Store details updated successfully!");
+                    // नया iOS पॉपअप
+                    const updateModal = document.getElementById('update-success-modal');
+                    const updateContent = document.getElementById('update-success-content');
+                    if(updateModal) {
+                        updateModal.classList.remove('hidden');
+                        setTimeout(() => {
+                            updateModal.classList.remove('opacity-0');
+                            if(updateContent) {
+                                updateContent.classList.remove('scale-90');
+                                updateContent.classList.add('scale-100');
+                            }
+                        }, 10);
+                    }
                 } else {
-                    // अगर एकदम नया स्टोर बना रहे हैं
                     const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
                     
                     const newShopData = { 
@@ -1919,10 +1986,14 @@
                         description: desc,
                         category: category,
                         address: address,
+                        landmark: landmark,
+                        googleMapLink: mapLink, // लिंक डेटाबेस में सेव
                         phone: tempPhone, 
                         password: tempPass, 
                         status: "active", 
-                        setupCompleted: true, // ✨ यह मिसिंग था
+                        setupCompleted: true,
+                        latitude: typeof shopLat !== 'undefined' ? shopLat : null,
+                        longitude: typeof shopLng !== 'undefined' ? shopLng : null,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp() 
                     };
                     
@@ -1951,10 +2022,42 @@
                 btn.disabled = false; 
             }
         }
+           // ✨ अपडेट पॉपअप बंद करने का फंक्शन
+        function closeUpdateSuccessModal() {
+            const updateModal = document.getElementById('update-success-modal');
+            const updateContent = document.getElementById('update-success-content');
+            if(updateModal) {
+                updateModal.classList.add('opacity-0');
+                updateContent.classList.remove('scale-100');
+                updateContent.classList.add('scale-90');
+                setTimeout(() => updateModal.classList.add('hidden'), 300);
+            }
+        }
+        // ✨ MOBILE KEYBOARD SCROLL FIX ✨
+        // जैसे ही कोई इनपुट छुएगा, वो अपने आप स्क्रीन के बीच में आ जाएगा
+        document.querySelectorAll('.step-container input, .step-container textarea').forEach(item => {
+            item.addEventListener('focus', function() {
+                setTimeout(() => {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300); // 300ms का इंतज़ार ताकि कीबोर्ड पूरा खुल जाए
+            });
+        });
 
-
-   
     </script>
+        <!-- ✨ iOS STYLE UPDATE SUCCESS MODAL ✨ -->
+    <div id="update-success-modal" class="fixed inset-0 bg-[#111827]/40 backdrop-blur-sm z-[150] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+        <div class="bg-white rounded-[24px] shadow-2xl max-w-xs w-full p-6 text-center transform scale-90 transition-all duration-300" id="update-success-content">
+            <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 shadow-sm border border-blue-100">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 class="text-xl font-black text-gray-900 mb-2">Profile Updated!</h3>
+            <p class="text-sm text-gray-500 font-medium mb-6">Your store details have been saved successfully.</p>
+            <button onclick="closeUpdateSuccessModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold py-3.5 rounded-xl transition active:scale-95 text-sm">
+                Done
+            </button>
+        </div>
+    </div>
+
     <!-- ✨ iOS STYLE STORE SUCCESS MODAL ✨ -->
     <div id="store-success-modal" class="fixed inset-0 bg-[#111827]/60 backdrop-blur-md z-[150] hidden flex items-center justify-center p-4 transition-all duration-300">
         <div class="bg-white rounded-[24px] shadow-2xl max-w-xs w-full p-8 text-center transform scale-90 opacity-0 transition-all duration-300" id="store-success-content">
