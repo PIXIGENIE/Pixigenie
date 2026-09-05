@@ -391,7 +391,11 @@
                                             <span class="text-[#6B7280] font-bold mr-1 border-r border-[#E5E7EB] pr-2">₹</span>
                                             <input type="number" id="prod-price" placeholder="Price" required class="w-full sm:w-24 bg-transparent text-sm font-semibold outline-none">
                                         </div>
+                                    
                                     </div>
+                                    <!-- ✨ NAYA: Product Description Box ✨ -->
+<textarea id="prod-desc" placeholder="Product Description (Optional - e.g. 100% Original, 1 Year Warranty)" rows="2" class="w-full bg-white border border-[#E5E7EB] rounded-[12px] px-4 py-3 text-sm font-semibold outline-none focus:border-[#A855F7] transition resize-none"></textarea>
+
                                     <div class="flex flex-col sm:flex-row gap-3">
                                         <div class="flex gap-2 sm:w-48 shrink-0">
                                             <input type="number" step="any" id="prod-qty" placeholder="Qty" required class="w-1/2 bg-white border border-[#E5E7EB] rounded-[12px] px-3 h-11 text-sm font-semibold outline-none focus:border-[#A855F7] transition">
@@ -1585,14 +1589,16 @@
             const p = parseInt(document.getElementById('prod-price').value);
             const qtySize = parseFloat(document.getElementById('prod-qty').value) || 1;
             const unit = document.getElementById('prod-unit').value;
-            
+            const desc = document.getElementById('prod-desc').value.trim();
+
             const btn = e.target.querySelector('button'); const orig = btn.innerHTML; 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
 
             const imgBase64 = await processImage(document.getElementById('prod-image'));
 
             try { 
-                let pd = { name: n, price: p, qtySize: qtySize, unit: unit, image: imgBase64, timestamp: firebase.firestore.FieldValue.serverTimestamp() }; 
+                let pd = { name: n, price: p, qtySize: qtySize, unit: unit, description: desc, image: imgBase64, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
+
                 const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
                 pd.id = doc.id; storeProducts.unshift(pd); e.target.reset(); renderAdminProducts(); 
             } catch(e) { alert(e.message); } 
@@ -1606,7 +1612,8 @@
             document.getElementById('edit-prod-price').value = p.price; 
             document.getElementById('edit-prod-qty').value = p.qtySize !== undefined ? p.qtySize : (p.stock !== undefined ? p.stock : 1);
             document.getElementById('edit-prod-unit').value = p.unit || 'pcs';
-            document.getElementById('edit-prod-image').value = ''; 
+           document.getElementById('prod-desc').value = '';
+ document.getElementById('edit-prod-image').value = ''; 
             
             document.getElementById('edit-product-form').dataset.id = id;
             const md = document.getElementById('edit-product-modal'); md.classList.remove('hidden'); setTimeout(()=>md.classList.add('opacity-100'),10);
