@@ -1278,18 +1278,32 @@
             }, 1000);
         }
 
-                function toggleCartModal() {
+                        function toggleCartModal() {
             const modal = document.getElementById('cart-modal');
             const content = document.getElementById('cart-modal-content');
+            
             if(modal.classList.contains('hidden')) {
                 renderCartItems();
                 
-                // ✨ Pre-fill Name & Phone in Cart ✨
+                // ✨ SMART PRE-FILL LOGIC ✨
+                const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
+                let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
+                const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
+
+                // अगर ईमेल है, तो फोन का डब्बा खाली छोड़ो
+                if (savedPhone.includes('@')) {
+                    savedPhone = ''; 
+                }
+                
+                // फॉर्म में डाटा भरो (अगर पहले से खाली है)
                 if(!document.getElementById('cart-cust-name').value) {
-                    document.getElementById('cart-cust-name').value = localStorage.getItem('pixigenie_customer_name') || '';
+                    document.getElementById('cart-cust-name').value = savedName;
                 }
                 if(!document.getElementById('cart-cust-phone').value) {
-                    document.getElementById('cart-cust-phone').value = localStorage.getItem('pixigenie_customer_phone') || '';
+                    document.getElementById('cart-cust-phone').value = savedPhone;
+                }
+                if(!document.getElementById('cart-address').value && savedAddress) {
+                    document.getElementById('cart-address').value = savedAddress;
                 }
 
                 modal.classList.remove('hidden');
@@ -1307,6 +1321,7 @@
                 }, 300); 
             }
         }
+
 
         // ==========================================
         // 🍔 SIDEBAR MENU LOGIC
@@ -1474,16 +1489,30 @@
         // --- ORDER CHECKOUT MODAL LOGIC ---
         let currentOrder = null;
 
-              function openOrderModal(itemName, itemPrice, shopName, shopPhone) {
+                      function openOrderModal(itemName, itemPrice, shopName, shopPhone) {
             currentOrder = { itemName, itemPrice, shopName, shopPhone };
             document.getElementById('order-item-name').innerText = itemName;
             document.getElementById('order-item-price').innerText = `₹${itemPrice}`;
             document.getElementById('order-shop-name').innerText = shopName || 'Local Store';
             
-            // ✨ CUSTOMER DATA PRE-FILL (Auto-Bhar Jayega) ✨
-            document.getElementById('order-cust-name').value = localStorage.getItem('pixigenie_customer_name') || '';
-            document.getElementById('order-cust-phone').value = localStorage.getItem('pixigenie_customer_phone') || '';
-            document.getElementById('order-shop-phone').value = shopPhone || '';
+            // ✨ SMART PRE-FILL LOGIC (Email filter + Saved Address) ✨
+            const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
+            let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
+            const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
+
+            // अगर फोन में '@' है (यानी ईमेल है), तो इसे खाली छोड़ दो
+            if (savedPhone.includes('@')) {
+                savedPhone = '';
+            }
+
+            // फॉर्म में डाटा डाल दो
+            document.getElementById('order-cust-name').value = savedName;
+            document.getElementById('order-cust-phone').value = savedPhone;
+            document.getElementById('order-address').value = savedAddress;
+            
+            if (document.getElementById('order-shop-phone')) {
+                document.getElementById('order-shop-phone').value = shopPhone || '';
+            }
 
             const modal = document.getElementById('order-modal');
             const content = document.getElementById('order-modal-content');
@@ -1496,7 +1525,6 @@
             }, 10);
             document.body.style.overflow = 'hidden'; 
         }
-
 
         function closeOrderModal() {
             const modal = document.getElementById('order-modal');
@@ -1803,12 +1831,14 @@
                 </div>
             </div>
 
-            <!-- Modal Footer (Logout) -->
+                   <!-- Modal Footer (Logout) -->
             <div class="p-5 border-t border-gray-100 shrink-0">
-                <button onclick="logout()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm">
+                <!-- यहाँ logout() को बदलकर logoutUser() कर दे 👇 -->
+                <button onclick="logoutUser()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
+
         </div>
     </div>
 
