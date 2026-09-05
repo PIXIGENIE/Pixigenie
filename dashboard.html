@@ -338,7 +338,13 @@
                                         <div class="flex justify-between items-center border-b border-[#E5E7EB] pb-2 mb-2"><span class="text-[11px] text-[#6B7280] uppercase font-bold"><i class="fas fa-hand-holding-usd text-[#DC2626] mr-1"></i> Udhar (Pending)</span><span id="insight-udhar-list" class="font-bold text-[#DC2626] text-sm">₹0</span></div>
                                         <div class="flex flex-col border-b border-[#E5E7EB] pb-3 mb-3">
                                             <div class="flex justify-between items-center mb-2.5"><span class="text-[11px] text-[#6B7280] uppercase font-bold"><i class="fas fa-boxes text-[#2563EB] mr-1"></i> Investment</span><span id="insight-display-investment" class="font-bold text-[#111827] text-sm">₹0</span></div>
-                                            <div class="flex justify-between items-center bg-white p-1.5 rounded-[12px] border border-[#E5E7EB]"><span class="text-[9px] text-[#6B7280] font-bold pl-2 uppercase">+ Add Expense</span><div class="flex items-center gap-1"><input type="number" id="insight-add-expense-input" placeholder="₹0" class="w-16 bg-[#F7F7F9] rounded-[8px] px-2 h-7 text-[#111827] text-xs font-bold outline-none"><button onclick="addMonthlyExpense(event)" class="bg-[#2563EB] text-white px-2 h-7 rounded-[8px] text-[10px] font-bold active:scale-95 transition">Add</button></div></div>
+                                            <div class="flex justify-between items-center bg-white p-1.5 rounded-[12px] border border-[#E5E7EB]"><span class="text-[9px] text-[#6B7280] font-bold pl-2 uppercase">+ Add Expense</span><div class="flex items-center gap-1">
+    <input type="number" id="insight-add-expense-input" placeholder="₹0" class="w-16 bg-[#F7F7F9] rounded-[8px] px-2 h-7 text-[#111827] text-xs font-bold outline-none">
+    <!-- ✨ NAYA: Undo/Minus Button ✨ -->
+    <button onclick="subtractMonthlyExpense(event)" class="bg-[#DC2626] text-white px-2.5 h-7 rounded-[8px] text-[12px] font-bold active:scale-95 transition"><i class="fas fa-minus"></i></button>
+    <button onclick="addMonthlyExpense(event)" class="bg-[#2563EB] text-white px-3 h-7 rounded-[8px] text-[10px] font-bold active:scale-95 transition">Add</button>
+</div>
+</div>
                                             <div class="text-right mt-1.5"><button onclick="resetMonthlyInvestment()" class="text-[8px] text-[#DC2626] hover:underline font-bold uppercase tracking-wider">Reset Investment</button></div>
                                         </div>
                                         <div class="flex justify-between items-center"><span class="text-xs text-[#111827] uppercase font-black tracking-widest"><i class="fas fa-chart-line text-[#16A34A] mr-1"></i> Net Profit</span><span id="insight-net-profit" class="font-black text-xl text-[#16A34A]">₹0</span></div>
@@ -1295,6 +1301,44 @@
                 allInvestments[mKey] = newTotal; input.value = ''; renderInsights();
             } catch(err) { alert(err.message); }
             btn.innerText = "Add"; setTimeout(() => { btn.disabled = false; }, 1500);
+        }
+        // ✨ NAYA: Expense को Undo (Minus) करने का फंक्शन ✨
+        async function subtractMonthlyExpense(e) {
+            const input = document.getElementById('insight-add-expense-input'); 
+            let val = parseInt(input.value);
+            if (isNaN(val) || val <= 0) return alert("Enter valid amount to subtract!");
+            
+            const btn = e.currentTarget; 
+            const orig = btn.innerHTML; 
+            btn.innerHTML = "⏳"; 
+            btn.disabled = true;
+            
+            let mPick = document.getElementById('insight-month-picker'); 
+            let y = new Date().getFullYear(); 
+            let m = new Date().getMonth();
+            if (mPick && mPick.value) { 
+                const p = mPick.value.split('-'); 
+                y = parseInt(p[0]); 
+                m = parseInt(p[1]) - 1; 
+            }
+            let mKey = `${y}-${(m + 1).toString().padStart(2, '0')}`;
+            
+            let currentTotal = allInvestments[mKey] || 0;
+            let newTotal = currentTotal - val;
+            
+            // इन्वेस्टमेंट 0 से नीचे (माइनस में) न जाए
+            if(newTotal < 0) newTotal = 0; 
+
+            try {
+                await db.collection('shops').doc(currentShopId).collection('investments').doc(mKey).set({ amount: newTotal }, { merge: true });
+                allInvestments[mKey] = newTotal; 
+                input.value = ''; 
+                renderInsights();
+            } catch(err) { 
+                alert(err.message); 
+            }
+            btn.innerHTML = orig; 
+            setTimeout(() => { btn.disabled = false; }, 1500);
         }
 
         async function resetMonthlyInvestment() {
