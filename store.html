@@ -134,6 +134,15 @@
             </div>
             <div id="my-review-container" class="hidden mb-6 bg-purple-50/50 border border-purple-100/50 rounded-[20px] p-5 relative"></div>
             <div id="review-form-container" class="mb-8 hidden transition-all duration-300"></div>
+            <div id="logged-out-review-box" class="text-center py-8 bg-[#F7F7F9] rounded-[20px] border border-[#E5E7EB] mb-6">
+    <div class="w-12 h-12 bg-white text-[#9CA3AF] rounded-full flex items-center justify-center text-xl mx-auto mb-3 shadow-sm border border-[#E5E7EB]">
+        <i class="fas fa-lock"></i>
+    </div>
+    <p class="text-sm font-bold text-[#6B7280] mb-4">Log in to shop & post reviews</p>
+    <button onclick="goToCustomerLogin()" class="bg-[#111827] text-white font-bold py-3 px-8 rounded-xl text-sm active:scale-95 transition shadow-md">
+        Login / Sign Up
+    </button>
+</div>
             <div id="reviews-list" class="space-y-4"><p class="text-center text-sm text-gray-400 py-4 font-semibold"><i class="fas fa-circle-notch fa-spin"></i> Loading reviews...</p></div>
             <button id="load-more-reviews-btn" onclick="loadReviews(true)" class="w-full mt-6 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-3.5 rounded-[16px] text-sm transition hidden active:scale-95">Load More</button>
         </div>
@@ -678,9 +687,25 @@
                 } else { badge.classList.add('hidden'); }
             }
         }
+        // ✨ कस्टमर को लॉगिन पर भेजना और वापस आने का रास्ता सेव करना
+        function goToCustomerLogin() {
+            localStorage.setItem('pixigenie_return_url', window.location.href);
+            window.location.href = 'index.html'; 
+        }
+
+        // ✨ शॉपिंग से पहले लॉगिन चेक करने का फंक्शन
+        function enforceCustomerLogin() {
+            const isCustomerLoggedIn = localStorage.getItem('pixigenie_customer_phone'); 
+            if (!isCustomerLoggedIn) {
+                goToCustomerLogin();
+                return false;
+            }
+            return true;
+        }
 
         function addToCart(event, name, price, shopName, shopPhone) {
             event.stopPropagation(); 
+            if (!enforceCustomerLogin()) return;
             let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
             const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
             if (existingItem) { existingItem.qty += 1; } else { cart.push({ name, price: parseInt(price), shopName, shopPhone, qty: 1 }); }
@@ -801,6 +826,7 @@
         let currentOrder = null;
 
         function openOrderModal(itemName, itemPrice, shopName, shopPhone) {
+               if (!enforceCustomerLogin()) return;
             currentOrder = { itemName, itemPrice, shopName, shopPhone };
             document.getElementById('order-item-name').innerText = itemName;
             document.getElementById('order-item-price').innerText = `₹${itemPrice}`;
@@ -925,6 +951,26 @@
                 (error) => { alert("⚠️ Please allow location access in your browser to use Auto-Fetch."); btn.innerHTML = `<i class="fas fa-location-crosshairs"></i> Locate Me`; btn.disabled = false; },
                 { enableHighAccuracy: true, timeout: 10000 }
             );
+        }
+        // ✨ कस्टमर को लॉगिन पर भेजना और वापस आने का रास्ता सेव करना
+        function goToCustomerLogin() {
+            // मौजूदा दुकान का पूरा URL localStorage में सेव कर दो
+            localStorage.setItem('pixigenie_return_url', window.location.href);
+            // लॉगिन पेज पर भेज दो
+            window.location.href = 'index.html'; 
+        }
+
+        // ✨ शॉपिंग से पहले लॉगिन चेक करने का फंक्शन
+        function enforceCustomerLogin() {
+            // चेक करो कि कस्टमर का डेटा सेव है या नहीं (अपने हिसाब से key बदल लेना अगर अलग हो)
+            const isCustomerLoggedIn = localStorage.getItem('pixigenie_customer_phone') || localStorage.getItem('customer_data'); 
+            
+            if (!isCustomerLoggedIn) {
+                // अगर लॉगिन नहीं है, तो सीधा लॉगिन पेज पर फेंको
+                goToCustomerLogin();
+                return false;
+            }
+            return true;
         }
 
     </script>
