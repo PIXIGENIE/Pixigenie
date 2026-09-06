@@ -10,7 +10,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
+       <!-- ✨ NAYA: Offline QR Code Generator Library ✨ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -663,7 +664,7 @@
             .font-serif-logo { font-family: 'Playfair Display', serif; }
             .font-cursive { font-family: 'Great Vibes', cursive; }
         </style>
-        <div class="absolute bottom-16 left-0 w-[400px] h-[300px] opacity-10 bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')] pointer-events-none z-0"></div>
+       
         <div class="px-10 pt-12 pb-6 flex justify-between items-start relative z-10 border-b border-[#e6dfd3]">
             <div class="flex flex-col items-center text-center">
                             <div class="relative w-32 h-32 mb-2 rounded-full border-[3px] border-[#c29b62] bg-gradient-to-br from-[#ffffff] to-[#f5ebd9] flex items-center justify-center shadow-md overflow-hidden group">
@@ -721,7 +722,8 @@
         </div>
         <div class="bg-[#4A3B32] text-[#f5ebd9] px-10 py-6 rounded-t-[40px] flex justify-between items-center relative z-10 mt-10">
             <div class="text-[11px] space-y-2 w-2/3"><p class="font-bold text-white tracking-wider uppercase" id="print-store-name-2">STORE</p><p id="print-store-address">Address</p><p id="print-store-phone">Phone</p></div>
-            <div class="w-1/3 text-center"><p id="receipt-qr-label" class="text-[10px] uppercase font-bold mb-2 text-[#c29b62]">Scan To Pay / Visit</p><div class="bg-white p-1 inline-block rounded"><img id="receipt-qr-img" src="" class="w-16 h-16" crossorigin="anonymous"></div></div>
+            <div class="w-1/3 text-center"><p id="receipt-qr-label" class="text-[10px] uppercase font-bold mb-2 text-[#c29b62]">Scan To Pay / Visit</p><div class="bg-white p-1.5 inline-block rounded"><div id="receipt-qr-img" class="w-16 h-16 flex items-center justify-center"></div></div>
+</div>
         </div>
     </div>
     
@@ -1899,7 +1901,7 @@
             let sE = document.getElementById('receipt-paystatus');
             if(sE) { sE.innerText = isP ? 'PAID ✓' : 'UNPAID'; sE.className = isP ? 'text-green-600 font-bold uppercase' : 'text-red-600 font-bold uppercase'; }
 
-             // ✨ 5. QR CODE FIX: QuickChart API (100% Working for Canvas) ✨
+                    // ✨ 5. 100% OFFLINE QR CODE GENERATOR (No API, No CORS Issue) ✨
             let qI = document.getElementById('receipt-qr-img'); 
             let qL = document.getElementById('receipt-qr-label');
             
@@ -1909,27 +1911,21 @@
                 
                 if (qL) qL.innerText = "VISIT STORE";
                 
-                // ✨ NAYI API: Jo security me block nahi hoti
-                let qrApiUrl = `https://quickchart.io/qr?text=${encodeURIComponent(storeUrl)}&size=150&margin=0`;
+                // Purana QR saaf karo
+                qI.innerHTML = "";
 
-                // Fetch karke Base64 me convert karna
-                fetch(qrApiUrl)
-                    .then(res => res.blob())
-                    .then(blob => {
-                        let reader = new FileReader();
-                        reader.onloadend = function() {
-                            qI.src = reader.result; 
-                            // QR lagne ke theek 300ms baad bill banega
-                            setTimeout(generateCanvas, 300); 
-                        }
-                        reader.readAsDataURL(blob);
-                    })
-                    .catch(e => {
-                        // Agar internet ya kisi wajah se fetch fail ho, toh direct image lagao
-                        qI.setAttribute('crossorigin', 'anonymous');
-                        qI.src = qrApiUrl;
-                        setTimeout(generateCanvas, 1200);
-                    });
+                // Naya QR bina internet ke locally generate karo
+                new QRCode(qI, {
+                    text: storeUrl,
+                    width: 64, // 16 * 4 (w-16 in Tailwind)
+                    height: 64,
+                    colorDark : "#4A3B32", // Bill text color se match karta hua QR
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.L
+                });
+
+                // QR turant render hoga, fir bhi safely canvas ke liye thoda wait karte hain
+                setTimeout(generateCanvas, 300);
             } else {
                 generateCanvas();
             }
@@ -1939,6 +1935,7 @@
                 const c = document.getElementById('receipt-container');
                 if (typeof html2canvas === 'undefined') return alert("Library missing.");
                 
+                // allowTaint hata diya kyunki ab koi external image nahi hai
                 html2canvas(c, { scale: 2, backgroundColor: "#Fdfbf7", useCORS: true, logging: false }).then(cv => {
                     let l = document.createElement('a'); 
                     l.download = `Invoice_${b.customerName.replace(/\s+/g, '_')}.png`; 
@@ -1946,9 +1943,7 @@
                     l.click();
                 }).catch(e => alert("Failed generating image."));
             }
-
-        }
-
+}
 
         async function shareStoreLink() {
             let u = window.location.origin + window.location.pathname.replace("dashboard.html", "store.html");
