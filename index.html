@@ -1731,6 +1731,19 @@
                 const isEmail = phoneStr.includes('@');
 
                 document.getElementById('prof-name').innerText = name;
+                                // ✨ Dukaandar ke liye Delivery Hide, Dashboard Show ✨
+                if (activeShop) {
+                    document.getElementById('prof-merchant-btn').classList.remove('hidden');
+                    document.getElementById('delivery-section-wrapper').classList.add('hidden');
+                } else {
+                    document.getElementById('prof-merchant-btn').classList.add('hidden');
+                    document.getElementById('delivery-section-wrapper').classList.remove('hidden');
+                }
+
+                // ✨ Edit form pre-fill ✨
+                document.getElementById('edit-prof-name').value = name !== 'Customer' ? name : '';
+                document.getElementById('edit-prof-phone').value = isEmail ? '' : (phoneStr !== 'N/A' ? phoneStr : '');
+
                                // ✨ NAYA: Load Profile Image ✨
                 const savedImg = localStorage.getItem('pixigenie_profile_img');
                 const imgPreview = document.getElementById('prof-img-preview');
@@ -1890,96 +1903,281 @@
             };
             reader.readAsDataURL(file);
         }
+             // ✨ NAYA: Keyboard Jump/Glitch 100% Fix ✨
+               function toggleProfEdit() {
+            const viewMode = document.getElementById('prof-view-mode');
+            const editMode = document.getElementById('prof-edit-mode');
+            
+            if (viewMode.classList.contains('hidden')) {
+                viewMode.classList.remove('hidden'); 
+                editMode.classList.add('hidden'); 
+                editMode.classList.remove('flex');
+            } else {
+                viewMode.classList.add('hidden'); 
+                editMode.classList.remove('hidden'); 
+                editMode.classList.add('flex');
+                
+                // ✨ Auto-focus hata diya! Ab screen bilkul nahi hilegi.
+                // User aaram se form dekh kar khud tap karega.
+            }
+        }
+
+            async function saveProfChanges(event) {
+            const newName = document.getElementById('edit-prof-name').value.trim();
+            const activeShop = localStorage.getItem('pixigenie_active_shop');
+            const customerPhone = localStorage.getItem('pixigenie_customer_phone');
+            
+            if(!newName) return alert("Name is required!");
+            const btn = event.currentTarget; const orig = btn.innerText;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+
+            try {
+                if (activeShop) {
+                    await db.collection('shops').doc(activeShop).update({ ownerName: newName });
+                    localStorage.setItem('pixigenie_owner_name', newName);
+                } else if (customerPhone) {
+                    await db.collection('customers').doc(customerPhone).update({ name: newName });
+                    localStorage.setItem('pixigenie_customer_name', newName);
+                }
+
+                // UI me sirf naam update hoga, login ID wahi rahegi jo thi
+                document.getElementById('prof-name').innerText = newName;
+                document.getElementById('prof-initial').innerText = newName.charAt(0).toUpperCase();
+                
+                const navInitials = document.getElementById('nav-initials');
+                if (navInitials) navInitials.innerText = getInitials(newName);
+                
+                toggleProfEdit();
+            } catch(e) { alert("Error: " + e.message); } 
+            finally { btn.innerText = orig; btn.disabled = false; }
+        }
+
 
     </script>
     <!-- ✨ iOS STYLE CUSTOMER PROFILE MODAL ✨ -->
-    <div id="ios-profile-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300 opacity-0">
-        <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-md h-[90vh] sm:h-auto sm:max-h-[90vh] flex flex-col transform translate-y-full sm:scale-95 sm:translate-y-0 transition-all duration-300 relative" id="ios-profile-content">
+    <div id="ios-profile-modal" class="fixed inset-0 z-[150] hidden transition-all duration-300 opacity-0">
+        
+        <!-- 🚀 1. Background Blur -->
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="toggleProfileModal()"></div>
+        
+        <!-- 🚀 2. MAGIC FIX: Pinned exactly to TOP (top-16). Ab keyboard isko hila hi nahi payega! -->
+        <div class="absolute top-16 left-0 right-0 w-full max-w-md mx-auto px-4">
             
-            <!-- Modal Header -->
-            <div class="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
-                <h3 class="font-black text-gray-900 text-xl">My Account</h3>
-                <button onclick="toggleProfileModal()" class="text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90"><i class="fas fa-times"></i></button>
-            </div>
-
-            <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
-                <!-- Basic Info Card -->
-                <div class="bg-gray-50 rounded-2xl p-4 flex items-center gap-4 border border-gray-100">
-                <!-- ✨ NAYA: Clickable Profile/Store Logo Upload ✨ -->
-<label class="relative w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold cursor-pointer overflow-hidden group shrink-0 border border-indigo-200 shadow-sm">
-    <span id="prof-initial">U</span>
-    <!-- यहाँ अपलोड की हुई फोटो दिखेगी -->
-    <img id="prof-img-preview" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
-    
-    <!-- होवर करने पर कैमरे का आइकॉन दिखेगा -->
-    <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center z-20 transition-all">
-        <i class="fas fa-camera text-white text-[14px]"></i>
-    </div>
-    
-    <!-- असली फाइल इनपुट जो छुपा हुआ है -->
-    <input type="file" accept="image/*" class="hidden" onchange="uploadProfileImage(event)">
-</label>
-
-                    <div class="flex-1">
-                        <h4 class="font-bold text-gray-900 text-[15px]" id="prof-name">Customer Name</h4>
-                        <p class="text-xs text-gray-500 font-medium" id="prof-phone">+91 xxxxxxxxxx</p>
-                        <p class="text-[11px] text-gray-400 font-bold mt-0.5 hidden" id="prof-email">email@gmail.com</p>
-                    </div>
+            <div id="ios-profile-content" class="bg-white rounded-[2rem] shadow-2xl w-full max-h-[75vh] flex flex-col transform scale-90 transition-all duration-300 relative">
+                
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
+                    <h3 class="font-black text-gray-900 text-xl">My Account</h3>
+                    <button onclick="toggleProfileModal()" class="text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90"><i class="fas fa-times"></i></button>
                 </div>
 
-                           <!-- Dashboard Button -->
-                <button id="prof-merchant-btn" onclick="window.location.href='dashboard.html'" class="hidden w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm mb-4">
-                    <i class="fas fa-store"></i> Merchant Dashboard
-                </button>
-
-
-                <!-- Saved Address Section -->
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt text-gray-400"></i> Saved Delivery Details</h4>
-                    <p class="text-[11px] text-gray-500 mb-4 font-medium leading-relaxed">Save your details here so you don't have to type them every time you order.</p>
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
                     
-                    <div class="space-y-3">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Full Name</label>
-                                <input type="text" id="saved-name" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
+                    <!-- Basic Info Card -->
+                    <div class="bg-gray-50 rounded-2xl p-4 flex items-start gap-4 border border-gray-100">
+                        <!-- Profile Image -->
+                        <label class="relative w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold cursor-pointer overflow-hidden group shrink-0 border border-indigo-200 shadow-sm mt-1">
+                            <span id="prof-initial">U</span>
+                            <img id="prof-img-preview" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+                            <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center z-20 transition-all">
+                                <i class="fas fa-camera text-white text-[14px]"></i>
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Phone</label>
-                                <input type="tel" id="saved-phone" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
+                            <input type="file" accept="image/*" class="hidden" onchange="uploadProfileImage(event)">
+                        </label>
+
+                        <div class="flex-1 min-w-0">
+                            <!-- View Mode -->
+                            <div id="prof-view-mode">
+                                <div class="flex justify-between items-start">
+                                    <h4 class="font-bold text-gray-900 text-[15px] truncate" id="prof-name">Customer Name</h4>
+                                    <button onclick="toggleProfEdit()" class="text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-[10px] uppercase font-bold active:scale-95 transition border border-blue-100 shrink-0 mt-0.5"><i class="fas fa-pen mr-1"></i> Edit</button>
+                                </div>
+                                <p class="text-xs text-gray-500 font-medium mt-0.5" id="prof-phone">+91 xxxxxxxxxx</p>
+                            </div>
+
+                            <!-- Edit Mode -->
+                            <div id="prof-edit-mode" class="hidden flex-col gap-2 mt-1">
+                                <input type="text" id="edit-prof-name" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-blue-500" placeholder="Full Name">
+                                <div class="flex gap-2 mt-1">
+                                    <button onclick="saveProfChanges(event)" class="flex-1 bg-gray-900 text-white rounded-lg py-2 text-xs font-bold active:scale-95 transition">Save</button>
+                                    <button onclick="toggleProfEdit()" class="flex-1 bg-gray-200 text-gray-700 rounded-lg py-2 text-xs font-bold active:scale-95 transition">Cancel</button>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Landmark (Optional)</label>
-                            <input type="text" id="saved-landmark" placeholder="e.g. Near City Hospital" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
-                        </div>
-                        <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Full Address</label>
-                                <button type="button" onclick="fetchProfileGPS()" id="prof-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition">
-                                    <i class="fas fa-location-crosshairs"></i> Auto-Fetch
-                                </button>
-                            </div>
-                            <textarea id="saved-address" placeholder="House No, Street, City..." rows="2" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition resize-none"></textarea>
-                        </div>
+                    </div>
+
+                    <!-- Dashboard Button -->
+                    <button id="prof-merchant-btn" onclick="window.location.href='dashboard.html'" class="hidden w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm mb-4 border border-indigo-100">
+                        <i class="fas fa-store"></i> Merchant Dashboard
+                    </button>
+
+                    <!-- Saved Delivery Section -->
+                    <div id="delivery-section-wrapper">
+                        <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt text-gray-400"></i> Saved Delivery Details</h4>
+                        <p class="text-[11px] text-gray-500 mb-4 font-medium leading-relaxed">Save your details here so you don't have to type them every time you order.</p>
                         
-                        <button onclick="saveCustomerAddress()" id="save-addr-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3.5 rounded-xl active:scale-95 transition text-sm shadow-md mt-2 flex justify-center items-center gap-2">
-                            Save Details
-                        </button>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Full Name</label>
+                                    <input type="text" id="saved-name" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Phone</label>
+                                    <input type="tel" id="saved-phone" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Landmark (Optional)</label>
+                                <input type="text" id="saved-landmark" placeholder="e.g. Near City Hospital" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Full Address</label>
+                                    <button type="button" onclick="fetchProfileGPS()" id="prof-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition">
+                                        <i class="fas fa-location-crosshairs"></i> Auto-Fetch
+                                    </button>
+                                </div>
+                                <textarea id="saved-address" placeholder="House No, Street, City..." rows="2" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition resize-none"></textarea>
+                            </div>
+                            
+                            <button onclick="saveCustomerAddress()" id="save-addr-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3.5 rounded-xl active:scale-95 transition text-sm shadow-md mt-2 flex justify-center items-center gap-2">
+                                Save Details
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-                   <!-- Modal Footer (Logout) -->
-            <div class="p-5 border-t border-gray-100 shrink-0">
-                <!-- यहाँ logout() को बदलकर logoutUser() कर दे 👇 -->
-                <button onclick="logoutUser()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
+                <!-- Modal Footer (Logout) -->
+                <div class="p-5 border-t border-gray-100 shrink-0">
+                    <button onclick="logoutUser()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm border border-red-100">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
 
+            </div>
         </div>
     </div>
+
+
+    <!-- ✨ FINAL JAVASCRIPT FOR PROFILE ✨ -->
+    <script>
+        function toggleProfileModal() {
+            const modal = document.getElementById('ios-profile-modal');
+            const content = document.getElementById('ios-profile-content');
+            const oldDropdown = document.getElementById('profile-dropdown'); 
+            if(oldDropdown) oldDropdown.classList.add('hidden');
+
+            if (modal.classList.contains('hidden')) {
+                const name = localStorage.getItem('pixigenie_customer_name') || localStorage.getItem('pixigenie_owner_name') || 'Customer';
+                const phoneStr = localStorage.getItem('pixigenie_customer_phone') || 'N/A'; 
+                const activeShop = localStorage.getItem('pixigenie_active_shop'); 
+                const isEmail = phoneStr.includes('@');
+
+                // UI Texts
+                document.getElementById('prof-name').innerText = name;
+                document.getElementById('prof-phone').innerText = isEmail ? phoneStr : (phoneStr !== 'N/A' ? '+91 ' + phoneStr : 'N/A');
+
+                // Image Load
+                const savedImg = localStorage.getItem('pixigenie_profile_img');
+                const imgPreview = document.getElementById('prof-img-preview');
+                const initialText = document.getElementById('prof-initial');
+                if (savedImg) {
+                    imgPreview.src = savedImg; imgPreview.classList.remove('hidden'); initialText.style.display = 'none';
+                } else {
+                    imgPreview.classList.add('hidden'); initialText.style.display = 'flex';
+                    initialText.innerText = name.charAt(0).toUpperCase();
+                }
+
+                // ✨ NAYA LOGIC: Dukaandar ko kya dikhega aur Customer ko kya ✨
+                const merchantBtn = document.getElementById('prof-merchant-btn');
+                const deliverySection = document.getElementById('delivery-section-wrapper');
+                if (activeShop) {
+                    merchantBtn.classList.remove('hidden');
+                    if (deliverySection) deliverySection.classList.add('hidden');
+                } else {
+                    merchantBtn.classList.add('hidden');
+                    if (deliverySection) deliverySection.classList.remove('hidden');
+                }
+
+                // Reset Edit Mode
+                document.getElementById('prof-view-mode').classList.remove('hidden');
+                document.getElementById('prof-edit-mode').classList.add('hidden');
+                document.getElementById('prof-edit-mode').classList.remove('flex');
+
+                // Pre-fill Forms
+                document.getElementById('edit-prof-name').value = name !== 'Customer' ? name : '';
+
+                
+                document.getElementById('saved-name').value = localStorage.getItem('pixigenie_saved_name') || name;
+                document.getElementById('saved-phone').value = localStorage.getItem('pixigenie_saved_phone') || (isEmail ? '' : phoneStr);
+                document.getElementById('saved-landmark').value = localStorage.getItem('pixigenie_saved_landmark') || '';
+                document.getElementById('saved-address').value = localStorage.getItem('pixigenie_saved_address') || '';
+
+                             // ✨ NAYI ANIMATION: Ab neeche se nahi aayega, center me zoom hoke khulega ✨
+                modal.classList.remove('hidden');
+                setTimeout(() => { 
+                    modal.classList.remove('opacity-0'); 
+                    content.classList.remove('scale-90'); 
+                    content.classList.add('scale-100'); 
+                }, 10);
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                modal.classList.add('opacity-0'); 
+                content.classList.remove('scale-100'); 
+                content.classList.add('scale-90');
+                setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); 
+            }
+        }
+
+             // ✨ NAYA 1: Focus hata diya taaki BLINK na ho ✨
+        function toggleProfEdit() {
+            const viewMode = document.getElementById('prof-view-mode');
+            const editMode = document.getElementById('prof-edit-mode');
+            if (viewMode.classList.contains('hidden')) {
+                viewMode.classList.remove('hidden'); 
+                editMode.classList.add('hidden'); 
+                editMode.classList.remove('flex');
+            } else {
+                viewMode.classList.add('hidden'); 
+                editMode.classList.remove('hidden'); 
+                editMode.classList.add('flex');
+                // 👉 Yahan se focus() hamesha ke liye hata diya hai, ab jump/blink nahi hoga!
+            }
+        }
+
+        // ✨ NAYA 2: Phone wala crash fix kar diya ✨
+        async function saveProfChanges(event) {
+            const newName = document.getElementById('edit-prof-name').value.trim();
+            const activeShop = localStorage.getItem('pixigenie_active_shop');
+            const customerPhone = localStorage.getItem('pixigenie_customer_phone');
+            
+            if(!newName) return alert("Name is required!");
+            const btn = event.currentTarget; const orig = btn.innerText;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+
+            try {
+                if (activeShop) {
+                    await db.collection('shops').doc(activeShop).update({ ownerName: newName });
+                    localStorage.setItem('pixigenie_owner_name', newName);
+                } else if (customerPhone) {
+                    await db.collection('customers').doc(customerPhone).update({ name: newName });
+                    localStorage.setItem('pixigenie_customer_name', newName);
+                }
+
+                // UI update
+                document.getElementById('prof-name').innerText = newName;
+                document.getElementById('prof-initial').innerText = newName.charAt(0).toUpperCase();
+                
+                const navInitials = document.getElementById('nav-initials');
+                if (navInitials) navInitials.innerText = getInitials(newName);
+                
+                toggleProfEdit();
+            } catch(e) { alert("Error: " + e.message); } 
+            finally { btn.innerText = orig; btn.disabled = false; }
+        }
+
+    </script>
 
 </body>
 </html>
