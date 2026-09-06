@@ -740,42 +740,47 @@
                 </table>
             </div>
 
-            <!-- BOTTOM SECTION (Always at bottom) -->
-            <div class="shrink-0 mt-auto">
-                <!-- TOTALS & STATUS -->
-                <div class="mx-14 pt-4 flex justify-between items-end border-t-2 border-gray-200">
-                    <div class="mb-3">
-                        <p class="text-[11px] font-black text-gray-500 uppercase tracking-widest mb-3">Payment Status</p>
-                        <div id="receipt-paystatus" class="inline-flex items-center justify-center h-10 px-6 rounded-xl text-sm font-black tracking-widest shadow-sm leading-none">
+                 <!-- BOTTOM SECTION (Always at bottom) -->
+            <div class="shrink-0 mt-auto w-full flex flex-col">
+                <!-- ✨ PREMIUM TOTALS & STATUS SECTION ✨ -->
+                <div class="mx-14 pt-8 pb-4 flex justify-between items-end border-t border-gray-200 gap-8 relative z-10">
+                    
+                    <!-- Left: Minimalist Status Pill -->
+                    <div class="pb-3 shrink-0">
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 ml-1">Payment Status</p>
+                        <div id="receipt-paystatus" class="inline-flex items-center justify-center h-10 px-6 rounded-full text-sm font-black tracking-widest leading-none shadow-sm">
                             PAID
                         </div>
                     </div>
 
-                    <div class="w-80 bg-gray-50 rounded-2xl p-5 border border-gray-200 shadow-sm">
-                        <div id="receipt-breakdown" class="hidden flex-col space-y-2 border-b border-gray-300 pb-3 mb-3 text-base font-bold text-gray-600">
-                            <div class="flex justify-between items-center">
+                    <!-- Right: Premium Floating Total Card -->
+                    <div class="min-w-[340px] max-w-[75%] bg-[#FCFCFD] rounded-[24px] p-7 border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] ml-auto">
+                        <div id="receipt-breakdown" class="hidden flex-col space-y-3 border-b border-gray-200/60 pb-4 mb-4 text-sm font-bold text-gray-500">
+                            <div class="flex justify-between items-center gap-8">
                                 <span>Subtotal</span>
-                                <span id="receipt-subtotal" class="text-gray-900">₹0.00</span>
+                                <span id="receipt-subtotal" class="text-gray-900 text-right">₹0.00</span>
                             </div>
-                            <div id="receipt-discount-row" class="hidden justify-between items-center text-red-500">
+                            <div id="receipt-discount-row" class="hidden justify-between items-center gap-8 text-rose-500">
                                 <span>Discount</span>
-                                <span>-₹<span id="receipt-discount">0.00</span></span>
+                                <span class="text-right bg-rose-50 px-2.5 py-1 rounded-lg text-rose-600">-₹<span id="receipt-discount">0.00</span></span>
                             </div>
-                            <div id="receipt-delivery-row" class="hidden justify-between items-center text-blue-500">
+                            <div id="receipt-delivery-row" class="hidden justify-between items-center gap-8 text-blue-500">
                                 <span>Delivery</span>
-                                <span>+₹<span id="receipt-delivery">0.00</span></span>
+                                <span class="text-right bg-blue-50 px-2.5 py-1 rounded-lg text-blue-600">+₹<span id="receipt-delivery">0.00</span></span>
                             </div>
                         </div>
                         
-                        <div class="flex justify-between items-end">
-                            <span class="text-base text-gray-900 font-black uppercase tracking-wider">Total</span>
-                            <span class="text-5xl font-black text-gray-900 tracking-tighter leading-none" id="receipt-total">₹0.00</span>
+                        <div class="flex justify-between items-end gap-6">
+                            <span class="text-[11px] text-gray-400 font-black uppercase tracking-[0.2em] shrink-0 mb-1.5">Grand Total</span>
+                            <span class="text-[42px] font-black text-gray-900 tracking-tighter leading-none text-right break-words drop-shadow-sm" id="receipt-total">₹0.00</span>
                         </div>
                     </div>
                 </div>
 
+
+
                 <!-- ULTRA SLIM PREMIUM FOOTER -->
-                <div class="mt-6 bg-gray-900 px-14 py-5 flex justify-between items-center rounded-t-[20px] relative overflow-hidden">
+                <div class="mt-6 bg-gray-900 px-14 py-5 flex justify-between items-center rounded-t-[20px] relative overflow-hidden w-full">
                     <div class="absolute inset-0 bg-gradient-to-r from-gray-800 to-gray-900 opacity-50"></div>
                     
                     <!-- Left: Support Info -->
@@ -786,20 +791,17 @@
                     
                     <!-- Right: Watermark -->
                     <div class="relative z-10 text-right">
-                                            <!-- ✨ BRANDED WATERMARK WITH PIXIGENIE LOGO ✨ -->
-                    <p class="text-[11px] text-gray-500 font-bold tracking-widest uppercase mt-8 relative z-10 flex items-center justify-center gap-2">
-                        POWERED BY 
-                       <span class="text-white font-black">Pixigenie</span> 
-                      
-                      
-                    </p>
-
+                        <!-- ✨ BRANDED WATERMARK WITH PIXIGENIE LOGO ✨ -->
+                        <p class="text-[11px] text-gray-500 font-bold tracking-widest uppercase relative z-10 flex items-center justify-center gap-2">
+                            POWERED BY <span class="text-white font-black">Pixigenie</span> 
+                        </p>
                     </div>
                 </div>
             </div>
 
         </div>
     </div>
+
 
     <!-- FULL INTEGRATED JAVASCRIPT LOGIC -->
     <script>
@@ -1969,16 +1971,16 @@
                 
                 document.getElementById('receipt-total').innerText = `₹${(parseFloat(b.grandTotal)||0).toFixed(2)}`;
                 
-                // 4. Payment Status UI (Centered & Sized)
+                          // 4. Payment Status UI (Premium Gradient & Icons)
                 let isP = b.payStatus && b.payStatus.includes('Paid');
                 let sE = document.getElementById('receipt-paystatus');
                 if(sE) { 
-                    sE.innerText = isP ? 'PAID' : 'PENDING'; 
-                    // Changed to explicit height h-10 and leading-none to force text to stay exactly in the middle
+                    sE.innerHTML = isP ? '<i class="fas fa-check-circle mr-2 opacity-80 text-[12px]"></i> PAID' : '<i class="fas fa-clock mr-2 opacity-80 text-[12px]"></i> PENDING'; 
                     sE.className = isP 
-                        ? 'inline-flex items-center justify-center h-10 px-6 rounded-full bg-[#e8f5e9] text-[#16a34a] text-sm font-black tracking-widest leading-none' 
-                        : 'inline-flex items-center justify-center h-10 px-6 rounded-full bg-[#fef2f2] text-[#dc2626] text-sm font-black tracking-widest leading-none'; 
+                        ? 'inline-flex items-center justify-center h-10 px-6 rounded-full bg-gradient-to-r from-[#ECFDF5] to-[#D1FAE5] text-[#065F46] border border-[#A7F3D0] text-sm font-black tracking-widest leading-none shadow-sm' 
+                        : 'inline-flex items-center justify-center h-10 px-6 rounded-full bg-gradient-to-r from-[#FEF2F2] to-[#FEE2E2] text-[#991B1B] border border-[#FECACA] text-sm font-black tracking-widest leading-none shadow-sm'; 
                 }
+
 
                 // 5. Only Wait for Logo
                 const savedImg = localStorage.getItem('pixigenie_profile_img');
