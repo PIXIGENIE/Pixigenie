@@ -696,14 +696,17 @@
             </table>
         </div>
               <div class="px-10 mt-5 flex justify-between items-start relative z-10">
-            <!-- ✨ NAYA: Updated Thank You & Greeting Section ✨ -->
-            <div class="w-[50%] pt-0 pl-2">
-                <h3 class="font-cursive text-[5.5rem] text-[#4A3B32] leading-none mb-6 -mt-3">Thank You!</h3>
-                <div class="border-l-2 border-[#c29b62] pl-4 mt-2">
+                       <div class="w-[50%] pt-0 pl-2">
+                <!-- ✨ NAYA: Size chota kiya (5.5rem se 4.5rem) aur mb-8 kar diya ✨ -->
+                <h3 class="font-cursive text-[4.5rem] text-[#4A3B32] leading-none mb-8 -mt-2">Thank You!</h3>
+                
+                <div class="border-l-2 border-[#c29b62] pl-4 mt-4">
                     <p class="text-[11px] font-black text-[#4A3B32] uppercase tracking-widest mb-1.5">Delivered with Trust</p>
                     <p class="text-[11px] text-[#5a4a40] font-medium leading-relaxed pr-6">Your support helps our local business grow. We hope you love your purchase and look forward to serving you again!</p>
                 </div>
             </div>
+
+
             
             <div class="w-[320px] bg-white border border-[#e6dfd3] p-4 rounded shadow-sm text-[#4A3B32]">
 
@@ -1892,11 +1895,24 @@
             let sE = document.getElementById('receipt-paystatus');
             if(sE) { sE.innerText = isP ? 'PAID ✓' : 'UNPAID'; sE.className = isP ? 'text-green-600 font-bold uppercase' : 'text-red-600 font-bold uppercase'; }
 
-            let qI = document.getElementById('receipt-qr-img'); let qL = document.getElementById('receipt-qr-label');
+                        let qI = document.getElementById('receipt-qr-img'); 
+            let qL = document.getElementById('receipt-qr-label');
+            
             if (qI) {
-                if (isP) { qI.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`https://pixigenie.com/store.html?shop=${currentShopId}`)}`; if(qL) qL.innerText="VISIT STORE"; } 
-                else { let upi = "8750900635@kotakbank"; qI.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${upi}&pn=${globalShopData.shopName}&am=${b.grandTotal}&cu=INR`)}`; if(qL) qL.innerText="SCAN TO PAY"; }
+                // ✨ NAYA: Ab chahe bill paid ho ya unpaid, QR code scan karne se sidha aapki dukan ka page khulega
+                // Local testing aur live website dono ke liye dynamic URL banega
+                let storeUrl = window.location.origin + window.location.pathname.replace("dashboard.html", "store.html") + "?shop=" + currentShopId;
+                
+                // Agar file:// se chala rahe ho (bina server ke) to default live domain use karo
+                if (window.location.protocol === 'file:') {
+                    storeUrl = `https://pixigenie.com/store.html?shop=${currentShopId}`;
+                }
+                
+                qI.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(storeUrl)}`;
+                
+                if (qL) qL.innerText = "VISIT STORE";
             }
+
 
             const c = document.getElementById('receipt-container');
             setTimeout(() => {
