@@ -668,23 +668,22 @@
             }
         }
 
-                            // ✨ GOOGLE LOGIN LOGIC (Photo Fetch Update)
+            // ✨ GOOGLE LOGIN LOGIC (SMART FIX: Email & Phone dono check karega) ✨
         function loginWithGoogle(event) {
             const btn = event ? event.currentTarget : null;
             if (btn) btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Please wait...`;
             
             auth.signInWithPopup(googleProvider).then(async (result) => {
                 const user = result.user;
-                const userEmailOrId = user.email || user.uid; // ईमेल को ही आईडी मानेंगे
+                const userEmailOrId = user.email || user.uid;
                 
-                // 1. अगर पुराना कस्टमर है तो सीधा लॉगिन (बार-बार Role नहीं पूछेगा)
+                // 1. अगर पुराना कस्टमर है तो सीधा लॉगिन
                 const custSnap = await db.collection('customers').doc(userEmailOrId).get();
                 if(custSnap.exists) {
                     const custData = custSnap.data();
                     localStorage.setItem('pixigenie_customer_name', custData.name);
                     localStorage.setItem('pixigenie_customer_phone', custData.phone);
                     
-                    // ✨ NAYA: Firebase se wapas photo load karo ✨
                     if (custData.profileImage) {
                         localStorage.setItem('pixigenie_profile_img', custData.profileImage);
                     }
@@ -694,15 +693,22 @@
                     return;
                 }
                 
-                // 2. अगर पुराना दुकानदार है तो सीधा डैशबोर्ड 
-                const shopSnap = await db.collection('shops').where('phone', '==', userEmailOrId).get();
+                // 2. 🚀 SMART FIX: अगर पुराना दुकानदार है तो सीधा डैशबोर्ड (Email और Phone दोनों से ढूंढेगा)
+                // Pehle hum as a 'email' field me check karenge (Dashboard update ke baad wali sthiti)
+                let shopSnap = await db.collection('shops').where('email', '==', user.email).get();
+                
+                // Agar email me nahi mila, toh 'phone' wale field me check karenge (Pehli baar login wali sthiti)
+                if (shopSnap.empty) {
+                    shopSnap = await db.collection('shops').where('phone', '==', userEmailOrId).get();
+                }
+
+                // Agar dono me se kisi me bhi shop mil gayi, toh seedha andar!
                 if(!shopSnap.empty) {
                     const shopData = shopSnap.docs[0].data();
                     localStorage.setItem('pixigenie_active_shop', shopData.shopId);
                     localStorage.setItem('pixigenie_owner_name', shopData.ownerName);
                     localStorage.setItem('pixigenie_customer_phone', shopData.phone || userEmailOrId);
                     
-                    // ✨ NAYA: Firebase se wapas photo load karo ✨
                     if (shopData.storeLogo) {
                         localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
                     }
@@ -711,12 +717,12 @@
                     return;
                 }
 
-                // 3. ✨ अगर नया यूज़र है, तो पहला फॉर्म हटाकर सीधा Role Selection दिखाओ ✨
+                // 3. ✨ अगर सच में नया यूज़र है, तो Role Selection दिखाओ
                 authTemp.name = user.displayName || "Google User";
                 authTemp.phone = userEmailOrId; 
                 authTemp.password = "google-verified";
                 
-                showStep('auth-step-2'); // सीधा Customer / Shop Owner वाले पेज पर ले जाएगा
+                showStep('auth-step-2'); 
 
             }).catch((error) => {
                 console.error(error);
@@ -1795,19 +1801,41 @@
             }
         }
 
-        // ✨ SAVE DETAILS FUNCTION ✨
-        function saveCustomerAddress() {
-            localStorage.setItem('pixigenie_saved_name', document.getElementById('saved-name').value.trim());
-            localStorage.setItem('pixigenie_saved_phone', document.getElementById('saved-phone').value.trim());
-            localStorage.setItem('pixigenie_saved_landmark', document.getElementById('saved-landmark').value.trim());
-            localStorage.setItem('pixigenie_saved_address', document.getElementById('saved-address').value.trim());
+                // ✨ NAYA: Ab details Firebase Database me permanent save hongi ✨
+        async function saveCustomerAddress() {
+            const sName = document.getElementById('saved-name').value.trim();
+            const sPhone = document.getElementById('saved-phone').value.trim();
+            const sLand = document.getElementById('saved-landmark').value.trim();
+            const sAddr = document.getElementById('saved-address').value.trim();
+
+            // Phone memory me save
+            localStorage.setItem('pixigenie_saved_name', sName);
+            localStorage.setItem('pixigenie_saved_phone', sPhone);
+            localStorage.setItem('pixigenie_saved_landmark', sLand);
+            localStorage.setItem('pixigenie_saved_address', sAddr);
 
             const btn = document.getElementById('save-addr-btn');
             const orig = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
+            
+            // 🚀 FIREBASE ME UPLOAD LOGIC
+            const customerPhone = localStorage.getItem('pixigenie_customer_phone');
+            if (customerPhone) {
+                try {
+                    await db.collection('customers').doc(customerPhone).update({
+                        savedName: sName,
+                        savedPhone: sPhone,
+                        savedLandmark: sLand,
+                        savedAddress: sAddr
+                    });
+                } catch (e) { console.log("Firebase sync issue", e); }
+            }
+
             btn.innerHTML = `<i class="fas fa-check-circle"></i> Details Saved!`;
             btn.classList.replace('bg-gray-900', 'bg-green-500');
             setTimeout(() => { btn.innerHTML = orig; btn.classList.replace('bg-green-500', 'bg-gray-900'); }, 2000);
         }
+
 
         // ✨ PROFILE GPS AUTO-FETCH ✨
         function fetchProfileGPS() {
@@ -2062,6 +2090,7 @@
 
     <!-- ✨ FINAL JAVASCRIPT FOR PROFILE ✨ -->
     <script>
+               // ✨ NAYA: Logout ke baad Firebase se wapas address Download karega ✨
         function toggleProfileModal() {
             const modal = document.getElementById('ios-profile-modal');
             const content = document.getElementById('ios-profile-content');
@@ -2074,61 +2103,66 @@
                 const activeShop = localStorage.getItem('pixigenie_active_shop'); 
                 const isEmail = phoneStr.includes('@');
 
-                // UI Texts
                 document.getElementById('prof-name').innerText = name;
-                document.getElementById('prof-phone').innerText = isEmail ? phoneStr : (phoneStr !== 'N/A' ? '+91 ' + phoneStr : 'N/A');
+                
+                if (activeShop) {
+                    document.getElementById('prof-merchant-btn').classList.remove('hidden');
+                    if (document.getElementById('delivery-section-wrapper')) document.getElementById('delivery-section-wrapper').classList.add('hidden');
+                } else {
+                    document.getElementById('prof-merchant-btn').classList.add('hidden');
+                    if (document.getElementById('delivery-section-wrapper')) document.getElementById('delivery-section-wrapper').classList.remove('hidden');
+                }
 
-                // Image Load
+                document.getElementById('edit-prof-name').value = name !== 'Customer' ? name : '';
+
                 const savedImg = localStorage.getItem('pixigenie_profile_img');
                 const imgPreview = document.getElementById('prof-img-preview');
                 const initialText = document.getElementById('prof-initial');
+                
                 if (savedImg) {
                     imgPreview.src = savedImg; imgPreview.classList.remove('hidden'); initialText.style.display = 'none';
                 } else {
                     imgPreview.classList.add('hidden'); initialText.style.display = 'flex';
-                    initialText.innerText = name.charAt(0).toUpperCase();
                 }
+                document.getElementById('prof-initial').innerText = name.charAt(0).toUpperCase();
 
-                // ✨ NAYA LOGIC: Dukaandar ko kya dikhega aur Customer ko kya ✨
-                const merchantBtn = document.getElementById('prof-merchant-btn');
-                const deliverySection = document.getElementById('delivery-section-wrapper');
-                if (activeShop) {
-                    merchantBtn.classList.remove('hidden');
-                    if (deliverySection) deliverySection.classList.add('hidden');
-                } else {
-                    merchantBtn.classList.add('hidden');
-                    if (deliverySection) deliverySection.classList.remove('hidden');
-                }
+                if (isEmail) { document.getElementById('prof-phone').innerText = phoneStr; } 
+                else { document.getElementById('prof-phone').innerText = phoneStr !== 'N/A' ? '+91 ' + phoneStr : 'N/A'; }
 
-                // Reset Edit Mode
-                document.getElementById('prof-view-mode').classList.remove('hidden');
-                document.getElementById('prof-edit-mode').classList.add('hidden');
-                document.getElementById('prof-edit-mode').classList.remove('flex');
-
-                // Pre-fill Forms
-                document.getElementById('edit-prof-name').value = name !== 'Customer' ? name : '';
-
-                
+                // Local Storage se basic pre-fill
                 document.getElementById('saved-name').value = localStorage.getItem('pixigenie_saved_name') || name;
                 document.getElementById('saved-phone').value = localStorage.getItem('pixigenie_saved_phone') || (isEmail ? '' : phoneStr);
                 document.getElementById('saved-landmark').value = localStorage.getItem('pixigenie_saved_landmark') || '';
                 document.getElementById('saved-address').value = localStorage.getItem('pixigenie_saved_address') || '';
 
-                             // ✨ NAYI ANIMATION: Ab neeche se nahi aayega, center me zoom hoke khulega ✨
+                // 🚀 JADOO: Agar LocalStorage khali hai (Logout hone ki wajah se), toh Firebase se nikalo!
+                if (!localStorage.getItem('pixigenie_saved_address') && !activeShop && phoneStr !== 'N/A') {
+                    db.collection('customers').doc(phoneStr).get().then(doc => {
+                        if (doc.exists && doc.data().savedAddress) {
+                            const d = doc.data();
+                            document.getElementById('saved-name').value = d.savedName || '';
+                            document.getElementById('saved-phone').value = d.savedPhone || '';
+                            document.getElementById('saved-landmark').value = d.savedLandmark || '';
+                            document.getElementById('saved-address').value = d.savedAddress || '';
+                            
+                            // Wapas phone ki memory me daal do taaki baar-baar load na ho
+                            localStorage.setItem('pixigenie_saved_name', d.savedName || '');
+                            localStorage.setItem('pixigenie_saved_phone', d.savedPhone || '');
+                            localStorage.setItem('pixigenie_saved_landmark', d.savedLandmark || '');
+                            localStorage.setItem('pixigenie_saved_address', d.savedAddress || '');
+                        }
+                    }).catch(e => console.log(e));
+                }
+
                 modal.classList.remove('hidden');
-                setTimeout(() => { 
-                    modal.classList.remove('opacity-0'); 
-                    content.classList.remove('scale-90'); 
-                    content.classList.add('scale-100'); 
-                }, 10);
+                setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-90'); content.classList.add('scale-100'); }, 10);
                 document.body.style.overflow = 'hidden'; 
             } else {
-                modal.classList.add('opacity-0'); 
-                content.classList.remove('scale-100'); 
-                content.classList.add('scale-90');
+                modal.classList.add('opacity-0'); content.classList.remove('scale-100'); content.classList.add('scale-90');
                 setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); 
             }
         }
+
 
              // ✨ NAYA 1: Focus hata diya taaki BLINK na ho ✨
         function toggleProfEdit() {
