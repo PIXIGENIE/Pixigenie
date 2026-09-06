@@ -449,8 +449,19 @@
                             if (followDoc.exists) { isFollowing = true; updateFollowButtonUI(true); } 
                             else { isFollowing = false; updateFollowButtonUI(false); }
                         }
-                    } catch(e) {}
-                                                            // ✨ NAYA CHHOTA AUR SLEEK BLUE TICK ✨
+                      } catch(e) {}
+
+                    // ✨✨ AUTO VERIFY BADGE LOGIC (CRITERIA + LIFETIME VIP) ✨✨
+                    let totalOrders = 0;
+                    let totalFollowers = 0;
+                    if(document.getElementById('stat-orders')) totalOrders = parseInt(document.getElementById('stat-orders').innerText) || 0;
+                    if(document.getElementById('stat-followers')) totalFollowers = parseInt(document.getElementById('stat-followers').innerText) || 0;
+                    
+                    const ownerEmail = localStorage.getItem('pixigenie_user_email') || shopData.email || "";
+                    const isVIP = shopData.isVerified || (totalOrders >= 50 && totalFollowers >= 100) || ownerEmail === 'netajijhadustore@gmail.com';
+
+                    if (isVIP) {
+                        // ✨ NAYA CHHOTA AUR SLEEK BLUE TICK ✨
                         const verifiedBadgeHtml = `
                         <div class="relative inline-flex items-center justify-center ml-1 -translate-y-[2px]" title="Pixigenie Verified Store">
                             <!-- Chhota aur smooth glow -->
@@ -465,6 +476,7 @@
                         document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${verifiedBadgeHtml}`;
                     }
                     // ✨✨ VIP BADGE LOGIC END ✨✨
+
 
 
                 } else {
