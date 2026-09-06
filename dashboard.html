@@ -1183,24 +1183,25 @@
                 if(o.status === 'delivered') sBg = "bg-[#DCFCE7] text-[#16A34A] border-[#BBF7D0]";
                 if(o.status === 'cancelled') sBg = "bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]";
 
-                             let btns = '';
+                                           let btns = '';
                 if(o.status === 'pending') {
                     btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold py-3 rounded-[12px] text-sm hover:bg-black transition active:scale-95 shadow-md">Accept Order</button>
                             <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-white text-[#DC2626] border border-[#FECACA] hover:bg-[#FEF2F2] font-bold py-3 rounded-[12px] text-sm transition active:scale-95">Cancel</button>`;
                 } else if(o.status === 'accepted') {
                     btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" class="w-full bg-[#16A34A] hover:bg-[#15803D] text-white font-bold py-3 rounded-[12px] text-sm transition active:scale-95 shadow-md"><i class="fas fa-check-circle mr-1"></i> Mark Delivered</button>`;
                 } else if(o.status === 'delivered') {
-                    // ✨ NAYA: Delivered hote hi "Download Bill" ka option aa jayega ✨
+                    // ✨ NAYA: Purane orders ka bhi bill nikal jayega (o.id fallback lagaya) ✨
                     btns = `
                         <button disabled class="w-1/2 bg-[#F7F7F9] text-[#16A34A] font-bold py-3 rounded-[12px] text-sm border border-[#E5E7EB] cursor-not-allowed">
                             <i class="fas fa-check-circle mr-1"></i> Delivered
                         </button>
-                        <button onclick="downloadBillImage('${o.billId}')" class="w-1/2 bg-[#111827] hover:bg-black text-white font-bold py-3 rounded-[12px] text-sm transition active:scale-95 shadow-md">
+                        <button onclick="downloadBillImage('${o.billId || o.id}')" class="w-1/2 bg-[#111827] hover:bg-black text-white font-bold py-3 rounded-[12px] text-sm transition active:scale-95 shadow-md">
                             <i class="fas fa-file-invoice mr-1"></i> Download Bill
                         </button>`;
                 } else {
                     btns = `<div class="w-full text-center py-3 bg-[#F7F7F9] rounded-[12px] border border-[#E5E7EB] text-[#6B7280] text-xs font-black uppercase tracking-widest">Order ${o.status}</div>`;
                 }
+
 
 
                 html += `
@@ -1234,60 +1235,52 @@
             });
             list.innerHTML = html;
         }
-
-            // ✨ NAYA LOGIC: Order Delivered hote hi Bill banega aur Sales me judega ✨
+        // ✨ NAYA LOGIC: Order Delivered hote hi Bill banega aur Sales me judega ✨
         async function updateLiveOrderStatus(orderId, newStatus, custPhone, custName) {
             if(!confirm(`Are you sure you want to mark this order as ${newStatus}?`)) return;
 
             try {
                 let billIdToSave = null;
 
-                // 🚀 JADOO: Agar order Delivered ho raha hai, toh pehle uska Bill banao!
                 if (newStatus === 'delivered') {
-                    // 1. Order ki details nikalo
                     const orderDoc = await db.collection('orders').doc(orderId).get();
                     const oData = orderDoc.data();
                     const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-                    // 2. Naya Bill Object Banao
+                    // 🚀 BUG FIX: Amount ko Number banaya taaki Sales me jud sake!
+                    let grandTot = Number(oData.totalAmount) || 0;
+
                     let newBill = { 
                         date: dateStr, 
-                        customerName: oData.customerName, 
+                        customerName: oData.customerName || "Customer", 
                         customerPhone: oData.customerPhone || "N/A", 
                         address: oData.customerAddress || "",
-                        items: oData.items, 
+                        items: oData.items || [], 
                         discount: 0, 
                         delivery: 0, 
-                        grandTotal: oData.totalAmount, 
-                        payStatus: 'Paid', // App orders ko automatically Paid maan lenge
-                        payMode: 'Online/App Order', 
+                        grandTotal: grandTot, 
+                        payStatus: 'Paid', 
+                        payMode: 'App Order', 
                         deliveryStatus: 'Delivered', 
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         appOrderId: orderId
                     };
 
-                    // 3. Bill ko 'Billing' section me save karo
                     const addedBill = await db.collection('shops').doc(currentShopId).collection('bills').add(newBill);
                     billIdToSave = addedBill.id;
-                    newBill.id = addedBill.id;
                     
-                    // 4. Dashboard aur Sales ko turant update karo
-                    adminBills.unshift(newBill); 
-                    renderAdminBills(); 
-                    processCustomerData(); 
-                    renderInsights(); // ✨ ISSE TERI SALES (Business Insights) UPDATE HO JAYEGI
+                    // 🚀 Database ko force refresh karo taaki Sales, Customers aur Bills sab update ho jayein
+                    setTimeout(() => { fetchFirebaseData(); }, 1500); 
                 }
 
-                // Order ka status update karo (aur agar bill bana hai toh uski ID bhi save kar do)
                 let orderUpdateData = {
                     status: newStatus,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
-                if (billIdToSave) orderUpdateData.billId = billIdToSave; // Bill ka link jodh diya
+                if (billIdToSave) orderUpdateData.billId = billIdToSave;
 
                 await db.collection('orders').doc(orderId).update(orderUpdateData);
 
-                // WhatsApp Message
                 if(custPhone && custPhone !== 'undefined' && custPhone !== 'N/A') {
                     let msg = "";
                     if(newStatus === 'accepted') msg = `🎉 *Order Accepted!*\n\nHi ${custName},\nYour order (#${orderId.substring(0,6).toUpperCase()}) has been accepted by ${globalShopData.shopName}. We are preparing it for delivery!\n\nThank you!`;
@@ -1300,6 +1293,7 @@
                 alert("Error updating order: " + e.message);
             }
         }
+
 
 
         // ==========================================
@@ -1977,11 +1971,12 @@
         }
 
                   // ✨ NAYA: Lightning Fast Premium Bill Generator (Centered Badge & High Contrast) ✨
-        async function downloadBillImage(id) {
+             async function downloadBillImage(id) {
             if (window.event) window.event.stopPropagation();
 
-            const b = adminBills.find(x => x.id === id); 
-            if(!b) return alert("Order not found!");
+            // 🚀 BUG FIX: Agar normal bill ID se na mile, toh Order ID se dhoondh nikalega!
+            const b = adminBills.find(x => x.id === id || x.appOrderId === id); 
+            if(!b) return alert("Order not found! Please refresh the page once.");
 
             const btn = window.event ? window.event.currentTarget : null;
             let origHtml = "";
