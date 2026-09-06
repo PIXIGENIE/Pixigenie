@@ -43,7 +43,20 @@
         <button onclick="if(window.history.length > 1) { window.history.back(); } else { window.close(); window.location.href='index.html'; }" class="w-9 h-9 flex items-center justify-center text-gray-900 bg-gray-50 rounded-full active:scale-95 transition"><i class="fas fa-arrow-left"></i></button>
 
 
-        <h1 id="header-shop-name" class="font-black text-gray-900 text-[17px] tracking-tight uppercase truncate px-4">Loading...</h1>
+                      <!-- ✨ PREMIUM HEADER TITLE ✨ -->
+        <div class="flex items-center justify-center">
+            <h1 class="font-black text-gray-800 text-[12px] sm:text-[13px] tracking-[0.2em] uppercase flex items-center gap-2.5">
+                <!-- Naya Modern Circular Gradient Icon -->
+                <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white shadow-[0_2px_5px_rgba(79,70,229,0.3)]">
+                    <i class="fas fa-shopping-bag text-[11px] mb-[1px]"></i>
+                </span>
+                Storefront
+            </h1>
+            <!-- Ye hidden tag zaroori hai JS errors rokne ke liye -->
+            <span id="header-shop-name" class="hidden"></span>
+        </div>
+
+
         <button onclick="toggleCartModal()" class="relative w-9 h-9 flex items-center justify-center text-gray-900 bg-gray-50 rounded-full active:scale-95 transition">
             <i class="fas fa-shopping-bag"></i>
             <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full hidden border border-white">0</span>
@@ -57,28 +70,23 @@
         <!-- ✨ PROFILE SECTION ✨ -->
         <section class="px-5 pt-6 pb-6">
             <div class="flex items-center gap-5">
-                <div class="relative shrink-0">
-                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 p-[3px] shadow-sm">
-                        <div class="w-full h-full bg-white rounded-full p-0.5">
-                        <!-- ✨ NAYA: Clickable Store Logo Upload (Fixed for Owner Only) ✨ -->
+                            <!-- ✨ PROFILE PICTURE & PREMIUM BADGE ✨ -->
+            <div class="relative shrink-0 flex flex-col items-center">
+                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 p-[3px] shadow-sm relative z-10">
+                    <div class="w-full h-full bg-white rounded-full p-0.5">
                         <label id="store-logo-wrapper" class="relative w-full h-full bg-gray-50 rounded-full flex items-center justify-center text-gray-300 text-3xl overflow-hidden">
                             <i id="shop-avatar-icon" class="fas fa-store"></i>
-                            
-                            <!-- यहाँ अपलोड की हुई फोटो दिखेगी -->
                             <img id="shop-avatar-img" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
-                            
-                            <!-- होवर करने पर कैमरे का आइकॉन दिखेगा -->
                             <div id="camera-hover-overlay" class="absolute inset-0 bg-black/40 hidden items-center justify-center z-20 transition-all">
                                 <i class="fas fa-camera text-white text-xl"></i>
                             </div>
-                            
-                            <!-- असली फाइल इनपुट (by default disabled rahega) -->
                             <input type="file" id="logo-file-input" accept="image/*" class="hidden" onchange="uploadStoreLogo(event)" disabled>
                         </label>
-
-                        </div>
                     </div>
                 </div>
+                <!-- ✨ PHOTO KE NEECHE CHIPKA HUA BADGE ✨ -->
+                <div id="premium-biz-badge" class="absolute -bottom-2.5 left-1/2 transform -translate-x-1/2 hidden z-30"></div>
+            </div>
 
                 <div class="flex-1 flex justify-around items-center text-center">
                     <div class="flex flex-col">
@@ -99,6 +107,7 @@
             <div class="mt-5">
                 <h2 id="profile-shop-name" class="font-black text-gray-900 text-[17px] tracking-tight">Store Name</h2>
                 <p id="profile-owner-name" class="text-[13px] font-semibold text-gray-500">Proprietor Name</p>
+                
                 <span id="profile-category" class="inline-block mt-2 mb-2.5 px-2.5 py-1 bg-gray-50 text-gray-600 text-[10px] font-black uppercase tracking-wider rounded-lg border border-gray-100">Category</span>
                 
                 <div class="text-[13px] text-gray-700 leading-relaxed font-medium">
@@ -332,7 +341,32 @@
                     
                     const safeOwnerName = shopData.ownerName || "Shop Owner";
 
-                    document.title = `${shopData.shopName} | Pixigenie`;
+                    document.title = `${shopData.shopName} | Pixigenie`;                                    // ✨✨ PROFILE PIC PREMIUM VIP BADGE LOGIC ✨✨
+                    const bizType = shopData.businessType;
+                    const profileBadgeEl = document.getElementById('premium-biz-badge');
+                    
+                    if (bizType && profileBadgeEl) {
+                        // Default (Retailer) - Purple Glow
+                        let premiumStyle = 'bg-gradient-to-r from-purple-500 to-pink-500 shadow-[0_4px_10px_rgba(168,85,247,0.4)]'; 
+                        
+                        if (bizType === 'Wholesaler') { 
+                            premiumStyle = 'bg-gradient-to-r from-blue-500 to-cyan-500 shadow-[0_4px_10px_rgba(59,130,246,0.4)]'; 
+                        } else if (bizType === 'Manufacturer') { 
+                            premiumStyle = 'bg-gradient-to-r from-amber-500 to-orange-500 shadow-[0_4px_10px_rgba(245,158,11,0.4)]'; 
+                        } else if (bizType === 'Service Provider') { 
+                            premiumStyle = 'bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[0_4px_10px_rgba(16,185,129,0.4)]'; 
+                        }
+
+                        // Bina SVG ka sirf Premium Text Pill
+                        profileBadgeEl.innerHTML = `
+                            <div class="${premiumStyle} text-white px-3 py-[3px] rounded-full uppercase text-[8px] sm:text-[9px] font-black tracking-[0.2em] border border-white/40 backdrop-blur-md whitespace-nowrap text-center">
+                                ${bizType}
+                            </div>
+                        `;
+                        profileBadgeEl.classList.remove('hidden');
+                    }
+                    // ✨✨ VIP BADGE LOGIC END ✨✨
+
                     document.getElementById('header-shop-name').innerText = shopData.shopName;
                     document.getElementById('profile-shop-name').innerText = shopData.shopName;
                     document.getElementById('profile-owner-name').innerText = safeOwnerName;
@@ -405,6 +439,36 @@
                             else { isFollowing = false; updateFollowButtonUI(false); }
                         }
                     } catch(e) {}
+                                        // ✨✨ AUTO VERIFY BADGE LOGIC (CRITERIA + LIFETIME VIP) ✨✨
+                    let totalOrders = 0;
+                    let totalFollowers = 0;
+                    
+                    // HTML se updated stats uthao
+                    if(document.getElementById('stat-orders')) totalOrders = parseInt(document.getElementById('stat-orders').innerText) || 0;
+                    if(document.getElementById('stat-followers')) totalFollowers = parseInt(document.getElementById('stat-followers').innerText) || 0;
+                    
+                    // Owner email ko localStorage ya database dono se check karo
+                    const ownerEmail = localStorage.getItem('pixigenie_user_email') || shopData.email || "";
+                    
+                    // Check: Kya target poora hua? YA pehle se verified hai? YA Netaji ki email hai?
+                    const isVIP = shopData.isVerified || (totalOrders >= 50 && totalFollowers >= 100) || ownerEmail === 'netajijhadustore@gmail.com';
+
+                    if (isVIP) {
+                        const verifiedBadgeHtml = `
+                        <div class="relative inline-flex items-center justify-center ml-1.5 -translate-y-0.5" title="Pixigenie Verified Store">
+                            <!-- Chamakti hui background light (Glow + Pulse) -->
+                            <div class="absolute inset-0 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-full blur-[4px] opacity-70 animate-pulse"></div>
+                            <!-- Asli Premium Blue Tick -->
+                            <div class="relative w-[20px] h-[20px] sm:w-[22px] sm:h-[22px] bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-full flex items-center justify-center shadow-[0_2px_10px_rgba(59,130,246,0.6)] border-[1.5px] border-white">
+                                <i class="fas fa-check text-white text-[9px] sm:text-[10px] font-black mt-[1px]"></i>
+                            </div>
+                        </div>`;
+                        
+                        // Dukaan ke naam ke aage tick laga do
+                        document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${verifiedBadgeHtml}`;
+                    }
+                    // ✨✨ VIP BADGE LOGIC END ✨✨
+
 
                 } else {
                     document.getElementById('products-grid').innerHTML = `<p class="col-span-2 text-center py-10 text-red-500 font-bold">Store Not Found!</p>`;
