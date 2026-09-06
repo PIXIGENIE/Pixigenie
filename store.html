@@ -72,7 +72,8 @@
             <div class="flex items-center gap-5">
                             <!-- ✨ PROFILE PICTURE & PREMIUM BADGE ✨ -->
             <div class="relative shrink-0 flex flex-col items-center">
-                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 p-[3px] shadow-sm relative z-10">
+            <div id="profile-pic-ring" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 p-[3px] shadow-sm relative z-10 transition-all duration-500">
+
                     <div class="w-full h-full bg-white rounded-full p-0.5">
                         <label id="store-logo-wrapper" class="relative w-full h-full bg-gray-50 rounded-full flex items-center justify-center text-gray-300 text-3xl overflow-hidden">
                             <i id="shop-avatar-icon" class="fas fa-store"></i>
@@ -341,31 +342,41 @@
                     
                     const safeOwnerName = shopData.ownerName || "Shop Owner";
 
-                    document.title = `${shopData.shopName} | Pixigenie`;                                    // ✨✨ PROFILE PIC PREMIUM VIP BADGE LOGIC ✨✨
+                    document.title = `${shopData.shopName} | Pixigenie`;                                                      // ✨✨ PROFILE PIC PREMIUM VIP BADGE & RING LOGIC ✨✨
                     const bizType = shopData.businessType;
                     const profileBadgeEl = document.getElementById('premium-biz-badge');
+                    const profileRingEl = document.getElementById('profile-pic-ring'); // Ring ko pakdo
                     
                     if (bizType && profileBadgeEl) {
-                        // Default (Retailer) - Purple Glow
                         let premiumStyle = 'bg-gradient-to-r from-purple-500 to-pink-500 shadow-[0_4px_10px_rgba(168,85,247,0.4)]'; 
+                        let ringStyle = 'from-purple-500 to-pink-500'; // Default Ring Color
                         
                         if (bizType === 'Wholesaler') { 
                             premiumStyle = 'bg-gradient-to-r from-blue-500 to-cyan-500 shadow-[0_4px_10px_rgba(59,130,246,0.4)]'; 
+                            ringStyle = 'from-blue-500 to-cyan-500';
                         } else if (bizType === 'Manufacturer') { 
                             premiumStyle = 'bg-gradient-to-r from-amber-500 to-orange-500 shadow-[0_4px_10px_rgba(245,158,11,0.4)]'; 
+                            ringStyle = 'from-amber-500 to-orange-500';
                         } else if (bizType === 'Service Provider') { 
                             premiumStyle = 'bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[0_4px_10px_rgba(16,185,129,0.4)]'; 
+                            ringStyle = 'from-emerald-500 to-teal-500';
                         }
 
-                        // Bina SVG ka sirf Premium Text Pill
+                        // 1. Badge ka HTML set karo
                         profileBadgeEl.innerHTML = `
                             <div class="${premiumStyle} text-white px-3 py-[3px] rounded-full uppercase text-[8px] sm:text-[9px] font-black tracking-[0.2em] border border-white/40 backdrop-blur-md whitespace-nowrap text-center">
                                 ${bizType}
                             </div>
                         `;
                         profileBadgeEl.classList.remove('hidden');
+
+                        // 2. Ring ka color apne aap Badge jaisa kar do
+                        if (profileRingEl) {
+                            profileRingEl.className = `w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr ${ringStyle} p-[3px] shadow-sm relative z-10 transition-all duration-500`;
+                        }
                     }
                     // ✨✨ VIP BADGE LOGIC END ✨✨
+
 
                     document.getElementById('header-shop-name').innerText = shopData.shopName;
                     document.getElementById('profile-shop-name').innerText = shopData.shopName;
@@ -439,31 +450,17 @@
                             else { isFollowing = false; updateFollowButtonUI(false); }
                         }
                     } catch(e) {}
-                                        // ✨✨ AUTO VERIFY BADGE LOGIC (CRITERIA + LIFETIME VIP) ✨✨
-                    let totalOrders = 0;
-                    let totalFollowers = 0;
-                    
-                    // HTML se updated stats uthao
-                    if(document.getElementById('stat-orders')) totalOrders = parseInt(document.getElementById('stat-orders').innerText) || 0;
-                    if(document.getElementById('stat-followers')) totalFollowers = parseInt(document.getElementById('stat-followers').innerText) || 0;
-                    
-                    // Owner email ko localStorage ya database dono se check karo
-                    const ownerEmail = localStorage.getItem('pixigenie_user_email') || shopData.email || "";
-                    
-                    // Check: Kya target poora hua? YA pehle se verified hai? YA Netaji ki email hai?
-                    const isVIP = shopData.isVerified || (totalOrders >= 50 && totalFollowers >= 100) || ownerEmail === 'netajijhadustore@gmail.com';
-
-                    if (isVIP) {
+                                                            // ✨ NAYA CHHOTA AUR SLEEK BLUE TICK ✨
                         const verifiedBadgeHtml = `
-                        <div class="relative inline-flex items-center justify-center ml-1.5 -translate-y-0.5" title="Pixigenie Verified Store">
-                            <!-- Chamakti hui background light (Glow + Pulse) -->
-                            <div class="absolute inset-0 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-full blur-[4px] opacity-70 animate-pulse"></div>
-                            <!-- Asli Premium Blue Tick -->
-                            <div class="relative w-[20px] h-[20px] sm:w-[22px] sm:h-[22px] bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-full flex items-center justify-center shadow-[0_2px_10px_rgba(59,130,246,0.6)] border-[1.5px] border-white">
-                                <i class="fas fa-check text-white text-[9px] sm:text-[10px] font-black mt-[1px]"></i>
+                        <div class="relative inline-flex items-center justify-center ml-1 -translate-y-[2px]" title="Pixigenie Verified Store">
+                            <!-- Chhota aur smooth glow -->
+                            <div class="absolute inset-0 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-full blur-[3px] opacity-60 animate-pulse"></div>
+                            <!-- Chhota Size (16px) Blue Tick -->
+                            <div class="relative w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-full flex items-center justify-center shadow-[0_2px_8px_rgba(59,130,246,0.5)] border-[1.5px] border-white">
+                                <i class="fas fa-check text-white text-[7px] sm:text-[8px] font-black mt-[0.5px]"></i>
                             </div>
                         </div>`;
-                        
+
                         // Dukaan ke naam ke aage tick laga do
                         document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${verifiedBadgeHtml}`;
                     }
