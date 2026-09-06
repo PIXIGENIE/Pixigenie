@@ -460,22 +460,19 @@
                     const ownerEmail = localStorage.getItem('pixigenie_user_email') || shopData.email || "";
                     const isVIP = shopData.isVerified || (totalOrders >= 50 && totalFollowers >= 100) || ownerEmail === 'netajijhadustore@gmail.com';
 
-                    if (isVIP) {
-                        // ✨ NAYA CHHOTA AUR SLEEK BLUE TICK ✨
+                                     if (isVIP) {
+                        // ✨ CLEAN INSTAGRAM-STYLE VERIFIED BADGE ✨
                         const verifiedBadgeHtml = `
-                        <div class="relative inline-flex items-center justify-center ml-1 -translate-y-[2px]" title="Pixigenie Verified Store">
-                            <!-- Chhota aur smooth glow -->
-                            <div class="absolute inset-0 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-full blur-[3px] opacity-60 animate-pulse"></div>
-                            <!-- Chhota Size (16px) Blue Tick -->
-                            <div class="relative w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-full flex items-center justify-center shadow-[0_2px_8px_rgba(59,130,246,0.5)] border-[1.5px] border-white">
-                                <i class="fas fa-check text-white text-[7px] sm:text-[8px] font-black mt-[0.5px]"></i>
+                        <div class="inline-flex items-center justify-center ml-1 -translate-y-[1px]" title="Verified Store">
+                            <div class="w-[15px] h-[15px] sm:w-[17px] sm:h-[17px] bg-[#0095F6] rounded-full flex items-center justify-center">
+                                <i class="fas fa-check text-white text-[8px] sm:text-[9px] font-black mt-[0.5px]"></i>
                             </div>
                         </div>`;
 
                         // Dukaan ke naam ke aage tick laga do
                         document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${verifiedBadgeHtml}`;
                     }
-                    // ✨✨ VIP BADGE LOGIC END ✨✨
+
 
 
 
