@@ -1899,7 +1899,7 @@
             let sE = document.getElementById('receipt-paystatus');
             if(sE) { sE.innerText = isP ? 'PAID ✓' : 'UNPAID'; sE.className = isP ? 'text-green-600 font-bold uppercase' : 'text-red-600 font-bold uppercase'; }
 
-            // ✨ 5. QR CODE FIX: Download -> Base64 -> Render ✨
+             // ✨ 5. QR CODE FIX: QuickChart API (100% Working for Canvas) ✨
             let qI = document.getElementById('receipt-qr-img'); 
             let qL = document.getElementById('receipt-qr-label');
             
@@ -1909,28 +1909,27 @@
                 
                 if (qL) qL.innerText = "VISIT STORE";
                 
-                let qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(storeUrl)}`;
+                // ✨ NAYI API: Jo security me block nahi hoti
+                let qrApiUrl = `https://quickchart.io/qr?text=${encodeURIComponent(storeUrl)}&size=150&margin=0`;
 
-                // Purana crossorigin hata rahe hain taaki block na ho
-                qI.removeAttribute('crossorigin');
-
-                try {
-                    // QR Code ko internet se background me fetch karo
-                    let response = await fetch(qrApiUrl);
-                    let blob = await response.blob();
-                    
-                    let reader = new FileReader();
-                    reader.onloadend = function() {
-                        // QR Base64 me convert hone ke baad tag me dalo
-                        qI.src = reader.result; 
-                        // Photo aane ke theek baad hi canvas generate karo (Wait karne ki jarurat nahi)
-                        setTimeout(generateCanvas, 150); 
-                    }
-                    reader.readAsDataURL(blob);
-                } catch(e) {
-                    qI.src = qrApiUrl; 
-                    setTimeout(generateCanvas, 800);
-                }
+                // Fetch karke Base64 me convert karna
+                fetch(qrApiUrl)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        let reader = new FileReader();
+                        reader.onloadend = function() {
+                            qI.src = reader.result; 
+                            // QR lagne ke theek 300ms baad bill banega
+                            setTimeout(generateCanvas, 300); 
+                        }
+                        reader.readAsDataURL(blob);
+                    })
+                    .catch(e => {
+                        // Agar internet ya kisi wajah se fetch fail ho, toh direct image lagao
+                        qI.setAttribute('crossorigin', 'anonymous');
+                        qI.src = qrApiUrl;
+                        setTimeout(generateCanvas, 1200);
+                    });
             } else {
                 generateCanvas();
             }
@@ -1940,7 +1939,6 @@
                 const c = document.getElementById('receipt-container');
                 if (typeof html2canvas === 'undefined') return alert("Library missing.");
                 
-                // NOTE: useCORS: true rakha hai, allowTaint HATAYA hai (ye block karta tha)
                 html2canvas(c, { scale: 2, backgroundColor: "#Fdfbf7", useCORS: true, logging: false }).then(cv => {
                     let l = document.createElement('a'); 
                     l.download = `Invoice_${b.customerName.replace(/\s+/g, '_')}.png`; 
@@ -1948,6 +1946,7 @@
                     l.click();
                 }).catch(e => alert("Failed generating image."));
             }
+
         }
 
 
