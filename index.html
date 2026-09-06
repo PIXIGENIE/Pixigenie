@@ -317,7 +317,8 @@
     
      <!-- ✨ CART MODAL ✨ -->
     <div id="cart-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[90] hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300 opacity-0">
-        <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-md h-[85vh] sm:h-[80vh] flex flex-col transform translate-y-full sm:scale-95 sm:translate-y-0 transition-all duration-300 relative" id="cart-modal-content">
+        <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-md h-auto max-h-[85vh] sm:max-h-[90vh] flex flex-col transform translate-y-full sm:scale-95 sm:translate-y-0 transition-all duration-300 relative" id="cart-modal-content">
+
             <div class="flex items-center justify-between p-5 sm:p-6 border-b border-gray-100 shrink-0">
                 <h3 class="font-black text-gray-900 text-xl flex items-center gap-2"><i class="fas fa-shopping-basket text-purple-600"></i> Your Cart</h3>
                 <button onclick="toggleCartModal()" class="text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90"><i class="fas fa-times"></i></button>
