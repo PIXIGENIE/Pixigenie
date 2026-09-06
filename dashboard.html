@@ -1848,10 +1848,11 @@
         // ==========================================
         // 11. INVOICE IMAGE GENERATOR & SHARE
         // ==========================================
-             function downloadBillImage(id) {
+                   // ✨ NAYA: Async function (QR Code Base64 bypass ke sath) ✨
+        async function downloadBillImage(id) {
             const b = adminBills.find(x => x.id === id); if(!b) return;
             
-            // ✨ NAYA: LocalStorage se photo nikal kar bill pe lagao ✨
+            // 1. Photo Update
             const savedImg = localStorage.getItem('pixigenie_profile_img');
             const billLogo = document.getElementById('bill-store-logo');
             const watermark = document.getElementById('default-invoice-watermark');
@@ -1864,8 +1865,9 @@
                 if (watermark) watermark.style.display = 'flex';
             }
 
+            // 2. Details Setup
             document.getElementById('print-store-name').innerText = globalShopData.shopName.substring(0, 15);
- document.getElementById('print-store-name-2').innerText = globalShopData.shopName;
+            document.getElementById('print-store-name-2').innerText = globalShopData.shopName;
             document.getElementById('print-store-address').innerText = globalShopData.address || "Digital Store";
             document.getElementById('print-store-phone').innerText = globalShopData.phone || "";
             
@@ -1875,12 +1877,14 @@
             document.getElementById('receipt-date').innerText = b.date || "-";
             document.getElementById('receipt-address').innerHTML = b.address ? b.address.replace(/(https?:\/\/[^\s]+)/g, '').replace(/🔗/g, "").trim() : "Delivery Address";
 
+            // 3. Items Setup
             let iH = ''; let tA = 0;
             if (b.items) b.items.forEach((i, idx) => {
                 let t = i.total ? i.total : (i.price * i.qty); tA += t;
                 iH += `<tr class="border-b border-[#e6dfd3] bg-[#fdfbf7]"><td class="py-3 px-4 text-center font-bold text-[#8b7355] border-r">${String(idx+1).padStart(2,'0')}</td><td class="py-3 px-4 border-r"><p class="font-bold text-[#4A3B32]">${i.name}</p></td><td class="py-3 px-4 text-center font-bold text-[#4A3B32] border-r">${i.qty}</td><td class="py-3 px-4 text-right font-semibold text-[#4A3B32] border-r">${parseFloat(i.price).toFixed(2)}</td><td class="py-3 px-4 text-right font-bold text-[#4A3B32]">${parseFloat(t).toFixed(2)}</td></tr>`;
             }); document.getElementById('receipt-items').innerHTML = iH;
 
+            // 4. Totals
             let dC = parseFloat(b.discount)||0; let dL = parseFloat(b.delivery)||0;
             let bD = document.getElementById('receipt-breakdown');
             if (dC > 0 || dL > 0) {
@@ -1895,35 +1899,57 @@
             let sE = document.getElementById('receipt-paystatus');
             if(sE) { sE.innerText = isP ? 'PAID ✓' : 'UNPAID'; sE.className = isP ? 'text-green-600 font-bold uppercase' : 'text-red-600 font-bold uppercase'; }
 
-                        let qI = document.getElementById('receipt-qr-img'); 
+            // ✨ 5. QR CODE FIX: Download -> Base64 -> Render ✨
+            let qI = document.getElementById('receipt-qr-img'); 
             let qL = document.getElementById('receipt-qr-label');
             
             if (qI) {
-                // ✨ NAYA: Ab chahe bill paid ho ya unpaid, QR code scan karne se sidha aapki dukan ka page khulega
-                // Local testing aur live website dono ke liye dynamic URL banega
                 let storeUrl = window.location.origin + window.location.pathname.replace("dashboard.html", "store.html") + "?shop=" + currentShopId;
-                
-                // Agar file:// se chala rahe ho (bina server ke) to default live domain use karo
-                if (window.location.protocol === 'file:') {
-                    storeUrl = `https://pixigenie.com/store.html?shop=${currentShopId}`;
-                }
-                
-                qI.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(storeUrl)}`;
+                if (window.location.protocol === 'file:') storeUrl = `https://pixigenie.com/store.html?shop=${currentShopId}`;
                 
                 if (qL) qL.innerText = "VISIT STORE";
+                
+                let qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(storeUrl)}`;
+
+                // Purana crossorigin hata rahe hain taaki block na ho
+                qI.removeAttribute('crossorigin');
+
+                try {
+                    // QR Code ko internet se background me fetch karo
+                    let response = await fetch(qrApiUrl);
+                    let blob = await response.blob();
+                    
+                    let reader = new FileReader();
+                    reader.onloadend = function() {
+                        // QR Base64 me convert hone ke baad tag me dalo
+                        qI.src = reader.result; 
+                        // Photo aane ke theek baad hi canvas generate karo (Wait karne ki jarurat nahi)
+                        setTimeout(generateCanvas, 150); 
+                    }
+                    reader.readAsDataURL(blob);
+                } catch(e) {
+                    qI.src = qrApiUrl; 
+                    setTimeout(generateCanvas, 800);
+                }
+            } else {
+                generateCanvas();
             }
 
-
-                     const c = document.getElementById('receipt-container');
-            // ✨ NAYA: Timeout 500ms se badha kar 1200ms kar diya, aur allowTaint: true add kar diya ✨
-            setTimeout(() => {
+            // ✨ 6. Final Canvas Generation ✨
+            function generateCanvas() {
+                const c = document.getElementById('receipt-container');
                 if (typeof html2canvas === 'undefined') return alert("Library missing.");
-                html2canvas(c, { scale: 2, backgroundColor: "#Fdfbf7", useCORS: true, allowTaint: true, logging: false }).then(cv => {
-                    let l = document.createElement('a'); l.download = `Invoice_${b.customerName.replace(/\s+/g, '_')}.png`; l.href = cv.toDataURL("image/png", 1.0); l.click();
+                
+                // NOTE: useCORS: true rakha hai, allowTaint HATAYA hai (ye block karta tha)
+                html2canvas(c, { scale: 2, backgroundColor: "#Fdfbf7", useCORS: true, logging: false }).then(cv => {
+                    let l = document.createElement('a'); 
+                    l.download = `Invoice_${b.customerName.replace(/\s+/g, '_')}.png`; 
+                    l.href = cv.toDataURL("image/png", 1.0); 
+                    l.click();
                 }).catch(e => alert("Failed generating image."));
-            }, 1200);
-
+            }
         }
+
 
         async function shareStoreLink() {
             let u = window.location.origin + window.location.pathname.replace("dashboard.html", "store.html");
