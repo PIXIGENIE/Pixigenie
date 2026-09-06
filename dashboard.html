@@ -721,7 +721,7 @@
         </div>
         <div class="bg-[#4A3B32] text-[#f5ebd9] px-10 py-6 rounded-t-[40px] flex justify-between items-center relative z-10 mt-10">
             <div class="text-[11px] space-y-2 w-2/3"><p class="font-bold text-white tracking-wider uppercase" id="print-store-name-2">STORE</p><p id="print-store-address">Address</p><p id="print-store-phone">Phone</p></div>
-            <div class="w-1/3 text-center"><p id="receipt-qr-label" class="text-[10px] uppercase font-bold mb-2 text-[#c29b62]">Scan To Pay / Visit</p><div class="bg-white p-1 inline-block rounded"><img id="receipt-qr-img" src="" class="w-16 h-16"></div></div>
+            <div class="w-1/3 text-center"><p id="receipt-qr-label" class="text-[10px] uppercase font-bold mb-2 text-[#c29b62]">Scan To Pay / Visit</p><div class="bg-white p-1 inline-block rounded"><img id="receipt-qr-img" src="" class="w-16 h-16" crossorigin="anonymous"></div></div>
         </div>
     </div>
     
@@ -1914,13 +1914,15 @@
             }
 
 
-            const c = document.getElementById('receipt-container');
+                     const c = document.getElementById('receipt-container');
+            // ✨ NAYA: Timeout 500ms se badha kar 1200ms kar diya, aur allowTaint: true add kar diya ✨
             setTimeout(() => {
                 if (typeof html2canvas === 'undefined') return alert("Library missing.");
-                html2canvas(c, { scale: 2, backgroundColor: "#Fdfbf7", useCORS: true, logging: false }).then(cv => {
+                html2canvas(c, { scale: 2, backgroundColor: "#Fdfbf7", useCORS: true, allowTaint: true, logging: false }).then(cv => {
                     let l = document.createElement('a'); l.download = `Invoice_${b.customerName.replace(/\s+/g, '_')}.png`; l.href = cv.toDataURL("image/png", 1.0); l.click();
                 }).catch(e => alert("Failed generating image."));
-            }, 500);
+            }, 1200);
+
         }
 
         async function shareStoreLink() {
