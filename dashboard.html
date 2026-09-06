@@ -695,9 +695,18 @@
                 <tbody id="receipt-items" class="text-sm"></tbody>
             </table>
         </div>
-        <div class="px-10 mt-4 flex justify-between items-start relative z-10">
-            <div class="w-[45%] pt-4 pl-2"><h3 class="font-cursive text-6xl text-[#4A3B32] leading-none mb-2">Thank You!</h3><p class="text-[11px] text-[#5a4a40]">We truly appreciate your business.</p></div>
+              <div class="px-10 mt-5 flex justify-between items-start relative z-10">
+            <!-- ✨ NAYA: Updated Thank You & Greeting Section ✨ -->
+            <div class="w-[50%] pt-0 pl-2">
+                <h3 class="font-cursive text-[5.5rem] text-[#4A3B32] leading-none mb-6 -mt-3">Thank You!</h3>
+                <div class="border-l-2 border-[#c29b62] pl-4 mt-2">
+                    <p class="text-[11px] font-black text-[#4A3B32] uppercase tracking-widest mb-1.5">Delivered with Trust</p>
+                    <p class="text-[11px] text-[#5a4a40] font-medium leading-relaxed pr-6">Your support helps our local business grow. We hope you love your purchase and look forward to serving you again!</p>
+                </div>
+            </div>
+            
             <div class="w-[320px] bg-white border border-[#e6dfd3] p-4 rounded shadow-sm text-[#4A3B32]">
+
                 <div id="receipt-breakdown" class="hidden flex-col border-b border-[#e6dfd3] pb-1 mb-1">
                     <div class="flex justify-between items-center py-1.5 text-sm font-semibold"><span>Subtotal</span><span id="receipt-subtotal">₹0.00</span></div>
                     <div id="receipt-discount-row" class="hidden justify-between items-center py-1.5 text-sm font-semibold text-red-600"><span>Discount</span><span>-₹<span id="receipt-discount">0</span></span></div>
