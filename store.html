@@ -60,20 +60,21 @@
                 <div class="relative shrink-0">
                     <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 p-[3px] shadow-sm">
                         <div class="w-full h-full bg-white rounded-full p-0.5">
-                         <!-- ✨ NAYA: Clickable Store Logo Upload ✨ -->
-<label class="relative w-full h-full bg-gray-50 rounded-full flex items-center justify-center text-gray-300 text-3xl cursor-pointer overflow-hidden group">
-    <i id="shop-avatar-icon" class="fas fa-store"></i>
-    <!-- यहाँ अपलोड की हुई फोटो दिखेगी -->
-    <img id="shop-avatar-img" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
-    
-    <!-- होवर करने पर कैमरे का आइकॉन दिखेगा -->
-    <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center z-20 transition-all">
-        <i class="fas fa-camera text-white text-xl"></i>
-    </div>
-    
-    <!-- असली फाइल इनपुट -->
-    <input type="file" accept="image/*" class="hidden" onchange="uploadStoreLogo(event)">
-</label>
+                        <!-- ✨ NAYA: Clickable Store Logo Upload (Fixed for Owner Only) ✨ -->
+                        <label id="store-logo-wrapper" class="relative w-full h-full bg-gray-50 rounded-full flex items-center justify-center text-gray-300 text-3xl overflow-hidden">
+                            <i id="shop-avatar-icon" class="fas fa-store"></i>
+                            
+                            <!-- यहाँ अपलोड की हुई फोटो दिखेगी -->
+                            <img id="shop-avatar-img" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+                            
+                            <!-- होवर करने पर कैमरे का आइकॉन दिखेगा -->
+                            <div id="camera-hover-overlay" class="absolute inset-0 bg-black/40 hidden items-center justify-center z-20 transition-all">
+                                <i class="fas fa-camera text-white text-xl"></i>
+                            </div>
+                            
+                            <!-- असली फाइल इनपुट (by default disabled rahega) -->
+                            <input type="file" id="logo-file-input" accept="image/*" class="hidden" onchange="uploadStoreLogo(event)" disabled>
+                        </label>
 
                         </div>
                     </div>
@@ -367,10 +368,22 @@
                     }
 
 
-                    const loggedInOwner = localStorage.getItem('pixigenie_active_shop');
-                    if (loggedInOwner !== currentShopId) {
+                                        const loggedInOwner = localStorage.getItem('pixigenie_active_shop');
+                    
+                    const logoWrapper = document.getElementById('store-logo-wrapper');
+                    const cameraOverlay = document.getElementById('camera-hover-overlay');
+                    const fileInput = document.getElementById('logo-file-input');
+
+                    if (loggedInOwner === currentShopId) {
+                        // ✨ 1. Agar Owner khud dekh raha hai, to upload chalu karo ✨
+                        if (logoWrapper) logoWrapper.classList.add('cursor-pointer', 'group');
+                        if (cameraOverlay) cameraOverlay.classList.add('group-hover:flex');
+                        if (fileInput) fileInput.disabled = false;
+                    } else {
+                        // ✨ 2. Agar Customer dekh raha hai, to bas Follow/Message button dikhao ✨
                         document.getElementById('action-buttons-container').classList.remove('hidden');
                     }
+
                     
                     updateAverageRatingDisplay();
                     initReviewsSystem();
