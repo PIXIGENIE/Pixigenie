@@ -2318,10 +2318,19 @@
             }
 
             
+                    // ✨ Naya Foolproof Business Type Loader ✨
             const existingBizType = globalShopData.businessType || '';
-            document.querySelectorAll('.biz-btn').forEach(btn => {
-                if (existingBizType && btn.innerText.includes(existingBizType)) { selectBusinessType(btn, existingBizType); }
-            });
+            if (existingBizType) {
+                document.getElementById('selected-business-type').value = existingBizType;
+                document.querySelectorAll('.biz-btn').forEach(btn => {
+                    // Text ki jagah seedha onclick attribute check karega
+                    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(existingBizType)) { 
+                        selectBusinessType(btn, existingBizType); 
+                    }
+                });
+            }
+
+            
 
             if (document.getElementById('setup-address')) document.getElementById('setup-address').value = globalShopData.address || '';
             if (document.getElementById('setup-landmark')) document.getElementById('setup-landmark').value = globalShopData.landmark || '';
