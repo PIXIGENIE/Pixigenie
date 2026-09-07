@@ -109,7 +109,9 @@
                 <h2 id="profile-shop-name" class="font-black text-gray-900 text-[17px] tracking-tight">Store Name</h2>
                 <p id="profile-owner-name" class="text-[13px] font-semibold text-gray-500">Proprietor Name</p>
                 
-                <span id="profile-category" class="inline-block mt-2 mb-2.5 px-2.5 py-1 bg-gray-50 text-gray-600 text-[10px] font-black uppercase tracking-wider rounded-lg border border-gray-100">Category</span>
+                                     <span id="profile-category" class="inline-block mt-2 mb-2.5 px-2.5 py-1 bg-gray-50 text-gray-600 text-[10px] font-black uppercase tracking-wider rounded-lg border border-gray-100">Category</span>
+
+
                 
                 <div class="text-[13px] text-gray-700 leading-relaxed font-medium">
                     <span id="desc-text"></span>
@@ -123,6 +125,9 @@
                  <a id="profile-map-link" href="#" target="_blank" class="hidden mt-2.5 text-[11px] font-bold px-3 py-1.5 bg-green-50 text-green-600 rounded-lg inline-flex items-center gap-1.5 w-fit active:scale-95 transition border border-green-100 shadow-sm">
                     <i class="fas fa-map-marked-alt"></i> View on Google Maps
                 </a>
+                                <!-- ✨ NAYA PREMIUM DELIVERY BANNER ✨ -->
+                <div id="profile-delivery-banner" class="hidden"></div>
+
             </div>
 
             <div id="action-buttons-container" class="flex gap-2.5 mt-5 hidden">
@@ -388,7 +393,74 @@
                     document.getElementById('profile-owner-name').innerText = safeOwnerName;
                     document.getElementById('profile-category').innerText = shopData.category || "General Store";
                     
-                    document.getElementById('footer-shop-name').innerText = shopData.shopName;
+                          // ✨ PREMIUM DELIVERY BANNER LOGIC ✨
+                    const deliveryBanner = document.getElementById('profile-delivery-banner');
+                    if (deliveryBanner) {
+                        deliveryBanner.classList.remove('hidden');
+                        if (shopData.homeDelivery === true) {
+                            let areaText = shopData.deliveryArea || "Available";
+
+                            // ✨ SMART LOCATION & STATE DETECTION LOGIC ✨
+                            if (shopData.address) {
+                                // 1. "Local Area" Logic
+                                if (areaText === "Local Area") {
+                                    let addressParts = shopData.address.split(','); 
+                                    let localName = addressParts.length > 1 ? addressParts[addressParts.length - 2].trim() : shopData.address.split(' ')[0];
+                                    
+                                    if(localName.split(' ').length > 2) {
+                                       localName = localName.split(' ').slice(0, 2).join(' ');
+                                    }
+                                    localName = localName.replace(/[0-9]/g, '').trim();
+
+                                    areaText = `Local (${localName || 'Area'})`;
+                                } 
+                                // 2. "State Level" Logic
+                                else if (areaText === "State Level") {
+                                    const indianStates = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", "Jammu", "Kashmir", "Chandigarh"];
+                                    let detectedState = "Your State";
+                                    
+                                    let normAddress = shopData.address.toLowerCase().replace(/\s+/g, '');
+                                    for (let state of indianStates) {
+                                        let normState = state.toLowerCase().replace(/\s+/g, '');
+                                        if (normAddress.includes(normState)) {
+                                            detectedState = state;
+                                            break;
+                                        }
+                                    }
+                                    areaText = `Within ${detectedState}`;
+                                }
+                            }
+
+                            deliveryBanner.className = "mt-4 flex items-center gap-3 p-2.5 pr-5 rounded-[16px] bg-[#F0FDF4] border border-[#BBF7D0] max-w-full shadow-sm";
+                            deliveryBanner.innerHTML = `
+                                <div class="w-10 h-10 bg-white text-[#16A34A] rounded-[12px] flex items-center justify-center shadow-sm border border-[#DCFCE7] shrink-0">
+                                    <i class="fas fa-truck text-[17px]"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-[9px] text-[#059669] font-black uppercase tracking-[0.1em] mb-0.5">Home Delivery</p>
+                                    <p class="text-[13px] font-bold text-gray-900 leading-none truncate capitalize">${areaText}</p>
+                                </div>
+                            `;
+                                             } else {
+                            deliveryBanner.className = "mt-4 flex items-start gap-3 p-2.5 pr-4 rounded-[16px] bg-[#FFF7ED] border border-[#FED7AA] max-w-full shadow-sm";
+                            deliveryBanner.innerHTML = `
+                                <div class="w-10 h-10 bg-white text-[#EA580C] rounded-[12px] flex items-center justify-center shadow-sm border border-[#FFEDD5] shrink-0 mt-0.5">
+                                    <!-- ✨ SOLID ORANGE TRUCK ICON ✨ -->
+                                    <i class="fas fa-truck text-[17px]"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-[9px] text-[#C2410C] font-black uppercase tracking-[0.1em] mb-1">Delivery Status</p>
+                                    <p class="text-[11.5px] font-bold text-gray-900 leading-snug">Home delivery not started yet. Please pick up from store.</p>
+                                </div>
+                            `;
+                        }
+
+                    }
+
+
+
+
+ document.getElementById('footer-shop-name').innerText = shopData.shopName;
                     document.getElementById('footer-owner-name').innerText = safeOwnerName;
                     
                     let addressText = shopData.address || "Address not provided";
