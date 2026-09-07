@@ -1158,13 +1158,20 @@
         async function fetchFirebaseData() {
             const shopRef = db.collection('shops').doc(currentShopId);
             
-            const monthPicker = document.getElementById('insight-month-picker');
-            if (monthPicker && !monthPicker.value) {
+                                    const monthPicker = document.getElementById('insight-month-picker');
+            if (monthPicker) {
                 const date = new Date();
                 const year = date.getFullYear();
                 const month = ('0' + (date.getMonth() + 1)).slice(-2);
-                monthPicker.value = `${year}-${month}`;
+                const currentMonthStr = `${year}-${month}`;
+                
+                // ✨ FORCE AUTO-UPDATE: Hamesha live current month set karega ✨
+                monthPicker.value = currentMonthStr;
+                
+                // ✨ FUTURE BLOCKER: Aage ke mahine disable karega ✨
+                monthPicker.max = currentMonthStr;
             }
+
 
                     // ✨ REAL-TIME LIVE ORDERS FETCHING (WITH BADGE LOGIC) ✨
             if(liveOrdersUnsubscribe) liveOrdersUnsubscribe();
@@ -2522,125 +2529,3533 @@
                 }
             }
         }
-        // ==========================================
-        // 📊 PREMIUM iOS SMART REPORT GENERATOR
-        // ==========================================
-        function downloadSmartReport() {
-            // Dashboard se current data uthao
-            const storeName = globalShopData?.shopName || localStorage.getItem('pixigenie_active_shop') || 'Official Store';
-            
-            let totalSale = "₹0"; let pendingUdhar = "₹0"; let cashReceived = "₹0";
-            
-            // Text nikalte time extra spaces hata do
-            try { totalSale = document.getElementById('all-time-sale')?.innerText.trim() || "₹0"; } catch(e){}
-            try { pendingUdhar = document.getElementById('pending-udhar')?.innerText.trim() || "₹0"; } catch(e){}
-            try { cashReceived = document.getElementById('cash-received')?.innerText.trim() || "₹0"; } catch(e){}
+                    // ============================================================
+// 🍎 PREMIUM EXECUTIVE BUSINESS INSIGHT REPORT
+// iOS / Apple Finance Style • Responsive • Print/PDF Ready
+// ============================================================
 
-            const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-            const timeStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+function downloadSmartReport() {
 
-            // ✨ THE PREMIUM iOS HTML TEMPLATE ✨
-            const reportHTML = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Smart Report - ${storeName}</title>
-                <script src="https://cdn.tailwindcss.com"><\/script>
-                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-                <style>
-                    body { background-color: #F2F2F7; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, sans-serif; -webkit-font-smoothing: antialiased; }
-                    .ios-card { background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); }
-                    .glass-header { background: rgba(255, 255, 255, 0.7); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); }
-                </style>
-            </head>
-            <body class="pb-20 text-[#1d1d1f]">
-                
-                <!-- TOP HEADER -->
-                <div class="glass-header sticky top-0 px-8 py-5 border-b border-gray-200/50 flex justify-between items-center z-50">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-tr from-purple-600 to-indigo-500 rounded-full flex items-center justify-center text-white shadow-sm"><i class="fas fa-chart-pie"></i></div>
-                        <div>
-                            <h1 class="font-black text-xl tracking-tight">${storeName}</h1>
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Business Report</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-gray-900">${dateStr}</p>
-                        <p class="text-xs font-semibold text-gray-500">${timeStr}</p>
-                    </div>
-                </div>
+    const btn =
+        (typeof event !== "undefined" && event?.currentTarget)
+            ? event.currentTarget
+            : document.querySelector('[onclick*="downloadSmartReport"]');
 
-                <div class="max-w-4xl mx-auto px-6 mt-8 space-y-6">
-                    
-                    <!-- SUMMARY CARDS -->
-                    <h2 class="text-[13px] font-black text-gray-400 uppercase tracking-[0.2em] ml-2">Key Metrics</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        
-                        <!-- Total Sale -->
-                        <div class="ios-card p-6 border-t-[5px] border-[#34C759]">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="w-10 h-10 bg-green-50 text-green-500 rounded-full flex items-center justify-center"><i class="fas fa-wallet text-lg"></i></div>
-                                <span class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">All Time</span>
-                            </div>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Sales</p>
-                            <h3 class="text-3xl font-black text-gray-900 tracking-tight">${totalSale}</h3>
-                        </div>
+    const originalHTML = btn ? btn.innerHTML : '';
 
-                        <!-- Cash Received -->
-                        <div class="ios-card p-6 border-t-[5px] border-[#007AFF]">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center"><i class="fas fa-money-bill-wave text-lg"></i></div>
-                                <span class="bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">In Hand</span>
-                            </div>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Cash Received</p>
-                            <h3 class="text-3xl font-black text-gray-900 tracking-tight">${cashReceived}</h3>
-                        </div>
+    if (btn) {
+        btn.innerHTML = `
+            <i class="fas fa-circle-notch fa-spin"></i>
+            Preparing Report...
+        `;
+        btn.disabled = true;
+    }
 
-                        <!-- Udhar -->
-                        <div class="ios-card p-6 border-t-[5px] border-[#FF3B30]">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center"><i class="fas fa-hand-holding-usd text-lg"></i></div>
-                                <span class="bg-red-100 text-red-700 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">Pending</span>
-                            </div>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Pending Udhar</p>
-                            <h3 class="text-3xl font-black text-red-600 tracking-tight">${pendingUdhar}</h3>
-                        </div>
+    setTimeout(() => {
 
-                    </div>
+        // ========================================================
+        // 1. MONTH
+        // ========================================================
 
-                    <!-- INSIGHTS SECTION -->
-                    <div class="mt-8">
-                        <div class="ios-card p-8">
-                            <h3 class="text-xl font-black text-gray-900 mb-6 flex items-center gap-2"><i class="fas fa-bolt text-yellow-400"></i> Smart Insights</h3>
-                            
-                            <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100 mb-4 flex items-center gap-4">
-                                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-green-500 text-xl shrink-0"><i class="fas fa-arrow-trend-up"></i></div>
-                                <div>
-                                    <h4 class="font-bold text-gray-900">Business is Healthy</h4>
-                                    <p class="text-sm text-gray-500 mt-1">Focus on clearing the <strong>${pendingUdhar}</strong> pending udhar to maximize your cash flow this month.</p>
-                                </div>
-                            </div>
-                            
-                            <p class="text-center text-xs text-gray-400 font-semibold mt-6 uppercase tracking-widest">Powered by Pixigenie Engine</p>
-                        </div>
-                    </div>
-                    
-                </div>
-            </body>
-            </html>`;
+        const monthPicker =
+            document.getElementById('insight-month-picker');
 
-            // HTML file bana kar download karwana
-            const blob = new Blob([reportHTML], { type: 'text/html' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `Smart_Report_${storeName.replace(/\s+/g, '_')}_${dateStr.replace(/ /g, '_')}.html`;
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        let selectedDate = new Date();
+
+        if (monthPicker && monthPicker.value) {
+            const parts = monthPicker.value.split('-');
+
+            if (parts.length === 2) {
+                selectedDate = new Date(
+                    parseInt(parts[0]),
+                    parseInt(parts[1]) - 1,
+                    1
+                );
+            }
         }
+
+        const year = selectedDate.getFullYear();
+        const month = selectedDate.getMonth();
+
+        const monthKey =
+            `${year}-${String(month + 1).padStart(2, '0')}`;
+
+        const displayMonth =
+            selectedDate.toLocaleString('en-IN', {
+                month: 'long',
+                year: 'numeric'
+            });
+
+
+        // ========================================================
+        // 2. HELPERS
+        // ========================================================
+
+        const money = value => {
+            const num = Number(value) || 0;
+
+            return new Intl.NumberFormat('en-IN', {
+                maximumFractionDigits: 0
+            }).format(num);
+        };
+
+        const moneyDecimal = value => {
+            const num = Number(value) || 0;
+
+            return new Intl.NumberFormat('en-IN', {
+                maximumFractionDigits: 2
+            }).format(num);
+        };
+
+        const num = value =>
+            Number(value) || 0;
+
+        const escapeHTML = value => {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        };
+
+        const getBillDate = bill => {
+
+            if (
+                bill.timestamp &&
+                typeof bill.timestamp.toDate === 'function'
+            ) {
+                return bill.timestamp.toDate();
+            }
+
+            if (
+                bill.timestamp &&
+                bill.timestamp.seconds
+            ) {
+                return new Date(
+                    bill.timestamp.seconds * 1000
+                );
+            }
+
+            if (bill.date) {
+
+                const parts =
+                    String(bill.date).split('/');
+
+                if (parts.length === 3) {
+                    return new Date(
+                        parseInt(parts[2]),
+                        parseInt(parts[1]) - 1,
+                        parseInt(parts[0])
+                    );
+                }
+
+                const d = new Date(bill.date);
+
+                if (!isNaN(d)) return d;
+            }
+
+            return null;
+        };
+
+
+        // ========================================================
+        // 3. DATA CONTAINERS
+        // ========================================================
+
+        let totalSales = 0;
+        let cashReceived = 0;
+        let pendingUdhar = 0;
+        let investment = 0;
+
+        let validOrderCount = 0;
+        let cancelledOrders = 0;
+
+        let productMap = {};
+        let customerMap = {};
+        let dailyMap = {};
+        let paymentMap = {};
+        let deliveryMap = {};
+
+        let tableRowsHTML = '';
+
+        let totalItemsSold = 0;
+
+
+        // ========================================================
+        // 4. PROCESS ORDERS
+        // ========================================================
+
+        if (Array.isArray(adminBills)) {
+
+            adminBills.forEach(bill => {
+
+                const billDate = getBillDate(bill);
+
+                if (!billDate || isNaN(billDate)) return;
+
+                if (
+                    billDate.getMonth() !== month ||
+                    billDate.getFullYear() !== year
+                ) {
+                    return;
+                }
+
+                const grandTotal = num(bill.grandTotal);
+
+                const deliveryStatus =
+                    String(
+                        bill.deliveryStatus || 'Processing'
+                    );
+
+                const payStatus =
+                    String(
+                        bill.payStatus || ''
+                    );
+
+                const payMode =
+                    String(
+                        bill.payMode || 'Unknown'
+                    );
+
+                const isCancelled =
+                    deliveryStatus.toLowerCase() === 'cancelled';
+
+                const isPaid =
+                    payStatus.toLowerCase().includes('paid');
+
+                // ------------------------------------------------
+                // Cancelled
+                // ------------------------------------------------
+
+                if (isCancelled) {
+                    cancelledOrders++;
+                }
+
+                // ------------------------------------------------
+                // Payment status
+                // ------------------------------------------------
+
+                const paymentBadge = isPaid
+                    ? `
+                        <span class="status paid">
+                            <span class="status-dot"></span>
+                            PAID
+                        </span>
+                    `
+                    : `
+                        <span class="status unpaid">
+                            <span class="status-dot"></span>
+                            UNPAID
+                        </span>
+                    `;
+
+
+                // ------------------------------------------------
+                // Delivery status
+                // ------------------------------------------------
+
+                let deliveryClass = 'processing';
+
+                if (
+                    deliveryStatus.toLowerCase() === 'delivered'
+                ) {
+                    deliveryClass = 'delivered';
+                }
+
+                if (
+                    deliveryStatus.toLowerCase() === 'cancelled'
+                ) {
+                    deliveryClass = 'cancelled';
+                }
+
+                const deliveryBadge = `
+                    <span class="status ${deliveryClass}">
+                        <span class="status-dot"></span>
+                        ${escapeHTML(deliveryStatus.toUpperCase())}
+                    </span>
+                `;
+
+
+                // ------------------------------------------------
+                // Items
+                // ------------------------------------------------
+
+                let itemHTML = '-';
+
+                if (
+                    Array.isArray(bill.items) &&
+                    bill.items.length
+                ) {
+
+                    itemHTML = bill.items.map(item => {
+
+                        const qty = num(item.qty);
+                        const name =
+                            escapeHTML(item.name || 'Item');
+
+                        return `
+                            <div class="item-line">
+                                <strong>${qty}×</strong>
+                                ${name}
+                            </div>
+                        `;
+
+                    }).join('');
+                }
+
+
+                // ------------------------------------------------
+                // Table row
+                // ------------------------------------------------
+
+                const orderId =
+                    escapeHTML(
+                        String(bill.id || 'ORDER')
+                            .substring(0, 8)
+                            .toUpperCase()
+                    );
+
+                tableRowsHTML += `
+                    <tr>
+
+                        <td>
+                            <span class="order-id">
+                                #${orderId}
+                            </span>
+                        </td>
+
+                        <td>
+                            ${escapeHTML(bill.date || '-')}
+                        </td>
+
+                        <td>
+                            <strong>
+                                ${escapeHTML(
+                                    bill.customerName || 'N/A'
+                                )}
+                            </strong>
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                bill.customerPhone || 'N/A'
+                            )}
+                        </td>
+
+                        <td>
+                            ${itemHTML}
+                        </td>
+
+                        <td>
+                            <strong>
+                                ₹${money(grandTotal)}
+                            </strong>
+                        </td>
+
+                        <td>
+                            ${escapeHTML(payMode)}
+                        </td>
+
+                        <td>
+                            ${paymentBadge}
+                        </td>
+
+                        <td>
+                            ${deliveryBadge}
+                        </td>
+
+                    </tr>
+                `;
+
+
+                // =================================================
+                // FINANCIAL DATA
+                // =================================================
+
+                if (isCancelled) return;
+
+                totalSales += grandTotal;
+                validOrderCount++;
+
+                if (isPaid) {
+                    cashReceived += grandTotal;
+                } else {
+                    pendingUdhar += grandTotal;
+                }
+
+
+                // =================================================
+                // PRODUCTS
+                // =================================================
+
+                if (Array.isArray(bill.items)) {
+
+                    bill.items.forEach(item => {
+
+                        const name =
+                            String(
+                                item.name || 'Unknown Product'
+                            );
+
+                        const qty =
+                            num(item.qty);
+
+                        const revenue =
+                            num(
+                                item.total ??
+                                (qty * num(item.price))
+                            );
+
+                        totalItemsSold += qty;
+
+                        if (!productMap[name]) {
+
+                            productMap[name] = {
+                                qty: 0,
+                                revenue: 0
+                            };
+                        }
+
+                        productMap[name].qty += qty;
+                        productMap[name].revenue += revenue;
+
+                    });
+                }
+
+
+                // =================================================
+                // CUSTOMER
+                // =================================================
+
+                const customerId =
+                    bill.customerPhone &&
+                    bill.customerPhone !== 'N/A'
+                        ? bill.customerPhone
+                        : `NAME_${bill.customerName || 'Unknown'}`;
+
+                if (!customerMap[customerId]) {
+
+                    customerMap[customerId] = {
+                        name:
+                            bill.customerName ||
+                            'Unknown Customer',
+
+                        phone:
+                            bill.customerPhone ||
+                            '',
+
+                        spent: 0,
+                        orders: 0
+                    };
+                }
+
+                customerMap[customerId].spent += grandTotal;
+                customerMap[customerId].orders++;
+
+
+                // =================================================
+                // DAILY SALES
+                // =================================================
+
+                const day =
+                    billDate.getDate();
+
+                if (!dailyMap[day]) {
+                    dailyMap[day] = 0;
+                }
+
+                dailyMap[day] += grandTotal;
+
+
+                // =================================================
+                // PAYMENT METHODS
+                // =================================================
+
+                const paymentName =
+                    payMode || 'Unknown';
+
+                if (!paymentMap[paymentName]) {
+                    paymentMap[paymentName] = 0;
+                }
+
+                paymentMap[paymentName] += grandTotal;
+
+
+                // =================================================
+                // DELIVERY
+                // =================================================
+
+                if (!deliveryMap[deliveryStatus]) {
+                    deliveryMap[deliveryStatus] = 0;
+                }
+
+                deliveryMap[deliveryStatus]++;
+
+            });
+        }
+
+
+        // ========================================================
+        // 5. INVESTMENT
+        // ========================================================
+
+        investment =
+            num(
+                typeof allInvestments !== 'undefined'
+                    ? allInvestments[monthKey]
+                    : 0
+            );
+
+
+        // ========================================================
+        // 6. FINANCIAL CALCULATIONS
+        // ========================================================
+
+        const netProfit =
+            cashReceived - investment;
+
+        const profitDisplay =
+            Math.max(0, netProfit);
+
+        const collectionRate =
+            totalSales > 0
+                ? Math.round(
+                    (cashReceived / totalSales) * 100
+                )
+                : 0;
+
+        const udharRate =
+            totalSales > 0
+                ? Math.round(
+                    (pendingUdhar / totalSales) * 100
+                )
+                : 0;
+
+        const aov =
+            validOrderCount > 0
+                ? Math.round(
+                    totalSales / validOrderCount
+                )
+                : 0;
+
+        const profitMargin =
+            totalSales > 0
+                ? Math.round(
+                    (netProfit / totalSales) * 100
+                )
+                : 0;
+
+        const investmentRatio =
+            totalSales > 0
+                ? Math.round(
+                    (investment / totalSales) * 100
+                )
+                : 0;
+
+
+        // ========================================================
+        // 7. TOP PRODUCT
+        // ========================================================
+
+        const products =
+            Object.entries(productMap)
+                .map(([name, data]) => ({
+                    name,
+                    ...data
+                }))
+                .sort((a, b) => b.qty - a.qty);
+
+        const topProduct =
+            products[0] || {
+                name: 'N/A',
+                qty: 0,
+                revenue: 0
+            };
+
+
+        // ========================================================
+        // 8. TOP CUSTOMERS
+        // ========================================================
+
+        const customers =
+            Object.values(customerMap)
+                .sort(
+                    (a, b) =>
+                        b.spent - a.spent
+                );
+
+        const topCustomer =
+            customers[0] || {
+                name: 'N/A',
+                spent: 0,
+                orders: 0
+            };
+
+        const repeatCustomers =
+            customers.filter(
+                c => c.orders > 1
+            );
+
+        const newCustomers =
+            customers.filter(
+                c => c.orders === 1
+            );
+
+
+        // ========================================================
+        // 9. BEST DAY
+        // ========================================================
+
+        let bestDay = {
+            day: 'N/A',
+            sales: 0
+        };
+
+        Object.entries(dailyMap)
+            .forEach(([day, sales]) => {
+
+                if (sales > bestDay.sales) {
+
+                    bestDay = {
+                        day,
+                        sales
+                    };
+                }
+            });
+
+
+        // ========================================================
+        // 10. PRODUCT RANKING HTML
+        // ========================================================
+
+        const maxProductQty =
+            products.length
+                ? products[0].qty
+                : 1;
+
+        let productRankingHTML = '';
+
+        products
+            .slice(0, 5)
+            .forEach((product, index) => {
+
+                const percentage =
+                    Math.max(
+                        6,
+                        Math.round(
+                            (product.qty /
+                                maxProductQty) * 100
+                        )
+                    );
+
+                productRankingHTML += `
+                    <div class="rank-row">
+
+                        <div class="rank-number">
+                            ${index + 1}
+                        </div>
+
+                        <div class="rank-content">
+
+                            <div class="rank-top">
+
+                                <span>
+                                    ${escapeHTML(product.name)}
+                                </span>
+
+                                <strong>
+                                    ${product.qty} sold
+                                </strong>
+
+                            </div>
+
+                            <div class="progress-track">
+                                <div
+                                    class="progress-fill"
+                                    style="width:${percentage}%"
+                                ></div>
+                            </div>
+
+                            <div class="rank-bottom">
+                                Revenue ₹${money(product.revenue)}
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+            });
+
+        if (!productRankingHTML) {
+            productRankingHTML = `
+                <div class="empty-state">
+                    No product data available
+                </div>
+            `;
+        }
+
+
+        // ========================================================
+        // 11. CUSTOMER RANKING HTML
+        // ========================================================
+
+        let customerRankingHTML = '';
+
+        customers
+            .slice(0, 5)
+            .forEach((customer, index) => {
+
+                customerRankingHTML += `
+                    <div class="customer-row">
+
+                        <div class="customer-avatar">
+                            ${escapeHTML(
+                                String(customer.name)
+                                    .charAt(0)
+                                    .toUpperCase()
+                            )}
+                        </div>
+
+                        <div class="customer-info">
+
+                            <strong>
+                                ${escapeHTML(customer.name)}
+                            </strong>
+
+                            <span>
+                                ${customer.orders}
+                                ${
+                                    customer.orders === 1
+                                        ? 'order'
+                                        : 'orders'
+                                }
+                            </span>
+
+                        </div>
+
+                        <div class="customer-spend">
+                            ₹${money(customer.spent)}
+                        </div>
+
+                    </div>
+                `;
+            });
+
+        if (!customerRankingHTML) {
+            customerRankingHTML = `
+                <div class="empty-state">
+                    No customer data available
+                </div>
+            `;
+        }
+
+
+        // ========================================================
+        // 12. PAYMENT DATA
+        // ========================================================
+
+        const paymentLabels =
+            Object.keys(paymentMap);
+
+        const paymentValues =
+            Object.values(paymentMap);
+
+
+        // ========================================================
+        // 13. DAILY CHART
+        // ========================================================
+
+        const daysInMonth =
+            new Date(
+                year,
+                month + 1,
+                0
+            ).getDate();
+
+        const chartLabels =
+            Array.from(
+                { length: daysInMonth },
+                (_, i) => i + 1
+            );
+
+        const chartValues =
+            chartLabels.map(
+                day => dailyMap[day] || 0
+            );
+
+
+        // ========================================================
+        // 14. LOYAL CUSTOMERS
+        // ========================================================
+
+        let loyalHTML = '';
+
+        repeatCustomers
+            .slice(0, 10)
+            .forEach(customer => {
+
+                loyalHTML += `
+                    <div class="loyal-chip">
+
+                        <div class="mini-avatar">
+                            ${escapeHTML(
+                                String(customer.name)
+                                    .charAt(0)
+                                    .toUpperCase()
+                            )}
+                        </div>
+
+                        <span>
+                            ${escapeHTML(customer.name)}
+                        </span>
+
+                        <strong>
+                            ${customer.orders}×
+                        </strong>
+
+                    </div>
+                `;
+            });
+
+        if (!loyalHTML) {
+            loyalHTML = `
+                <div class="empty-state">
+                    No repeat customers this month.
+                </div>
+            `;
+        }
+
+
+        // ========================================================
+        // 15. AUTOMATIC BUSINESS INSIGHTS
+        // ========================================================
+
+        let insightsHTML = '';
+
+        if (collectionRate >= 90) {
+
+            insightsHTML += `
+                <div class="insight positive">
+                    <div class="insight-icon">✓</div>
+                    <div>
+                        <strong>Excellent collection</strong>
+                        <p>
+                            ${collectionRate}% of your sales
+                            have been collected.
+                        </p>
+                    </div>
+                </div>
+            `;
+
+        } else if (collectionRate >= 70) {
+
+            insightsHTML += `
+                <div class="insight neutral">
+                    <div class="insight-icon">↗</div>
+                    <div>
+                        <strong>Healthy collection rate</strong>
+                        <p>
+                            ${collectionRate}% of sales
+                            have been collected.
+                        </p>
+                    </div>
+                </div>
+            `;
+
+        } else {
+
+            insightsHTML += `
+                <div class="insight warning">
+                    <div class="insight-icon">!</div>
+                    <div>
+                        <strong>Collection needs attention</strong>
+                        <p>
+                            ₹${money(pendingUdhar)}
+                            is currently outstanding.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        if (netProfit > 0) {
+
+            insightsHTML += `
+                <div class="insight positive">
+                    <div class="insight-icon">₹</div>
+                    <div>
+                        <strong>Positive cash profit</strong>
+                        <p>
+                            Cash profit after investment is
+                            ₹${money(netProfit)}.
+                        </p>
+                    </div>
+                </div>
+            `;
+
+        } else if (netProfit < 0) {
+
+            insightsHTML += `
+                <div class="insight warning">
+                    <div class="insight-icon">↓</div>
+                    <div>
+                        <strong>Investment is ahead of collections</strong>
+                        <p>
+                            Current cash profit is negative
+                            by ₹${money(Math.abs(netProfit))}.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        if (repeatCustomers.length > 0) {
+
+            insightsHTML += `
+                <div class="insight blue">
+                    <div class="insight-icon">★</div>
+                    <div>
+                        <strong>Loyal customer base</strong>
+                        <p>
+                            ${repeatCustomers.length}
+                            customer${
+                                repeatCustomers.length > 1
+                                    ? 's'
+                                    : ''
+                            }
+                            placed multiple orders.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        if (topProduct.name !== 'N/A') {
+
+            insightsHTML += `
+                <div class="insight purple">
+                    <div class="insight-icon">↑</div>
+                    <div>
+                        <strong>Best-selling product</strong>
+                        <p>
+                            ${escapeHTML(topProduct.name)}
+                            led sales with
+                            ${topProduct.qty} units.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        // ========================================================
+        // 16. STORE NAME
+        // ========================================================
+
+        const storeName =
+            typeof globalShopData !== 'undefined' &&
+            globalShopData?.shopName
+                ? globalShopData.shopName
+                : 'Official Store';
+
+        const safeStoreName =
+            String(storeName)
+                .replace(/[^a-zA-Z0-9]/g, '');
+
+
+        // ========================================================
+        // 17. EMPTY TABLE
+        // ========================================================
+
+        if (!tableRowsHTML) {
+
+            tableRowsHTML = `
+                <tr>
+                    <td
+                        colspan="9"
+                        class="empty-table"
+                    >
+                        No orders found for this month.
+                    </td>
+                </tr>
+            `;
+        }
+
+
+        // ========================================================
+        // 18. REPORT HTML
+        // ========================================================
+
+        let reportHTML = `
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+    Executive Business Report -
+    ${escapeHTML(storeName)}
+</title>
+
+
+<!-- Fonts -->
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+>
+
+
+<!-- Icons -->
+
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+>
+
+
+<!-- Chart -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>
+
+
+<style>
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+:root {
+
+    --bg: #f5f5f7;
+    --card: rgba(255,255,255,.94);
+
+    --text: #17171a;
+    --secondary: #6e6e73;
+    --muted: #9a9aa0;
+
+    --line: #e8e8ed;
+
+    --blue: #007aff;
+    --green: #34c759;
+    --orange: #ff9500;
+    --red: #ff3b30;
+    --purple: #af52de;
+
+    --radius: 24px;
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+
+    margin: 0;
+
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(0,122,255,.045),
+            transparent 35%
+        ),
+        var(--bg);
+
+    color: var(--text);
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    -webkit-font-smoothing: antialiased;
+
+}
+
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.container {
+
+    width: min(1180px, calc(100% - 32px));
+
+    margin: 0 auto;
+
+    padding: 34px 0 60px;
+
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.report-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 24px;
+
+    margin-bottom: 30px;
+
+}
+
+
+.brand {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+}
+
+
+.brand-icon {
+
+    width: 54px;
+    height: 54px;
+
+    border-radius: 17px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: white;
+
+    font-size: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #1c1c1e,
+            #48484a
+        );
+
+    box-shadow:
+        0 8px 22px rgba(0,0,0,.12);
+
+}
+
+
+.brand h1 {
+
+    margin: 0;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size: 22px;
+
+    font-weight: 800;
+
+    letter-spacing: -.6px;
+
+}
+
+
+.brand p {
+
+    margin: 5px 0 0;
+
+    color: var(--secondary);
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+.print-btn {
+
+    border: none;
+
+    background: #1c1c1e;
+
+    color: white;
+
+    border-radius: 14px;
+
+    padding: 13px 18px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    box-shadow:
+        0 6px 18px rgba(0,0,0,.12);
+
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.card {
+
+    background: var(--card);
+
+    border: 1px solid rgba(255,255,255,.7);
+
+    border-radius: var(--radius);
+
+    box-shadow:
+        0 8px 35px rgba(0,0,0,.045);
+
+}
+
+
+/* =========================================================
+   EXECUTIVE HERO
+========================================================= */
+
+.executive-card {
+
+    padding: 30px;
+
+    margin-bottom: 18px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f8fbff 100%
+        );
+
+}
+
+
+.executive-card::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 240px;
+    height: 240px;
+
+    border-radius: 50%;
+
+    right: -90px;
+    top: -90px;
+
+    background:
+        rgba(0,122,255,.055);
+
+}
+
+
+.eyebrow {
+
+    color: var(--secondary);
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1.8px;
+
+}
+
+
+.executive-title {
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size: 31px;
+
+    font-weight: 800;
+
+    letter-spacing: -1.2px;
+
+    margin: 8px 0 4px;
+
+}
+
+
+.executive-subtitle {
+
+    color: var(--secondary);
+
+    font-size: 13px;
+
+    margin: 0;
+
+}
+
+
+.executive-bottom {
+
+    display: grid;
+
+    grid-template-columns:
+        1.3fr 1fr 1fr 1fr;
+
+    gap: 14px;
+
+    margin-top: 28px;
+
+}
+
+
+.exec-metric {
+
+    padding: 17px;
+
+    border-radius: 18px;
+
+    background: rgba(245,245,247,.8);
+
+}
+
+
+.exec-metric span {
+
+    display: block;
+
+    color: var(--secondary);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    margin-bottom: 7px;
+
+}
+
+
+.exec-metric strong {
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+}
+
+
+/* =========================================================
+   KPI GRID
+========================================================= */
+
+.kpi-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 16px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.kpi {
+
+    padding: 22px;
+
+    position: relative;
+
+}
+
+
+.kpi-icon {
+
+    width: 36px;
+    height: 36px;
+
+    border-radius: 11px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-bottom: 15px;
+
+    font-size: 14px;
+
+}
+
+
+.kpi-label {
+
+    color: var(--secondary);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+}
+
+
+.kpi-value {
+
+    margin-top: 5px;
+
+    font-family:
+        "Plus Jakarta Sans",
+        sans-serif;
+
+    font-size: 25px;
+
+    font-weight: 800;
+
+    letter-spacing: -.7px;
+
+}
+
+
+.kpi-foot {
+
+    color: var(--muted);
+
+    font-size: 10px;
+
+    margin-top: 7px;
+
+    font-weight: 600;
+
+}
+
+
+/* colors */
+
+.icon-blue {
+    background: #e8f2ff;
+    color: var(--blue);
+}
+
+.icon-green {
+    background: #e8f8ed;
+    color: var(--green);
+}
+
+.icon-red {
+    background: #ffeded;
+    color: var(--red);
+}
+
+.icon-orange {
+    background: #fff3df;
+    color: var(--orange);
+}
+
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+.section-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 18px;
+
+}
+
+
+.section-title {
+
+    margin: 0;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    letter-spacing: -.2px;
+
+}
+
+
+.section-caption {
+
+    color: var(--secondary);
+
+    font-size: 11px;
+
+}
+
+
+/* =========================================================
+   MAIN GRID
+========================================================= */
+
+.main-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1.45fr 1fr;
+
+    gap: 18px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.chart-card {
+
+    padding: 24px;
+
+    min-height: 370px;
+
+}
+
+
+.chart-wrap {
+
+    height: 280px;
+
+}
+
+
+/* =========================================================
+   INSIGHTS
+========================================================= */
+
+.insights-card {
+
+    padding: 24px;
+
+}
+
+
+.insight {
+
+    display: flex;
+
+    gap: 12px;
+
+    padding: 14px;
+
+    border-radius: 16px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.insight:last-child {
+    margin-bottom: 0;
+}
+
+
+.insight-icon {
+
+    width: 34px;
+    height: 34px;
+
+    flex: 0 0 34px;
+
+    border-radius: 11px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-weight: 800;
+
+}
+
+
+.insight strong {
+
+    font-size: 12px;
+
+    display: block;
+
+}
+
+
+.insight p {
+
+    margin: 4px 0 0;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+
+    color: var(--secondary);
+
+}
+
+
+.insight.positive {
+    background: #effaf2;
+}
+
+.insight.positive .insight-icon {
+    background: #d9f5df;
+    color: #1d9d45;
+}
+
+
+.insight.warning {
+    background: #fff6e8;
+}
+
+.insight.warning .insight-icon {
+    background: #ffe7bd;
+    color: #c77700;
+}
+
+
+.insight.blue {
+    background: #edf5ff;
+}
+
+.insight.blue .insight-icon {
+    background: #dcecff;
+    color: var(--blue);
+}
+
+
+.insight.purple {
+    background: #f8effc;
+}
+
+.insight.purple .insight-icon {
+    background: #efd9f7;
+    color: var(--purple);
+}
+
+
+.insight.neutral {
+    background: #f4f4f6;
+}
+
+.insight.neutral .insight-icon {
+    background: #e6e6e9;
+    color: #555;
+}
+
+
+/* =========================================================
+   ANALYTICS GRID
+========================================================= */
+
+.analytics-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 18px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.analytics-card {
+
+    padding: 24px;
+
+}
+
+
+/* =========================================================
+   PRODUCT RANKING
+========================================================= */
+
+.rank-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.rank-number {
+
+    width: 28px;
+    height: 28px;
+
+    border-radius: 9px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #f2f2f7;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+}
+
+
+.rank-content {
+
+    flex: 1;
+
+}
+
+
+.rank-top {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+}
+
+
+.rank-top strong {
+
+    color: var(--secondary);
+
+}
+
+
+.progress-track {
+
+    height: 6px;
+
+    border-radius: 10px;
+
+    background: #eeeeF2;
+
+    margin: 7px 0;
+
+    overflow: hidden;
+
+}
+
+
+.progress-fill {
+
+    height: 100%;
+
+    border-radius: inherit;
+
+    background: #007aff;
+
+}
+
+
+.rank-bottom {
+
+    font-size: 9px;
+
+    color: var(--muted);
+
+}
+
+
+/* =========================================================
+   CUSTOMERS
+========================================================= */
+
+.customer-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 10px 0;
+
+    border-bottom: 1px solid var(--line);
+
+}
+
+
+.customer-row:last-child {
+    border-bottom: none;
+}
+
+
+.customer-avatar,
+.mini-avatar {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #f0f0f3;
+
+    color: #555;
+
+    font-weight: 800;
+
+}
+
+
+.customer-avatar {
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 13px;
+
+    font-size: 13px;
+
+}
+
+
+.customer-info {
+
+    flex: 1;
+
+}
+
+
+.customer-info strong {
+
+    display: block;
+
+    font-size: 11px;
+
+}
+
+
+.customer-info span {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+}
+
+
+.customer-spend {
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+}
+
+
+/* =========================================================
+   FINANCIAL SPLIT
+========================================================= */
+
+.finance-card {
+
+    padding: 24px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.finance-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 25px;
+
+    align-items: center;
+
+}
+
+
+.finance-chart {
+
+    height: 260px;
+
+}
+
+
+.finance-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+
+}
+
+
+.finance-item {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 14px 16px;
+
+    border-radius: 15px;
+
+    background: #f7f7f9;
+
+}
+
+
+.finance-label {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+}
+
+
+.dot {
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+}
+
+
+.dot-green {
+    background: var(--green);
+}
+
+.dot-blue {
+    background: var(--blue);
+}
+
+.dot-red {
+    background: var(--red);
+}
+
+
+.finance-value {
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+}
+
+
+/* =========================================================
+   LOYAL CUSTOMERS
+========================================================= */
+
+.loyal-card {
+
+    padding: 24px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.loyal-wrap {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 9px;
+
+}
+
+
+.loyal-chip {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px 11px 8px 8px;
+
+    border-radius: 14px;
+
+    background: #f4f4f7;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+}
+
+
+.loyal-chip strong {
+
+    color: var(--blue);
+
+}
+
+
+.mini-avatar {
+
+    width: 25px;
+    height: 25px;
+
+    border-radius: 8px;
+
+    font-size: 9px;
+
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-card {
+
+    overflow: hidden;
+
+}
+
+
+.table-header {
+
+    padding: 22px 24px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    border-bottom: 1px solid var(--line);
+
+}
+
+
+.record-badge {
+
+    background: #f1f1f4;
+
+    color: var(--secondary);
+
+    padding: 7px 10px;
+
+    border-radius: 20px;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+}
+
+
+.table-scroll {
+
+    overflow-x: auto;
+
+}
+
+
+table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 950px;
+
+}
+
+
+thead {
+
+    background: #f7f7f9;
+
+}
+
+
+th {
+
+    padding: 12px 16px;
+
+    text-align: left;
+
+    color: var(--secondary);
+
+    font-size: 8px;
+
+    text-transform: uppercase;
+
+    letter-spacing: .8px;
+
+    font-weight: 800;
+
+}
+
+
+td {
+
+    padding: 14px 16px;
+
+    border-bottom: 1px solid var(--line);
+
+    font-size: 10px;
+
+    color: #4a4a4f;
+
+}
+
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+.order-id {
+
+    font-family: monospace;
+
+    font-size: 9px;
+
+    color: var(--secondary);
+
+}
+
+
+.item-line {
+
+    margin-bottom: 3px;
+
+}
+
+
+.item-line strong {
+
+    color: #111;
+
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 5px 8px;
+
+    border-radius: 20px;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+}
+
+
+.status-dot {
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+}
+
+
+.status.paid {
+
+    background: #e9f8ee;
+    color: #20883e;
+
+}
+
+.status.paid .status-dot {
+    background: var(--green);
+}
+
+
+.status.unpaid {
+
+    background: #fff0ef;
+    color: #c72c24;
+
+}
+
+.status.unpaid .status-dot {
+    background: var(--red);
+}
+
+
+.status.delivered {
+
+    background: #eaf3ff;
+    color: #1268c4;
+
+}
+
+.status.delivered .status-dot {
+    background: var(--blue);
+}
+
+
+.status.processing {
+
+    background: #fff4df;
+    color: #a96700;
+
+}
+
+.status.processing .status-dot {
+    background: var(--orange);
+}
+
+
+.status.cancelled {
+
+    background: #f0f0f2;
+    color: #666;
+
+}
+
+.status.cancelled .status-dot {
+    background: #888;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty-state {
+
+    padding: 30px;
+
+    text-align: center;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    font-style: italic;
+
+}
+
+
+.empty-table {
+
+    padding: 50px !important;
+
+    text-align: center;
+
+    color: var(--muted);
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.report-footer {
+
+    text-align: center;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+    margin-top: 25px;
+
+}
+
+
+.report-footer strong {
+    color: #555;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:800px) {
+
+    .container {
+
+        width: calc(100% - 22px);
+
+        padding-top: 18px;
+
+    }
+
+    .report-header {
+
+        align-items: flex-start;
+
+    }
+
+    .brand h1 {
+
+        font-size: 17px;
+
+    }
+
+    .brand-icon {
+
+        width: 46px;
+        height: 46px;
+
+    }
+
+    .print-btn {
+
+        padding: 11px 13px;
+
+        font-size: 10px;
+
+    }
+
+    .executive-card {
+
+        padding: 22px;
+
+    }
+
+    .executive-title {
+
+        font-size: 25px;
+
+    }
+
+    .executive-bottom {
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+    .kpi-grid {
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+    .main-grid,
+    .analytics-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .finance-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+@media(max-width:480px) {
+
+    .report-header {
+
+        flex-direction: column;
+
+    }
+
+    .print-btn {
+
+        width: 100%;
+
+        justify-content: center;
+
+    }
+
+    .executive-bottom {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+    @page {
+
+        size: A4;
+
+        margin: 10mm;
+
+    }
+
+    body {
+
+        background: white !important;
+
+        font-size: 10px;
+
+    }
+
+    .container {
+
+        width: 100%;
+
+        padding: 0;
+
+    }
+
+    .no-print {
+
+        display: none !important;
+
+    }
+
+    .card {
+
+        box-shadow: none !important;
+
+        border: 1px solid #e5e5e5;
+
+    }
+
+    .report-header {
+
+        margin-bottom: 18px;
+
+    }
+
+    .main-grid,
+    .analytics-grid {
+
+        break-inside: avoid;
+
+    }
+
+    .kpi-grid {
+
+        grid-template-columns:
+            repeat(4,1fr);
+
+    }
+
+    .table-card {
+
+        break-before: auto;
+
+    }
+
+    tr {
+
+        break-inside: avoid;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<!-- ======================================================
+     HEADER
+======================================================= -->
+
+<header class="report-header">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            <i class="fas fa-chart-line"></i>
+        </div>
+
+        <div>
+
+            <h1>
+                ${escapeHTML(storeName)}
+            </h1>
+
+            <p>
+                BUSINESS PERFORMANCE REPORT
+                • ${escapeHTML(displayMonth)}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="print-btn no-print"
+        onclick="window.print()"
+    >
+
+        <i class="fas fa-print"></i>
+
+        Print / Save PDF
+
+    </button>
+
+</header>
+
+
+<!-- ======================================================
+     EXECUTIVE SUMMARY
+======================================================= -->
+
+<section class="card executive-card">
+
+    <div class="eyebrow">
+        Executive Summary
+    </div>
+
+    <div class="executive-title">
+
+        ₹${money(totalSales)}
+
+        <span style="
+            color:#6e6e73;
+            font-size:16px;
+            font-weight:600;
+        ">
+            total revenue
+        </span>
+
+    </div>
+
+    <p class="executive-subtitle">
+
+        ${validOrderCount}
+        completed order${
+            validOrderCount === 1 ? '' : 's'
+        }
+        generated during ${escapeHTML(displayMonth)}.
+
+    </p>
+
+
+    <div class="executive-bottom">
+
+
+        <div class="exec-metric">
+
+            <span>Cash Collected</span>
+
+            <strong>
+                ₹${money(cashReceived)}
+            </strong>
+
+        </div>
+
+
+        <div class="exec-metric">
+
+            <span>Collection Rate</span>
+
+            <strong>
+                ${collectionRate}%
+            </strong>
+
+        </div>
+
+
+        <div class="exec-metric">
+
+            <span>Average Order</span>
+
+            <strong>
+                ₹${money(aov)}
+            </strong>
+
+        </div>
+
+
+        <div class="exec-metric">
+
+            <span>Items Sold</span>
+
+            <strong>
+                ${money(totalItemsSold)}
+            </strong>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     KPI GRID
+======================================================= -->
+
+<section class="kpi-grid">
+
+
+    <div class="card kpi">
+
+        <div class="kpi-icon icon-green">
+            <i class="fas fa-arrow-trend-up"></i>
+        </div>
+
+        <div class="kpi-label">
+            CASH RECEIVED
+        </div>
+
+        <div class="kpi-value">
+            ₹${money(cashReceived)}
+        </div>
+
+        <div class="kpi-foot">
+            ${collectionRate}% collection rate
+        </div>
+
+    </div>
+
+
+    <div class="card kpi">
+
+        <div class="kpi-icon icon-red">
+            <i class="fas fa-clock"></i>
+        </div>
+
+        <div class="kpi-label">
+            OUTSTANDING
+        </div>
+
+        <div class="kpi-value">
+            ₹${money(pendingUdhar)}
+        </div>
+
+        <div class="kpi-foot">
+            ${udharRate}% of total sales
+        </div>
+
+    </div>
+
+
+    <div class="card kpi">
+
+        <div class="kpi-icon icon-blue">
+            <i class="fas fa-boxes-stacked"></i>
+        </div>
+
+        <div class="kpi-label">
+            INVESTMENT
+        </div>
+
+        <div class="kpi-value">
+            ₹${money(investment)}
+        </div>
+
+        <div class="kpi-foot">
+            ${investmentRatio}% of revenue
+        </div>
+
+    </div>
+
+
+    <div class="card kpi">
+
+        <div class="kpi-icon icon-orange">
+            <i class="fas fa-receipt"></i>
+        </div>
+
+        <div class="kpi-label">
+            AVERAGE BILL
+        </div>
+
+        <div class="kpi-value">
+            ₹${money(aov)}
+        </div>
+
+        <div class="kpi-foot">
+            ${validOrderCount} orders
+        </div>
+
+    </div>
+
+
+</section>
+
+
+<!-- ======================================================
+     MAIN ANALYTICS
+======================================================= -->
+
+<section class="main-grid">
+
+
+    <!-- SALES TREND -->
+
+    <div class="card chart-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    Sales Performance
+                </h2>
+
+                <div class="section-caption">
+                    Daily revenue movement
+                </div>
+
+            </div>
+
+            <span class="record-badge">
+                ${escapeHTML(displayMonth)}
+            </span>
+
+        </div>
+
+
+        <div class="chart-wrap">
+
+            <canvas id="salesChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- INSIGHTS -->
+
+    <div class="card insights-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    Business Insights
+                </h2>
+
+                <div class="section-caption">
+                    Automated analysis
+                </div>
+
+            </div>
+
+            <i
+                class="fas fa-sparkles"
+                style="color:#ff9500"
+            ></i>
+
+        </div>
+
+        ${insightsHTML}
+
+    </div>
+
+
+</section>
+
+
+<!-- ======================================================
+     PRODUCT + CUSTOMER
+======================================================= -->
+
+<section class="analytics-grid">
+
+
+    <div class="card analytics-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    Top Products
+                </h2>
+
+                <div class="section-caption">
+                    By units sold
+                </div>
+
+            </div>
+
+            <i
+                class="fas fa-ranking-star"
+                style="color:#007aff"
+            ></i>
+
+        </div>
+
+        ${productRankingHTML}
+
+    </div>
+
+
+    <div class="card analytics-card">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    Top Customers
+                </h2>
+
+                <div class="section-caption">
+                    By total spending
+                </div>
+
+            </div>
+
+            <i
+                class="fas fa-user-group"
+                style="color:#af52de"
+            ></i>
+
+        </div>
+
+        ${customerRankingHTML}
+
+    </div>
+
+
+</section>
+
+
+<!-- ======================================================
+     FINANCIAL SPLIT
+======================================================= -->
+
+<section class="card finance-card">
+
+    <div class="section-header">
+
+        <div>
+
+            <h2 class="section-title">
+                Financial Overview
+            </h2>
+
+            <div class="section-caption">
+                Cash flow allocation
+            </div>
+
+        </div>
+
+        <strong
+            style="
+                color:${netProfit >= 0 ? '#34c759' : '#ff3b30'};
+                font-size:13px;
+            "
+        >
+            ${
+                netProfit >= 0
+                    ? '+'
+                    : ''
+            }₹${money(netProfit)}
+        </strong>
+
+    </div>
+
+
+    <div class="finance-grid">
+
+
+        <div class="finance-chart">
+
+            <canvas id="financeChart"></canvas>
+
+        </div>
+
+
+        <div class="finance-list">
+
+
+            <div class="finance-item">
+
+                <div class="finance-label">
+
+                    <span class="dot dot-green"></span>
+
+                    Cash Profit
+
+                </div>
+
+                <div class="finance-value">
+
+                    ₹${money(profitDisplay)}
+
+                </div>
+
+            </div>
+
+
+            <div class="finance-item">
+
+                <div class="finance-label">
+
+                    <span class="dot dot-blue"></span>
+
+                    Investment
+
+                </div>
+
+                <div class="finance-value">
+
+                    ₹${money(investment)}
+
+                </div>
+
+            </div>
+
+
+            <div class="finance-item">
+
+                <div class="finance-label">
+
+                    <span class="dot dot-red"></span>
+
+                    Outstanding
+
+                </div>
+
+                <div class="finance-value">
+
+                    ₹${money(pendingUdhar)}
+
+                </div>
+
+            </div>
+
+
+            <div class="finance-item">
+
+                <div class="finance-label">
+
+                    <i class="fas fa-chart-line"></i>
+
+                    Cash Profit Margin
+
+                </div>
+
+                <div class="finance-value">
+
+                    ${profitMargin}%
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     LOYAL CUSTOMERS
+======================================================= -->
+
+<section class="card loyal-card">
+
+    <div class="section-header">
+
+        <div>
+
+            <h2 class="section-title">
+                Loyal Customers
+            </h2>
+
+            <div class="section-caption">
+                Customers with 2+ orders
+            </div>
+
+        </div>
+
+        <strong style="
+            font-size:12px;
+            color:#007aff;
+        ">
+            ${repeatCustomers.length}
+        </strong>
+
+    </div>
+
+
+    <div class="loyal-wrap">
+
+        ${loyalHTML}
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     ORDER HISTORY
+======================================================= -->
+
+<section class="card table-card">
+
+
+    <div class="table-header">
+
+        <div>
+
+            <h2 class="section-title">
+                Order History
+            </h2>
+
+            <div class="section-caption">
+                Complete transaction ledger
+            </div>
+
+        </div>
+
+
+        <span class="record-badge">
+
+            ${validOrderCount}
+            RECORD${
+                validOrderCount === 1 ? '' : 'S'
+            }
+
+        </span>
+
+    </div>
+
+
+    <div class="table-scroll">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Order ID</th>
+
+                    <th>Date</th>
+
+                    <th>Customer</th>
+
+                    <th>Phone</th>
+
+                    <th>Items</th>
+
+                    <th>Total</th>
+
+                    <th>Payment</th>
+
+                    <th>Status</th>
+
+                    <th>Delivery</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${tableRowsHTML}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     FOOTER
+======================================================= -->
+
+<footer class="report-footer">
+
+    <strong>
+        ${escapeHTML(storeName)}
+    </strong>
+
+    • Executive Business Report
+
+    • ${escapeHTML(displayMonth)}
+
+    <br>
+
+    Generated automatically from business records.
+
+</footer>
+
+
+</div>
+
+
+<!-- ======================================================
+     CHARTS
+======================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+
+        /* ================================================
+           SALES CHART
+        ================================================ */
+
+        const salesCanvas =
+            document.getElementById("salesChart");
+
+        if (salesCanvas) {
+
+            const salesCtx =
+                salesCanvas.getContext("2d");
+
+            const gradient =
+                salesCtx.createLinearGradient(
+                    0,
+                    0,
+                    0,
+                    280
+                );
+
+            gradient.addColorStop(
+                0,
+                "rgba(0,122,255,.25)"
+            );
+
+            gradient.addColorStop(
+                1,
+                "rgba(0,122,255,0)"
+            );
+
+
+            new Chart(
+                salesCtx,
+                {
+
+                    type: "line",
+
+                    data: {
+
+                        labels:
+                            ${JSON.stringify(chartLabels)},
+
+                        datasets: [
+
+                            {
+
+                                data:
+                                    ${JSON.stringify(chartValues)},
+
+                                borderColor:
+                                    "#007aff",
+
+                                backgroundColor:
+                                    gradient,
+
+                                borderWidth: 3,
+
+                                fill: true,
+
+                                tension: .42,
+
+                                pointRadius: 0,
+
+                                pointHoverRadius: 5,
+
+                                pointHoverBackgroundColor:
+                                    "#007aff"
+
+                            }
+
+                        ]
+
+                    },
+
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        plugins: {
+
+                            legend: {
+                                display: false
+                            },
+
+                            tooltip: {
+
+                                displayColors: false,
+
+                                callbacks: {
+
+                                    label:
+                                        function(context) {
+
+                                            return
+                                                " ₹" +
+                                                new Intl.NumberFormat(
+                                                    "en-IN"
+                                                ).format(
+                                                    context.raw || 0
+                                                );
+
+                                        }
+
+                                }
+
+                            }
+
+                        },
+
+
+                        scales: {
+
+                            x: {
+
+                                grid: {
+                                    display: false
+                                },
+
+                                ticks: {
+
+                                    color: "#8e8e93",
+
+                                    font: {
+                                        size: 9
+                                    },
+
+                                    maxTicksLimit: 10
+
+                                }
+
+                            },
+
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                grid: {
+
+                                    color:
+                                        "rgba(0,0,0,.045)"
+
+                                },
+
+                                ticks: {
+
+                                    color: "#8e8e93",
+
+                                    font: {
+                                        size: 9
+                                    },
+
+                                    callback:
+                                        function(value) {
+
+                                            return "₹" +
+                                                new Intl.NumberFormat(
+                                                    "en-IN",
+                                                    {
+                                                        notation:
+                                                            "compact"
+                                                    }
+                                                ).format(value);
+
+                                        }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* ================================================
+           FINANCIAL CHART
+        ================================================ */
+
+        const financeCanvas =
+            document.getElementById("financeChart");
+
+        if (financeCanvas) {
+
+            new Chart(
+
+                financeCanvas.getContext("2d"),
+
+                {
+
+                    type: "doughnut",
+
+                    data: {
+
+                        labels: [
+                            "Cash Profit",
+                            "Investment",
+                            "Outstanding"
+                        ],
+
+                        datasets: [
+
+                            {
+
+                                data: [
+
+                                    ${profitDisplay},
+
+                                    ${investment},
+
+                                    ${pendingUdhar}
+
+                                ],
+
+                                backgroundColor: [
+
+                                    "#34c759",
+                                    "#007aff",
+                                    "#ff3b30"
+
+                                ],
+
+                                borderWidth: 0,
+
+                                spacing: 4,
+
+                                hoverOffset: 5
+
+                            }
+
+                        ]
+
+                    },
+
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        cutout: "76%",
+
+                        plugins: {
+
+                            legend: {
+                                display: false
+                            },
+
+                            tooltip: {
+
+                                callbacks: {
+
+                                    label:
+                                        function(context) {
+
+                                            return " ₹" +
+                                                new Intl.NumberFormat(
+                                                    "en-IN"
+                                                ).format(
+                                                    context.raw || 0
+                                                );
+
+                                        }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            );
+
+        }
+
+    }
+
+);
+
+<\/script>
+
+
+</body>
+
+</html>
+`;
+
+
+        // ========================================================
+        // 19. DOWNLOAD
+        // ========================================================
+
+        const blob =
+            new Blob(
+                [reportHTML],
+                {
+                    type: "text/html;charset=utf-8"
+                }
+            );
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const anchor =
+            document.createElement("a");
+
+        anchor.href = url;
+
+        anchor.download =
+            `Executive_Business_Report_${safeStoreName}_${displayMonth.replace(/\s+/g, "_")}.html`;
+
+        document.body.appendChild(anchor);
+
+        anchor.click();
+
+        document.body.removeChild(anchor);
+
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+        }, 1000);
+
+
+        // ========================================================
+        // 20. RESET BUTTON
+        // ========================================================
+
+        if (btn) {
+
+            btn.innerHTML = originalHTML;
+
+            btn.disabled = false;
+
+        }
+
+    }, 300);
+
+}
+
         // ✨ iOS ALERT CONTROLLERS ✨
         function showIOSAlert(title, message) {
             document.getElementById('ios-alert-title').innerText = title;
