@@ -80,7 +80,9 @@
 
 <!-- ✨ PREMIUM iOS SETUP MODAL (5 STEPS) ✨ -->
 <div id="store-setup-modal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300">
-    <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-lg h-[90vh] sm:h-[720px] flex flex-col relative overflow-hidden">
+    <!-- ✨ HEIGHT INCREASED FROM 90vh TO 96vh ✨ -->
+    <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-lg h-[96vh] sm:h-[720px] flex flex-col relative overflow-hidden">
+
         
         <!-- FIXED HEADER & PROGRESS BAR -->
         <div class="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0 z-20 bg-white relative shadow-sm">
@@ -247,9 +249,20 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" onclick="nextSetupStep(6)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2 shrink-0">
+                                        <!-- ✨ FREE DELIVERY THRESHOLD INPUT ✨ -->
+                        <div class="mt-6 mb-4">
+                            <p class="text-[13px] font-bold text-gray-900 mb-2.5">Free Delivery Above (₹)? <span class="text-gray-400 font-medium text-[11px]">(Optional)</span></p>
+                            <div class="flex items-center bg-white rounded-2xl border border-gray-200 focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-50 transition-all shadow-sm overflow-hidden px-4 h-13">
+                                <i class="fas fa-rupee-sign text-gray-400 mr-2.5 text-[15px]"></i>
+                                <input type="number" id="setup-free-delivery" placeholder="e.g. 500" class="w-full bg-transparent outline-none text-[14px] font-bold text-gray-900 placeholder-gray-400">
+                            </div>
+                            <p class="text-[10px] text-gray-500 mt-1.5 ml-1">Customers won't pay delivery charges if the order crosses this amount.</p>
+                        </div>
+
+                                <button type="button" onclick="nextSetupStep(6)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 mb-10 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2 shrink-0">
                     Next <i class="fas fa-arrow-right text-sm"></i>
                 </button>
+
             </div>
 
             <!-- STEP 6: LOCATION & FINISH -->
@@ -2303,6 +2316,11 @@
             // ✨ Naye Fields Load Karo
             if (document.getElementById('setup-phone')) document.getElementById('setup-phone').value = globalShopData.phone || '';
             if (document.getElementById('setup-email')) document.getElementById('setup-email').value = globalShopData.email || '';
+                        // Load Free Delivery Threshold
+            if (document.getElementById('setup-free-delivery') && globalShopData.freeDeliveryAbove) {
+                document.getElementById('setup-free-delivery').value = globalShopData.freeDeliveryAbove;
+            }
+
                         // ✨ Delivery Data Load ✨
             if (globalShopData.homeDelivery === true) {
                 const yesRadio = document.querySelector('input[name="home_delivery"][value="yes"]');
@@ -2367,7 +2385,8 @@
             const address = document.getElementById('setup-address').value.trim();
             const landmark = document.getElementById('setup-landmark') ? document.getElementById('setup-landmark').value.trim() : "";
             const mapLink = document.getElementById('setup-map-link') ? document.getElementById('setup-map-link').value.trim() : "";
-            
+                        const freeDeliveryAmt = document.getElementById('setup-free-delivery') ? document.getElementById('setup-free-delivery').value : "";
+
             if(category === 'Other') category = document.getElementById('other-category-input').value.trim();
          if(!address) { showIOSAlert("Missing Address", "Please add your store address!"); return; }
 
@@ -2395,7 +2414,8 @@
                     category: category,
                     homeDelivery: offersDelivery,   // ✨ Naya Field
                     deliveryArea: deliveryRange,    // ✨ Naya Field
-                 
+                                     freeDeliveryAbove: freeDeliveryAmt ? Number(freeDeliveryAmt) : null,
+                                     
                     address: address,
                     landmark: landmark,
                     googleMapLink: mapLink,
