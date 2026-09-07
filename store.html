@@ -342,14 +342,17 @@
                     
                     const safeOwnerName = shopData.ownerName || "Shop Owner";
 
-                    document.title = `${shopData.shopName} | Pixigenie`;                                                      // ✨✨ PROFILE PIC PREMIUM VIP BADGE & RING LOGIC ✨✨
+                    document.title = `${shopData.shopName} | Pixigenie`;                                                                     // ✨✨ PROFILE PIC PREMIUM VIP BADGE & RING LOGIC ✨✨
                     const bizType = shopData.businessType;
                     const profileBadgeEl = document.getElementById('premium-biz-badge');
-                    const profileRingEl = document.getElementById('profile-pic-ring'); // Ring ko pakdo
+                    const profileRingEl = document.getElementById('profile-pic-ring'); 
                     
                     if (bizType && profileBadgeEl) {
                         let premiumStyle = 'bg-gradient-to-r from-purple-500 to-pink-500 shadow-[0_4px_10px_rgba(168,85,247,0.4)]'; 
-                        let ringStyle = 'from-purple-500 to-pink-500'; // Default Ring Color
+                        let ringStyle = 'from-purple-500 to-pink-500'; 
+                        
+                        // ✨ NAYA: Lamba naam chhota karne ka logic ✨
+                        let displayType = bizType;
                         
                         if (bizType === 'Wholesaler') { 
                             premiumStyle = 'bg-gradient-to-r from-blue-500 to-cyan-500 shadow-[0_4px_10px_rgba(59,130,246,0.4)]'; 
@@ -360,12 +363,13 @@
                         } else if (bizType === 'Service Provider') { 
                             premiumStyle = 'bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[0_4px_10px_rgba(16,185,129,0.4)]'; 
                             ringStyle = 'from-emerald-500 to-teal-500';
+                            displayType = 'SERVICES'; // Lamba naam hatakar chhota kar diya
                         }
 
                         // 1. Badge ka HTML set karo
                         profileBadgeEl.innerHTML = `
                             <div class="${premiumStyle} text-white px-3 py-[3px] rounded-full uppercase text-[8px] sm:text-[9px] font-black tracking-[0.2em] border border-white/40 backdrop-blur-md whitespace-nowrap text-center">
-                                ${bizType}
+                                ${displayType}
                             </div>
                         `;
                         profileBadgeEl.classList.remove('hidden');
@@ -376,6 +380,7 @@
                         }
                     }
                     // ✨✨ VIP BADGE LOGIC END ✨✨
+
 
 
                     document.getElementById('header-shop-name').innerText = shopData.shopName;
