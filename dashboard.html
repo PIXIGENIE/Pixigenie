@@ -97,14 +97,15 @@
             <h2 class="text-2xl font-black text-gray-900 text-center tracking-tight">Store Profile</h2>
             <p class="text-[13px] text-gray-500 text-center mt-1 font-medium">Let's set up your storefront easily.</p>
             
-            <!-- PROGRESS BAR (Now divided in 5 steps) -->
+                     <!-- PROGRESS BAR (Now divided in 6 steps) -->
             <div class="mt-5">
                 <div class="w-full bg-gray-100 rounded-full h-1.5 mb-1.5 overflow-hidden">
-                    <div id="setup-progress" class="bg-purple-600 h-full rounded-full transition-all duration-500 ease-out" style="width: 20%;"></div>
+                    <!-- 100/6 = 16.6% -->
+                    <div id="setup-progress" class="bg-purple-600 h-full rounded-full transition-all duration-500 ease-out" style="width: 16.6%;"></div>
                 </div>
-                <p id="setup-step-text" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Step 1 of 5</p>
+                <p id="setup-step-text" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Step 1 of 6</p>
             </div>
-        </div>
+            </div>
 
         <!-- STEPS WRAPPER -->
         <div class="step-wrapper">
@@ -190,14 +191,71 @@
                     </div>
                     <input type="hidden" id="selected-category">
                 </div>
-                <button type="button" onclick="nextSetupStep(5)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2 shrink-0">
+                                <button type="button" onclick="nextSetupStep(5)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2 shrink-0">
                     Next <i class="fas fa-arrow-right text-sm"></i>
                 </button>
             </div>
 
-            <!-- STEP 5: LOCATION & FINISH (Purana Step 3) -->
+            <!-- ✨ NAYA STEP 5: DELIVERY SETTINGS ✨ -->
             <div id="setup-step-5" class="step-container step-hidden-right">
-                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 shrink-0">5. Store Location</p>
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 shrink-0">5. Delivery Options</p>
+                <div class="mb-auto space-y-4">
+                    <!-- Question 1: Do you offer Home Delivery? -->
+                    <div class="bg-blue-50 p-4 sm:p-5 rounded-[20px] border border-blue-100">
+                        <label class="font-bold text-blue-900 text-[15px] block mb-3">Do you offer Home Delivery?</label>
+                        <div class="flex gap-3">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="home_delivery" value="yes" class="peer hidden" onchange="toggleDeliveryRange(true)">
+                                <div class="w-full text-center py-3.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-500 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 transition-all active:scale-95 shadow-sm">
+                                    <i class="fas fa-check-circle mr-1"></i> Yes
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="home_delivery" value="no" class="peer hidden" onchange="toggleDeliveryRange(false)" checked>
+                                <div class="w-full text-center py-3.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-500 peer-checked:bg-gray-900 peer-checked:text-white peer-checked:border-gray-900 transition-all active:scale-95 shadow-sm">
+                                    <i class="fas fa-times-circle mr-1"></i> No
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 2: Delivery Range -->
+                    <div id="delivery-range-container" class="bg-gray-50 p-4 sm:p-5 rounded-[20px] border border-gray-100 transition-all duration-300 hidden">
+                        <label class="font-bold text-gray-900 text-[15px] block mb-3">How far can you deliver?</label>
+                        <div class="space-y-2.5">
+                            <label class="block cursor-pointer">
+                                <input type="radio" name="delivery_range" value="Local Area" class="peer hidden" checked>
+                                <div class="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-600 peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-200 transition-all flex items-center justify-between shadow-sm active:scale-[0.98]">
+                                    <span><i class="fas fa-biking mr-2 opacity-70"></i> Local Area Only</span>
+                                    <i class="fas fa-check-circle text-blue-500 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                                </div>
+                            </label>
+                            <label class="block cursor-pointer">
+                                <input type="radio" name="delivery_range" value="State Level" class="peer hidden">
+                                <div class="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-600 peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-200 transition-all flex items-center justify-between shadow-sm active:scale-[0.98]">
+                                    <span><i class="fas fa-truck mr-2 opacity-70"></i> Within State</span>
+                                    <i class="fas fa-check-circle text-blue-500 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                                </div>
+                            </label>
+                            <label class="block cursor-pointer">
+                                <input type="radio" name="delivery_range" value="All Over India" class="peer hidden">
+                                <div class="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-600 peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-200 transition-all flex items-center justify-between shadow-sm active:scale-[0.98]">
+                                    <span><i class="fas fa-plane-departure mr-2 opacity-70"></i> All Over India</span>
+                                    <i class="fas fa-check-circle text-blue-500 opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" onclick="nextSetupStep(6)" class="w-full bg-gray-900 text-white font-bold h-14 rounded-2xl mt-6 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex justify-center items-center gap-2 shrink-0">
+                    Next <i class="fas fa-arrow-right text-sm"></i>
+                </button>
+            </div>
+
+            <!-- STEP 6: LOCATION & FINISH -->
+            <div id="setup-step-6" class="step-container step-hidden-right">
+                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-4 shrink-0">6. Store Location</p>
+
                 <div class="space-y-4 mb-4">
                     <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col gap-3 shrink-0">
                         <div class="flex gap-3">
@@ -915,10 +973,11 @@
             const step1 = document.getElementById('setup-step-1');
             if(step1) step1.className = 'step-container step-active';
             
-            const prog = document.getElementById('setup-progress');
-            if(prog) prog.style.width = '33%';
+                        const prog = document.getElementById('setup-progress');
+            if(prog) prog.style.width = '16.6%';
             const stepTxt = document.getElementById('setup-step-text');
-            if(stepTxt) stepTxt.innerText = 'Step 1 of 3';
+            if(stepTxt) stepTxt.innerText = 'Step 1 of 6';
+
 
             if (document.getElementById('setup-shop-name')) document.getElementById('setup-shop-name').value = globalShopData.shopName || '';
             if (document.getElementById('setup-owner-name')) document.getElementById('setup-owner-name').value = globalShopData.ownerName || '';
@@ -2111,8 +2170,21 @@
                 window.location.href = "index.html"; 
             } 
         }
-            let currentSetupStep = 1;
-        const totalSetupSteps = 5; // Naya Total Steps
+                 let currentSetupStep = 1;
+        const totalSetupSteps = 6; // Ab 6 steps ho gaye hain
+
+        // ✨ NAYA: Delivery Show/Hide Function
+        function toggleDeliveryRange(isYes) {
+            const rangeContainer = document.getElementById('delivery-range-container');
+            if (isYes) {
+                rangeContainer.classList.remove('hidden');
+                setTimeout(() => { rangeContainer.style.opacity = '1'; }, 10);
+            } else {
+                rangeContainer.classList.add('hidden');
+                rangeContainer.style.opacity = '0';
+            }
+        }
+
 
         // ✨ Naya Function: Business Type Select Karne Ke Liye
         function selectBusinessType(btnElement, typeName) {
@@ -2147,29 +2219,35 @@
             }
         }
 
-        // 5 Steps Validation Logic
+               // 6 Steps Validation Logic (With iOS Alerts)
         function nextSetupStep(stepNumber) {
             if (currentSetupStep === 1) {
                 if (!document.getElementById('setup-shop-name').value.trim()) {
-                    alert("Please enter Shop Name"); return;
+                    showIOSAlert("Missing Details", "Please enter your Shop Name."); return;
                 }
-            } else if (currentSetupStep === 2) {
+            } 
+            else if (currentSetupStep === 2) {
                 if (!document.getElementById('setup-phone').value.trim()) {
-                    alert("Please enter Store Contact Number"); return;
+                    showIOSAlert("Missing Details", "Please enter Store Contact Number."); return;
                 }
-            } else if (currentSetupStep === 3) {
+            } 
+            else if (currentSetupStep === 3) {
                 if (!document.getElementById('selected-business-type').value) {
-                    alert("Please select Who Are You"); return;
+                    showIOSAlert("Selection Required", "Please select 'Who Are You' to continue."); return;
                 }
-            } else if (currentSetupStep === 4) {
+            } 
+            else if (currentSetupStep === 4) {
                 const selectedCat = document.getElementById('selected-category').value;
-                if (!selectedCat) { alert("Please select a Store Category"); return; }
+                if (!selectedCat) { 
+                    showIOSAlert("Category Required", "Please select a Store Category."); return; 
+                }
                 if (selectedCat === 'Other' && !document.getElementById('other-category-input').value.trim()) {
-                    alert("Please type your custom category name!"); return;
+                    showIOSAlert("Category Required", "Please type your custom category name."); return;
                 }
             }
             goToStep(stepNumber);
         }
+
 
         function prevSetupStep() {
             if (currentSetupStep > 1) {
@@ -2190,10 +2268,12 @@
             targetEl.className = 'step-container step-active';
             currentSetupStep = targetStep;
 
+            // ✨ MAIN FIX: Progress bar aur text ab "6" ke hisab se chalega
             const progressPercent = (currentSetupStep / totalSetupSteps) * 100;
             document.getElementById('setup-progress').style.width = `${progressPercent}%`;
             document.getElementById('setup-step-text').innerText = `Step ${currentSetupStep} of ${totalSetupSteps}`;
         }
+
 
         // Open Settings Modal me purana data load karna
         function openSettings() {
@@ -2213,8 +2293,9 @@
             const step1 = document.getElementById('setup-step-1');
             if(step1) step1.className = 'step-container step-active';
             
-            document.getElementById('setup-progress').style.width = '20%';
-            document.getElementById('setup-step-text').innerText = 'Step 1 of 5';
+                        document.getElementById('setup-progress').style.width = '16.6%';
+            document.getElementById('setup-step-text').innerText = 'Step 1 of 6';
+
 
             if (document.getElementById('setup-shop-name')) document.getElementById('setup-shop-name').value = globalShopData.shopName || '';
             if (document.getElementById('setup-owner-name')) document.getElementById('setup-owner-name').value = globalShopData.ownerName || '';
@@ -2222,6 +2303,20 @@
             // ✨ Naye Fields Load Karo
             if (document.getElementById('setup-phone')) document.getElementById('setup-phone').value = globalShopData.phone || '';
             if (document.getElementById('setup-email')) document.getElementById('setup-email').value = globalShopData.email || '';
+                        // ✨ Delivery Data Load ✨
+            if (globalShopData.homeDelivery === true) {
+                const yesRadio = document.querySelector('input[name="home_delivery"][value="yes"]');
+                if(yesRadio) { yesRadio.checked = true; toggleDeliveryRange(true); }
+                const area = globalShopData.deliveryArea;
+                if(area) {
+                    const areaRadio = document.querySelector(`input[name="delivery_range"][value="${area}"]`);
+                    if(areaRadio) areaRadio.checked = true;
+                }
+            } else {
+                const noRadio = document.querySelector('input[name="home_delivery"][value="no"]');
+                if(noRadio) { noRadio.checked = true; toggleDeliveryRange(false); }
+            }
+
             
             const existingBizType = globalShopData.businessType || '';
             document.querySelectorAll('.biz-btn').forEach(btn => {
@@ -2265,7 +2360,15 @@
             const mapLink = document.getElementById('setup-map-link') ? document.getElementById('setup-map-link').value.trim() : "";
             
             if(category === 'Other') category = document.getElementById('other-category-input').value.trim();
-            if(!address) { alert("Please add store address!"); return; }
+         if(!address) { showIOSAlert("Missing Address", "Please add your store address!"); return; }
+
+
+                        // ✨ DELIVERY DATA NIKALO ✨
+            const offersDeliveryElement = document.querySelector('input[name="home_delivery"]:checked');
+            const offersDelivery = offersDeliveryElement ? (offersDeliveryElement.value === 'yes') : false;
+            const deliveryRangeElement = document.querySelector('input[name="delivery_range"]:checked');
+            const deliveryRange = offersDelivery && deliveryRangeElement ? deliveryRangeElement.value : 'No Delivery';
+
             
             const btn = event ? event.currentTarget : document.getElementById('final-launch-btn');
             const origHtml = btn.innerHTML;
@@ -2281,6 +2384,9 @@
                     businessType: businessType,// ✨ Saved!
                     description: desc,
                     category: category,
+                    homeDelivery: offersDelivery,   // ✨ Naya Field
+                    deliveryArea: deliveryRange,    // ✨ Naya Field
+                 
                     address: address,
                     landmark: landmark,
                     googleMapLink: mapLink,
@@ -2508,6 +2614,34 @@
             link.click();
             document.body.removeChild(link);
         }
+        // ✨ iOS ALERT CONTROLLERS ✨
+        function showIOSAlert(title, message) {
+            document.getElementById('ios-alert-title').innerText = title;
+            document.getElementById('ios-alert-message').innerText = message;
+            
+            const modal = document.getElementById('ios-alert-modal');
+            const content = document.getElementById('ios-alert-content');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeIOSAlert() {
+            const modal = document.getElementById('ios-alert-modal');
+            const content = document.getElementById('ios-alert-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
 
     </script>
         <!-- ✨ iOS STYLE UPDATE SUCCESS MODAL ✨ -->
@@ -2556,6 +2690,23 @@
             <button onclick="closeVerifiedModal()" class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold py-4 rounded-[16px] transition active:scale-95 text-[15px] shadow-[0_8px_20px_rgba(59,130,246,0.3)]">
                 Claim My Badge
             </button>
+        </div>
+    </div>
+    <!-- ✨ iOS PREMIUM ALERT MODAL ✨ -->
+    <div id="ios-alert-modal" class="fixed inset-0 z-[300] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+        <!-- Backdrop Blur -->
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeIOSAlert()"></div>
+        <!-- Alert Box -->
+        <div class="bg-white/90 backdrop-blur-2xl rounded-[14px] w-[270px] flex flex-col overflow-hidden shadow-2xl transform scale-95 transition-all duration-300 relative z-10" id="ios-alert-content">
+            <div class="p-5 text-center flex flex-col gap-1">
+                <h3 id="ios-alert-title" class="text-[17px] font-semibold text-black tracking-tight leading-snug">Alert</h3>
+                <p id="ios-alert-message" class="text-[13px] text-gray-800 font-medium leading-snug">Message goes here.</p>
+            </div>
+            <div class="border-t border-gray-300/80">
+                <button onclick="closeIOSAlert()" class="w-full py-3 text-[17px] text-[#007AFF] font-bold active:bg-gray-200/50 transition-colors">
+                    OK
+                </button>
+            </div>
         </div>
     </div>
 
