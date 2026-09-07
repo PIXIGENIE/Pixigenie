@@ -927,7 +927,7 @@
                         </div>
                         <div class="p-2 space-y-1">
                             <a href="dashboard.html?shop=${activeShop}" class="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-chart-line text-blue-500"></i> Dashboard</a>
-                            <button onclick="logoutUser()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                            <button onclick="showLogoutModal()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-sign-out-alt"></i> Logout</button>
                         </div>
                     </div>
                 `;
@@ -1010,7 +1010,7 @@
                             ${customerPhone ? `<p class="text-xs text-gray-500 mt-1.5 font-medium flex items-center gap-1.5"><i class="fas fa-phone-alt text-gray-400"></i> +91 ${customerPhone}</p>` : ''}
                         </div>
                         <div class="p-2">
-                            <button onclick="logoutUser()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                            <button onclick="showLogoutModal()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-sign-out-alt"></i> Logout</button>
                         </div>
                     </div>
                 `;
@@ -2092,7 +2092,7 @@
 
                 <!-- Modal Footer (Logout) -->
                 <div class="p-5 border-t border-gray-100 shrink-0">
-                    <button onclick="logoutUser()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm border border-red-100">
+                    <button onclick="showLogoutModal()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm border border-red-100">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </div>
@@ -2224,8 +2224,54 @@
             } catch(e) { alert("Error: " + e.message); } 
             finally { btn.innerText = orig; btn.disabled = false; }
         }
+        // ==========================================
+        // 🚪 iOS LOGOUT CONTROLLERS
+        // ==========================================
+        function showLogoutModal() {
+            const modal = document.getElementById('ios-logout-modal');
+            const card = document.getElementById('ios-logout-card');
+            
+            modal.classList.remove('hidden');
+            // Thoda delay taaki CSS animation smooth chale
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeLogoutModal() {
+            const modal = document.getElementById('ios-logout-modal');
+            const card = document.getElementById('ios-logout-card');
+            
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300); // 300ms baad hide karega jab animation khatam ho jaye
+        }
+
+        function confirmLogoutAction() {
+            // Yahan tera actual logout logic aayega (localStorage clear karna aur redirect karna)
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'index.html'; 
+        }
 
     </script>
+    <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
+    <div id="ios-logout-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div id="ios-logout-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
+            <div class="p-4 pt-5 pb-4">
+                <h3 class="text-[17px] font-semibold text-black leading-tight mb-1">Log Out</h3>
+                <p class="text-[13px] text-black/70 leading-snug">Are you sure you want to log out of your account?</p>
+            </div>
+            <div class="flex border-t border-black/10">
+                <button onclick="closeLogoutModal()" class="flex-1 py-3 text-[17px] text-[#007AFF] font-normal border-r border-black/10 hover:bg-black/5 active:bg-black/10 transition-colors">Cancel</button>
+                <button onclick="confirmLogoutAction()" class="flex-1 py-3 text-[17px] text-[#FF3B30] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">Log Out</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
