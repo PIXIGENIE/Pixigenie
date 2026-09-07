@@ -339,7 +339,9 @@
                         <i class="fas fa-external-link-alt w-5 text-center"></i> Visit Store
                     </a>
                     <div class="my-4 border-t border-[#E5E7EB] mx-2"></div>
-                    <a href="#" onclick="logout(); return false;" class="flex items-center gap-4 text-[#DC2626] hover:bg-[#FEF2F2] px-4 py-3.5 rounded-[16px] font-bold transition active:scale-[0.98] mt-2"><i class="fas fa-sign-out-alt w-5 text-center"></i> Logout</a>
+                    <a href="#" onclick="showLogoutModal()"
+
+ return false;" class="flex items-center gap-4 text-[#DC2626] hover:bg-[#FEF2F2] px-4 py-3.5 rounded-[16px] font-bold transition active:scale-[0.98] mt-2"><i class="fas fa-sign-out-alt w-5 text-center"></i> Logout</a>
                 </nav>
             </aside>
 
@@ -361,7 +363,9 @@
                             <div class="p-6 bg-[#F7F7F9] border-b border-[#E5E7EB]"><p class="text-[10px] text-[#6B7280] font-bold uppercase tracking-widest mb-1">Store Owner</p><h4 id="menu-owner-name" class="font-black text-[#111827] text-xl leading-tight truncate">Loading...</h4></div>
                             <div class="p-2 space-y-1">
                                 <button onclick="openSettings()" class="w-full flex items-center gap-3 px-4 py-3 text-[#111827] hover:bg-[#F7F7F9] rounded-[16px] font-bold transition text-sm"><i class="fas fa-pen text-[#A855F7]"></i> Edit Store Profile</button>
-                                <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 text-[#DC2626] hover:bg-[#FEF2F2] rounded-[16px] font-bold transition text-sm"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                                <button onclick="showLogoutModal()"
+
+ class="w-full flex items-center gap-3 px-4 py-3 text-[#DC2626] hover:bg-[#FEF2F2] rounded-[16px] font-bold transition text-sm"><i class="fas fa-sign-out-alt"></i> Logout</button>
                             </div>
                         </div>
                     </div>
@@ -1316,7 +1320,14 @@
                     </div>
                     
                     <div class="bg-[#F7F7F9] p-4 rounded-[16px] border border-[#E5E7EB] mb-4">
-                        <p class="text-[10px] text-[#A855F7] font-bold uppercase tracking-widest mb-2 border-b border-[#E9D5FF] pb-1">Delivery Address</p>
+                                    <div class="flex justify-between items-center mb-2 border-b border-[#E9D5FF] pb-1">
+                <p class="text-[10px] text-[#A855F7] font-bold uppercase tracking-widest">Delivery Address</p>
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.customerAddress || '')}" target="_blank" class="bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 active:scale-95 transition">
+                    <i class="fas fa-location-arrow"></i> Map
+                </a>
+            </div>
+            <p class="text-sm text-[#111827] font-semibold mb-3">${o.customerAddress || 'N/A'}</p>
+
                         <p class="text-sm text-[#111827] font-semibold mb-3">${o.customerAddress || 'N/A'}</p>
                         <p class="text-[10px] text-[#A855F7] font-bold uppercase tracking-widest mb-2 border-b border-[#E9D5FF] pb-1">Order Items</p>
                         <div class="space-y-1">${itemsHtml}</div>
@@ -6762,6 +6773,39 @@ td.mono {
             // 7. नए टैब में AI खोलना
             window.open(gptUrl, "_blank");
         }
+        // ==========================================
+        // 🚪 iOS LOGOUT CONTROLLERS
+        // ==========================================
+        function showLogoutModal() {
+            const modal = document.getElementById('ios-logout-modal');
+            const card = document.getElementById('ios-logout-card');
+            
+            modal.classList.remove('hidden');
+            // Thoda delay taaki CSS animation smooth chale
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeLogoutModal() {
+            const modal = document.getElementById('ios-logout-modal');
+            const card = document.getElementById('ios-logout-card');
+            
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300); // 300ms baad hide karega jab animation khatam ho jaye
+        }
+
+        function confirmLogoutAction() {
+            // Yahan tera actual logout logic aayega (localStorage clear karna aur redirect karna)
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'index.html'; 
+        }
 
     </script>
         <!-- ✨ iOS STYLE UPDATE SUCCESS MODAL ✨ -->
@@ -6826,6 +6870,19 @@ td.mono {
                 <button onclick="closeIOSAlert()" class="w-full py-3 text-[17px] text-[#007AFF] font-bold active:bg-gray-200/50 transition-colors">
                     OK
                 </button>
+            </div>
+        </div>
+    </div>
+    <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
+    <div id="ios-logout-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div id="ios-logout-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
+            <div class="p-4 pt-5 pb-4">
+                <h3 class="text-[17px] font-semibold text-black leading-tight mb-1">Log Out</h3>
+                <p class="text-[13px] text-black/70 leading-snug">Are you sure you want to log out of your account?</p>
+            </div>
+            <div class="flex border-t border-black/10">
+                <button onclick="closeLogoutModal()" class="flex-1 py-3 text-[17px] text-[#007AFF] font-normal border-r border-black/10 hover:bg-black/5 active:bg-black/10 transition-colors">Cancel</button>
+                <button onclick="confirmLogoutAction()" class="flex-1 py-3 text-[17px] text-[#FF3B30] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">Log Out</button>
             </div>
         </div>
     </div>
