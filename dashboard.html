@@ -406,11 +406,15 @@
                                 </div>
                                       <!-- Smart Report & Excel Data Buttons -->
         <div class="grid grid-cols-2 gap-3 mb-5 mt-4">
-            <button onclick="downloadSmartReport()" class="w-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+            <button onclick="openDownloadModal('smart')" 
+
+ class="w-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
                 <i class="fas fa-file-invoice text-lg"></i> Smart Report
             </button>
             
-            <button onclick="downloadExcelData()" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+            <button onclick="openDownloadModal('excel')" 
+
+ class="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
                 <i class="fas fa-file-excel text-lg"></i> Excel Data
             </button>
                    <!-- ✨ iOS PREMIUM AI BUTTON ✨ -->
@@ -6806,6 +6810,124 @@ td.mono {
             sessionStorage.clear();
             window.location.href = 'index.html'; 
         }
+        // ==========================================
+        // 📥 iOS DOWNLOAD CONTROLLERS
+        // ==========================================
+        let activeDownloadFunction = null;
+
+        function openDownloadModal(type) {
+            const modal = document.getElementById('ios-download-modal');
+            const card = document.getElementById('ios-download-card');
+            const title = document.getElementById('ios-dl-title');
+            
+            // Ye check karega ki konsa button click hua hai
+            if (type === 'smart') {
+                title.innerText = 'Smart Report';
+                activeDownloadFunction = downloadSmartReport;
+            } else if (type === 'excel') {
+                title.innerText = 'Excel Data';
+                activeDownloadFunction = downloadExcelData; // Dhyan rakhna tera Excel wale function ka naam yahi ho
+            }
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeDownloadModal() {
+            const modal = document.getElementById('ios-download-modal');
+            const card = document.getElementById('ios-download-card');
+            
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+                 function confirmDownloadAction() {
+            closeDownloadModal();
+            if (activeDownloadFunction) {
+                setTimeout(() => {
+                    activeDownloadFunction();
+                }, 300);
+            }
+        }
+
+        // ==========================================
+        // 📊 EXCEL / CSV DATA EXPORT FUNCTION
+        // ==========================================
+        function downloadExcelData() {
+            // 1. Get Selected Month
+            let mPick = document.getElementById('insight-month-picker');
+            let y = new Date().getFullYear();
+            let m = new Date().getMonth();
+            if (mPick && mPick.value) {
+                const p = mPick.value.split('-');
+                y = parseInt(p[0]);
+                m = parseInt(p[1]) - 1;
+            }
+            const displayMonth = new Date(y, m).toLocaleString('default', { month: 'long' });
+
+            // 2. Prepare CSV Headers
+            let csvContent = "Order ID,Date,Customer Name,Phone,Items Ordered,Total Amount (Rs),Payment Mode,Payment Status,Delivery Status\n";
+            let hasData = false;
+
+            // 3. Loop through orders and format for Excel
+            adminBills.forEach(b => {
+                let bD;
+                if (b.timestamp && typeof b.timestamp.toDate === 'function') bD = b.timestamp.toDate();
+                else if (b.timestamp && b.timestamp.seconds) bD = new Date(b.timestamp.seconds * 1000);
+                else { let pa = b.date.split('/'); if (pa.length === 3) bD = new Date(pa[2], pa[1] - 1, pa[0]); else bD = new Date(b.date); }
+
+                // Match with selected month
+                if (bD && !isNaN(bD) && bD.getMonth() === m && bD.getFullYear() === y) {
+                    hasData = true;
+                    
+                    // Format text to avoid breaking Excel columns (replacing commas with spaces)
+                    let id = (b.id || "").substring(0,8).toUpperCase();
+                    let date = b.date || "";
+                    let name = (b.customerName || "N/A").replace(/,/g, " "); 
+                    let phone = b.customerPhone || "N/A";
+                    
+                    // Combine items into a single string
+                    let items = (b.items ? b.items.map(i => `${i.qty}x ${i.name}`).join(' | ') : "-").replace(/,/g, " ");
+                    
+                    let total = b.grandTotal || 0;
+                    let payMode = b.payMode || "-";
+                    let payStatus = (b.payStatus || "UNPAID").replace(/,/g, " ");
+                    let delStatus = (b.deliveryStatus || "PROCESSING").replace(/,/g, " ");
+
+                    // Append row to CSV
+                    csvContent += `${id},${date},${name},${phone},${items},${total},${payMode},${payStatus},${delStatus}\n`;
+                }
+            });
+
+            // 4. Check if data exists
+            if (!hasData) {
+                alert("No orders found for " + displayMonth + " " + y + " to export!");
+                return;
+            }
+
+            // 5. Trigger Excel (CSV) Download
+            const storeName = typeof globalShopData !== 'undefined' && globalShopData?.shopName ? globalShopData.shopName.replace(/[^a-zA-Z0-9]/g, '') : 'Store';
+            const fileName = `${storeName}_Data_${displayMonth}_${y}.csv`;
+            
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' }); // \uFEFF ensures MS Excel reads rupees (₹) and Hindi chars properly
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
 
     </script>
         <!-- ✨ iOS STYLE UPDATE SUCCESS MODAL ✨ -->
@@ -6883,6 +7005,20 @@ td.mono {
             <div class="flex border-t border-black/10">
                 <button onclick="closeLogoutModal()" class="flex-1 py-3 text-[17px] text-[#007AFF] font-normal border-r border-black/10 hover:bg-black/5 active:bg-black/10 transition-colors">Cancel</button>
                 <button onclick="confirmLogoutAction()" class="flex-1 py-3 text-[17px] text-[#FF3B30] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">Log Out</button>
+            </div>
+        </div>
+    </div>
+    <!-- ✨ iOS STYLE DOWNLOAD MODAL ✨ -->
+    <div id="ios-download-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div id="ios-download-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
+            <div class="p-4 pt-5 pb-4">
+                <h3 id="ios-dl-title" class="text-[17px] font-semibold text-black leading-tight mb-1">Download</h3>
+                <p class="text-[13px] text-black/70 leading-snug">Are you sure you want to generate and download this file?</p>
+            </div>
+            <div class="flex border-t border-black/10">
+                <button onclick="closeDownloadModal()" class="flex-1 py-3 text-[17px] text-[#007AFF] font-normal border-r border-black/10 hover:bg-black/5 active:bg-black/10 transition-colors">Cancel</button>
+               <button id="ios-dl-confirm-btn" onclick="confirmDownloadAction()" class="flex-1 py-3 text-[17px] text-[#007AFF] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">Download</button>
+
             </div>
         </div>
     </div>
