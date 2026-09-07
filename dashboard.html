@@ -409,6 +409,22 @@
             <button onclick="downloadExcelData()" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
                 <i class="fas fa-file-excel text-lg"></i> Excel Data
             </button>
+                   <!-- ✨ iOS PREMIUM AI BUTTON ✨ -->
+            <button onclick="analyzeWithAI()" class="w-full md:col-span-1 col-span-2 relative bg-white text-[#1D1D1F] font-bold py-3 rounded-[16px] text-[14px] transition-all active:scale-[0.96] flex items-center justify-center gap-3 shadow-[0_6px_24px_rgba(0,0,0,0.06)] border border-[#E5E7EB] overflow-hidden">
+                
+                <!-- Apple Style Subtle Gradient Background -->
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 opacity-70"></div>
+                
+                <!-- iOS Colorful Magic Icon -->
+                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#007AFF] via-[#AF52DE] to-[#FF2D55] flex items-center justify-center shadow-sm relative z-10">
+                    <i class="fas fa-sparkles text-white text-[12px]"></i>
+                </div>
+                
+                <!-- Aasan English Text -->
+                <span class="relative z-10 tracking-wide">Explain My Report</span>
+                
+            </button>
+
         </div>
 
 
@@ -6648,6 +6664,103 @@ td.mono {
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300);
+        }
+        function analyzeWithAI() {
+            // 1. डैशबोर्ड से बेसिक डेटा निकालना
+            let shopName = (typeof globalShopData !== 'undefined' && globalShopData.shopName) ? globalShopData.shopName : "मेरी दुकान";
+            let totalSale = document.getElementById('insight-monthly') ? document.getElementById('insight-monthly').innerText : "₹0";
+            let cashReceived = document.getElementById('insight-profit') ? document.getElementById('insight-profit').innerText : "₹0";
+            let udharPending = document.getElementById('insight-udhar-list') ? document.getElementById('insight-udhar-list').innerText : "₹0";
+            let investment = document.getElementById('insight-display-investment') ? document.getElementById('insight-display-investment').innerText : "₹0";
+            let allTimeSale = document.getElementById('insight-all-time') ? document.getElementById('insight-all-time').innerText : "₹0";
+
+            // 2. कौन सा महीना सेलेक्टेड है, वो निकालना (e.g., "September 2026")
+            let mPick = document.getElementById('insight-month-picker'); 
+            let y = new Date().getFullYear(); 
+            let m = new Date().getMonth();
+            if (mPick && mPick.value) { 
+                const p = mPick.value.split('-'); 
+                y = parseInt(p[0]); 
+                m = parseInt(p[1]) - 1; 
+            }
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            let selectedMonthName = `${monthNames[m]} ${y}`;
+
+            // 3. डीप डेटा निकालना (Top Products, Top Customers, Total Orders)
+            let topCustomers = "डेटा नहीं";
+            if (typeof allCustomersArray !== 'undefined' && allCustomersArray.length > 0) {
+                topCustomers = allCustomersArray.slice(0, 3).map(c => `${c.name} (₹${c.totalSpent})`).join(", ");
+            }
+
+            let productSales = {};
+            let totalOrdersCount = 0;
+            if (typeof adminBills !== 'undefined' && adminBills.length > 0) {
+                adminBills.forEach(b => {
+                    if (b.deliveryStatus !== 'Cancelled' && b.deliveryStatus !== 'Canceled') {
+                        totalOrdersCount++;
+                        if (b.items) {
+                            b.items.forEach(i => {
+                                productSales[i.name] = (productSales[i.name] || 0) + (parseInt(i.qty) || 0);
+                            });
+                        }
+                    }
+                });
+            }
+            
+            let topProducts = Object.entries(productSales)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(p => `${p[0]} (${p[1]} पीस)` )
+                .join(", ");
+            if(!topProducts) topProducts = "डेटा नहीं";
+
+            // 4. कैश प्रॉफिट/लॉस को कैलकुलेट करना
+            let cashNum = parseInt(cashReceived.replace(/[^0-9.-]+/g, "")) || 0;
+            let invNum = parseInt(investment.replace(/[^0-9.-]+/g, "")) || 0;
+            let cashDiff = cashNum - invNum;
+            let cashStatus = cashDiff >= 0 ? `+₹${cashDiff} (कैश प्रॉफिट में है)` : `-₹${Math.abs(cashDiff)} (कैश लॉस - अपनी जेब से पैसा लग गया है)`;
+
+            // 5. नया और फुल-प्रूफ मास्टर प्रॉम्प्ट (Month + All-Time Compare के साथ)
+            let masterPrompt = `आप एक एक्सपर्ट और बहुत ही समझदार लोकल बिज़नेस एडवाइजर हो। मैं '${shopName}' का मालिक हूँ। नीचे मेरी रिपोर्ट का पूरा डेटा दिया गया है:
+
+मेरी रिपोर्ट का डेटा:
+- रिपोर्ट का महीना (Report Month): ${selectedMonthName} (यह डेटा सिर्फ इसी महीने का है)
+- इस महीने की टोटल सेल (This Month Sale): ${totalSale} (इतने का माल बिका)
+- हाथ में आया कैश (Cash Received): ${cashReceived} (इतना पैसा ही हाथ में आया)
+- बाज़ार में फंसा उधार (Pending Udhar): ${udharPending} (इतना पैसा कस्टमर्स पे बाकी है)
+- दुकान में इन्वेस्टमेंट (Investment): ${investment} (इतना पैसा मैंने माल/स्टॉक पे लगाया)
+- कैश प्रॉफिट/लॉस का स्टेटस: ${cashStatus} (Cash Received - Investment)
+- कुल ऑर्डर्स: ${totalOrdersCount}
+- टॉप बिकने वाले आइटम/सर्विस: ${topProducts}
+- सबसे ज्यादा खरीदने वाले कस्टमर्स: ${topCustomers}
+
+ऐतिहासिक डेटा (Historical Data):
+- ऑल-टाइम कुल सेल (All-Time Total Sale): ${allTimeSale} (यह दुकान शुरू होने से अब तक की ओवरऑल कुल सेल है)
+
+आपके लिए सख्त निर्देश (Strict Instructions):
+1. लिपि और नंबर: अपना पूरा जवाब देवनागरी लिपि (Devanagari) में लिखना, लेकिन **नंबरों और रुपयों के लिए सिर्फ इंग्लिश अंकों (जैसे: 1, 2, 3, 500, 2500) का ही इस्तेमाल करना**। हिंदी के १, २, ३ अंकों का इस्तेमाल बिलकुल मत करना।
+2. भाषा: भाषा एकदम आम बोलचाल वाली 'हिंग्लिश' (Hinglish) होनी चाहिए। भारी एकाउंटिंग शब्दों का इस्तेमाल मत करना।
+3. दुकान का प्रकार: मेरी दुकान के नाम ('${shopName}') से समझो कि मेरा किस चीज़ का बिज़नेस है, और अपनी सलाह उसी बिज़नेस के हिसाब से दो।
+
+मेरी रिपोर्ट की जांच करके अपना जवाब सिर्फ इन 4 हेडिंग्स में देना (बुलेट पॉइंट्स के साथ):
+
+📊 1. बिज़नेस का हाल (${selectedMonthName}): 
+(बताएं कि ${selectedMonthName} का महीना कैसा रहा। 'ऑल-टाइम कुल सेल' (All-Time Total Sale) से तुलना करके बताएं कि ओवरऑल बिज़नेस के मुकाबले इस महीने कैसा परफॉर्म किया है। 'कैश प्रॉफिट/लॉस का स्टेटस' को देखकर बताओ कि असली प्रॉफिट है या जेब से पैसा लग गया है।)
+
+🚨 2. खतरे की घंटी (सावधानी): 
+(सबसे बड़ा रिस्क कहाँ है? उधार और इन्वेस्टमेंट का गैप देखकर वार्निंग दो।)
+
+💡 3. आगे क्या करें (3 आसान कदम): 
+(फंसा हुआ उधार निकालने, टॉप कस्टमर्स से और सेल निकालने, और टॉप प्रोडक्ट्स को मैनेज करने के 3 पक्के और प्रैक्टिकल तरीके बताएं।)
+
+🏆 4. मास्टरमाइंड गोल्डन टिप: 
+(मेरे कस्टमर्स, प्रोडक्ट्स के डेटा और मेरे बिज़नेस ('${shopName}') की केटेगरी को देखकर मुझे एक ऐसी 'आउट-ऑफ-द-बॉक्स' और सीक्रेट टिप दो जिससे मेरी ग्रोथ तेज़ी से बढ़े!)`;
+
+            // 6. ChatGPT का URL तैयार करना
+            let gptUrl = "https://chatgpt.com/?q=" + encodeURIComponent(masterPrompt);
+            
+            // 7. नए टैब में AI खोलना
+            window.open(gptUrl, "_blank");
         }
 
     </script>
