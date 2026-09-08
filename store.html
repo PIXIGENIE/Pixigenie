@@ -448,10 +448,16 @@
                             ? 'Home service not started yet. Please visit our center.' 
                             : 'Home delivery not started yet. Please pick up from store.';
 
-                        if (shopData.homeDelivery === true) {
+                                            if (shopData.homeDelivery === true) {
                             let areaText = shopData.deliveryArea || "Available";
                             
+                            // ✨ FIX: Service Provider ke liye "No Delivery" ko hata kar "Available" dikhao ✨
+                            if (isService && (areaText === "No Delivery" || areaText === "")) {
+                                areaText = "Available";
+                            }
+                            
                             if (areaText === "State Level" && shopData.address) {
+
                                 const indianStates = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", "Jammu", "Kashmir", "Chandigarh"];
                                 let detectedState = "Your State";
                                 let normAddress = shopData.address.toLowerCase().replace(/\s+/g, '');
@@ -606,15 +612,22 @@
                     }
                 }
                 
-                if (productsSnap.empty) {
-                    // ✨ NAYA: Cross me Wrench & Screwdriver wala Premium SVG (Inline block ke sath taaki center rahe) ✨
-                    const emptySvg = isServiceProvider 
-                        ? `<svg class="w-12 h-12 text-gray-300 inline-block mb-3" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z"></path></svg>`
-                        : `<i class="fas fa-box-open text-4xl text-gray-200 mb-2"></i>`;
+                     if (productsSnap.empty) {
+                    // ✨ NAYA: Premium Solid Circular Badge (Ekdum Clear Wrench & Screwdriver) ✨
+                    const emptyIcon = isServiceProvider 
+                        ? `<div class="w-24 h-24 bg-gradient-to-br from-[#F7F7F9] to-[#F3F4F6] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#E5E7EB] shadow-inner">
+                               <i class="fas fa-tools text-[40px] text-[#D1D5DB] drop-shadow-sm"></i>
+                           </div>`
+                        : `<div class="w-24 h-24 bg-gradient-to-br from-[#F7F7F9] to-[#F3F4F6] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#E5E7EB] shadow-inner">
+                               <i class="fas fa-box-open text-[40px] text-[#D1D5DB] drop-shadow-sm"></i>
+                           </div>`;
+                        
                     const emptyText = isServiceProvider ? 'No services available.' : 'No products available.';
                     
-                    // ✨ Puraana HTML layout exactly same rakha hai ✨
-                    grid.innerHTML = `<div class="col-span-2 text-center py-16 grid-item">${emptySvg}<p class="text-sm text-gray-500 font-bold">${emptyText}</p></div>`;
+                    grid.innerHTML = `<div class="col-span-2 text-center py-16 grid-item flex flex-col items-center justify-center">
+                        ${emptyIcon}
+                        <p class="text-[13px] text-gray-400 font-bold tracking-wide">${emptyText}</p>
+                    </div>`;
                     return;
                 }
 
