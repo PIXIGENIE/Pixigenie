@@ -524,9 +524,12 @@
                                     <div class="flex flex-col sm:flex-row gap-3">
                                         <div class="flex gap-2 sm:w-48 shrink-0">
                                             <input type="number" step="any" id="prod-qty" placeholder="Qty" required class="w-1/2 bg-white border border-[#E5E7EB] rounded-[12px] px-3 h-11 text-sm font-semibold outline-none focus:border-[#A855F7] transition">
-                                            <select id="prod-unit" class="w-1/2 bg-white border border-[#E5E7EB] rounded-[12px] px-2 h-11 text-sm font-semibold outline-none focus:border-[#A855F7] cursor-pointer transition">
+                                                                                        <select id="prod-unit" class="w-1/2 bg-white border border-[#E5E7EB] rounded-[12px] px-2 h-11 text-sm font-semibold outline-none focus:border-[#A855F7] cursor-pointer transition">
                                                 <option value="pcs">pcs</option><option value="kg">kg</option><option value="g">g</option><option value="liter">liter</option><option value="ml">ml</option><option value="packet">pkt</option><option value="box">box</option>
+                                                <!-- ✨ NAYA: Service Units ✨ -->
+                                                <option value="hr">per hr</option><option value="visit">per visit</option><option value="service">per service</option><option value="fixed">fixed fee</option>
                                             </select>
+
                                         </div>
                                         <div class="flex gap-2 flex-1">
                                             <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex items-center px-2 overflow-hidden h-11">
@@ -714,7 +717,7 @@
                     <div class="ios-input flex items-center px-3 flex-1">
                         <input type="number" step="any" id="edit-prod-qty" placeholder="Quantity" required class="w-full bg-transparent outline-none text-[#111827] font-semibold text-sm">
                     </div>
-                    <select id="edit-prod-unit" class="ios-input px-2 flex-1 text-[#111827] text-sm font-semibold outline-none cursor-pointer">
+                                       <select id="edit-prod-unit" class="ios-input px-2 flex-1 text-[#111827] text-sm font-semibold outline-none cursor-pointer">
                         <option value="pcs">pcs</option>
                         <option value="kg">kg</option>
                         <option value="g">g</option>
@@ -722,7 +725,13 @@
                         <option value="ml">ml</option>
                         <option value="packet">pkt</option>
                         <option value="box">box</option>
+                        <!-- ✨ NAYA: Service Units ✨ -->
+                        <option value="hr">per hr</option>
+                        <option value="visit">per visit</option>
+                        <option value="service">per service</option>
+                        <option value="fixed">fixed fee</option>
                     </select>
+
                 </div>
                 <div>
                                                         <!-- ✨ NAYA: Edit Description Box ✨ -->
@@ -1134,7 +1143,7 @@
 
         function enterDashboard() { document.getElementById('congrats-screen').classList.add('hidden'); loadShopData(); }
 
-        // ✨ 2. लोड डेटा फंक्शन
+             // ✨ 2. लोड डेटा फंक्शन (SAFE & COMPLETE)
         async function loadShopData() {
             try {
                 const doc = await db.collection('shops').doc(currentShopId).get();
@@ -1169,12 +1178,38 @@
                     document.getElementById('store-name-display').innerText = globalShopData.shopName;
                     document.getElementById('menu-owner-name').innerText = globalShopData.ownerName;
                     
+                    // ✨ DYNAMIC UI FOR SERVICE PROVIDERS ✨
+                    if (globalShopData.businessType === 'Service Provider') {
+                        // Top tabs ka naam change
+                        const invTabs = document.querySelectorAll('button[onclick*="tab-inventory"]');
+                        invTabs.forEach(btn => btn.innerText = "Services");
+                        
+                        // Header aur List title change
+                        const tabHeader = document.querySelector('#tab-inventory h3');
+                        if(tabHeader) tabHeader.innerHTML = "Services";
+                        
+                        const listTitle = document.querySelector('#tab-inventory h4');
+                        if(listTitle) listTitle.innerText = "YOUR SERVICES";
+                        
+                        // Inputs placeholders change
+                        const pName = document.getElementById('prod-name');
+                        if(pName) pName.placeholder = "Service Name (e.g. AC Repair)";
+                        
+                        const pDesc = document.getElementById('prod-desc');
+                        if(pDesc) pDesc.placeholder = "Service Description (e.g. Deep cleaning + Gas check)";
+                        
+                        // Default unit select 'fixed fee' kar do
+                        const unitSelect = document.getElementById('prod-unit');
+                        if (unitSelect) unitSelect.value = 'fixed';
+                    }
+
                     fetchFirebaseData(); 
                 } else { 
                     alert("Store not found! Please register again."); 
                     logout(); 
                 }
             } catch (error) { 
+                // ✨ FIX: Ye wala block miss ho gaya tha pichli baar! ✨
                 console.error("Error loading store:", error); 
             }
         }
