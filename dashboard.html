@@ -1822,7 +1822,8 @@
                 <div class="bg-[#F7F7F9] p-3 rounded-[12px] mb-4 border border-[#E5E7EB]"><p class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-2">Customer</p><p class="text-sm font-bold text-[#111827]"><i class="fas fa-user text-[#A855F7] mr-1"></i> ${b.customerName}</p><p class="text-xs font-semibold text-[#6B7280] mt-1"><i class="fab fa-whatsapp text-[#16A34A] mr-1"></i> ${b.customerPhone}</p></div>
                 ${b.address ? `<div class="bg-[#F7F7F9] p-3 rounded-[12px] mb-4 border border-[#E5E7EB]"><p class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1">Address</p><div class="text-sm text-[#4B5563] font-medium leading-relaxed">${b.address.replace(/(https?:\/\/[^\s]+)/g, '<br><a href="$1" target="_blank" class="text-[#2563EB] hover:underline font-bold text-xs mt-1 inline-block">Open Map <i class="fas fa-external-link-alt"></i></a>')}</div></div>`:''}
                 <div class="bg-[#F7F7F9] p-3 rounded-[12px] mb-4 border border-[#E5E7EB]"><p class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-2 border-b border-[#E5E7EB] pb-2">Items</p>${ih}<div class="flex justify-between items-center mt-2 pt-2"><span class="text-[#6B7280] font-bold text-xs">TOTAL</span><span class="text-[#16A34A] font-black text-lg">₹${b.grandTotal}</span></div></div>
-                <div class="grid grid-cols-2 gap-3"><div class="bg-[#F7F7F9] p-3 rounded-[12px] border border-[#E5E7EB] text-center flex flex-col justify-between"><p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Status</p><p class="text-sm font-black ${isP?'text-[#16A34A]':'text-[#DC2626]'}">${b.payStatus||'Unpaid'}</p><button onclick="toggleAdminPaymentStatus('${b.id}','${nS}')" class="mt-2 w-full text-[10px] font-bold py-1.5 rounded-[6px] ${tC}">Mark ${nS}</button></div><div class="bg-[#F7F7F9] p-3 rounded-[12px] border border-[#E5E7EB] text-center flex flex-col justify-center"><p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Mode</p><p class="text-sm font-bold text-[#111827]">${b.payMode||'N/A'}</p></div></div>
+                <div class="grid grid-cols-2 gap-3"><div class="bg-[#F7F7F9] p-3 rounded-[12px] border border-[#E5E7EB] text-center flex flex-col justify-between"><p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Status</p><p class="text-sm font-black ${isP?'text-[#16A34A]':'text-[#DC2626]'}">${b.payStatus||'Unpaid'}</p><button onclick="toggleAdminPaymentStatus('${b.id}','${nS}')" class="mt-2 w-full text-[10px] font-bold py-1.5 rounded-[6px] ${tC}">Mark ${nS}</button></div><div class="bg-[#F7F7F9] p-3 rounded-[12px] border border-[#E5E7EB] text-center flex flex-col justify-center"><p class="text-[10px] text-[#6B7280] font-bold uppercase mb-1">Mode</p><select onchange="updatePaymentMode('${b.id}', this.value)" ${!isP ? 'disabled' : ''} class="bg-white border border-[#E5E7EB] rounded-[8px] px-1 py-1.5 text-[11px] font-bold text-[#111827] outline-none w-full text-center mt-1 cursor-pointer shadow-sm disabled:opacity-50"><option value="None" ${!isP || b.payMode==='None' ? 'selected' : ''}>None</option><option value="UPI (Online)" ${isP && b.payMode==='UPI (Online)' ? 'selected' : ''}>UPI (Online)</option><option value="Cash (Offline)" ${isP && b.payMode==='Cash (Offline)' ? 'selected' : ''}>Cash (Offline)</option></select></div>
+</div>
             `;
             const m = document.getElementById('admin-order-details-modal'); m.classList.remove('hidden'); setTimeout(()=>m.classList.add('opacity-100'),10);
         }
@@ -1837,22 +1838,45 @@
  viewAdminOrderDetails(id); renderAdminBills(); } catch(e){alert(e.message);}
         }
 
-           // ✨ iOS Style Payment Status Toggle (Paid/Unpaid) ✨
+               // ✨ iOS Style Payment Status Toggle (Auto UPI/None Logic) ✨
         async function toggleAdminPaymentStatus(id, nS) {
-            // Naya iOS popup (Promise based) - 'nS' apne aap 'Paid' ya 'Unpaid' ban jayega
             const isConfirmed = await iosConfirm("Payment Status", `Do you want to mark this as ${nS}?`, `Mark ${nS}`);
-            if(!isConfirmed) return; // Agar Cancel dabaya toh ruk jao
+            if(!isConfirmed) return;
             
             try { 
-                await db.collection('shops').doc(currentShopId).collection('bills').doc(id).update({payStatus: nS}); 
-                let b = adminBills.find(x=>x.id===id); 
-                if(b) b.payStatus=nS; 
+                let b = adminBills.find(x=>x.id===id);
+                let updateData = { payStatus: nS };
+                
+                // Smart Logic: Paid pe auto UPI, Unpaid pe auto None
+                if(nS === 'Paid' && (!b.payMode || b.payMode === 'None')) {
+                    updateData.payMode = 'UPI (Online)'; 
+                } else if(nS === 'Unpaid') {
+                    updateData.payMode = 'None';
+                }
+
+                await db.collection('shops').doc(currentShopId).collection('bills').doc(id).update(updateData); 
+                
+                if(b) {
+                    b.payStatus = nS;
+                    if(updateData.payMode) b.payMode = updateData.payMode;
+                }
+                
                 renderAdminBills(); 
                 viewAdminOrderDetails(id); 
-                
-                // Success alert bhi iOS style me
                 iosAlert("Status Updated", `Order marked as ${nS} successfully!`);
             } catch(e) {
+                iosAlert("Error", e.message);
+            }
+        }
+
+        // ✨ NAYA: Payment Mode Manually Change Karne Ka Function ✨
+        async function updatePaymentMode(id, newMode) {
+            try {
+                await db.collection('shops').doc(currentShopId).collection('bills').doc(id).update({ payMode: newMode });
+                let b = adminBills.find(x => x.id === id);
+                if (b) b.payMode = newMode;
+                renderAdminBills();
+            } catch (e) {
                 iosAlert("Error", e.message);
             }
         }
