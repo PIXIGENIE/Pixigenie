@@ -1326,13 +1326,13 @@
                     <div class="bg-[#F7F7F9] p-4 rounded-[16px] border border-[#E5E7EB] mb-4">
                                     <div class="flex justify-between items-center mb-2 border-b border-[#E9D5FF] pb-1">
                 <p class="text-[10px] text-[#A855F7] font-bold uppercase tracking-widest">Delivery Address</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.customerAddress || '')}" target="_blank" class="bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 active:scale-95 transition">
-                    <i class="fas fa-location-arrow"></i> Map
-                </a>
-            </div>
-            <p class="text-sm text-[#111827] font-semibold mb-3">${o.customerAddress || 'N/A'}</p>
-
-                        <p class="text-sm text-[#111827] font-semibold mb-3">${o.customerAddress || 'N/A'}</p>
+                   <!-- ✨ SMART NAVIGATION BUTTON ✨ -->
+    <a href="https://www.google.com/maps/dir/?api=1&destination=${ (o.lat && o.lng) ? o.lat + ',' + o.lng : encodeURIComponent(o.customerAddress || '') }" target="_blank" class="bg-blue-50 text-blue-600 border border-blue-100 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 active:scale-95 transition">
+        <i class="fas fa-location-arrow"></i> Navigate
+    </a>
+    
+</div>
+<p class="text-sm text-[#111827] font-semibold mb-3">${o.customerAddress || 'N/A'}</p>
                         <p class="text-[10px] text-[#A855F7] font-bold uppercase tracking-widest mb-2 border-b border-[#E9D5FF] pb-1">Order Items</p>
                         <div class="space-y-1">${itemsHtml}</div>
                     </div>
