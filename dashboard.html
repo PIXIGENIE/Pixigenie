@@ -540,7 +540,7 @@
                                     <div class="bg-blue-50 border border-blue-100 rounded-[12px] p-3 mt-1">
                                         <p class="text-[11px] text-blue-800 font-medium leading-relaxed">
                                             <i class="fas fa-lightbulb text-blue-600 mr-1.5 text-xs"></i> 
-                                            <strong>Solution:</strong> Agar image upload hone me time lag raha hai, toh us photo ko pehle kisi ko <strong>WhatsApp par bhejein</strong>, phir wahan se download karke yahan upload karein. (Isse photo ka size chota ho jayega aur wo turant upload ho jayegi!)
+                                            <strong>Solution:</strong> अगर इमेज अपलोड होने में समय लग रहा है, तो उस फोटो को पहले किसी को<strong>WhatsApp पर भेजें</strong>, फिर वहाँ से डाउनलोड करके यहाँ अपलोड करें। (इससे फोटो का साइज़ छोटा हो जाएगा और वो तुरंत अपलोड हो जाएगी!)
                                         </p>
                                     </div>
                                 </form>
@@ -1285,19 +1285,31 @@
 
                 let itemsHtml = o.items ? o.items.map(i => `<div class="flex justify-between text-sm mb-1 border-b border-[#E5E7EB] pb-1"><span class="font-bold text-[#4B5563]">${i.qty}x ${i.name}</span><span class="text-[#111827] font-black">₹${i.price * i.qty}</span></div>`).join('') : '';
 
+                                // ✨ PREMIUM iOS STATUS & HIGHLIGHT LOGIC ✨
                 let sBg = "bg-[#FEF3C7] text-[#D97706] border-[#FDE68A]";
-                if(o.status === 'accepted') sBg = "bg-[#DBEAFE] text-[#2563EB] border-[#BFDBFE]";
-                if(o.status === 'delivered') sBg = "bg-[#DCFCE7] text-[#16A34A] border-[#BBF7D0]";
-                if(o.status === 'cancelled') sBg = "bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]";
+                let cardStyle = "bg-white border border-[#E5E7EB] shadow-sm"; 
 
-                                           let btns = '';
+                if (o.status === 'pending') {
+                    sBg = "bg-[#DBEAFE] text-[#1D4ED8] border-[#93C5FD]"; // Blue Badge
+                    cardStyle = "bg-gradient-to-b from-[#EFF6FF] to-white border-[2px] border-[#93C5FD] shadow-[0_10px_30px_rgba(59,130,246,0.15)] ring-4 ring-[#EFF6FF]"; // iOS Blue Glow
+                } else if (o.status === 'accepted') {
+                    sBg = "bg-[#F3E8FF] text-[#7E22CE] border-[#D8B4FE]"; // Purple Badge
+                    cardStyle = "bg-white border border-[#E5E7EB] shadow-sm"; 
+                } else if (o.status === 'delivered') {
+                    sBg = "bg-[#DCFCE7] text-[#16A34A] border-[#BBF7D0]"; // Green Badge
+                    cardStyle = "bg-gradient-to-b from-[#F0FDF4] to-white border border-[#BBF7D0] shadow-sm opacity-90"; // Soft Green
+                } else if (o.status === 'cancelled') {
+                    sBg = "bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]"; // Red Badge
+                    cardStyle = "bg-gradient-to-b from-[#FEF2F2] to-white border border-[#FECACA] shadow-sm opacity-70 grayscale-[0.2]"; // Muted Red
+                }
+
+                let btns = '';
                 if(o.status === 'pending') {
                     btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold py-3 rounded-[12px] text-sm hover:bg-black transition active:scale-95 shadow-md">Accept Order</button>
                             <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-white text-[#DC2626] border border-[#FECACA] hover:bg-[#FEF2F2] font-bold py-3 rounded-[12px] text-sm transition active:scale-95">Cancel</button>`;
                 } else if(o.status === 'accepted') {
                     btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" class="w-full bg-[#16A34A] hover:bg-[#15803D] text-white font-bold py-3 rounded-[12px] text-sm transition active:scale-95 shadow-md"><i class="fas fa-check-circle mr-1"></i> Mark Delivered</button>`;
                 } else if(o.status === 'delivered') {
-                    // ✨ NAYA: Purane orders ka bhi bill nikal jayega (o.id fallback lagaya) ✨
                     btns = `
                         <button disabled class="w-1/2 bg-[#F7F7F9] text-[#16A34A] font-bold py-3 rounded-[12px] text-sm border border-[#E5E7EB] cursor-not-allowed">
                             <i class="fas fa-check-circle mr-1"></i> Delivered
@@ -1309,10 +1321,9 @@
                     btns = `<div class="w-full text-center py-3 bg-[#F7F7F9] rounded-[12px] border border-[#E5E7EB] text-[#6B7280] text-xs font-black uppercase tracking-widest">Order ${o.status}</div>`;
                 }
 
-
-
                 html += `
-                <div class="bg-white border border-[#E5E7EB] rounded-[24px] p-5 flex flex-col shadow-sm">
+                <div class="${cardStyle} rounded-[24px] p-5 flex flex-col transition-all duration-300">
+
                     <div class="flex justify-between items-start mb-4 border-b border-[#E5E7EB] pb-3">
                         <div class="pr-3">
                             <span class="${sBg} border px-2.5 py-1 rounded-[8px] text-[10px] font-black uppercase tracking-widest mb-2 inline-block">${o.status}</span>
