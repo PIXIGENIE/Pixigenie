@@ -1205,6 +1205,19 @@
                             const btnDisplay = document.getElementById('prod-unit-display');
                             if(btnDisplay) btnDisplay.innerHTML = 'fixed fee <i class="fas fa-chevron-down text-[10px] sm:text-[12px] text-gray-400"></i>';
                         }
+                                                // ✨ NAYA: Qty Box ko hide karo aur Unit Box ko Full Width do ✨
+                        const qtyInput = document.getElementById('prod-qty');
+                        if (qtyInput) {
+                            qtyInput.style.display = 'none'; // Dabba gayab
+                            qtyInput.value = '1'; // Database ke liye default 1
+                        }
+
+                        const unitWrapper = document.getElementById('prod-unit-display').parentElement;
+                        if (unitWrapper) {
+                            unitWrapper.classList.remove('w-1/2');
+                            unitWrapper.classList.add('w-full'); // Fixed fee wale dabbe ko bada kar diya
+                        }
+
                     }
 
                     fetchFirebaseData(); 
