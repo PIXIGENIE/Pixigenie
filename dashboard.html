@@ -524,11 +524,13 @@
                                     <div class="flex flex-col sm:flex-row gap-3">
                                         <div class="flex gap-2 sm:w-48 shrink-0">
                                             <input type="number" step="any" id="prod-qty" placeholder="Qty" required class="w-1/2 bg-white border border-[#E5E7EB] rounded-[12px] px-3 h-11 text-sm font-semibold outline-none focus:border-[#A855F7] transition">
-                                                                                        <select id="prod-unit" class="w-1/2 bg-white border border-[#E5E7EB] rounded-[12px] px-2 h-11 text-sm font-semibold outline-none focus:border-[#A855F7] cursor-pointer transition">
-                                                <option value="pcs">pcs</option><option value="kg">kg</option><option value="g">g</option><option value="liter">liter</option><option value="ml">ml</option><option value="packet">pkt</option><option value="box">box</option>
-                                                <!-- ✨ NAYA: Service Units ✨ -->
-                                                <option value="hr">per hr</option><option value="visit">per visit</option><option value="service">per service</option><option value="fixed">fixed fee</option>
-                                            </select>
+                                                                                                                                    <div class="w-1/2 relative">
+                                                <input type="hidden" id="prod-unit" value="pcs">
+                                                <button type="button" onclick="openUnitPicker('prod-unit')" id="prod-unit-display" class="w-full bg-white border border-[#E5E7EB] rounded-[12px] px-3 h-11 text-sm font-semibold outline-none flex justify-between items-center focus:border-[#A855F7] transition active:scale-95 text-[#111827]">
+                                                    pcs <i class="fas fa-chevron-down text-[10px] text-gray-400"></i>
+                                                </button>
+                                            </div>
+
 
                                         </div>
                                         <div class="flex gap-2 flex-1">
@@ -717,20 +719,12 @@
                     <div class="ios-input flex items-center px-3 flex-1">
                         <input type="number" step="any" id="edit-prod-qty" placeholder="Quantity" required class="w-full bg-transparent outline-none text-[#111827] font-semibold text-sm">
                     </div>
-                                       <select id="edit-prod-unit" class="ios-input px-2 flex-1 text-[#111827] text-sm font-semibold outline-none cursor-pointer">
-                        <option value="pcs">pcs</option>
-                        <option value="kg">kg</option>
-                        <option value="g">g</option>
-                        <option value="liter">liter</option>
-                        <option value="ml">ml</option>
-                        <option value="packet">pkt</option>
-                        <option value="box">box</option>
-                        <!-- ✨ NAYA: Service Units ✨ -->
-                        <option value="hr">per hr</option>
-                        <option value="visit">per visit</option>
-                        <option value="service">per service</option>
-                        <option value="fixed">fixed fee</option>
-                    </select>
+                                                           <div class="flex-1 relative">
+                        <input type="hidden" id="edit-prod-unit" value="pcs">
+                        <button type="button" onclick="openUnitPicker('edit-prod-unit')" id="edit-prod-unit-display" class="w-full bg-[#F7F7F9] border border-transparent rounded-[16px] px-4 h-[52px] text-sm font-semibold outline-none flex justify-between items-center focus:border-[#A855F7] transition active:scale-95 text-[#111827]">
+                            pcs <i class="fas fa-chevron-down text-[12px] text-gray-400"></i>
+                        </button>
+                    </div>
 
                 </div>
                 <div>
@@ -1143,7 +1137,7 @@
 
         function enterDashboard() { document.getElementById('congrats-screen').classList.add('hidden'); loadShopData(); }
 
-             // ✨ 2. लोड डेटा फंक्शन (SAFE & COMPLETE)
+               // ✨ 2. लोड डेटा फंक्शन (SAFE & SYNTAX ERROR FIXED)
         async function loadShopData() {
             try {
                 const doc = await db.collection('shops').doc(currentShopId).get();
@@ -1200,7 +1194,11 @@
                         
                         // Default unit select 'fixed fee' kar do
                         const unitSelect = document.getElementById('prod-unit');
-                        if (unitSelect) unitSelect.value = 'fixed';
+                        if (unitSelect) {
+                            unitSelect.value = 'fixed';
+                            const btnDisplay = document.getElementById('prod-unit-display');
+                            if(btnDisplay) btnDisplay.innerHTML = 'fixed fee <i class="fas fa-chevron-down text-[10px] sm:text-[12px] text-gray-400"></i>';
+                        }
                     }
 
                     fetchFirebaseData(); 
@@ -1209,7 +1207,6 @@
                     logout(); 
                 }
             } catch (error) { 
-                // ✨ FIX: Ye wala block miss ho gaya tha pichli baar! ✨
                 console.error("Error loading store:", error); 
             }
         }
@@ -2016,7 +2013,13 @@
             document.getElementById('edit-prod-name').value = p.name; 
             document.getElementById('edit-prod-price').value = p.price; 
             document.getElementById('edit-prod-qty').value = p.qtySize !== undefined ? p.qtySize : (p.stock !== undefined ? p.stock : 1);
-            document.getElementById('edit-prod-unit').value = p.unit || 'pcs';
+                        // ✨ Update iOS hidden input & button ✨
+            const unitVal = p.unit || 'pcs';
+            document.getElementById('edit-prod-unit').value = unitVal;
+            const unitLabels = { 'pcs':'pcs', 'kg':'kg', 'g':'g', 'liter':'liter', 'ml':'ml', 'packet':'pkt', 'box':'box', 'hr':'per hr', 'visit':'per visit', 'service':'per service', 'fixed':'fixed fee' };
+            const editBtn = document.getElementById('edit-prod-unit-display');
+            if(editBtn) editBtn.innerHTML = (unitLabels[unitVal] || unitVal) + ' <i class="fas fa-chevron-down text-[12px] text-gray-400"></i>';
+
            document.getElementById('edit-prod-desc').value = p.description || '';
 
  document.getElementById('edit-prod-image').value = ''; 
@@ -7198,6 +7201,95 @@ td.mono {
             </div>
         </div>
     </div>
+    <!-- ✨ iOS STYLE UNIT PICKER (BOTTOM SHEET) ✨ -->
+    <div id="ios-unit-picker" class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeUnitPicker()">
+        <div id="ios-unit-card" onclick="event.stopPropagation()" class="bg-[#F2F2F7] w-full sm:w-[320px] rounded-t-[20px] sm:rounded-[20px] shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 overflow-hidden flex flex-col max-h-[80vh]">
+            <!-- Header -->
+            <div class="p-4 flex justify-between items-center bg-white border-b border-gray-200 shrink-0">
+                <span class="text-blue-500 font-normal text-[17px] cursor-pointer active:opacity-50" onclick="closeUnitPicker()">Cancel</span>
+                <h3 class="text-[17px] font-semibold text-black">Select Unit</h3>
+                <span class="w-[50px]"></span> <!-- Spacer for center alignment -->
+            </div>
+            <!-- Scrollable Options List -->
+            <div class="overflow-y-auto custom-scrollbar bg-white">
+                <ul id="ios-unit-list" class="flex flex-col divide-y divide-gray-100">
+                    <!-- Options JS se aayenge -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+           let currentUnitTarget = null;
+
+    function openUnitPicker(targetId) {
+        currentUnitTarget = targetId;
+        const currentVal = document.getElementById(targetId).value;
+        const list = document.getElementById('ios-unit-list');
+        
+        // ✨ SMART LOGIC: Business type ke hisaab se options filter honge ✨
+        const isService = (typeof globalShopData !== 'undefined' && globalShopData.businessType === 'Service Provider');
+        
+        let filteredOptions = [];
+        if (isService) {
+            filteredOptions = [
+                { value: 'fixed', label: 'fixed fee' },
+                { value: 'hr', label: 'per hr' }, 
+                { value: 'visit', label: 'per visit' },
+                { value: 'service', label: 'per service' }
+            ];
+        } else {
+            filteredOptions = [
+                { value: 'pcs', label: 'pcs' }, 
+                { value: 'kg', label: 'kg' }, 
+                { value: 'g', label: 'g' },
+                { value: 'liter', label: 'liter' }, 
+                { value: 'ml', label: 'ml' }, 
+                { value: 'packet', label: 'pkt' },
+                { value: 'box', label: 'box' }
+            ];
+        }
+        
+        list.innerHTML = filteredOptions.map(opt => `
+            <li onclick="selectUnit('${opt.value}', '${opt.label}')" class="flex justify-between items-center px-5 py-4 hover:bg-gray-50 active:bg-gray-100 cursor-pointer transition-colors border-b border-gray-100 last:border-0">
+                <span class="text-[17px] ${currentVal === opt.value ? 'text-blue-500 font-semibold' : 'text-black'}">${opt.label}</span>
+                ${currentVal === opt.value ? '<i class="fas fa-check text-blue-500 text-[18px]"></i>' : ''}
+            </li>
+        `).join('');
+
+        const modal = document.getElementById('ios-unit-picker');
+        const card = document.getElementById('ios-unit-card');
+        
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            card.classList.remove('translate-y-full', 'sm:scale-95');
+        }, 10);
+        document.body.style.overflow = 'hidden'; // Pichla page freeze
+    }
+
+
+    function closeUnitPicker() {
+        const modal = document.getElementById('ios-unit-picker');
+        const card = document.getElementById('ios-unit-card');
+        
+        modal.classList.add('opacity-0');
+        card.classList.add('translate-y-full', 'sm:scale-95');
+        
+        setTimeout(() => { 
+            modal.classList.add('hidden'); 
+            document.body.style.overflow = 'auto'; // Freeze hata do
+        }, 300);
+    }
+
+    function selectUnit(val, label) {
+        // Hidden input me asli value save karo
+        document.getElementById(currentUnitTarget).value = val;
+        // Button pe label dikhao
+        document.getElementById(currentUnitTarget + '-display').innerHTML = label + ' <i class="fas fa-chevron-down text-[10px] sm:text-[12px] text-gray-400"></i>';
+        closeUnitPicker();
+    }
+    </script>
 
 </body>
 </html>
