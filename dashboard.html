@@ -2343,32 +2343,41 @@
                  let currentSetupStep = 1;
         const totalSetupSteps = 6; // Ab 6 steps ho gaye hain
 
-           // ✨ NAYA: Delivery Show/Hide Function (FIXED FOR SERVICE PROVIDERS) ✨
-        function toggleDeliveryRange(isYes) {
-            const rangeContainer = document.getElementById('delivery-range-container');
-            const bizType = document.getElementById('selected-business-type') ? document.getElementById('selected-business-type').value : '';
+          // ✨ NAYA: Delivery Show/Hide Function (100% FIXED FOR ALL BUSINESS TYPES) ✨
+    function toggleDeliveryRange(isYes) {
+        const rangeContainer = document.getElementById('delivery-range-container');
+        const rangeOptions = document.getElementById('delivery-range-options');
+        const bizType = document.getElementById('selected-business-type') ? document.getElementById('selected-business-type').value : '';
 
-            // Agar Service Provider hai, toh Range (Local/State) hamesha HIDE rahega
-            if (bizType === 'Service Provider') {
-                if (rangeContainer) {
-                    rangeContainer.classList.add('hidden');
-                    rangeContainer.style.opacity = '0';
-                }
-                return; // Yahan se function ruk jayega, aage ka code nahi chalega
-            }
-
-            // Baki Retailers/Wholesalers ke liye normal logic
+        // 1. Agar Service Provider hai, toh poora Range wala dabba hamesha ke liye gayab kar do
+        if (bizType === 'Service Provider') {
             if (rangeContainer) {
-                if (isYes) {
-                    rangeContainer.classList.remove('hidden');
-                    setTimeout(() => { rangeContainer.style.opacity = '1'; }, 10);
-                } else {
-                    rangeContainer.classList.add('hidden');
-                    rangeContainer.style.opacity = '0';
-                }
+                rangeContainer.style.display = 'none';
             }
+            return; // Function yahin rok do
         }
 
+        // 2. Baki Retailer/Wholesaler ke liye Range wala dabba visible rakho
+        if (rangeContainer) {
+            rangeContainer.style.display = 'block';
+            rangeContainer.style.opacity = '1';
+        }
+
+        // 3. 'Yes' ya 'No' par depend karke andar ke options ko On/Off karna
+        if (rangeOptions) {
+            if (isYes) {
+                // 'Yes' dabaya -> Fade/Disable classes hata do (Options Enable ho jayenge)
+                rangeOptions.classList.remove('opacity-50', 'pointer-events-none');
+            } else {
+                // 'No' dabaya -> Fade/Disable classes wapas laga do (Options Disable)
+                rangeOptions.classList.add('opacity-50', 'pointer-events-none');
+                
+                // Saare selected options ko uncheck bhi kar do
+                const radios = rangeOptions.querySelectorAll('input[type="radio"]');
+                radios.forEach(r => r.checked = false);
+            }
+        }
+    }
 
         // ✨ Naya Function: Business Type Select Karne Ke Liye
         function selectBusinessType(btnElement, typeName) {
