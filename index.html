@@ -808,11 +808,32 @@
             });
         }
 
+                // ✨ NAYA: Check karne ke liye ki location filter ON hai ya OFF
+        let isNearMeActive = false;
+
         function findNearbyShops(btnElement) {
+            // ✨ LOGIC 1: Agar pehle se ON hai, toh CANCEL karke wapas normal karo
+            if (isNearMeActive) {
+                isNearMeActive = false; // Toggle Off
+                
+                // Button wapas 'Near Me' jaisa banao
+                btnElement.innerHTML = `<i class="fas fa-location-arrow text-blue-500"></i> Near Me`;
+                btnElement.classList.remove('bg-green-50', 'border-green-200', 'text-green-700');
+                btnElement.classList.add('bg-white', 'text-gray-800');
+                
+                // Wapas saari shops/products load karo
+                if (localStorage.getItem('pixigenie_customer_name')) fetchGlobalProducts(); 
+                else fetchLiveShops(); 
+                
+                return; // Function yahin rok do
+            }
+
+            // ✨ LOGIC 2: Agar OFF hai, toh GPS mang kar ON karo
             if (!navigator.geolocation) {
-                alert("GPS Geolocation is not supported by your browser.");
+                showIOSAlert("Error", "GPS Geolocation is not supported by your browser.");
                 return;
             }
+            
             const originalHTML = btnElement.innerHTML;
             btnElement.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Locating...`;
             btnElement.disabled = true;
@@ -820,24 +841,29 @@
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     setTimeout(() => {
-                        btnElement.innerHTML = `📍 1km Range`;
+                        isNearMeActive = true; // Toggle On
+                        
+                        // ✨ NAYA: Button par 'X' (Cancel) icon lagaya ✨
+                        btnElement.innerHTML = `📍 1km Range <i class="fas fa-times ml-1.5 opacity-60 hover:opacity-100 hover:text-red-500 transition-all"></i>`;
                         btnElement.classList.remove('bg-white', 'text-gray-800');
                         btnElement.classList.add('bg-green-50', 'border-green-200', 'text-green-700');
                         btnElement.disabled = false;
                         
-                        alert(`📍 Location found!\nFetching stores and products within 1km radius...`);
+                        // ✨ NAYA: Boring alert hata kar iOS Alert lagaya ✨
+                        showIOSAlert("📍 Location Found", "Fetching stores and products near you...");
                         
                         if (localStorage.getItem('pixigenie_customer_name')) fetchGlobalProducts(); 
                         else fetchLiveShops(); 
                     }, 1200);
                 },
                 (error) => {
-                    alert("⚠️ Please allow location access in your browser to find nearby shops.");
+                    showIOSAlert("Permission Denied", "Please allow location access in your browser to find nearby shops.");
                     btnElement.innerHTML = originalHTML;
                     btnElement.disabled = false;
                 }
             );
         }
+
 
         // --- ✨ UI UPDATER (WITH PREMIUM STORE ICONS & RATING) ✨ ---
         function updateUIBasedOnLogin() {
