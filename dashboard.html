@@ -1833,17 +1833,43 @@
         async function updateDeliveryStatus(id) {
             let s=document.getElementById(`admin-delivery-select-${id}`).value; let d=document.getElementById(`admin-delivery-date-${id}`);
             if(s==='Custom') { if(!d.value) return alert("Select date!"); s = `Delivery by ` + new Date(d.value).toLocaleDateString('en-GB',{day:'numeric',month:'short'}); }
-            try { await db.collection('shops').doc(currentShopId).collection('bills').doc(id).update({deliveryStatus: s}); let b = adminBills.find(x=>x.id===id); if(b) b.deliveryStatus=s; alert("Status Updated!"); viewAdminOrderDetails(id); renderAdminBills(); } catch(e){alert(e.message);}
+            try { await db.collection('shops').doc(currentShopId).collection('bills').doc(id).update({deliveryStatus: s}); let b = adminBills.find(x=>x.id===id); if(b) b.deliveryStatus=s; iosAlert("Order Updated", "Status Updated Successfully!");
+ viewAdminOrderDetails(id); renderAdminBills(); } catch(e){alert(e.message);}
         }
 
+           // ✨ iOS Style Payment Status Toggle (Paid/Unpaid) ✨
         async function toggleAdminPaymentStatus(id, nS) {
-            if(!confirm(`Mark as ${nS}?`)) return;
-            try { await db.collection('shops').doc(currentShopId).collection('bills').doc(id).update({payStatus: nS}); let b = adminBills.find(x=>x.id===id); if(b) b.payStatus=nS; renderAdminBills(); viewAdminOrderDetails(id); } catch(e){alert(e.message);}
+            // Naya iOS popup (Promise based) - 'nS' apne aap 'Paid' ya 'Unpaid' ban jayega
+            const isConfirmed = await iosConfirm("Payment Status", `Do you want to mark this as ${nS}?`, `Mark ${nS}`);
+            if(!isConfirmed) return; // Agar Cancel dabaya toh ruk jao
+            
+            try { 
+                await db.collection('shops').doc(currentShopId).collection('bills').doc(id).update({payStatus: nS}); 
+                let b = adminBills.find(x=>x.id===id); 
+                if(b) b.payStatus=nS; 
+                renderAdminBills(); 
+                viewAdminOrderDetails(id); 
+                
+                // Success alert bhi iOS style me
+                iosAlert("Status Updated", `Order marked as ${nS} successfully!`);
+            } catch(e) {
+                iosAlert("Error", e.message);
+            }
         }
 
+        // ✨ iOS Style Delete Bill ✨
         async function deleteBill(id) {
-            if(!confirm("Delete this bill?")) return;
-            try { await db.collection('shops').doc(currentShopId).collection('bills').doc(id).delete(); adminBills = adminBills.filter(b=>b.id!==id); renderAdminBills(); processCustomerData(); } catch(e){}
+            const isConfirmed = await iosConfirm("Delete Bill", "Are you sure you want to delete this bill? This cannot be undone.", "Delete");
+            if(!isConfirmed) return;
+            
+            try { 
+                await db.collection('shops').doc(currentShopId).collection('bills').doc(id).delete(); 
+                adminBills = adminBills.filter(b=>b.id!==id); 
+                renderAdminBills(); 
+                processCustomerData(); 
+            } catch(e) {
+                iosAlert("Error", e.message);
+            }
         }
 
         // ==========================================
@@ -6928,6 +6954,60 @@ td.mono {
             link.click();
             document.body.removeChild(link);
         }
+        // ==========================================
+        // 🍎 iOS STYLE ALERT & CONFIRM FUNCTIONS
+        // ==========================================
+        function iosAlert(title, message) {
+            document.getElementById('ios-alert-title').innerText = title;
+            document.getElementById('ios-alert-message').innerText = message;
+            
+            const modal = document.getElementById('ios-alert-modal');
+            const card = document.getElementById('ios-alert-card');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeIosAlert() {
+            const modal = document.getElementById('ios-alert-modal');
+            const card = document.getElementById('ios-alert-card');
+            
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function iosConfirm(title, message, confirmText, confirmColor = 'text-[#FF3B30]') {
+            return new Promise((resolve) => {
+                document.getElementById('ios-confirm-title').innerText = title;
+                document.getElementById('ios-confirm-message').innerText = message;
+                
+                const confirmBtn = document.getElementById('ios-confirm-btn');
+                confirmBtn.innerText = confirmText;
+                confirmBtn.className = `flex-1 py-3 text-[17px] ${confirmColor} font-semibold hover:bg-black/5 active:bg-black/10 transition-colors`;
+                
+                const modal = document.getElementById('ios-confirm-modal');
+                const card = document.getElementById('ios-confirm-card');
+                
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    card.classList.remove('scale-95');
+                }, 10);
+
+                window.closeIosConfirm = function(result) {
+                    modal.classList.add('opacity-0');
+                    card.classList.add('scale-95');
+                    setTimeout(() => modal.classList.add('hidden'), 300);
+                    resolve(result); // Return true (Yes) or false (Cancel)
+                }
+                
+                confirmBtn.onclick = () => window.closeIosConfirm(true);
+            });
+        }
 
     </script>
         <!-- ✨ iOS STYLE UPDATE SUCCESS MODAL ✨ -->
@@ -7019,6 +7099,32 @@ td.mono {
                 <button onclick="closeDownloadModal()" class="flex-1 py-3 text-[17px] text-[#007AFF] font-normal border-r border-black/10 hover:bg-black/5 active:bg-black/10 transition-colors">Cancel</button>
                <button id="ios-dl-confirm-btn" onclick="confirmDownloadAction()" class="flex-1 py-3 text-[17px] text-[#007AFF] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">Download</button>
 
+            </div>
+        </div>
+    </div>
+    <!-- ✨ iOS STYLE CONFIRM MODAL (For Yes/No) ✨ -->
+    <div id="ios-confirm-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div id="ios-confirm-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
+            <div class="p-4 pt-5 pb-4">
+                <h3 id="ios-confirm-title" class="text-[17px] font-semibold text-black leading-tight mb-1">Confirm</h3>
+                <p id="ios-confirm-message" class="text-[13px] text-black/70 leading-snug">Are you sure?</p>
+            </div>
+            <div class="flex border-t border-black/10">
+                <button onclick="closeIosConfirm(false)" class="flex-1 py-3 text-[17px] text-[#007AFF] font-normal border-r border-black/10 hover:bg-black/5 active:bg-black/10 transition-colors">Cancel</button>
+                <button id="ios-confirm-btn" class="flex-1 py-3 text-[17px] text-[#FF3B30] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✨ iOS STYLE ALERT MODAL (For OK only) ✨ -->
+    <div id="ios-alert-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div id="ios-alert-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
+            <div class="p-4 pt-5 pb-4">
+                <h3 id="ios-alert-title" class="text-[17px] font-semibold text-black leading-tight mb-1">Success</h3>
+                <p id="ios-alert-message" class="text-[13px] text-black/70 leading-snug">Action completed successfully.</p>
+            </div>
+            <div class="flex border-t border-black/10">
+                <button onclick="closeIosAlert()" class="w-full py-3 text-[17px] text-[#007AFF] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">OK</button>
             </div>
         </div>
     </div>
