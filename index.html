@@ -8,7 +8,10 @@
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+        <!-- Leaflet Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -267,13 +270,20 @@
                 </div>
 
                 <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Delivery Address</label>
-                        <!-- ✨ GPS Auto Fetch Button ✨ -->
-                        <button type="button" onclick="fetchCustomerGPS('order-address', 'order-gps-btn')" id="order-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition">
-                            <i class="fas fa-location-crosshairs"></i> Locate Me
-                        </button>
-                    </div>
+               <div class="flex justify-between items-center mb-1">
+    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Delivery Address</label>
+    
+    <!-- ✨ DONO BUTTONS (Map & Auto Fetch) ✨ -->
+    <div class="flex items-center gap-1.5">
+        <button type="button" onclick="openMapPicker('order-address', 'order-lat', 'order-lng')" class="text-[10px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-purple-100 shadow-sm">
+            <i class="fas fa-map-marked-alt"></i> Map
+        </button>
+        <button type="button" onclick="fetchCustomerGPS('order-address', 'order-gps-btn')" id="order-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-blue-100 shadow-sm">
+            <i class="fas fa-location-crosshairs"></i> Auto
+        </button>
+    </div>
+</div>
+
                     <textarea id="order-address" placeholder="House No, Street, Landmark..." required rows="2" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 outline-none bg-[#F7F7F9] focus:bg-white text-sm font-semibold transition resize-none"></textarea>
                 </div>
 
@@ -356,11 +366,18 @@
 
                 <div>
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Delivery Address</label>
-                        <button type="button" onclick="fetchCustomerGPS('cart-address', 'cart-gps-btn-cart')" id="cart-gps-btn-cart" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition">
-                            <i class="fas fa-location-crosshairs"></i> Locate Me
-                        </button>
-                    </div>
+    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Delivery Address</label>
+    
+    <div class="flex items-center gap-1.5">
+        <button type="button" onclick="openMapPicker('cart-address', 'cart-lat', 'cart-lng')" class="text-[10px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-purple-100 shadow-sm">
+            <i class="fas fa-map-marked-alt"></i> Map
+        </button>
+        <button type="button" onclick="fetchCustomerGPS('cart-address', 'cart-gps-btn-cart')" id="cart-gps-btn-cart" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-blue-100 shadow-sm">
+            <i class="fas fa-location-crosshairs"></i> Auto
+        </button>
+    </div>
+</div>
+
                     <textarea id="cart-address" placeholder="House No, Street, City..." rows="2" class="w-full px-4 py-3 mb-3 rounded-xl border border-gray-200 focus:border-purple-500 outline-none bg-white text-sm font-semibold transition resize-none shadow-sm"></textarea>
                     <input type="hidden" id="cart-lat">
 <input type="hidden" id="cart-lng">
@@ -2132,11 +2149,18 @@
                             </div>
                             <div>
                                 <div class="flex justify-between items-center mb-1">
-                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Full Address</label>
-                                    <button type="button" onclick="fetchProfileGPS()" id="prof-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition">
-                                        <i class="fas fa-location-crosshairs"></i> Auto-Fetch
-                                    </button>
-                                </div>
+    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Full Address</label>
+    
+    <div class="flex items-center gap-1.5">
+        <button type="button" onclick="openMapPicker('saved-address', 'saved-lat', 'saved-lng')" class="text-[10px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-purple-100 shadow-sm">
+            <i class="fas fa-map-marked-alt"></i> Map
+        </button>
+        <button type="button" onclick="fetchProfileGPS()" id="prof-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-blue-100 shadow-sm">
+            <i class="fas fa-location-crosshairs"></i> Auto
+        </button>
+    </div>
+</div>
+
                                 <textarea id="saved-address" placeholder="House No, Street, City..." rows="2" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition resize-none"></textarea>
                        <input type="hidden" id="saved-lat">
 <input type="hidden" id="saved-lng">
@@ -2330,6 +2354,138 @@
                 document.body.style.overflow = 'auto'; // Background scrolling wapas chalu
             }, 300);
         }
+              // ==========================================
+        // 🗺️ PREMIUM MAP PICKER (Google Maps UI + Live Fetch)
+        // ==========================================
+        let mapInstance = null;
+        let currentTargetAddressId = '';
+        let currentTargetLatId = '';
+        let currentTargetLngId = '';
+        let selectedLat = 28.7041; 
+        let selectedLng = 77.1025;
+
+        function openMapPicker(addressId, latId, lngId) {
+            currentTargetAddressId = addressId;
+            currentTargetLatId = latId;
+            currentTargetLngId = lngId;
+
+            const modal = document.getElementById('map-picker-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            
+            const preview = document.getElementById('map-address-preview');
+            preview.innerHTML = `<i class="fas fa-circle-notch fa-spin text-purple-500 mr-1"></i> Getting your live location...`;
+
+            // Agar pehle se coordinate save hai, to usko use karo
+            const existingLat = document.getElementById(latId) ? parseFloat(document.getElementById(latId).value) : null;
+            const existingLng = document.getElementById(lngId) ? parseFloat(document.getElementById(lngId).value) : null;
+
+            if (existingLat && existingLng && !isNaN(existingLat)) {
+                selectedLat = existingLat;
+                selectedLng = existingLng;
+                initOrUpdateMap();
+            } else {
+                // ✨ NAYA LOGIC: Agar naya address hai toh Map khulte hi Live Location fetch karo
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            selectedLat = pos.coords.latitude;
+                            selectedLng = pos.coords.longitude;
+                            initOrUpdateMap();
+                        },
+                        (err) => { initOrUpdateMap(); }, // Agar GPS band hai, toh default location khul jayegi
+                        { enableHighAccuracy: true, timeout: 5000 }
+                    );
+                } else {
+                    initOrUpdateMap();
+                }
+            }
+        }
+
+        function initOrUpdateMap() {
+            if (!mapInstance) {
+                // Zoom level 18 kar diya (Galiyan ekdum clear dikhengi)
+                mapInstance = L.map('map-container', { zoomControl: false }).setView([selectedLat, selectedLng], 18);
+                
+                // ✨ NAYA: GOOGLE MAPS TILE (Premium Look) ✨
+                L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { 
+                    maxZoom: 20,
+                    attribution: '© Google Maps'
+                }).addTo(mapInstance);
+                
+                mapInstance.on('moveend', async function() {
+                    const center = mapInstance.getCenter();
+                    selectedLat = center.lat;
+                    selectedLng = center.lng;
+                    
+                    const preview = document.getElementById('map-address-preview');
+                    preview.innerHTML = `<i class="fas fa-circle-notch fa-spin text-purple-500 mr-1"></i> Fetching exact address...`;
+                    
+                    try {
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${selectedLat}&lon=${selectedLng}`);
+                        const data = await res.json();
+                        if (data && data.display_name) {
+                            preview.innerHTML = `<i class="fas fa-location-dot text-purple-500 mr-1"></i> ${data.display_name}`;
+                        } else {
+                            preview.innerHTML = `<i class="fas fa-check text-green-500 mr-1"></i> Location Selected`;
+                        }
+                    } catch(e) {
+                        preview.innerHTML = `<i class="fas fa-check text-green-500 mr-1"></i> Location Pinned`;
+                    }
+                });
+            } else {
+                mapInstance.setView([selectedLat, selectedLng], 18);
+            }
+            
+            setTimeout(() => { mapInstance.invalidateSize(); mapInstance.fire('moveend'); }, 300);
+        }
+
+        // ✨ NAYA: Map ke andar wala GPS crosshair button ✨
+        function goToLiveLocation() {
+            const btn = document.getElementById('live-gps-btn');
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin text-xl"></i>`;
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        selectedLat = pos.coords.latitude;
+                        selectedLng = pos.coords.longitude;
+                        if(mapInstance) {
+                            mapInstance.setView([selectedLat, selectedLng], 18);
+                            mapInstance.fire('moveend'); // Force address fetch
+                        }
+                        btn.innerHTML = `<i class="fas fa-crosshairs text-xl"></i>`;
+                    },
+                    (err) => {
+                        alert("⚠️ Please turn on your GPS Location.");
+                        btn.innerHTML = `<i class="fas fa-crosshairs text-xl"></i>`;
+                    },
+                    { enableHighAccuracy: true, timeout: 5000 }
+                );
+            }
+        }
+
+        function closeMapPicker() {
+            const modal = document.getElementById('map-picker-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function confirmMapLocation() {
+            const previewText = document.getElementById('map-address-preview').innerText;
+            
+            if (document.getElementById(currentTargetAddressId)) {
+                if(!previewText.includes('Fetching') && !previewText.includes('Getting')) {
+                    document.getElementById(currentTargetAddressId).value = previewText.replace('📍 ', '').trim(); 
+                } else {
+                    document.getElementById(currentTargetAddressId).value = `Lat: ${selectedLat.toFixed(4)}, Lng: ${selectedLng.toFixed(4)}`;
+                }
+            }
+            
+            if (document.getElementById(currentTargetLatId)) document.getElementById(currentTargetLatId).value = selectedLat;
+            if (document.getElementById(currentTargetLngId)) document.getElementById(currentTargetLngId).value = selectedLng;
+            
+            closeMapPicker();
+        }
 
     </script>
     <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
@@ -2345,6 +2501,38 @@
             </div>
         </div>
     </div>
+    <!-- ✨ LIVE MAP PICKER MODAL (PREMIUM GOOGLE STYLE) ✨ -->
+    <div id="map-picker-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm z-[200] hidden flex flex-col transition-all duration-300 opacity-0">
+        <!-- Header -->
+        <div class="bg-white flex items-center justify-between p-4 shadow-sm z-10 shrink-0 rounded-b-2xl">
+            <h3 class="font-black text-gray-900 text-lg flex items-center gap-2"><i class="fas fa-map-marker-alt text-purple-500"></i> Pin Location</h3>
+            <button onclick="closeMapPicker()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 active:scale-90 transition"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <!-- Map Area -->
+        <div class="relative flex-1 w-full bg-gray-100 overflow-hidden">
+            <div id="map-container" class="absolute inset-0 w-full h-full z-0"></div>
+            
+            <!-- Center Target Pin -->
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[400] pointer-events-none pb-8 animate-bounce">
+                <i class="fas fa-map-marker-alt text-4xl text-red-500 drop-shadow-md"></i>
+            </div>
+            
+            <!-- ✨ NAYA: Live GPS Button (Map ke upar) ✨ -->
+            <button onclick="goToLiveLocation()" id="live-gps-btn" class="absolute bottom-6 right-4 z-[400] w-12 h-12 bg-white rounded-full shadow-[0_5px_15px_rgba(0,0,0,0.2)] flex items-center justify-center text-blue-600 hover:bg-gray-50 active:scale-95 transition border border-gray-100">
+                <i class="fas fa-crosshairs text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-white p-5 shadow-[0_-10px_20px_rgba(0,0,0,0.1)] z-10 shrink-0 rounded-t-3xl">
+            <p id="map-address-preview" class="text-xs text-gray-600 font-semibold mb-3 line-clamp-2 leading-relaxed"><i class="fas fa-spinner fa-spin mr-1"></i> Finding your location...</p>
+            <button onclick="confirmMapLocation()" id="map-confirm-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-xl active:scale-95 transition shadow-lg flex items-center justify-center gap-2">
+                Confirm Location <i class="fas fa-check-circle text-green-400"></i>
+            </button>
+        </div>
+    </div>
+
 
 </body>
 </html>
