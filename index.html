@@ -1344,10 +1344,14 @@
             if(modal.classList.contains('hidden')) {
                 renderCartItems();
                 
-                // ✨ SMART PRE-FILL LOGIC ✨
+                           // ✨ SMART PRE-FILL LOGIC ✨
                 const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
                 let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
                 const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
+                
+                // ✨ NAYA LOGIC: Saved GPS Memory se uthao ✨
+                const savedLat = localStorage.getItem('pixigenie_saved_lat') || '';
+                const savedLng = localStorage.getItem('pixigenie_saved_lng') || '';
 
                 // अगर ईमेल है, तो फोन का डब्बा खाली छोड़ो
                 if (savedPhone.includes('@')) {
@@ -1363,7 +1367,14 @@
                 }
                 if(!document.getElementById('cart-address').value && savedAddress) {
                     document.getElementById('cart-address').value = savedAddress;
+                    
+                    // ✨ NAYA LOGIC: Cart ke hidden GPS fields me daalo ✨
+                    if(savedLat && savedLng) {
+                        if(document.getElementById('cart-lat')) document.getElementById('cart-lat').value = savedLat;
+                        if(document.getElementById('cart-lng')) document.getElementById('cart-lng').value = savedLng;
+                    }
                 }
+
 
                 modal.classList.remove('hidden');
                 setTimeout(() => {
@@ -1562,10 +1573,14 @@
             document.getElementById('order-item-price').innerText = `₹${itemPrice}`;
             document.getElementById('order-shop-name').innerText = shopName || 'Local Store';
             
-            // ✨ SMART PRE-FILL LOGIC (Email filter + Saved Address) ✨
+                     // ✨ SMART PRE-FILL LOGIC (Email filter + Saved Address) ✨
             const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
             let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
             const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
+            
+            // ✨ NAYA LOGIC: Saved GPS Memory se uthao ✨
+            const savedLat = localStorage.getItem('pixigenie_saved_lat') || '';
+            const savedLng = localStorage.getItem('pixigenie_saved_lng') || '';
 
             // अगर फोन में '@' है (यानी ईमेल है), तो इसे खाली छोड़ दो
             if (savedPhone.includes('@')) {
@@ -1577,9 +1592,16 @@
             document.getElementById('order-cust-phone').value = savedPhone;
             document.getElementById('order-address').value = savedAddress;
             
+            // ✨ NAYA LOGIC: Order ke hidden GPS fields me daalo ✨
+            if(savedLat && savedLng) {
+                if(document.getElementById('order-lat')) document.getElementById('order-lat').value = savedLat;
+                if(document.getElementById('order-lng')) document.getElementById('order-lng').value = savedLng;
+            }
+            
             if (document.getElementById('order-shop-phone')) {
                 document.getElementById('order-shop-phone').value = shopPhone || '';
             }
+
 
             const modal = document.getElementById('order-modal');
             const content = document.getElementById('order-modal-content');
@@ -1829,18 +1851,28 @@
             }
         }
 
-                // ✨ NAYA: Ab details Firebase Database me permanent save hongi ✨
+                      // ✨ NAYA: Ab details Firebase Database me permanent save hongi ✨
         async function saveCustomerAddress() {
             const sName = document.getElementById('saved-name').value.trim();
             const sPhone = document.getElementById('saved-phone').value.trim();
             const sLand = document.getElementById('saved-landmark').value.trim();
             const sAddr = document.getElementById('saved-address').value.trim();
+            
+            // ✨ NAYA LOGIC: Hidden GPS fields ka data nikalna ✨
+            const sLat = document.getElementById('saved-lat') ? document.getElementById('saved-lat').value : '';
+            const sLng = document.getElementById('saved-lng') ? document.getElementById('saved-lng').value : '';
 
             // Phone memory me save
             localStorage.setItem('pixigenie_saved_name', sName);
             localStorage.setItem('pixigenie_saved_phone', sPhone);
             localStorage.setItem('pixigenie_saved_landmark', sLand);
             localStorage.setItem('pixigenie_saved_address', sAddr);
+            
+            // ✨ NAYA LOGIC: GPS Coordinates bhi LocalStorage me save karna ✨
+            if(sLat && sLng) {
+                localStorage.setItem('pixigenie_saved_lat', sLat);
+                localStorage.setItem('pixigenie_saved_lng', sLng);
+            }
 
             const btn = document.getElementById('save-addr-btn');
             const orig = btn.innerHTML;
@@ -1854,7 +1886,10 @@
                         savedName: sName,
                         savedPhone: sPhone,
                         savedLandmark: sLand,
-                        savedAddress: sAddr
+                        savedAddress: sAddr,
+                        // ✨ NAYA LOGIC: Firebase me bhi GPS save karo ✨
+                        savedLat: sLat,
+                        savedLng: sLng
                     });
                 } catch (e) { console.log("Firebase sync issue", e); }
             }
@@ -1863,7 +1898,6 @@
             btn.classList.replace('bg-gray-900', 'bg-green-500');
             setTimeout(() => { btn.innerHTML = orig; btn.classList.replace('bg-green-500', 'bg-gray-900'); }, 2000);
         }
-
 
         // ✨ PROFILE GPS AUTO-FETCH ✨
         function fetchProfileGPS() {
