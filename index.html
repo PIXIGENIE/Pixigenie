@@ -304,8 +304,15 @@
     </div>
         <!-- ✨ iOS STYLE SUCCESS MODAL ✨ -->
     <div id="order-success-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
-        <div class="bg-white rounded-[24px] shadow-2xl max-w-xs w-full p-6 text-center transform scale-90 transition-all duration-300" id="order-success-content">
-            <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 shadow-sm border border-green-100">
+                <div class="bg-white rounded-[24px] shadow-2xl max-w-xs w-full p-6 text-center transform scale-90 transition-all duration-300 relative" id="order-success-content">
+            
+            <!-- ✨ NAYA: Cross Button ✨ -->
+            <button onclick="closeOrderSuccessModal()" class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full transition active:scale-90">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 shadow-sm border border-green-100 mt-2">
+
                 <i class="fas fa-check"></i>
             </div>
             <h3 class="text-xl font-black text-gray-900 mb-2">Order Placed!</h3>
@@ -2308,6 +2315,20 @@
             localStorage.clear();
             sessionStorage.clear();
             window.location.href = 'index.html'; 
+        }
+        // ✨ NAYA: Success Modal ko wahin close karne ka function ✨
+        function closeOrderSuccessModal() {
+            const modal = document.getElementById('order-success-modal');
+            const content = document.getElementById('order-success-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-90');
+            
+            setTimeout(() => { 
+                modal.classList.add('hidden'); 
+                document.body.style.overflow = 'auto'; // Background scrolling wapas chalu
+            }, 300);
         }
 
     </script>
