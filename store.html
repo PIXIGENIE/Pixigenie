@@ -576,13 +576,53 @@
                     const isVIP = shopData.isVerified || (totalOrders >= 50 && totalFollowers >= 100) || ownerEmail === 'netajijhadustore@gmail.com';
 
                                      if (isVIP) {
-                        // ✨ CLEAN INSTAGRAM-STYLE VERIFIED BADGE ✨
-                        const verifiedBadgeHtml = `
-                        <div class="inline-flex items-center justify-center ml-1 -translate-y-[1px]" title="Verified Store">
-                            <div class="w-[15px] h-[15px] sm:w-[17px] sm:h-[17px] bg-[#0095F6] rounded-full flex items-center justify-center">
-                                <i class="fas fa-check text-white text-[8px] sm:text-[9px] font-black mt-[0.5px]"></i>
-                            </div>
-                        </div>`;
+                                          // ✨ GLOWING CROWN WITH MODERN INLINE TOOLTIP (NO CHEAP ALERTS) ✨
+        const verifiedBadgeHtml = `
+        <style>
+            /* 🌟 Sirf Crown ke chamakne ka animation */
+            @keyframes crownShine {
+                0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); }
+                50% { filter: drop-shadow(0 0 7px rgba(255, 215, 0, 1)); }
+            }
+            .animate-crown { animation: crownShine 2s infinite ease-in-out; }
+        </style>
+        
+        <!-- 'group' class lagai hai taaki hover/click par tooltip dikhe. 'tabindex="0"' se mobile par tap kaam karega -->
+        <span class="group inline-flex items-center justify-center ml-1.5 relative top-[3px] cursor-pointer outline-none" tabindex="0">
+            
+            <svg class="w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Clean Deep Black Circle -->
+                <circle cx="12" cy="12" r="12" fill="#111827"></circle>
+                
+                <!-- 👑 VIP Crown (Sirf Glow Animation Ke Sath) -->
+                <path class="animate-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="url(#pureGold)"></path>
+                
+                <!-- Pure 24K Gold Gradient -->
+                <defs>
+                    <linearGradient id="pureGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#FFF700"></stop>
+                        <stop offset="50%" stop-color="#FFD700"></stop>
+                        <stop offset="100%" stop-color="#FFAA00"></stop>
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <!-- ✨ Premium CSS Tooltip (Badge ke theek niche) ✨ -->
+            <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2.5 py-1 bg-[#111827] text-[#FFD700] text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-lg">
+                Verified
+                <!-- Tooltip ke upar ka chhota sa triangle -->
+                <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-[#111827]"></span>
+            </span>
+        </span>`;
+
+
+
+
+
+
+
+
+
 
                         // Dukaan ke naam ke aage tick laga do
                         document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${verifiedBadgeHtml}`;
