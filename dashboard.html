@@ -2320,18 +2320,118 @@
             }
         }
 
-        async function shareStoreLink() {
-            let u = window.location.origin + window.location.pathname.replace("dashboard.html", "store.html");
-            if (window.location.protocol === 'file:') u = "https://pixigenie.com/store.html"; 
-            const sU = u + "?shop=" + currentShopId;
+                         // ==========================================
+        // 🚀 iOS PREMIUM SHARE & QR CODE LOGIC (URL & ENCODING FIXED)
+        // ==========================================
+        let shareQrInstance = null;
+        let currentStoreUrlToShare = "";
+
+        function shareStoreLink() {
+            // ✨ FIX 1: GUARANTEED .html URL ✨
+            let u = window.location.href.split('?')[0]; // Pura URL le lo
+            u = u.replace("dashboard.html", "store.html"); // dashboard ko store se badal do
+            
+            // Agar local phone me test kar raha hai, toh GitHub pages ka asil link bana do
+            if (u.startsWith("file://")) {
+                u = "https://pixigenie.github.io/Pixigenie/store.html"; 
+            }
+            
+            currentStoreUrlToShare = u + "?shop=" + currentShopId;
+            
+            // Name aur URL text set karna
             const sN = document.getElementById('store-name-display').innerText;
-            if (navigator.share && window.location.protocol !== 'file:') {
-                try { await navigator.share({ title: `${sN} on Pixigenie`, text: `Check out our products and order directly online! 🛍️✨\nVisit our store here:`, url: sU }); } catch (err) {}
-            } else {
-                const t = `Store Link Copied! 🎉\n\nShare this link to get orders:\n${sU}`;
-                if(navigator.clipboard) { navigator.clipboard.writeText(sU).then(()=>alert(t)).catch(()=>alert(t)); } else { alert(t); }
+            document.getElementById('share-shop-name').innerText = sN;
+            
+            // UI me dikhane ke liye clean URL
+            let displayUrl = currentStoreUrlToShare.replace(/^https?:\/\//, '');
+            document.getElementById('share-store-url').innerText = displayUrl;
+
+            // QR Code Generate karna
+            const qrContainer = document.getElementById('share-qr-code');
+            qrContainer.innerHTML = ""; 
+            
+            shareQrInstance = new QRCode(qrContainer, {
+                text: currentStoreUrlToShare,
+                width: 160,
+                height: 160,
+                colorDark : "#111827",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            // iOS Modal Open karna
+            const modal = document.getElementById('ios-share-modal');
+            const card = document.getElementById('ios-share-card');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('translate-y-full', 'sm:scale-95');
+            }, 10);
+            
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeShareModal() {
+            const modal = document.getElementById('ios-share-modal');
+            const card = document.getElementById('ios-share-card');
+            
+            modal.classList.add('opacity-0');
+            card.classList.add('translate-y-full', 'sm:scale-95');
+            
+            setTimeout(() => { 
+                modal.classList.add('hidden'); 
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        function copyStoreLink() {
+            if(navigator.clipboard) { 
+                navigator.clipboard.writeText(currentStoreUrlToShare).then(() => {
+                    iosAlert("Link Copied!", "Store link copied to clipboard. Paste it anywhere to share.");
+                }); 
+            } else { 
+                prompt("Copy this link manually:", currentStoreUrlToShare);
             }
         }
+
+        // ✨ FIX 2: NO EMOJIS, CLEAN TEXT (Taaki editor corrupt na kare) ✨
+        function shareToWhatsApp() {
+            const sN = document.getElementById('store-name-display').innerText;
+            
+            // Clean, bold, and professional message without emojis
+            const msg = `*${sN} is now ONLINE!*\n\nHello! We are excited to announce that our digital store is live. You can now browse our catalog and place orders directly from your smartphone.\n\n-> *Visit our store here:*\n${currentStoreUrlToShare}\n\nThank you for supporting our business!`;
+            
+            const encodedMsg = encodeURIComponent(msg);
+            window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
+        }
+
+        // ✨ FIX 3: NATIVE SYSTEM SHARE ✨
+        async function nativeSystemShare() {
+            const sN = document.getElementById('store-name-display').innerText;
+            
+            if (window.location.protocol === 'file:') {
+                 iosAlert("Testing Locally!", "Bhai, 'More Options' (System Share) sirf live site (HTTPS) par chalta hai. Local testing me ye sirf link copy karega.");
+                 copyStoreLink(); 
+                 return;
+            }
+
+            if (navigator.share) {
+                try { 
+                    await navigator.share({ 
+                        title: `${sN} Online Store`, 
+                        text: `Check out our products and order directly online! Visit our store here:`, 
+                        url: currentStoreUrlToShare 
+                    }); 
+                } catch (err) {
+                    console.log("Share dialogue closed.");
+                }
+            } else {
+                copyStoreLink(); 
+            }
+        }
+
+
 
         function logout() { 
             if(confirm("Log out?")) { 
@@ -7369,6 +7469,63 @@ td.mono {
     }
 
     </script>
+    <!-- ✨ iOS STYLE PREMIUM SHARE MODAL (WITH QR CODE) ✨ -->
+    <div id="ios-share-modal" class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-md transition-opacity duration-300 opacity-0" onclick="closeShareModal()">
+        <!-- Bottom Sheet on Mobile, Centered Card on Desktop -->
+        <div id="ios-share-card" onclick="event.stopPropagation()" class="bg-[#F2F2F7] w-full sm:w-[380px] rounded-t-[24px] sm:rounded-[24px] shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 overflow-hidden flex flex-col pb-8 sm:pb-4">
+            
+            <!-- Mobile Handle -->
+            <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-3 sm:hidden"></div>
+
+            <!-- Header -->
+            <div class="px-5 pt-4 pb-2 flex justify-between items-center relative">
+                <h3 class="text-[17px] font-semibold text-black mx-auto tracking-tight">Share Store</h3>
+                <button onclick="closeShareModal()" class="absolute right-4 w-7 h-7 bg-gray-200/80 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-300 transition active:scale-95">
+                    <i class="fas fa-times text-[13px]"></i>
+                </button>
+            </div>
+
+            <!-- QR Code Section -->
+            <div class="px-6 py-4 flex flex-col items-center">
+                <div class="bg-white p-4 rounded-[24px] shadow-sm border border-gray-100 mb-4 flex items-center justify-center">
+                    <div id="share-qr-code" class="w-40 h-40 flex items-center justify-center"></div>
+                </div>
+                <h4 id="share-shop-name" class="text-[17px] font-bold text-black tracking-tight mb-1">Store Name</h4>
+                <p class="text-[13px] text-gray-500 font-medium">Scan QR to visit the digital store</p>
+            </div>
+
+            <!-- Link Box -->
+            <div class="px-5 mb-6">
+                <div class="bg-white border border-gray-200/80 rounded-[16px] p-1.5 flex items-center shadow-sm">
+                    <div class="flex-1 overflow-hidden px-3">
+                        <p id="share-store-url" class="text-[14px] text-[#007AFF] font-medium truncate select-all">pixigenie.com/store...</p>
+                    </div>
+                    <button onclick="copyStoreLink()" class="bg-[#007AFF]/10 text-[#007AFF] px-4 py-2 rounded-[12px] font-semibold text-[13px] hover:bg-[#007AFF]/20 transition active:scale-95 shrink-0 flex gap-1.5 items-center">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Share Actions -->
+            <div class="px-6 pb-2 flex justify-center gap-6">
+                <!-- WhatsApp Share -->
+                <button onclick="shareToWhatsApp()" class="flex flex-col items-center gap-2 group">
+                    <div class="w-16 h-16 bg-white rounded-[18px] flex items-center justify-center shadow-sm border border-gray-100 group-hover:scale-105 group-active:scale-95 transition-all">
+                        <i class="fab fa-whatsapp text-[32px] text-[#25D366]"></i>
+                    </div>
+                    <span class="text-[11px] font-semibold text-gray-600">WhatsApp</span>
+                </button>
+
+                <!-- Native System Share (More) -->
+                <button onclick="nativeSystemShare()" class="flex flex-col items-center gap-2 group">
+                    <div class="w-16 h-16 bg-white rounded-[18px] flex items-center justify-center shadow-sm border border-gray-100 group-hover:scale-105 group-active:scale-95 transition-all">
+                        <i class="fas fa-external-link-alt text-[24px] text-gray-700"></i>
+                    </div>
+                    <span class="text-[11px] font-semibold text-gray-600">More Options</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
