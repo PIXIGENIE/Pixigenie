@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin | Pixigenie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        // AAPKA FIREBASE CONFIG YAHAN AAYEGA
+        const firebaseConfig = {
+          apiKey: "AIzaSyAdJsThwv9E7zp6Mff4XUCm6hVNQCYCLyo",
+          authDomain: "pixigenie-ee9f5.firebaseapp.com",
+          projectId: "pixigenie-ee9f5",
+          storageBucket: "pixigenie-ee9f5.firebasestorage.app",
+          messagingSenderId: "727128884439",
+          appId: "1:727128884439:web:8a521d0308347ddcccdc92",
+          measurementId: "G-QTBJS03LTF"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+    </script>
+
+    <style>
+        body { background-color: #F3F4F6; }
+        .glass-card { background: white; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 24px; }
+        .ios-input { background: #F7F7F9; border-radius: 12px; height: 48px; border: 1px solid transparent; transition: 0.3s; padding: 0 16px; width: 100%; outline: none; }
+        .ios-input:focus { background: white; border-color: #A855F7; }
+    </style>
+</head>
+<body class="font-sans text-gray-800 pb-10">
+
+    <!-- Header -->
+    <header class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-md">
+        <h1 class="text-lg font-black tracking-widest uppercase flex items-center gap-2">
+            <i class="fas fa-chess-king text-yellow-400 text-xl"></i> Super Admin
+        </h1>
+        <button onclick="logoutAdmin()" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-bold transition">Logout</button>
+    </header>
+
+    <main class="max-w-4xl mx-auto mt-8 px-4 space-y-6">
+
+        <!-- 1. LIVE STATS -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="glass-card flex items-center gap-4 border border-gray-100">
+                <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-store"></i></div>
+                <div><p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-1">Total Shops</p><h3 id="stat-total-shops" class="text-3xl font-black text-gray-900">0</h3></div>
+            </div>
+            <div class="glass-card flex items-center gap-4 border border-gray-100">
+                <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-users"></i></div>
+                <div><p class="text-xs text-gray-500 font-bold uppercase tracking-widest mb-1">Total Customers</p><h3 id="stat-total-customers" class="text-3xl font-black text-gray-900">0</h3></div>
+            </div>
+        </div>
+
+        <!-- 2. ASSIGN VIP PLAN -->
+        <div class="glass-card border border-purple-100 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-purple-100 rounded-full blur-3xl -z-10"></div>
+            <h2 class="text-lg font-black text-gray-900 mb-1"><i class="fas fa-crown text-purple-500 mr-2"></i> Assign Plan Access</h2>
+            <p class="text-xs text-gray-500 mb-5 font-semibold">Give a shop access to Plus or Pro VIP features.</p>
+            
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input type="text" id="plan-shop-id" placeholder="Enter Shop ID (e.g. rohan-store-1234)" class="ios-input flex-1">
+                <select id="plan-select" class="ios-input sm:w-48 cursor-pointer font-bold text-gray-700">
+                    <option value="basic">Basic (Free)</option>
+                    <option value="plus">Plus (₹149)</option>
+                    <option value="pro">Pro VIP (₹299)</option>
+                </select>
+                <button id="btn-assign-plan" onclick="assignPlan()" class="bg-gray-900 hover:bg-black text-white font-bold h-12 px-6 rounded-xl transition active:scale-95 whitespace-nowrap">Assign Plan</button>
+            </div>
+        </div>
+
+        <!-- 3. SHOP CONTROL (BAN / DELETE) -->
+        <div class="glass-card border border-red-100">
+            <h2 class="text-lg font-black text-gray-900 mb-1"><i class="fas fa-shield-alt text-red-500 mr-2"></i> Shop Control Center</h2>
+            <p class="text-xs text-gray-500 mb-5 font-semibold">Search a shop to View, Ban, or Delete it.</p>
+            
+            <div class="flex gap-3 mb-5">
+                <input type="text" id="search-shop-id" placeholder="Enter Exact Shop ID or Phone Number" class="ios-input flex-1">
+                <button id="btn-search-shop" onclick="searchShop()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 px-6 rounded-xl transition active:scale-95 whitespace-nowrap">Search</button>
+            </div>
+
+            <!-- Search Result UI -->
+            <div id="shop-result-box" class="hidden bg-gray-50 rounded-2xl p-5 border border-gray-200">
+                <div class="flex justify-between items-start mb-4 border-b border-gray-200 pb-4">
+                    <div>
+                        <h3 id="res-shop-name" class="font-black text-lg text-gray-900">Store Name</h3>
+                        <p id="res-owner-info" class="text-sm font-bold text-gray-500 mt-1">Owner: Name | Phone: 0000</p>
+                        <span id="res-status-badge" class="inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest">STATUS</span>
+                    </div>
+                    <a id="res-visit-link" href="#" target="_blank" class="bg-white border border-gray-200 text-gray-700 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-gray-100 transition shadow-sm">Visit Store <i class="fas fa-external-link-alt ml-1"></i></a>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button id="btn-toggle-ban" onclick="toggleBanShop()" class="flex-1 bg-orange-100 text-orange-700 border border-orange-200 font-bold py-3 rounded-xl transition active:scale-95">Ban Shop</button>
+                    <button id="btn-delete-shop" onclick="deleteShop()" class="flex-1 bg-red-100 text-red-700 border border-red-200 font-bold py-3 rounded-xl transition active:scale-95">Delete Permanently</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JS LOGIC -->
+    <script>
+        // Security Check: Agar Admin nahi hai toh wapas bhej do
+        if (localStorage.getItem('pixigenie_super_admin') !== 'true') {
+            window.location.href = "index.html";
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardStats();
+        });
+
+        // 1. Load Total Counts
+        async function loadDashboardStats() {
+            try {
+                // Shops Count
+                const shopSnap = await db.collection('shops').get();
+                document.getElementById('stat-total-shops').innerText = shopSnap.size;
+
+                // Customers Count
+                const custSnap = await db.collection('customers').get();
+                document.getElementById('stat-total-customers').innerText = custSnap.size;
+            } catch(e) { console.error("Error loading stats:", e); }
+        }
+
+        // 2. Assign Plan Logic
+        async function assignPlan() {
+            const shopId = document.getElementById('plan-shop-id').value.trim();
+            const selectedPlan = document.getElementById('plan-select').value;
+            const btn = document.getElementById('btn-assign-plan');
+
+            if (!shopId) return alert("Please enter a Shop ID");
+            
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`; btn.disabled = true;
+
+            try {
+                const shopRef = db.collection('shops').doc(shopId);
+                const doc = await shopRef.get();
+                
+                if (!doc.exists) {
+                    alert("⚠️ Shop ID not found in database!");
+                } else {
+                    await shopRef.update({ plan: selectedPlan });
+                    alert(`✅ Plan successfully updated to '${selectedPlan.toUpperCase()}' for Shop: ${shopId}`);
+                    document.getElementById('plan-shop-id').value = '';
+                }
+            } catch (error) {
+                alert("Error updating plan: " + error.message);
+            }
+            btn.innerHTML = `Assign Plan`; btn.disabled = false;
+        }
+
+        // 3. Search Shop Logic
+        let currentSearchedShopId = null;
+        let currentShopStatus = "active";
+
+        async function searchShop() {
+            const queryText = document.getElementById('search-shop-id').value.trim();
+            const btn = document.getElementById('btn-search-shop');
+            const resultBox = document.getElementById('shop-result-box');
+            
+            if (!queryText) return alert("Please enter Shop ID or Phone");
+            
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; btn.disabled = true;
+            resultBox.classList.add('hidden');
+            currentSearchedShopId = null;
+
+            try {
+                let shopDoc = null;
+
+                // Pehle as Shop ID try karo
+                let docSnap = await db.collection('shops').doc(queryText).get();
+                if (docSnap.exists) {
+                    shopDoc = docSnap;
+                } else {
+                    // Agar nahi mila toh as Phone Number search karo
+                    const phoneSnap = await db.collection('shops').where('phone', '==', queryText).get();
+                    if (!phoneSnap.empty) {
+                        shopDoc = phoneSnap.docs[0];
+                    }
+                }
+
+                if (shopDoc) {
+                    const data = shopDoc.data();
+                    currentSearchedShopId = shopDoc.id;
+                    currentShopStatus = data.status || "active";
+
+                    document.getElementById('res-shop-name').innerText = data.shopName || "Unnamed Store";
+                    document.getElementById('res-owner-info').innerText = `Owner: ${data.ownerName || 'N/A'} | Phone: ${data.phone || 'N/A'}`;
+                    document.getElementById('res-visit-link').href = `store.html?shop=${shopDoc.id}`;
+
+                    const badge = document.getElementById('res-status-badge');
+                    const banBtn = document.getElementById('btn-toggle-ban');
+
+                    if (currentShopStatus === 'banned') {
+                        badge.innerText = "BANNED";
+                        badge.className = "inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest bg-red-100 text-red-700";
+                        banBtn.innerText = "Unban Shop";
+                        banBtn.className = "flex-1 bg-green-100 text-green-700 border border-green-200 font-bold py-3 rounded-xl transition active:scale-95";
+                    } else {
+                        badge.innerText = "ACTIVE";
+                        badge.className = "inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest bg-green-100 text-green-700";
+                        banBtn.innerText = "Ban Shop";
+                        banBtn.className = "flex-1 bg-orange-100 text-orange-700 border border-orange-200 font-bold py-3 rounded-xl transition active:scale-95";
+                    }
+
+                    resultBox.classList.remove('hidden');
+                } else {
+                    alert("❌ No shop found with this ID or Phone.");
+                }
+            } catch (error) {
+                alert("Error searching: " + error.message);
+            }
+            btn.innerHTML = `Search`; btn.disabled = false;
+        }
+
+        // 4. Ban / Unban Logic
+        async function toggleBanShop() {
+            if (!currentSearchedShopId) return;
+            
+            const isBanning = currentShopStatus !== 'banned';
+            const confirmMsg = isBanning ? "Ban this shop? They won't be able to log in or sell." : "Unban this shop? They will be restored.";
+            
+            if (!confirm(confirmMsg)) return;
+
+            const newStatus = isBanning ? "banned" : "active";
+            const btn = document.getElementById('btn-toggle-ban');
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+
+            try {
+                await db.collection('shops').doc(currentSearchedShopId).update({ status: newStatus });
+                alert(`Shop successfully ${newStatus}!`);
+                searchShop(); // Refresh UI
+            } catch (error) {
+                alert("Error: " + error.message);
+                btn.innerHTML = "Error";
+            }
+        }
+
+        // 5. Delete Shop Logic
+        async function deleteShop() {
+            if (!currentSearchedShopId) return;
+            
+            if (!confirm("🚨 WARNING: This will permanently delete the shop. Are you 100% sure?")) return;
+
+            const btn = document.getElementById('btn-delete-shop');
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+
+            try {
+                await db.collection('shops').doc(currentSearchedShopId).delete();
+                alert("🗑️ Shop deleted permanently.");
+                document.getElementById('shop-result-box').classList.add('hidden');
+                document.getElementById('search-shop-id').value = '';
+                loadDashboardStats(); // Update numbers
+            } catch (error) {
+                alert("Error deleting shop: " + error.message);
+                btn.innerHTML = "Delete Permanently";
+            }
+        }
+
+        // 6. Logout Admin
+        function logoutAdmin() {
+            localStorage.removeItem('pixigenie_super_admin');
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
