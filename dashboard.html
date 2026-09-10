@@ -1248,11 +1248,14 @@
             }
 
 
-                    // ✨ REAL-TIME LIVE ORDERS FETCHING (WITH BADGE LOGIC) ✨
+                             // ✨ REAL-TIME LIVE ORDERS FETCHING (WITH BADGE LOGIC) ✨
             if(liveOrdersUnsubscribe) liveOrdersUnsubscribe();
             liveOrdersUnsubscribe = db.collection('orders')
                 .where('shopPhone', '==', globalShopData.phone) 
+                .orderBy('createdAt', 'desc') // NAYA: Naye orders upar aayenge
+                .limit(50)                    // NAYA: Sirf aakhri 50 orders hi track honge
                 .onSnapshot(snapshot => {
+
                     let live = [];
                     let pendingCount = 0; // 🔔 Naya Order count karne ke liye
                     
@@ -7345,18 +7348,7 @@ td.mono {
         </div>
     </div>
 
-    <!-- ✨ iOS STYLE ALERT MODAL (For OK only) ✨ -->
-    <div id="ios-alert-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
-        <div id="ios-alert-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
-            <div class="p-4 pt-5 pb-4">
-                <h3 id="ios-alert-title" class="text-[17px] font-semibold text-black leading-tight mb-1">Success</h3>
-                <p id="ios-alert-message" class="text-[13px] text-black/70 leading-snug">Action completed successfully.</p>
-            </div>
-            <div class="flex border-t border-black/10">
-                <button onclick="closeIosAlert()" class="w-full py-3 text-[17px] text-[#007AFF] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">OK</button>
-            </div>
-        </div>
-    </div>
+    
     <!-- ✨ iOS STYLE UNIT PICKER (BOTTOM SHEET) ✨ -->
     <div id="ios-unit-picker" class="fixed inset-0 z-[9999] hidden flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeUnitPicker()">
         <div id="ios-unit-card" onclick="event.stopPropagation()" class="bg-[#F2F2F7] w-full sm:w-[320px] rounded-t-[20px] sm:rounded-[20px] shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 overflow-hidden flex flex-col max-h-[80vh]">
