@@ -161,6 +161,9 @@
             <div class="col-span-full text-center py-12 grid-item">
 <i class="fas fa-circle-notch fa-spin text-2xl text-gray-400"></i><p class="text-xs text-gray-500 font-bold mt-2">Loading catalog...</p></div>
         </section>
+<button id="load-more-products-btn" onclick="loadMoreProducts()" class="w-full mt-6 max-w-sm mx-auto block bg-purple-50 text-purple-600 border border-purple-100 font-bold py-3.5 rounded-[16px] text-sm transition hidden active:scale-95">
+    Load More Products <i class="fas fa-arrow-down ml-1"></i>
+</button>
 
         <!-- Thick Divider -->
         <div class="w-full h-2 bg-[#F7F7F9]"></div>
@@ -357,6 +360,8 @@
         let fullDesc = "";
         let isDescExpanded = false;
         let isFollowing = false;
+let lastProductDoc = null;
+let hasMoreProducts = true;
 
         let userRating = 0;
         let currentUserReviewText = ""; 
@@ -566,38 +571,59 @@
                         }
                       } catch(e) {}
 
-                    // ✨✨ AUTO VERIFY BADGE LOGIC (CRITERIA + LIFETIME VIP) ✨✨
-                    let totalOrders = 0;
-                    let totalFollowers = 0;
-                    if(document.getElementById('stat-orders')) totalOrders = parseInt(document.getElementById('stat-orders').innerText) || 0;
-                    if(document.getElementById('stat-followers')) totalFollowers = parseInt(document.getElementById('stat-followers').innerText) || 0;
-                    
-                    const ownerEmail = localStorage.getItem('pixigenie_user_email') || shopData.email || "";
-                    const isVIP = shopData.isVerified || (totalOrders >= 50 && totalFollowers >= 100) || ownerEmail === 'netajijhadustore@gmail.com';
+                   // ✨✨ AUTO VERIFY BADGE LOGIC (CRITERIA + LIFETIME VIP) ✨✨
+let totalOrders = 0;
+let totalFollowers = 0;
+if(document.getElementById('stat-orders')) totalOrders = parseInt(document.getElementById('stat-orders').innerText) || 0;
+if(document.getElementById('stat-followers')) totalFollowers = parseInt(document.getElementById('stat-followers').innerText) || 0;
 
-                                     if (isVIP) {
-                                          // ✨ GLOWING CROWN WITH MODERN INLINE TOOLTIP (NO CHEAP ALERTS) ✨
-        const verifiedBadgeHtml = `
+const ownerEmail = localStorage.getItem('pixigenie_user_email') || shopData.email || "";
+const isVIP = shopData.isVerified || (totalOrders >= 50 && totalFollowers >= 100) || ownerEmail === 'netajijhadustore@gmail.com';
+
+if (isVIP) {
+    let finalBadgeHtml = "";
+
+    // 👇 LOGIC 1: Agar dukaandar ka plan 'Plus' hai toh naya "Lite Badge" dikhao
+    if (shopData.plan === 'plus') {
+        finalBadgeHtml = `
         <style>
-            /* 🌟 Sirf Crown ke chamakne ka animation */
+            @keyframes liteCrownShine {
+                0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5)); }
+                50% { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1)); }
+            }
+            .animate-lite-crown { animation: liteCrownShine 2s infinite ease-in-out; }
+        </style>
+        <span class="group inline-flex items-center justify-center ml-1.5 relative top-[3px] cursor-pointer outline-none" tabindex="0">
+            <svg class="w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="litePinkPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#A855F7"></stop>
+                        <stop offset="100%" stop-color="#EC4899"></stop>
+                    </linearGradient>
+                </defs>
+                <circle cx="12" cy="12" r="12" fill="url(#litePinkPurple)"></circle>
+                <path class="animate-lite-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="#FFFFFF"></path>
+            </svg>
+            <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2.5 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-lg">
+                Verified Lite
+                <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-purple-500"></span>
+            </span>
+        </span>`;
+    } 
+    // 👇 LOGIC 2: Warna default original "Gold Badge" (Pro VIP walo ke liye) dikhao
+    else {
+        finalBadgeHtml = `
+        <style>
             @keyframes crownShine {
                 0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); }
                 50% { filter: drop-shadow(0 0 7px rgba(255, 215, 0, 1)); }
             }
             .animate-crown { animation: crownShine 2s infinite ease-in-out; }
         </style>
-        
-        <!-- 'group' class lagai hai taaki hover/click par tooltip dikhe. 'tabindex="0"' se mobile par tap kaam karega -->
         <span class="group inline-flex items-center justify-center ml-1.5 relative top-[3px] cursor-pointer outline-none" tabindex="0">
-            
             <svg class="w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Clean Deep Black Circle -->
                 <circle cx="12" cy="12" r="12" fill="#111827"></circle>
-                
-                <!-- 👑 VIP Crown (Sirf Glow Animation Ke Sath) -->
                 <path class="animate-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="url(#pureGold)"></path>
-                
-                <!-- Pure 24K Gold Gradient -->
                 <defs>
                     <linearGradient id="pureGold" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stop-color="#FFF700"></stop>
@@ -606,27 +632,17 @@
                     </linearGradient>
                 </defs>
             </svg>
-
-            <!-- ✨ Premium CSS Tooltip (Badge ke theek niche) ✨ -->
             <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2.5 py-1 bg-[#111827] text-[#FFD700] text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-lg">
                 Verified
-                <!-- Tooltip ke upar ka chhota sa triangle -->
                 <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-[#111827]"></span>
             </span>
         </span>`;
+    }
 
+    // Dukaan ke naam ke aage sahi wala tick laga do
+    document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${finalBadgeHtml}`;
+}
 
-
-
-
-
-
-
-
-
-                        // Dukaan ke naam ke aage tick laga do
-                        document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${verifiedBadgeHtml}`;
-                    }
 
 
 
@@ -636,71 +652,56 @@
                     return;
                 }
 
-                                                  const productsSnap = await db.collection('shops').doc(currentShopId).collection('products').orderBy('timestamp', 'desc').get();
-                const grid = document.getElementById('products-grid');
-                
-                // ✨ FIX: shopData out of scope tha, ab safely DOM se check kar rahe hain ✨
-                const badgeEl = document.getElementById('premium-biz-badge');
-                const isServiceProvider = badgeEl && badgeEl.innerText.includes('SERVICES');
-                
-                if (isServiceProvider) {
-                    const searchInput = document.getElementById('store-product-search');
-                    if (searchInput) {
-                        searchInput.placeholder = "Search services...";
-                        const heading = searchInput.parentElement.previousElementSibling;
-                        if (heading && heading.tagName === 'H3') heading.innerText = "Services";
-                    }
-                }
-                
-                     if (productsSnap.empty) {
-                    // ✨ NAYA: Premium Solid Circular Badge (Ekdum Clear Wrench & Screwdriver) ✨
-                    const emptyIcon = isServiceProvider 
-                        ? `<div class="w-24 h-24 bg-gradient-to-br from-[#F7F7F9] to-[#F3F4F6] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#E5E7EB] shadow-inner">
-                               <i class="fas fa-tools text-[40px] text-[#D1D5DB] drop-shadow-sm"></i>
-                           </div>`
-                        : `<div class="w-24 h-24 bg-gradient-to-br from-[#F7F7F9] to-[#F3F4F6] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#E5E7EB] shadow-inner">
-                               <i class="fas fa-box-open text-[40px] text-[#D1D5DB] drop-shadow-sm"></i>
-                           </div>`;
-                        
-                    const emptyText = isServiceProvider ? 'No services available.' : 'No products available.';
-                    
-                    grid.innerHTML = `<div class="col-span-2 text-center py-16 grid-item flex flex-col items-center justify-center">
-                        ${emptyIcon}
-                        <p class="text-[13px] text-gray-400 font-bold tracking-wide">${emptyText}</p>
-                    </div>`;
-                    return;
-                }
+                                                  // Purana .get() hata kar .limit(12) lagao
+const productsSnap = await db.collection('shops').doc(currentShopId).collection('products').orderBy('timestamp', 'desc').limit(12).get();
+const grid = document.getElementById('products-grid');
+const loadMoreBtn = document.getElementById('load-more-products-btn');
 
+// Baki ka tumhara purana empty/Service check waisa hi rahega...
+if (productsSnap.empty) {
+    // ... tumhara purana empty icon wala code ...
+    if(loadMoreBtn) loadMoreBtn.classList.add('hidden');
+    return;
+}
 
-                let html = '';
-                productsSnap.forEach(doc => {
-                    const product = doc.data();
-                    const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
-                    const unit = product.unit || 'pcs';
-                    html += `
-                    <div class="grid-item p-4 flex flex-col active:bg-gray-50 transition">
-                        <div class="w-full aspect-square bg-gray-50 rounded-[14px] mb-3 flex items-center justify-center overflow-hidden relative">
-                            ${product.image ? `<img src="${product.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-3xl text-gray-200"></i>`}
-                            <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-700 shadow-sm">${qtySize} ${unit}</div>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="text-gray-900 font-semibold text-[13px] leading-tight line-clamp-2">${product.name}</h4>
-                            <p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>
-                        </div>
-                        <div class="flex flex-col gap-2 w-full mt-3">
-                            <div class="flex gap-2 w-full">
-                                <button onclick="addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
-                                    <i class="fas fa-cart-plus text-sm"></i> Cart
-                                </button>
-                                <!-- ✨ DIRECT ORDER BUTTON RESTORED ✨ -->
-                                <button onclick="openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
-                                    Order Now
-                                </button>
-                            </div>
-                        </div>
-                    </div>`;
-                });
-                grid.innerHTML = html;
+// Pagination setup
+lastProductDoc = productsSnap.docs[productsSnap.docs.length - 1];
+if (productsSnap.docs.length < 12) {
+    hasMoreProducts = false;
+    if(loadMoreBtn) loadMoreBtn.classList.add('hidden');
+} else {
+    hasMoreProducts = true;
+    if(loadMoreBtn) loadMoreBtn.classList.remove('hidden');
+}
+
+let html = '';
+productsSnap.forEach(doc => {
+    const product = doc.data();
+    const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
+    const unit = product.unit || 'pcs';
+    html += `
+    <div class="grid-item p-4 flex flex-col active:bg-gray-50 transition">
+        <div class="w-full aspect-square bg-gray-50 rounded-[14px] mb-3 flex items-center justify-center overflow-hidden relative">
+            ${product.image ? `<img src="${product.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-3xl text-gray-200"></i>`}
+            <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-700 shadow-sm">${qtySize} ${unit}</div>
+        </div>
+        <div class="flex-1">
+            <h4 class="text-gray-900 font-semibold text-[13px] leading-tight line-clamp-2">${product.name}</h4>
+            <p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>
+        </div>
+        <div class="flex flex-col gap-2 w-full mt-3">
+            <div class="flex gap-2 w-full">
+                <button onclick="addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
+                    <i class="fas fa-cart-plus text-sm"></i> Cart
+                </button>
+                <button onclick="openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
+                    Order Now
+                </button>
+            </div>
+        </div>
+    </div>`;
+});
+grid.innerHTML = html;
 
             } catch(e) { 
                 document.getElementById('products-grid').innerHTML = `<p class="col-span-2 text-center py-10 text-red-500 font-bold">Error loading store data.</p>`;
@@ -1548,6 +1549,65 @@
             
             closeMapPicker();
         }
+async function loadMoreProducts() {
+    if (!hasMoreProducts || !currentShopId) return;
+    const btn = document.getElementById('load-more-products-btn');
+    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Loading...`;
+    
+    try {
+        const snap = await db.collection('shops').doc(currentShopId).collection('products')
+                             .orderBy('timestamp', 'desc')
+                             .startAfter(lastProductDoc)
+                             .limit(12).get();
+                             
+        if (snap.empty) {
+            hasMoreProducts = false;
+            btn.classList.add('hidden');
+            return;
+        }
+        
+        lastProductDoc = snap.docs[snap.docs.length - 1];
+        if (snap.docs.length < 12) {
+            hasMoreProducts = false;
+            btn.classList.add('hidden');
+        } else {
+            btn.innerHTML = `Load More Products <i class="fas fa-arrow-down ml-1"></i>`;
+        }
+        
+        let html = '';
+        snap.forEach(doc => {
+            const product = doc.data();
+            const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
+            const unit = product.unit || 'pcs';
+            html += `
+            <div class="grid-item p-4 flex flex-col active:bg-gray-50 transition">
+                <div class="w-full aspect-square bg-gray-50 rounded-[14px] mb-3 flex items-center justify-center overflow-hidden relative">
+                    ${product.image ? `<img src="${product.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-3xl text-gray-200"></i>`}
+                    <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-700 shadow-sm">${qtySize} ${unit}</div>
+                </div>
+                <div class="flex-1">
+                    <h4 class="text-gray-900 font-semibold text-[13px] leading-tight line-clamp-2">${product.name}</h4>
+                    <p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>
+                </div>
+                <div class="flex flex-col gap-2 w-full mt-3">
+                    <div class="flex gap-2 w-full">
+                        <button onclick="addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
+                            <i class="fas fa-cart-plus text-sm"></i> Cart
+                        </button>
+                        <button onclick="openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
+                            Order Now
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        });
+        
+        document.getElementById('products-grid').insertAdjacentHTML('beforeend', html);
+    } catch (e) {
+        console.error("Error loading more products:", e);
+        btn.innerHTML = `Load More Products <i class="fas fa-arrow-down ml-1"></i>`;
+    }
+}
 
 
     </script>
