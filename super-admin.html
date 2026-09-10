@@ -64,7 +64,8 @@
             <p class="text-xs text-gray-500 mb-5 font-semibold">Give a shop access to Plus or Pro VIP features.</p>
             
             <div class="flex flex-col sm:flex-row gap-3">
-                <input type="text" id="plan-shop-id" placeholder="Enter Shop ID (e.g. rohan-store-1234)" class="ios-input flex-1">
+           <input type="email" id="plan-shop-id" placeholder="Enter Shop Email ID" class="ios-input flex-1">
+
                 <select id="plan-select" class="ios-input sm:w-48 cursor-pointer font-bold text-gray-700">
                     <option value="basic">Basic (Free)</option>
                     <option value="plus">Plus (₹149)</option>
@@ -128,32 +129,36 @@
             } catch(e) { console.error("Error loading stats:", e); }
         }
 
-        // 2. Assign Plan Logic
+               // 2. Assign Plan Logic (Email ke zariye)
         async function assignPlan() {
-            const shopId = document.getElementById('plan-shop-id').value.trim();
+            const shopEmail = document.getElementById('plan-shop-id').value.trim().toLowerCase(); // Ab Email aayega
             const selectedPlan = document.getElementById('plan-select').value;
             const btn = document.getElementById('btn-assign-plan');
 
-            if (!shopId) return alert("Please enter a Shop ID");
+            if (!shopEmail) return alert("Please enter the Shop's Email ID");
             
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`; btn.disabled = true;
 
             try {
-                const shopRef = db.collection('shops').doc(shopId);
-                const doc = await shopRef.get();
+                // Database mein Email se shop search karo
+                const shopQuery = await db.collection('shops').where('email', '==', shopEmail).get();
                 
-                if (!doc.exists) {
-                    alert("⚠️ Shop ID not found in database!");
+                if (shopQuery.empty) {
+                    alert("⚠️ Is Email ID se koi bhi shop register nahi hai!");
                 } else {
-                    await shopRef.update({ plan: selectedPlan });
-                    alert(`✅ Plan successfully updated to '${selectedPlan.toUpperCase()}' for Shop: ${shopId}`);
-                    document.getElementById('plan-shop-id').value = '';
+                    // Jo shop mili, uski asli ID nikal kar update kar do
+                    const shopDoc = shopQuery.docs[0];
+                    await db.collection('shops').doc(shopDoc.id).update({ plan: selectedPlan });
+                    
+                    alert(`✅ Plan successfully updated to '${selectedPlan.toUpperCase()}' for: ${shopEmail}`);
+                    document.getElementById('plan-shop-id').value = ''; // Input box khali kar do
                 }
             } catch (error) {
                 alert("Error updating plan: " + error.message);
             }
             btn.innerHTML = `Assign Plan`; btn.disabled = false;
         }
+
 
         // 3. Search Shop Logic
         let currentSearchedShopId = null;
