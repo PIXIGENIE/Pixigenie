@@ -1484,14 +1484,15 @@
                 </div>
             </div>`;
         }
-        // ✨ DYNAMIC VIP BADGE GENERATOR ✨
+             // ✨ DYNAMIC VIP BADGE GENERATOR ✨
         function getVIPBadge(isVerified, plan) {
             if (!isVerified) return '';
 
+            // 👇 PLUS PLAN: "Verified Plus"
             if (plan === 'plus') {
                 return `
-                <span class="group inline-flex items-center justify-center ml-1.5 relative top-[1px] cursor-pointer outline-none" tabindex="0">
-                    <svg class="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <span class="group relative inline-block ml-1.5 align-middle cursor-pointer outline-none" tabindex="0">
+                    <svg class="w-[15px] h-[15px] relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient id="litePinkPurpleList" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" stop-color="#A855F7"></stop>
@@ -1501,15 +1502,18 @@
                         <circle cx="12" cy="12" r="12" fill="url(#litePinkPurpleList)"></circle>
                         <path class="animate-lite-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="#FFFFFF"></path>
                     </svg>
-                    <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[9px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                        Verified Lite
+                    <!-- List ke hisaab se height top-[20px] set ki hai -->
+                    <span class="absolute left-1/2 -translate-x-1/2 top-[20px] px-2 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[9px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-[999] shadow-md">
+                        Verified Plus
                         <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[3px] border-transparent border-b-purple-500"></span>
                     </span>
                 </span>`;
-            } else {
+            } 
+            // 👇 PRO PLAN: "Verified Pro"
+            else {
                 return `
-                <span class="group inline-flex items-center justify-center ml-1.5 relative top-[1px] cursor-pointer outline-none" tabindex="0">
-                    <svg class="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <span class="group relative inline-block ml-1.5 align-middle cursor-pointer outline-none" tabindex="0">
+                    <svg class="w-[15px] h-[15px] relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="12" r="12" fill="#111827"></circle>
                         <path class="animate-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="url(#pureGoldList)"></path>
                         <defs>
@@ -1520,13 +1524,15 @@
                             </linearGradient>
                         </defs>
                     </svg>
-                    <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2 py-0.5 bg-[#111827] text-[#FFD700] text-[9px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                        Verified
+                    <!-- List ke hisaab se height top-[20px] set ki hai -->
+                    <span class="absolute left-1/2 -translate-x-1/2 top-[20px] px-2 py-0.5 bg-[#111827] text-[#FFD700] text-[9px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-[999] shadow-md">
+                        Verified Pro
                         <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[3px] border-transparent border-b-[#111827]"></span>
                     </span>
                 </span>`;
             }
         }
+
 
             // ==========================================
         // 🛒 CART LOGIC (Add, Render, Checkout)
@@ -2283,68 +2289,79 @@
 
 
     </script>
-    <!-- ✨ iOS STYLE CUSTOMER PROFILE MODAL ✨ -->
+        <!-- ✨ iOS STYLE CUSTOMER PROFILE MODAL (FULL SAFE CODE) ✨ -->
     <div id="ios-profile-modal" class="fixed inset-0 z-[150] hidden transition-all duration-300 opacity-0">
-        
-        <!-- 🚀 1. Background Blur -->
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="toggleProfileModal()"></div>
         
-        <!-- 🚀 2. MAGIC FIX: Pinned exactly to TOP (top-16). Ab keyboard isko hila hi nahi payega! -->
         <div class="absolute top-16 left-0 right-0 w-full max-w-md mx-auto px-4">
-            
             <div id="ios-profile-content" class="bg-white rounded-[2rem] shadow-2xl w-full max-h-[75vh] flex flex-col transform scale-90 transition-all duration-300 relative">
                 
-                <!-- Modal Header -->
+                <!-- Header -->
                 <div class="flex items-center justify-between p-5 border-b border-gray-100 shrink-0">
                     <h3 class="font-black text-gray-900 text-xl">My Account</h3>
                     <button onclick="toggleProfileModal()" class="text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90"><i class="fas fa-times"></i></button>
                 </div>
 
+                <!-- Scrollable Content Area -->
                 <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6">
                     
-                    <!-- Basic Info Card -->
-                    <div class="bg-gray-50 rounded-2xl p-4 flex items-start gap-4 border border-gray-100">
-                        <!-- Profile Image -->
-                        <label class="relative w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold cursor-pointer overflow-hidden group shrink-0 border border-indigo-200 shadow-sm mt-1">
-                            <span id="prof-initial">U</span>
-                            <img id="prof-img-preview" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
-                            <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center z-20 transition-all">
-                                <i class="fas fa-camera text-white text-[14px]"></i>
-                            </div>
-                            <input type="file" accept="image/*" class="hidden" onchange="uploadProfileImage(event)">
-                        </label>
-
-                        <div class="flex-1 min-w-0">
-                            <!-- View Mode -->
-                            <div id="prof-view-mode">
-                                <div class="flex justify-between items-start">
-                                    <h4 class="font-bold text-gray-900 text-[15px] truncate" id="prof-name">Customer Name</h4>
-                                    <button onclick="toggleProfEdit()" class="text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-[10px] uppercase font-bold active:scale-95 transition border border-blue-100 shrink-0 mt-0.5"><i class="fas fa-pen mr-1"></i> Edit</button>
+                    <!-- ✨ iOS PREMIUM PROFILE CARD ✨ -->
+                    <div class="bg-gray-50 rounded-2xl p-4 flex flex-col gap-4 border border-gray-100 shadow-sm">
+                        
+                        <!-- Top Row: Photo & Details -->
+                        <div class="flex items-center gap-4">
+                            <label class="relative w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold cursor-pointer overflow-hidden group shrink-0 border border-indigo-200 shadow-sm">
+                                <span id="prof-initial">U</span>
+                                <img id="prof-img-preview" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+                                <div class="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center z-20 transition-all">
+                                    <i class="fas fa-camera text-white text-[14px]"></i>
                                 </div>
-                                <p class="text-xs text-gray-500 font-medium mt-0.5" id="prof-phone">+91 xxxxxxxxxx</p>
-                            </div>
+                                <input type="file" accept="image/*" class="hidden" onchange="uploadProfileImage(event)">
+                            </label>
 
-                            <!-- Edit Mode -->
-                            <div id="prof-edit-mode" class="hidden flex-col gap-2 mt-1">
-                                <input type="text" id="edit-prof-name" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-blue-500" placeholder="Full Name">
-                                <div class="flex gap-2 mt-1">
-                                    <button onclick="saveProfChanges(event)" class="flex-1 bg-gray-900 text-white rounded-lg py-2 text-xs font-bold active:scale-95 transition">Save</button>
-                                    <button onclick="toggleProfEdit()" class="flex-1 bg-gray-200 text-gray-700 rounded-lg py-2 text-xs font-bold active:scale-95 transition">Cancel</button>
+                            <div class="flex-1 min-w-0">
+                                <!-- View Mode -->
+                                <div id="prof-view-mode" class="flex-1 w-full">
+                                    <div class="flex justify-between items-start mb-0.5">
+                                        <h4 class="font-bold text-gray-900 text-[16px] tracking-tight truncate" id="prof-name">Customer Name</h4>
+                                        <button onclick="toggleProfEdit()" class="text-blue-500 font-semibold text-[13px] active:opacity-50 transition shrink-0">Edit</button>
+                                    </div>
+                                    <p class="text-[13px] text-gray-500 font-medium" id="prof-phone">+91 xxxxxxxxxx</p>
+                                </div>
+
+                                <!-- Edit Mode -->
+                                <div id="prof-edit-mode" class="hidden flex-col gap-2 mt-1">
+                                    <input type="text" id="edit-prof-name" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-blue-500" placeholder="Full Name">
+                                    <div class="flex gap-2 mt-1">
+                                        <button onclick="saveProfChanges(event)" class="flex-1 bg-gray-900 text-white rounded-lg py-2 text-xs font-bold active:scale-95 transition">Save</button>
+                                        <button onclick="toggleProfEdit()" class="flex-1 bg-gray-200 text-gray-700 rounded-lg py-2 text-xs font-bold active:scale-95 transition">Cancel</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- ✨ iOS Style Plan & Validity List ✨ -->
+                        <div id="prof-plan-container" class="hidden w-full bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                            <div class="flex justify-between items-center px-4 py-3 border-b border-gray-100">
+                                <span class="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Plan</span>
+                                <div id="prof-active-plan" class="flex items-center gap-1.5 text-sm font-bold text-gray-900"></div>
+                            </div>
+                            <div class="flex justify-between items-center px-4 py-3">
+                                <span class="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Validity</span>
+                                <div id="prof-plan-validity" class="flex items-center gap-1.5 text-sm font-bold"></div>
+                            </div>
+                        </div>
+                        
                     </div>
 
-                    <!-- Dashboard Button -->
+                    <!-- Merchant Dashboard Button -->
                     <button id="prof-merchant-btn" onclick="window.location.href='dashboard.html'" class="hidden w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm mb-4 border border-indigo-100">
                         <i class="fas fa-store"></i> Merchant Dashboard
                     </button>
 
-                    <!-- Saved Delivery Section -->
+                    <!-- Saved Details Section -->
                     <div id="delivery-section-wrapper">
                         <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-map-marker-alt text-gray-400"></i> Saved Delivery Details</h4>
-                        <p class="text-[11px] text-gray-500 mb-4 font-medium leading-relaxed">Save your details here so you don't have to type them every time you order.</p>
-                        
                         <div class="space-y-3">
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
@@ -2362,31 +2379,28 @@
                             </div>
                             <div>
                                 <div class="flex justify-between items-center mb-1">
-    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Full Address</label>
-    
-    <div class="flex items-center gap-1.5">
-        <button type="button" onclick="openMapPicker('saved-address', 'saved-lat', 'saved-lng')" class="text-[10px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-purple-100 shadow-sm">
-            <i class="fas fa-map-marked-alt"></i> Map
-        </button>
-        <button type="button" onclick="fetchProfileGPS()" id="prof-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-blue-100 shadow-sm">
-            <i class="fas fa-location-crosshairs"></i> Auto
-        </button>
-    </div>
-</div>
-
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Full Address</label>
+                                    <div class="flex items-center gap-1.5">
+                                        <button type="button" onclick="openMapPicker('saved-address', 'saved-lat', 'saved-lng')" class="text-[10px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-purple-100 shadow-sm">
+                                            <i class="fas fa-map-marked-alt"></i> Map
+                                        </button>
+                                        <button type="button" onclick="fetchProfileGPS()" id="prof-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-blue-100 shadow-sm">
+                                            <i class="fas fa-location-crosshairs"></i> Auto
+                                        </button>
+                                    </div>
+                                </div>
                                 <textarea id="saved-address" placeholder="House No, Street, City..." rows="2" class="w-full px-3 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 outline-none bg-white text-sm font-semibold transition resize-none"></textarea>
-                       <input type="hidden" id="saved-lat">
-<input type="hidden" id="saved-lng">
+                                <input type="hidden" id="saved-lat">
+                                <input type="hidden" id="saved-lng">
                             </div>
-                            
-                            <button onclick="saveCustomerAddress()" id="save-addr-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3.5 rounded-xl active:scale-95 transition text-sm shadow-md mt-2 flex justify-center items-center gap-2">
+                            <button onclick="saveCustomerAddress()" id="save-addr-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3.5 rounded-xl active:scale-95 transition text-sm shadow-md mt-2">
                                 Save Details
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Modal Footer (Logout) -->
+                <!-- Footer (Logout) -->
                 <div class="p-5 border-t border-gray-100 shrink-0">
                     <button onclick="showLogoutModal()" class="w-full bg-red-50 text-red-600 hover:bg-red-100 font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition text-sm border border-red-100">
                         <i class="fas fa-sign-out-alt"></i> Logout
@@ -2398,9 +2412,10 @@
     </div>
 
 
+
     <!-- ✨ FINAL JAVASCRIPT FOR PROFILE ✨ -->
     <script>
-               // ✨ NAYA: Logout ke baad Firebase se wapas address Download karega ✨
+                                   // ✨ NAYA: PROFILE MODAL LOGIC (CLEAN & FLAT iOS STYLE) ✨
         function toggleProfileModal() {
             const modal = document.getElementById('ios-profile-modal');
             const content = document.getElementById('ios-profile-content');
@@ -2413,49 +2428,120 @@
                 const activeShop = localStorage.getItem('pixigenie_active_shop'); 
                 const isEmail = phoneStr.includes('@');
 
-                document.getElementById('prof-name').innerText = name;
+                const profNameEl = document.getElementById('prof-name');
+                if(profNameEl) profNameEl.innerText = name;
                 
                 if (activeShop) {
-                    document.getElementById('prof-merchant-btn').classList.remove('hidden');
-                    if (document.getElementById('delivery-section-wrapper')) document.getElementById('delivery-section-wrapper').classList.add('hidden');
+                    // 🏪 SHOPKEEPER LOGIC: Show Plan Box & Dashboard Button
+                    const mBtn = document.getElementById('prof-merchant-btn');
+                    if(mBtn) mBtn.classList.remove('hidden');
+                    const dWrap = document.getElementById('delivery-section-wrapper');
+                    if (dWrap) dWrap.classList.add('hidden');
+                    
+                    db.collection('shops').doc(activeShop).get().then(doc => {
+                        if(doc.exists) {
+                            const shopData = doc.data();
+                            const planContainer = document.getElementById('prof-plan-container');
+                            
+                            if (planContainer) {
+                                planContainer.classList.remove('hidden'); // Show for shopkeeper
+                                
+                                const planEl = document.getElementById('prof-active-plan');
+                                const validEl = document.getElementById('prof-plan-validity');
+                                
+                                const plan = shopData.plan || 'basic';
+                                const isVerified = shopData.isVerified || plan === 'plus' || plan === 'pro' || shopData.email === 'netajijhadustore@gmail.com' || activeShop.includes('netajijhadustore');
+                                
+                                let badge = typeof getVIPBadge === 'function' ? getVIPBadge(isVerified, plan) : ''; 
+                                
+                                if(planEl) {
+                                    if (plan === 'pro') {
+                                        planEl.innerHTML = `${badge} <span class="text-yellow-500 drop-shadow-sm font-black">Pro VIP</span>`;
+                                    } else if (plan === 'plus') {
+                                        planEl.innerHTML = `${badge} <span class="text-purple-600 drop-shadow-sm font-black">Plus</span>`;
+                                    } else {
+                                        planEl.innerHTML = `Basic <span class="line-through text-gray-400 font-medium ml-1 text-[11px]">₹99/mo</span> <span class="text-green-600 font-black ml-1 text-[10px] bg-green-50 px-2 py-0.5 rounded border border-green-200 uppercase tracking-wider">FREE</span>`;
+                                    }
+                                }
+                                
+                                if(validEl) {
+                                    if (plan === 'basic') {
+                                        validEl.innerHTML = `<i class="fas fa-infinity text-gray-400 text-[11px]"></i> Lifetime`;
+                                        validEl.className = "flex items-center gap-1.5 text-[13px] font-bold text-gray-700";
+                                    } else {
+                                        let daysLeft = 30; 
+                                        if (shopData.createdAt) {
+                                            let createdDate = shopData.createdAt.toDate ? shopData.createdAt.toDate() : new Date(shopData.createdAt);
+                                            let diff = new Date() - createdDate;
+                                            daysLeft = 30 - Math.floor(diff / (1000 * 60 * 60 * 24));
+                                        }
+                                        if(daysLeft <= 0) daysLeft = 0;
+                                        
+                                        if (daysLeft > 0) {
+                                            validEl.innerHTML = `<i class="fas fa-clock text-blue-500 text-[12px]"></i> ${daysLeft} Days Left`;
+                                            validEl.className = "flex items-center gap-1.5 text-[13px] font-bold text-blue-600";
+                                        } else {
+                                            validEl.innerHTML = `<i class="fas fa-exclamation-circle text-red-500 text-[12px]"></i> Expired`;
+                                            validEl.className = "flex items-center gap-1.5 text-[13px] font-bold text-red-600";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }).catch(e => console.log("Error fetching plan:", e));
+
                 } else {
-                    document.getElementById('prof-merchant-btn').classList.add('hidden');
-                    if (document.getElementById('delivery-section-wrapper')) document.getElementById('delivery-section-wrapper').classList.remove('hidden');
+                    // 👤 NORMAL CUSTOMER LOGIC: Hide Plan Box & Show Delivery Details
+                    const mBtn = document.getElementById('prof-merchant-btn');
+                    if(mBtn) mBtn.classList.add('hidden');
+                    const dWrap = document.getElementById('delivery-section-wrapper');
+                    if (dWrap) dWrap.classList.remove('hidden');
+                    
+                    const pCont = document.getElementById('prof-plan-container');
+                    if (pCont) pCont.classList.add('hidden'); // 👈 यह लाइन सुनिश्चित करती है कि कस्टमर को ये बॉक्स कभी ना दिखे!
                 }
 
-                document.getElementById('edit-prof-name').value = name !== 'Customer' ? name : '';
+                const editProfName = document.getElementById('edit-prof-name');
+                if(editProfName) editProfName.value = name !== 'Customer' ? name : '';
 
                 const savedImg = localStorage.getItem('pixigenie_profile_img');
                 const imgPreview = document.getElementById('prof-img-preview');
                 const initialText = document.getElementById('prof-initial');
                 
-                if (savedImg) {
+                if (savedImg && imgPreview && initialText) {
                     imgPreview.src = savedImg; imgPreview.classList.remove('hidden'); initialText.style.display = 'none';
-                } else {
+                } else if (imgPreview && initialText) {
                     imgPreview.classList.add('hidden'); initialText.style.display = 'flex';
                 }
-                document.getElementById('prof-initial').innerText = name.charAt(0).toUpperCase();
+                if(initialText) initialText.innerText = name.charAt(0).toUpperCase();
 
-                if (isEmail) { document.getElementById('prof-phone').innerText = phoneStr; } 
-                else { document.getElementById('prof-phone').innerText = phoneStr !== 'N/A' ? '+91 ' + phoneStr : 'N/A'; }
+                const profPhoneEl = document.getElementById('prof-phone');
+                if(profPhoneEl) {
+                    if (isEmail) { profPhoneEl.innerText = phoneStr; } 
+                    else { profPhoneEl.innerText = phoneStr !== 'N/A' ? '+91 ' + phoneStr : 'N/A'; }
+                }
 
-                // Local Storage se basic pre-fill
-                document.getElementById('saved-name').value = localStorage.getItem('pixigenie_saved_name') || name;
-                document.getElementById('saved-phone').value = localStorage.getItem('pixigenie_saved_phone') || (isEmail ? '' : phoneStr);
-                document.getElementById('saved-landmark').value = localStorage.getItem('pixigenie_saved_landmark') || '';
-                document.getElementById('saved-address').value = localStorage.getItem('pixigenie_saved_address') || '';
+                const sName = document.getElementById('saved-name');
+                if(sName) sName.value = localStorage.getItem('pixigenie_saved_name') || name;
+                
+                const sPhone = document.getElementById('saved-phone');
+                if(sPhone) sPhone.value = localStorage.getItem('pixigenie_saved_phone') || (isEmail ? '' : phoneStr);
+                
+                const sLand = document.getElementById('saved-landmark');
+                if(sLand) sLand.value = localStorage.getItem('pixigenie_saved_landmark') || '';
+                
+                const sAddr = document.getElementById('saved-address');
+                if(sAddr) sAddr.value = localStorage.getItem('pixigenie_saved_address') || '';
 
-                // 🚀 JADOO: Agar LocalStorage khali hai (Logout hone ki wajah se), toh Firebase se nikalo!
                 if (!localStorage.getItem('pixigenie_saved_address') && !activeShop && phoneStr !== 'N/A') {
                     db.collection('customers').doc(phoneStr).get().then(doc => {
                         if (doc.exists && doc.data().savedAddress) {
                             const d = doc.data();
-                            document.getElementById('saved-name').value = d.savedName || '';
-                            document.getElementById('saved-phone').value = d.savedPhone || '';
-                            document.getElementById('saved-landmark').value = d.savedLandmark || '';
-                            document.getElementById('saved-address').value = d.savedAddress || '';
+                            if(sName) sName.value = d.savedName || '';
+                            if(sPhone) sPhone.value = d.savedPhone || '';
+                            if(sLand) sLand.value = d.savedLandmark || '';
+                            if(sAddr) sAddr.value = d.savedAddress || '';
                             
-                            // Wapas phone ki memory me daal do taaki baar-baar load na ho
                             localStorage.setItem('pixigenie_saved_name', d.savedName || '');
                             localStorage.setItem('pixigenie_saved_phone', d.savedPhone || '');
                             localStorage.setItem('pixigenie_saved_landmark', d.savedLandmark || '');
@@ -2472,7 +2558,6 @@
                 setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300); 
             }
         }
-
 
              // ✨ NAYA 1: Focus hata diya taaki BLINK na ho ✨
         function toggleProfEdit() {
@@ -2699,81 +2784,100 @@
             
             closeMapPicker();
         }
-              // ✨ NAYA: DYNAMIC PRICING FEATURES (WITH SMART REPORT & EXCEL) ✨
+                     // ✨ NAYA: DYNAMIC PRICING FEATURES (FULL LIST RESTORED WITH CORRECT ICONS) ✨
         function updateDynamicPricing(businessType) {
             let features = { starter: '', plus: '', pro: '' };
 
             if (businessType === 'Service Provider') {
                 features.starter = `
                     <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Services Listing</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Direct WhatsApp Bookings</span></li>
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">WhatsApp Bookings Only</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
-                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-times text-gray-300 mt-1"></i> <span>No VIP Crown Badge</span></li>`;
+                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
                 features.plus = `
                     <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">App & WhatsApp Bookings</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Services</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-file-excel text-purple-500 mt-1"></i> <span>Smart Report & Excel Data</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>`;
                 features.pro = `
-                    <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus Features</span></li>
+                    <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">App & WhatsApp Bookings</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Services</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-users text-yellow-400 mt-1"></i> <span>Advanced Client CRM</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>`;
             
             } else if (businessType === 'Wholesaler') {
                 features.starter = `
                     <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Bulk Items Listing</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Receive WhatsApp Orders</span></li>
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">WhatsApp Orders Only</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
-                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-times text-gray-300 mt-1"></i> <span>No VIP Crown Badge</span></li>`;
+                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
                 features.plus = `
                     <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">Order via App & WhatsApp</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Bulk Items</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-file-excel text-purple-500 mt-1"></i> <span>Smart Report & Excel Data</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>`;
                 features.pro = `
-                   <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus Features</span></li>
+                   <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
+                   <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">Order via App & WhatsApp</span></li>
+                   <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Bulk Items</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-users text-yellow-400 mt-1"></i> <span>Advanced Retailer CRM</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>`;
             
             } else if (businessType === 'Manufacturer') {
                 features.starter = `
                     <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Catalog Items</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Receive WhatsApp Orders</span></li>
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">WhatsApp Orders Only</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
-                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-times text-gray-300 mt-1"></i> <span>No VIP Crown Badge</span></li>`;
+                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
                 features.plus = `
                    <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
+                   <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">Order via App & WhatsApp</span></li>
+                   <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Catalog Items</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-file-excel text-purple-500 mt-1"></i> <span>Smart Report & Excel Data</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>`;
                 features.pro = `
-                    <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus Features</span></li>
+                    <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">Order via App & WhatsApp</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Catalog Items</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-users text-yellow-400 mt-1"></i> <span>Advanced Vendor CRM</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>`;
             
             } else {
                 // Default Retailer (Normal Shop)
                 features.starter = `
                     <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Max 20 Products Listing</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-check-circle text-gray-400 mt-1"></i> <span>Receive WhatsApp Orders</span></li>
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-gray-400 mt-1"></i> <span class="font-bold text-gray-600">WhatsApp Orders Only</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-file-invoice text-gray-400 mt-1"></i> <span>Authorised Bill (Watermarked)</span></li>
-                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-times text-gray-300 mt-1"></i> <span>No VIP Crown Badge</span></li>`;
+                    <li class="flex items-start gap-2 text-gray-400"><i class="fas fa-users text-gray-300 mt-1"></i> <span>Basic CRM (No Reminders)</span></li>`;
                 features.plus = `
                  <li class="flex items-start gap-2"><i class="fas fa-crown text-purple-500 mt-1"></i> <span>VIP Crown Lite & Custom Bills</span></li>
+                 <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-purple-500 mt-1"></i> <span class="font-bold">Order via App & WhatsApp</span></li>
+                 <li class="flex items-start gap-2"><i class="fas fa-level-up-alt text-purple-500 mt-1"></i> <span>Rank Above Basic Shops</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-check-circle text-purple-500 mt-1"></i> <span>Up to 100 Products</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-file-excel text-purple-500 mt-1"></i> <span>Smart Report & Excel Data</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fas fa-robot text-purple-500 mt-1"></i> <span>AI 'Explain My Report'</span></li>
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-purple-500 mt-1"></i> <span class="font-bold">1-Click Payment Reminders</span></li>`;
                 features.pro = `
-                    <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus Features</span></li>
+                    <li class="flex items-start gap-2 text-white font-bold"><i class="fas fa-crown text-yellow-400 mt-1"></i> <span>Premium Gold VIP Crown + All Plus</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-mobile-alt text-yellow-400 mt-1"></i> <span class="text-white font-bold">Order via App & WhatsApp</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Products</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fas fa-users text-yellow-400 mt-1"></i> <span>Advanced Customer CRM</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>`;
             }
 
-            // UI Update Karna
             if(document.getElementById('plan-features-starter')) document.getElementById('plan-features-starter').innerHTML = features.starter;
             if(document.getElementById('plan-features-plus')) document.getElementById('plan-features-plus').innerHTML = features.plus;
             if(document.getElementById('plan-features-pro')) document.getElementById('plan-features-pro').innerHTML = features.pro;
