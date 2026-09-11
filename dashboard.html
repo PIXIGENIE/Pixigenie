@@ -525,14 +525,25 @@
                                 </div>
                                 
                                 <form onsubmit="addProduct(event)" class="flex flex-col gap-3 mb-8 bg-[#F7F7F9] p-4 rounded-[20px] border border-[#E5E7EB]">
-                                    <div class="flex flex-col sm:flex-row gap-3">
-                                        <input type="text" id="prod-name" placeholder="Product Name (e.g. Amul Milk)" required class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] px-4 h-11 text-sm font-semibold outline-none focus:border-[#A855F7] transition">
-                                        <div class="flex items-center bg-white border border-[#E5E7EB] rounded-[12px] px-3 h-11 focus-within:border-[#A855F7] transition">
-                                            <span class="text-[#6B7280] font-bold mr-1 border-r border-[#E5E7EB] pr-2">₹</span>
-                                            <input type="number" id="prod-price" placeholder="Price" required class="w-full sm:w-24 bg-transparent text-sm font-semibold outline-none">
+                                                                        
+                                        
+                                        <!-- ✨ NAYA: MRP & SELLING PRICE ✨ -->
+                                                              <div class="flex flex-col gap-3">
+                                        <input type="text" id="prod-name" placeholder="Product Name (e.g. Amul Milk)" required class="w-full bg-white border border-[#E5E7EB] rounded-[12px] px-4 h-11 text-sm font-semibold outline-none focus:border-[#A855F7] transition">
+                                        
+                                        <!-- ✨ NAYA: MRP & SELLING PRICE ✨ -->
+                                        <div class="flex flex-row gap-3">
+                                            <div class="flex-1 flex items-center bg-white border border-[#E5E7EB] rounded-[12px] px-3 h-11 focus-within:border-[#A855F7] transition">
+                                                <span class="text-[#9CA3AF] font-bold mr-1 border-r border-[#E5E7EB] pr-2 line-through">₹</span>
+                                                <input type="number" id="prod-mrp" placeholder="MRP (Max Price)" required class="w-full bg-transparent text-sm font-semibold outline-none text-[#6B7280]">
+                                            </div>
+                                            <div class="flex-1 flex items-center bg-white border border-[#E5E7EB] rounded-[12px] px-3 h-11 focus-within:border-[#16A34A] transition shadow-sm">
+                                                <span class="text-[#16A34A] font-bold mr-1 border-r border-[#E5E7EB] pr-2">₹</span>
+                                                <input type="number" id="prod-price" placeholder="Selling Price" required class="w-full bg-transparent text-sm font-bold outline-none text-[#111827]">
+                                            </div>
                                         </div>
-                                    
                                     </div>
+
                                     <!-- ✨ NAYA: Product Description Box ✨ -->
 <textarea id="prod-desc" placeholder="Product Description (Optional - e.g. 100% Original, 1 Year Warranty)" rows="2" class="w-full bg-white border border-[#E5E7EB] rounded-[12px] px-4 py-3 text-sm font-semibold outline-none focus:border-[#A855F7] transition resize-none"></textarea>
 
@@ -726,10 +737,17 @@
                 <div class="ios-input flex items-center px-4">
                     <input type="text" id="edit-prod-name" placeholder="Product Name" required class="w-full bg-transparent outline-none text-[#111827] font-semibold text-sm">
                 </div>
-                <div class="ios-input flex items-center px-4">
-                    <span class="text-[#6B7280] font-bold mr-2 pr-2 border-r border-[#E5E7EB]">₹</span>
-                    <input type="number" id="edit-prod-price" placeholder="Price" required class="w-full bg-transparent outline-none text-[#111827] font-semibold text-sm">
+                                <div class="flex gap-3">
+                    <div class="ios-input flex items-center px-4 flex-1">
+                        <span class="text-[#9CA3AF] font-bold mr-2 pr-2 border-r border-[#E5E7EB] line-through">₹</span>
+                        <input type="number" id="edit-prod-mrp" placeholder="MRP" required class="w-full bg-transparent outline-none text-[#6B7280] font-semibold text-sm">
+                    </div>
+                    <div class="ios-input flex items-center px-4 flex-1">
+                        <span class="text-[#16A34A] font-bold mr-2 pr-2 border-r border-[#E5E7EB]">₹</span>
+                        <input type="number" id="edit-prod-price" placeholder="Sale Price" required class="w-full bg-transparent outline-none text-[#111827] font-bold text-sm">
+                    </div>
                 </div>
+
                 <div class="flex gap-3">
                     <div class="ios-input flex items-center px-3 flex-1">
                         <input type="number" step="any" id="edit-prod-qty" placeholder="Quantity" required class="w-full bg-transparent outline-none text-[#111827] font-semibold text-sm">
@@ -2004,12 +2022,30 @@
             });
         }
 
-        function renderAdminProducts() {
+          function renderAdminProducts() {
             const list = document.getElementById('admin-products-list'); const cnt = document.getElementById('inventory-count'); if(!list) return; cnt.innerText = storeProducts.length;
             if (storeProducts.length === 0) { list.innerHTML = `<div class="col-span-full text-center py-6 bg-[#F7F7F9] rounded-[16px] border border-[#E5E7EB]"><p class="text-[#9CA3AF] text-sm font-semibold">No products yet.</p></div>`; return; }
             let html = '';
             storeProducts.forEach(p => {
-                let imgHtml = p.image ? `<img src="${p.image}" class="w-12 h-12 rounded-[10px] object-cover border border-[#E5E7EB] shrink-0">` : `<div class="w-12 h-12 rounded-[10px] bg-[#F7F7F9] border border-[#E5E7EB] flex items-center justify-center text-[#9CA3AF] shrink-0"><i class="fas fa-box"></i></div>`;
+                
+                // ✨ NAYA: DISCOUNT CALCULATION LOGIC ✨
+                let discountBadge = '';
+                let priceHtml = `<p class="text-[#16A34A] font-black text-sm">₹${p.price}</p>`;
+                
+                if (p.mrp && p.mrp > p.price) {
+                    let discountPercent = Math.round(((p.mrp - p.price) / p.mrp) * 100);
+                    // लाल रंग का % OFF बैज
+                    discountBadge = `<div class="absolute -top-2 -right-2 bg-[#DC2626] text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow-sm border border-white z-10">${discountPercent}% OFF</div>`;
+                    // प्राइस के बगल में कटा हुआ MRP
+                    priceHtml = `<p class="text-[#16A34A] font-black text-sm">₹${p.price}</p><p class="text-[#9CA3AF] text-[10px] font-bold line-through ml-1.5">₹${p.mrp}</p>`;
+                }
+
+                let imgHtml = `
+                <div class="relative shrink-0">
+                    ${p.image ? `<img src="${p.image}" class="w-12 h-12 rounded-[10px] object-cover border border-[#E5E7EB]">` : `<div class="w-12 h-12 rounded-[10px] bg-[#F7F7F9] border border-[#E5E7EB] flex items-center justify-center text-[#9CA3AF]"><i class="fas fa-box"></i></div>`}
+                    ${discountBadge}
+                </div>`;
+                
                 let qtyVal = p.qtySize !== undefined ? p.qtySize : (p.stock !== undefined ? p.stock : 1);
                 let qtyHtml = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-[6px] bg-[#F3E8FF] text-[#A855F7] border border-[#E9D5FF] ml-2">${qtyVal} ${p.unit||'pcs'}</span>`;
                 
@@ -2018,7 +2054,7 @@
                         ${imgHtml}
                         <div class="min-w-0">
                             <h4 class="text-[#111827] font-bold text-sm truncate">${p.name}</h4>
-                            <div class="flex items-center mt-0.5"><p class="text-[#16A34A] font-black text-sm">₹${p.price}</p>${qtyHtml}</div>
+                            <div class="flex items-center mt-0.5">${priceHtml}${qtyHtml}</div>
                         </div>
                     </div>
                     <div class="flex gap-2 shrink-0"><button onclick="openEditProductModal('${p.id}')" class="w-8 h-8 bg-[#F3E8FF] text-[#A855F7] rounded-[8px] flex items-center justify-center hover:bg-[#A855F7] hover:text-white transition shadow-sm"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteProduct('${p.id}')" class="w-8 h-8 bg-[#FEF2F2] text-[#DC2626] rounded-[8px] flex items-center justify-center hover:bg-[#DC2626] hover:text-white transition shadow-sm"><i class="fas fa-trash-alt text-xs"></i></button></div>
@@ -2026,13 +2062,21 @@
             }); list.innerHTML = html;
         }
 
-        async function addProduct(e) {
+
+            async function addProduct(e) {
             e.preventDefault(); 
             const n = document.getElementById('prod-name').value.trim(); 
+            const mrpVal = parseInt(document.getElementById('prod-mrp').value); // ✨ NAYA: MRP ki value
             const p = parseInt(document.getElementById('prod-price').value);
             const qtySize = parseFloat(document.getElementById('prod-qty').value) || 1;
             const unit = document.getElementById('prod-unit').value;
             const desc = document.getElementById('prod-desc').value.trim();
+
+            // ✨ NAYA CHECK: Selling Price kabhi MRP se zyada nahi ho sakti
+            if (p > mrpVal) {
+                showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
+                return;
+            }
 
             const btn = e.target.querySelector('button'); const orig = btn.innerHTML; 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
@@ -2040,7 +2084,8 @@
             const imgBase64 = await processImage(document.getElementById('prod-image'));
 
             try { 
-                let pd = { name: n, price: p, qtySize: qtySize, unit: unit, description: desc, image: imgBase64, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
+                // ✨ NAYA: Data save karte waqt 'mrp: mrpVal' bhi bhej diya
+                let pd = { name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: desc, image: imgBase64, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
 
                 const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
                 pd.id = doc.id; storeProducts.unshift(pd); e.target.reset(); renderAdminProducts(); 
@@ -2049,10 +2094,13 @@
             btn.innerHTML = orig; btn.disabled = false;
         }
 
-        function openEditProductModal(id) {
+            function openEditProductModal(id) {
             const p = storeProducts.find(x=>x.id===id); if(!p) return; 
+            
             document.getElementById('edit-prod-name').value = p.name; 
+            document.getElementById('edit-prod-mrp').value = p.mrp || p.price; // ✨ NAYA: MRP yahan load hoga
             document.getElementById('edit-prod-price').value = p.price; 
+
             document.getElementById('edit-prod-qty').value = p.qtySize !== undefined ? p.qtySize : (p.stock !== undefined ? p.stock : 1);
                         // ✨ Update iOS hidden input & button ✨
             const unitVal = p.unit || 'pcs';
@@ -2071,22 +2119,27 @@
 
         function closeEditProductModal() { const md = document.getElementById('edit-product-modal'); md.classList.remove('opacity-100'); setTimeout(()=>md.classList.add('hidden'),300); }
 
-        async function handleEditProduct(e) {
+                async function handleEditProduct(e) {
             e.preventDefault(); 
             const n = document.getElementById('edit-prod-name').value.trim(); 
             const updatedDesc = document.getElementById('edit-prod-desc').value.trim();
-            
-
-
+            const mrpVal = parseInt(document.getElementById('edit-prod-mrp').value); // ✨ NAYA: MRP
             const p = parseInt(document.getElementById('edit-prod-price').value); 
             const qtySize = parseFloat(document.getElementById('edit-prod-qty').value) || 1;
             const unit = document.getElementById('edit-prod-unit').value;
             const id = e.target.dataset.id;
+
+            // ✨ NAYA CHECK: Selling Price kabhi MRP se zyada nahi ho sakti
+            if (p > mrpVal) {
+                showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
+                return;
+            }
             
             const btn = e.target.querySelector('button'); const orig = btn.innerText; 
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Updating...`; btn.disabled = true;
 
-            let updateData = { name: n, price: p, qtySize: qtySize, unit: unit };
+            // ✨ NAYA: updateData me mrp aur description dono daal diye
+            let updateData = { name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: updatedDesc };
             
             const newImg = await processImage(document.getElementById('edit-prod-image'));
             if (newImg !== "") updateData.image = newImg;
@@ -2095,13 +2148,20 @@
                 await db.collection('shops').doc(currentShopId).collection('products').doc(id).update(updateData); 
                 let idx = storeProducts.findIndex(x=>x.id===id); 
                 if(idx!==-1) {
-                    storeProducts[idx].name = n; storeProducts[idx].price = p; storeProducts[idx].qtySize = qtySize; storeProducts[idx].unit = unit;
+                    storeProducts[idx].name = n; 
+                    storeProducts[idx].mrp = mrpVal; // ✨ NAYA
+                    storeProducts[idx].price = p; 
+                    storeProducts[idx].qtySize = qtySize; 
+                    storeProducts[idx].unit = unit;
+                    storeProducts[idx].description = updatedDesc; // ✨ NAYA
                     if(newImg !== "") storeProducts[idx].image = newImg;
                 } 
                 renderAdminProducts(); closeEditProductModal(); 
             } catch(e) { alert(e.message); } 
+            
             btn.innerText = orig; btn.disabled = false;
         }
+
 
         async function deleteProduct(id) { if(!confirm("Delete product?")) return; try { await db.collection('shops').doc(currentShopId).collection('products').doc(id).delete(); storeProducts = storeProducts.filter(x=>x.id!==id); renderAdminProducts(); } catch(e){} }
 
