@@ -584,7 +584,7 @@ const isVIP = shopData.isVerified || (totalOrders >= 50 && totalFollowers >= 100
 if (isVIP) {
     let finalBadgeHtml = "";
 
-    // 👇 LOGIC 1: Agar dukaandar ka plan 'Plus' hai toh naya "Lite Badge" dikhao
+    // 👇 PLUS PLAN: "Verified Plus" (Pink Badge)
     if (shopData.plan === 'plus') {
         finalBadgeHtml = `
         <style>
@@ -594,8 +594,8 @@ if (isVIP) {
             }
             .animate-lite-crown { animation: liteCrownShine 2s infinite ease-in-out; }
         </style>
-        <span class="group inline-flex items-center justify-center ml-1.5 cursor-pointer outline-none" tabindex="0">
-            <svg class="w-[17px] h-[17px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <span class="group relative inline-block ml-1.5 align-middle cursor-pointer outline-none" tabindex="0">
+            <svg class="w-[17px] h-[17px] relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="litePinkPurple" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stop-color="#A855F7"></stop>
@@ -605,13 +605,13 @@ if (isVIP) {
                 <circle cx="12" cy="12" r="12" fill="url(#litePinkPurple)"></circle>
                 <path class="animate-lite-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="#FFFFFF"></path>
             </svg>
-            <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2.5 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-lg">
-                Verified Lite
-                <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-purple-500"></span>
+            <span class="absolute left-1/2 -translate-x-1/2 top-[24px] px-2.5 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999] shadow-lg">
+                Verified Plus
+                <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-purple-500"></span>
             </span>
         </span>`;
     } 
-    // 👇 LOGIC 2: Warna default original "Gold Badge" (Pro VIP walo ke liye) dikhao
+    // 👇 PRO PLAN: "Verified Pro" (Gold Badge)
     else {
         finalBadgeHtml = `
         <style>
@@ -621,8 +621,8 @@ if (isVIP) {
             }
             .animate-crown { animation: crownShine 2s infinite ease-in-out; }
         </style>
-        <span class="group inline-flex items-center justify-center ml-1.5 cursor-pointer outline-none" tabindex="0">
-            <svg class="w-[17px] h-[17px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <span class="group relative inline-block ml-1.5 align-middle cursor-pointer outline-none" tabindex="0">
+            <svg class="w-[17px] h-[17px] relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="12" cy="12" r="12" fill="#111827"></circle>
                 <path class="animate-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="url(#pureGold)"></path>
                 <defs>
@@ -633,17 +633,15 @@ if (isVIP) {
                     </linearGradient>
                 </defs>
             </svg>
-            <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2.5 py-1 bg-[#111827] text-[#FFD700] text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 shadow-lg">
-                Verified
-                <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-4 border-transparent border-b-[#111827]"></span>
+            <span class="absolute left-1/2 -translate-x-1/2 top-[24px] px-2.5 py-1 bg-[#111827] text-[#FFD700] text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999] shadow-lg">
+                Verified Pro
+                <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-[#111827]"></span>
             </span>
         </span>`;
     }
 
-    // Dukaan ke naam ke aage sahi wala tick laga do
     document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${finalBadgeHtml}`;
 }
-
 
 
 
