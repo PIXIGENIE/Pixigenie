@@ -412,10 +412,12 @@ let hasMoreProducts = true;
                 return;
             }
 
-            try {
+                        try {
                 const shopDoc = await db.collection('shops').doc(currentShopId).get();
+                let shopData; // Variable ko bahar declare kiya
                 if (shopDoc.exists) {
-                    const shopData = shopDoc.data();
+                    shopData = shopDoc.data(); // Data assign kiya
+
                     globalShopPhone = shopData.phone;
                     globalShopName = shopData.shopName;
                     
