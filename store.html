@@ -113,7 +113,8 @@
             </div>
 
             <div class="mt-5">
-                <h2 id="profile-shop-name" class="font-black text-gray-900 text-[17px] tracking-tight">Store Name</h2>
+                <h2 id="profile-shop-name" class="font-black text-gray-900 text-[17px] tracking-tight flex items-center">Store Name</h2>
+
                 <p id="profile-owner-name" class="text-[13px] font-semibold text-gray-500">Proprietor Name</p>
                 
                                      <span id="profile-category" class="inline-block mt-2 mb-2.5 px-2.5 py-1 bg-gray-50 text-gray-600 text-[10px] font-black uppercase tracking-wider rounded-lg border border-gray-100">Category</span>
@@ -593,8 +594,8 @@ if (isVIP) {
             }
             .animate-lite-crown { animation: liteCrownShine 2s infinite ease-in-out; }
         </style>
-        <span class="group inline-flex items-center justify-center ml-1.5 relative top-[3px] cursor-pointer outline-none" tabindex="0">
-            <svg class="w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <span class="group inline-flex items-center justify-center ml-1.5 cursor-pointer outline-none" tabindex="0">
+            <svg class="w-[17px] h-[17px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="litePinkPurple" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stop-color="#A855F7"></stop>
@@ -620,8 +621,8 @@ if (isVIP) {
             }
             .animate-crown { animation: crownShine 2s infinite ease-in-out; }
         </style>
-        <span class="group inline-flex items-center justify-center ml-1.5 relative top-[3px] cursor-pointer outline-none" tabindex="0">
-            <svg class="w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <span class="group inline-flex items-center justify-center ml-1.5 cursor-pointer outline-none" tabindex="0">
+            <svg class="w-[17px] h-[17px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="12" cy="12" r="12" fill="#111827"></circle>
                 <path class="animate-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="url(#pureGold)"></path>
                 <defs>
@@ -642,6 +643,7 @@ if (isVIP) {
     // Dukaan ke naam ke aage sahi wala tick laga do
     document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${finalBadgeHtml}`;
 }
+
 
 
 
