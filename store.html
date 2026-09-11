@@ -734,27 +734,40 @@ if (isVIP) {
                     return;
                 }
 
-                                                  // Purana .get() hata kar .limit(12) lagao
-const productsSnap = await db.collection('shops').doc(currentShopId).collection('products').orderBy('timestamp', 'desc').limit(12).get();
-const grid = document.getElementById('products-grid');
-const loadMoreBtn = document.getElementById('load-more-products-btn');
+                                                                     // ==========================================
+                    // ✨ NAYA: VISIBILITY LIMIT LOGIC (PLAN BASED) ✨
+                    // ==========================================
+                    let storeMaxLimit = 20; // Default Starter Plan
+                    if (shopData.plan === 'plus') storeMaxLimit = 100;
+                    if (shopData.plan === 'pro' || shopData.email === 'netajijhadustore@gmail.com') storeMaxLimit = 500;
+                    
+                    window.storeMaxLimit = storeMaxLimit;
+                    window.currentLoadedCount = 0;
 
-// Baki ka tumhara purana empty/Service check waisa hi rahega...
-if (productsSnap.empty) {
-    // ... tumhara purana empty icon wala code ...
-    if(loadMoreBtn) loadMoreBtn.classList.add('hidden');
-    return;
-}
+                    let fetchLimit = Math.min(12, storeMaxLimit); // Ek baar me max 12, ya jo limit bachi ho
 
-// Pagination setup
-lastProductDoc = productsSnap.docs[productsSnap.docs.length - 1];
-if (productsSnap.docs.length < 12) {
-    hasMoreProducts = false;
-    if(loadMoreBtn) loadMoreBtn.classList.add('hidden');
-} else {
-    hasMoreProducts = true;
-    if(loadMoreBtn) loadMoreBtn.classList.remove('hidden');
-}
+                    const productsSnap = await db.collection('shops').doc(currentShopId).collection('products').orderBy('timestamp', 'desc').limit(fetchLimit).get();
+                    const grid = document.getElementById('products-grid');
+                    const loadMoreBtn = document.getElementById('load-more-products-btn');
+
+                    if (productsSnap.empty) {
+                        grid.innerHTML = `<p class="col-span-full text-center py-10 text-gray-500 font-bold">No products available.</p>`;
+                        if(loadMoreBtn) loadMoreBtn.classList.add('hidden');
+                        return;
+                    }
+
+                    window.currentLoadedCount += productsSnap.docs.length;
+
+                    // Pagination setup with Limit check
+                    lastProductDoc = productsSnap.docs[productsSnap.docs.length - 1];
+                    if (productsSnap.docs.length < fetchLimit || window.currentLoadedCount >= storeMaxLimit) {
+                        hasMoreProducts = false;
+                        if(loadMoreBtn) loadMoreBtn.classList.add('hidden');
+                    } else {
+                        hasMoreProducts = true;
+                        if(loadMoreBtn) loadMoreBtn.classList.remove('hidden');
+                    }
+
 
 let html = '';
 productsSnap.forEach(doc => {
