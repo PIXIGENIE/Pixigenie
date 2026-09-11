@@ -1298,46 +1298,67 @@
                     document.getElementById('store-name-display').innerText = globalShopData.shopName;
                     document.getElementById('menu-owner-name').innerText = globalShopData.ownerName;
                     
-                    // ✨ DYNAMIC UI FOR SERVICE PROVIDERS ✨
-                    if (globalShopData.businessType === 'Service Provider') {
-                        // Top tabs ka naam change
-                        const invTabs = document.querySelectorAll('button[onclick*="tab-inventory"]');
-                        invTabs.forEach(btn => btn.innerText = "Services");
-                        
-                        // Header aur List title change
-                        const tabHeader = document.querySelector('#tab-inventory h3');
-                        if(tabHeader) tabHeader.innerHTML = "Services";
-                        
-                        const listTitle = document.querySelector('#tab-inventory h4');
-                        if(listTitle) listTitle.innerText = "YOUR SERVICES";
-                        
-                        // Inputs placeholders change
-                        const pName = document.getElementById('prod-name');
-                        if(pName) pName.placeholder = "Service Name (e.g. AC Repair)";
-                        
-                        const pDesc = document.getElementById('prod-desc');
-                        if(pDesc) pDesc.placeholder = "Service Description (e.g. Deep cleaning + Gas check)";
-                        
-                        // Default unit select 'fixed fee' kar do
-                        const unitSelect = document.getElementById('prod-unit');
-                        if (unitSelect) {
-                            unitSelect.value = 'fixed';
-                            const btnDisplay = document.getElementById('prod-unit-display');
-                            if(btnDisplay) btnDisplay.innerHTML = 'fixed fee <i class="fas fa-chevron-down text-[10px] sm:text-[12px] text-gray-400"></i>';
-                        }
-                                                // ✨ NAYA: Qty Box ko hide karo aur Unit Box ko Full Width do ✨
-                        const qtyInput = document.getElementById('prod-qty');
-                        if (qtyInput) {
-                            qtyInput.style.display = 'none'; // Dabba gayab
-                            qtyInput.value = '1'; // Database ke liye default 1
-                        }
+                                   // ==========================================
+                    // ✨ NAYA: DYNAMIC TERMINOLOGY (Product vs Service) ✨
+                    // ==========================================
+                    const isService = (globalShopData.businessType === 'Service Provider');
+                    
+                    // 1. Tab Menu & Header Text
+                    document.querySelectorAll('button[onclick*="tab-inventory"]').forEach(btn => {
+                        if (isService) btn.innerHTML = btn.innerHTML.replace('Inventory', 'Services');
+                        else btn.innerHTML = btn.innerHTML.replace('Services', 'Inventory');
+                    });
+                    
+                    const tabHeader = document.querySelector('#tab-inventory h3');
+                    if(tabHeader) {
+                        if(isService) tabHeader.innerHTML = tabHeader.innerHTML.replace('Inventory', 'Services');
+                        else tabHeader.innerHTML = tabHeader.innerHTML.replace('Services', 'Inventory');
+                    }
 
-                        const unitWrapper = document.getElementById('prod-unit-display').parentElement;
-                        if (unitWrapper) {
-                            unitWrapper.classList.remove('w-1/2');
-                            unitWrapper.classList.add('w-full'); // Fixed fee wale dabbe ko bada kar diya
-                        }
+                    // 2. Search Placeholder (✨ UPDATE KIYA GAYA ✨)
+                    const invSearch = document.getElementById('inventory-search');
+                    if (invSearch) invSearch.placeholder = isService ? "Search services by name..." : "Search products by name...";
 
+                    // 3. Section Heading (YOUR PRODUCTS -> YOUR SERVICES)
+                    document.querySelectorAll('h4').forEach(h4 => {
+                        const txt = h4.innerText.toUpperCase();
+                        if (txt === 'YOUR PRODUCTS' || txt === 'YOUR SERVICES') {
+                            h4.innerText = isService ? 'YOUR SERVICES' : 'YOUR PRODUCTS';
+                        }
+                    });
+
+                    // 4. Smart Placeholders Changer (✨ NAYA LOGIC ✨)
+                    const updatePlaceholder = (id, prodText, servText) => {
+                        const el = document.getElementById(id);
+                        if (el) el.placeholder = isService ? servText : prodText;
+                    };
+
+                    // Add Form Update
+                    updatePlaceholder('prod-name', 'Product Name (e.g. Amul Milk)', 'Service Name (e.g. AC Repair)');
+                    updatePlaceholder('prod-price', 'Selling Price', 'Service Charge');
+                    updatePlaceholder('prod-mrp', 'MRP (Max Price)', 'Regular Fee');
+                    updatePlaceholder('prod-desc', 'Product Description (Optional)', 'Service Description (Optional)');
+
+                    // Edit Form Update
+                    updatePlaceholder('edit-prod-name', 'Product Name', 'Service Name');
+                    updatePlaceholder('edit-prod-price', 'Sale Price', 'Service Charge');
+                    updatePlaceholder('edit-prod-mrp', 'MRP', 'Regular Fee');
+                    updatePlaceholder('edit-prod-desc', 'Product Description (Optional)', 'Service Description (Optional)');
+
+                    // 5. Hide Qty Box & Set Default Unit to Fixed for Services
+                    const qtyInput = document.getElementById('prod-qty');
+                    const unitWrapper = document.getElementById('prod-unit-display') ? document.getElementById('prod-unit-display').parentElement : null;
+                    const unitSelect = document.getElementById('prod-unit');
+                    const btnDisplay = document.getElementById('prod-unit-display');
+
+                    if (isService) {
+                        if (qtyInput) { qtyInput.style.display = 'none'; qtyInput.value = '1'; }
+                        if (unitWrapper) { unitWrapper.classList.remove('w-1/2'); unitWrapper.classList.add('w-full'); }
+                        if (unitSelect) unitSelect.value = 'fixed';
+                        if (btnDisplay) btnDisplay.innerHTML = 'fixed fee <i class="fas fa-chevron-down text-[10px] sm:text-[12px] text-gray-400"></i>';
+                    } else {
+                        if (qtyInput) { qtyInput.style.display = 'block'; }
+                        if (unitWrapper) { unitWrapper.classList.add('w-1/2'); unitWrapper.classList.remove('w-full'); }
                     }
 
                     fetchFirebaseData(); 
