@@ -380,11 +380,16 @@
               <div class="bg-white border-b border-[#E5E7EB] px-4 py-3 flex gap-2 overflow-x-auto custom-scrollbar shrink-0">
 
                     <button onclick="switchTab('tab-dashboard', this)" class="tab-btn bg-[#111827] text-white px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition shadow-md">Dashboard</button>
-                                       <!-- ✨ NEW ORDERS TAB BUTTON (WITH BADGE) ✨ -->
-                    <button onclick="switchTab('tab-orders', this)" class="tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition relative flex items-center gap-1.5">
+                                                          <!-- ✨ NEW ORDERS TAB BUTTON (WITH PREMIUM CROWN LOCK) ✨ -->
+                    <button onclick="let btn=this; checkPremiumAndExecute(() => switchTab('tab-orders', btn))" class="relative tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition flex items-center gap-1.5">
                         Orders
                         <span id="live-orders-badge" class="hidden bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-black min-w-[18px] text-center shadow-sm">0</span>
+                        <!-- Crown Icon for Basic Users -->
+                        <div class="premium-lock-icon hidden absolute -top-1.5 -right-1 bg-white rounded-full shadow-sm p-0.5 border border-yellow-200 z-10">
+                            <i class="fas fa-crown text-yellow-500 text-[9px]"></i>
+                        </div>
                     </button>
+
 
                     <button onclick="switchTab('tab-inventory', this)" class="tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition">Inventory</button>
                     <button onclick="switchTab('tab-billing', this)" class="tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition">Billing</button>
@@ -410,36 +415,40 @@
                                     <h3 class="text-xl font-black text-[#111827] flex items-center gap-3"><div class="w-10 h-10 bg-[#E0E7FF] text-[#2563EB] rounded-[12px] flex items-center justify-center"><i class="fas fa-chart-pie"></i></div>Business Insights</h3>
                                     <input type="month" id="insight-month-picker" onchange="renderInsights(); renderAdminBills();" class="ios-input h-10 px-3 text-sm font-semibold cursor-pointer w-full sm:w-auto">
                                 </div>
-                                      <!-- Smart Report & Excel Data Buttons -->
-        <div class="grid grid-cols-2 gap-3 mb-5 mt-4">
-            <button onclick="openDownloadModal('smart')" 
-
- class="w-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
-                <i class="fas fa-file-invoice text-lg"></i> Smart Report
-            </button>
-            
-            <button onclick="openDownloadModal('excel')" 
-
- class="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
-                <i class="fas fa-file-excel text-lg"></i> Excel Data
-            </button>
-                   <!-- ✨ iOS PREMIUM AI BUTTON ✨ -->
-            <button onclick="analyzeWithAI()" class="w-full md:col-span-1 col-span-2 relative bg-white text-[#1D1D1F] font-bold py-3 rounded-[16px] text-[14px] transition-all active:scale-[0.96] flex items-center justify-center gap-3 shadow-[0_6px_24px_rgba(0,0,0,0.06)] border border-[#E5E7EB] overflow-hidden">
-                
-                <!-- Apple Style Subtle Gradient Background -->
-                <div class="absolute inset-0 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 opacity-70"></div>
-                
-                <!-- iOS Colorful Magic Icon -->
-                <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#007AFF] via-[#AF52DE] to-[#FF2D55] flex items-center justify-center shadow-sm relative z-10">
-                    <i class="fas fa-sparkles text-white text-[12px]"></i>
-                </div>
-                
-                <!-- Aasan English Text -->
-                <span class="relative z-10 tracking-wide">Explain My Report</span>
-                
-            </button>
-
-        </div>
+                                                                    <!-- Smart Report & Excel Data Buttons (WITH PREMIUM LOCKS) -->
+                                <div class="grid grid-cols-2 gap-3 mb-5 mt-4">
+                                    <button onclick="checkPremiumAndExecute(() => openDownloadModal('smart'))" class="relative w-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+                                        <i class="fas fa-file-invoice text-lg"></i> Smart Report
+                                        <!-- Crown Icon for Basic Users -->
+                                        <div class="premium-lock-icon hidden absolute -top-1.5 -right-1.5 bg-white rounded-full shadow-md p-1 border border-yellow-200">
+                                            <i class="fas fa-crown text-yellow-500 text-[10px]"></i>
+                                        </div>
+                                    </button>
+                                    
+                                    <button onclick="checkPremiumAndExecute(() => openDownloadModal('excel'))" class="relative w-full bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-100 font-bold py-3 rounded-[14px] text-xs sm:text-sm transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+                                        <i class="fas fa-file-excel text-lg"></i> Excel Data
+                                        <!-- Crown Icon for Basic Users -->
+                                        <div class="premium-lock-icon hidden absolute -top-1.5 -right-1.5 bg-white rounded-full shadow-md p-1 border border-yellow-200">
+                                            <i class="fas fa-crown text-yellow-500 text-[10px]"></i>
+                                        </div>
+                                    </button>
+                                    
+                                    <!-- ✨ iOS PREMIUM AI BUTTON ✨ -->
+                                    <button onclick="checkPremiumAndExecute(analyzeWithAI)" class="w-full md:col-span-1 col-span-2 relative bg-white text-[#1D1D1F] font-bold py-3 rounded-[16px] text-[14px] transition-all active:scale-[0.96] flex items-center justify-center gap-3 shadow-[0_6px_24px_rgba(0,0,0,0.06)] border border-[#E5E7EB] overflow-hidden">
+                                        <!-- Apple Style Subtle Gradient Background -->
+                                        <div class="absolute inset-0 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 opacity-70"></div>
+                                        <!-- iOS Colorful Magic Icon -->
+                                        <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#007AFF] via-[#AF52DE] to-[#FF2D55] flex items-center justify-center shadow-sm relative z-10">
+                                            <i class="fas fa-sparkles text-white text-[12px]"></i>
+                                        </div>
+                                        <!-- Aasan English Text -->
+                                        <span class="relative z-10 tracking-wide">Explain My Report</span>
+                                        <!-- Crown Icon for Basic Users -->
+                                        <div class="premium-lock-icon hidden absolute top-1/2 -translate-y-1/2 right-3 bg-white rounded-full shadow-md p-1.5 border border-yellow-200 z-20">
+                                            <i class="fas fa-crown text-yellow-500 text-[12px]"></i>
+                                        </div>
+                                    </button>
+                                </div>
 
 
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -796,7 +805,8 @@
                         <div id="default-invoice-watermark" class="absolute inset-0 flex items-center justify-center">
                             <span id="watermark-initials" class="text-gray-400 text-2xl font-black uppercase tracking-widest">ST</span>
                         </div>
-                        <img id="bill-store-logo" src="" crossorigin="anonymous" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+                        <img id="bill-store-logo" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+
                     </div>
                     <div class="pt-1">
                         <h1 id="print-store-name" class="text-3xl font-black tracking-tight text-gray-900 leading-none uppercase">STORE NAME</h1>
@@ -850,8 +860,8 @@
 
                  <!-- BOTTOM SECTION (Always at bottom) -->
             <div class="shrink-0 mt-auto w-full flex flex-col">
-                <!-- ✨ PREMIUM TOTALS & STATUS SECTION ✨ -->
-                <div class="mx-14 pt-8 pb-4 flex justify-between items-end border-t border-gray-200 gap-8 relative z-10">
+                          <!-- ✨ PREMIUM TOTALS & STATUS SECTION ✨ -->
+                <div class="mx-14 pt-8 pb-4 flex justify-between items-end border-t border-gray-200 relative z-10">
                     
                     <!-- Left: Minimalist Status Pill -->
                     <div class="pb-3 shrink-0">
@@ -861,8 +871,8 @@
                         </div>
                     </div>
 
-                    <!-- Right: Premium Floating Total Card -->
-                    <div class="min-w-[340px] max-w-[75%] bg-[#FCFCFD] rounded-[24px] p-7 border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] ml-auto">
+                    <!-- Right: Premium Floating Total Card (100% CANVAS SAFE FIX) -->
+                    <div class="w-[380px] shrink-0 bg-[#FCFCFD] rounded-[24px] p-7 border border-gray-100 shadow-sm">
                         <div id="receipt-breakdown" class="hidden flex-col space-y-3 border-b border-gray-200/60 pb-4 mb-4 text-sm font-bold text-gray-500">
                             <div class="flex justify-between items-center gap-8">
                                 <span>Subtotal</span>
@@ -878,12 +888,13 @@
                             </div>
                         </div>
                         
-                        <div class="flex justify-between items-end gap-6">
+                        <div class="flex justify-between items-end gap-4">
                             <span class="text-[11px] text-gray-400 font-black uppercase tracking-[0.2em] shrink-0 mb-1.5">Grand Total</span>
-                            <span class="text-[42px] font-black text-gray-900 tracking-tighter leading-none text-right break-words drop-shadow-sm" id="receipt-total">₹0.00</span>
+                            <span class="text-[40px] font-black text-gray-900 tracking-tighter leading-none text-right break-words drop-shadow-sm" id="receipt-total">₹0.00</span>
                         </div>
                     </div>
                 </div>
+
 
 
 
@@ -1149,6 +1160,14 @@
                 const doc = await db.collection('shops').doc(currentShopId).get();
                 if (doc.exists) {
                     globalShopData = doc.data();
+                                       // Check Premium and Show/Hide Crown Locks on Buttons
+                    const userPlan = globalShopData.plan || 'basic';
+                    const isUserPremium = userPlan === 'plus' || userPlan === 'pro' || globalShopData.email === 'netajijhadustore@gmail.com';
+                    document.querySelectorAll('.premium-lock-icon').forEach(icon => {
+                        if (isUserPremium) icon.classList.add('hidden');
+                        else icon.classList.remove('hidden');
+                    });
+
                     const isSetupDone = globalShopData.setupCompleted === true || (globalShopData.shopName && globalShopData.category);
 
                     if (!isSetupDone) {
@@ -2167,9 +2186,14 @@
             btn.innerText = orig; 
             btn.disabled = false;
         }
-        function viewCustomerInsights(idKey) {
+             function viewCustomerInsights(idKey) {
             const c = allCustomersMap[idKey]; if(!c) return;
             
+            // ✨ NAYA: Check Premium Status for Crown Icon directly in Modal ✨
+            const userPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
+            const isPremium = userPlan === 'plus' || userPlan === 'pro' || (typeof globalShopData !== 'undefined' && globalShopData.email === 'netajijhadustore@gmail.com');
+            const crownHtml = isPremium ? '' : `<div class="absolute top-1/2 -translate-y-1/2 right-3 bg-white rounded-full shadow-md p-1 border border-yellow-200"><i class="fas fa-crown text-yellow-500 text-[10px]"></i></div>`;
+
             let oHtml = c.orders.sort((a,b)=>b.timestamp-a.timestamp).map(o => {
                 let pS = o.payStatus || 'Unpaid';
                 let isUnpaid = !pS.includes('Paid'); // Check if bill is unpaid
@@ -2180,17 +2204,17 @@
                 if (isUnpaid && c.phone !== 'N/A') {
                     let shopN = typeof globalShopData !== 'undefined' ? globalShopData.shopName : 'Store';
                     
-                    // ✨ NAYA: Order ID hataya, Items ka naam aur Qty lagaya ✨
                     let itemsBought = o.items.map(i => `${i.qty}x ${i.name}`).join(', ');
                     
-                    // ✨ FIX: Question mark () glitch ko theek karne ke liye clean text use kiya ✨
                     let msg = `नमस्ते ${c.name} जी,\n\nबस एक छोटा सा रिमाइंडर था। आपके पिछले ऑर्डर (${itemsBought}) का ₹${o.grandTotal} का पेमेंट अभी बाकी है।\n\nऑर्डर डेट: ${o.date}\n\nजब भी टाइम मिले, कृपया ₹${o.grandTotal} का पेमेंट कर दीजिए, ताकि आपका हिसाब क्लियर हो जाए।\n\nबाकी राशि: ₹${o.grandTotal}\n\nअगर पेमेंट हो चुका है, तो इस मैसेज को इग्नोर कर दीजिए।\n\nधन्यवाद जी।\n— ${shopN}`;
                     
                     let waLink = `https://wa.me/91${c.phone}?text=${encodeURIComponent(msg)}`;
                     
+                    // ✨ PREMIUM LOCK APPLIED HERE ✨
                     reminderBtn = `
-                    <button onclick="window.open('${waLink}', '_blank')" class="mt-3 w-full bg-[#FFF7ED] hover:bg-[#FFEDD5] text-[#EA580C] border border-[#FED7AA] py-2.5 rounded-[10px] text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
+                    <button onclick="checkPremiumAndExecute(() => window.open('${waLink}', '_blank'))" class="relative mt-3 w-full bg-[#FFF7ED] hover:bg-[#FFEDD5] text-[#EA580C] border border-[#FED7AA] py-2.5 rounded-[10px] text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
                         <i class="fab fa-whatsapp text-[14px]"></i> पेमेंट रिमाइंडर भेजें (₹${o.grandTotal})
+                        ${crownHtml}
                     </button>`;
                 }
 
@@ -2211,7 +2235,7 @@
                 </div>`;
             }).join('');
             
-            // ✨ Chat & Call Buttons (Side by Side) ✨
+            // Chat & Call Buttons (Side by Side)
             let actionBtns = c.phone !== 'N/A' ? `
                 <a href="https://wa.me/91${c.phone}" target="_blank" class="bg-[#DCFCE7] hover:bg-[#BBF7D0] text-[#16A34A] px-3.5 py-1.5 rounded-[8px] text-[11px] font-bold flex items-center gap-1.5 transition">
                     <i class="fab fa-whatsapp text-[13px]"></i> Chat
@@ -2246,7 +2270,6 @@
             `;
             const md = document.getElementById('customer-insights-modal'); md.classList.remove('hidden'); setTimeout(()=>md.classList.add('opacity-100'),10);
         }
-
 
 
         function closeCustomerInsights() { const md = document.getElementById('customer-insights-modal'); md.classList.remove('opacity-100'); setTimeout(()=>md.classList.add('hidden'),300); }
@@ -2291,11 +2314,9 @@
             a.href = URL.createObjectURL(bL); a.download = `Pixigenie_Data_${mName}_${y}.csv`; a.click();
         }
 
-                  // ✨ NAYA: Lightning Fast Premium Bill Generator (Centered Badge & High Contrast) ✨
-             async function downloadBillImage(id) {
+                          async function downloadBillImage(id) {
             if (window.event) window.event.stopPropagation();
 
-            // 🚀 BUG FIX: Agar normal bill ID se na mile, toh Order ID se dhoondh nikalega!
             const b = adminBills.find(x => x.id === id || x.appOrderId === id); 
             if(!b) return alert("Order not found! Please refresh the page once.");
 
@@ -2304,7 +2325,6 @@
             if (btn) { origHtml = btn.innerHTML; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; btn.disabled = true; }
 
             try {
-                // 1. Text Fill
                 const sName = globalShopData.shopName || "Store";
                 document.getElementById('print-store-name').innerText = sName;
                 document.getElementById('print-store-name-footer').innerText = sName;
@@ -2320,7 +2340,25 @@
                 const watermarkInitials = document.getElementById('watermark-initials');
                 if (watermarkInitials) watermarkInitials.innerText = sName.substring(0, 2).toUpperCase();
 
-                // 2. Table Items (Bigger & Darker Text)
+                // ✨ PREMIUM PLAN CHECK ✨
+                const userPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
+                const isUpgraded = userPlan === 'plus' || userPlan === 'pro' || (typeof globalShopData !== 'undefined' && globalShopData.email === 'netajijhadustore@gmail.com');
+                
+                // 🚀 FIX 1: JAVASCRIPT CSS SELECTOR ERROR (No Brackets Allowed) 🚀
+                const receiptContainer = document.getElementById('receipt-container');
+                let footerPoweredBy = null;
+                
+                // ब्रैकेट वाले क्लास नेम की जगह, हम सीधा टेक्स्ट ('POWERED BY') सर्च करेंगे
+                receiptContainer.querySelectorAll('p').forEach(p => {
+                    if (p.textContent.includes('POWERED BY')) footerPoweredBy = p;
+                });
+
+                if (footerPoweredBy) {
+                    if (isUpgraded) footerPoweredBy.style.display = 'none';
+                    else footerPoweredBy.style.display = 'flex';
+                }
+
+                // ITEMS INJECTION
                 let iH = ''; let tA = 0;
                 if (b.items) b.items.forEach((i, idx) => {
                     let t = i.total ? i.total : (i.price * i.qty); tA += t;
@@ -2328,7 +2366,7 @@
                 }); 
                 document.getElementById('receipt-items').innerHTML = iH;
 
-                // 3. Breakdown & Calculation
+                // TOTALS CALCULATION
                 let dC = parseFloat(b.discount)||0; let dL = parseFloat(b.delivery)||0;
                 let bD = document.getElementById('receipt-breakdown');
                 if (dC > 0 || dL > 0) {
@@ -2339,43 +2377,80 @@
                 } else { bD.classList.add('hidden'); bD.classList.remove('flex'); }
                 
                 document.getElementById('receipt-total').innerText = `₹${(parseFloat(b.grandTotal)||0).toFixed(2)}`;
-                
-                          // 4. Payment Status UI (Premium Gradient & Icons)
+                                                                  // 🚀 1. THE MAGIC: 100% BULLETPROOF INLINE ALIGNMENT 🚀
                 let isP = b.payStatus && b.payStatus.includes('Paid');
                 let sE = document.getElementById('receipt-paystatus');
                 if(sE) { 
-                    sE.innerHTML = isP ? '<i class="fas fa-check-circle mr-2 opacity-80 text-[12px]"></i> PAID' : '<i class="fas fa-clock mr-2 opacity-80 text-[12px]"></i> PENDING'; 
-                    sE.className = isP 
-                        ? 'inline-flex items-center justify-center h-10 px-6 rounded-full bg-gradient-to-r from-[#ECFDF5] to-[#D1FAE5] text-[#065F46] border border-[#A7F3D0] text-sm font-black tracking-widest leading-none shadow-sm' 
-                        : 'inline-flex items-center justify-center h-10 px-6 rounded-full bg-gradient-to-r from-[#FEF2F2] to-[#FEE2E2] text-[#991B1B] border border-[#FECACA] text-sm font-black tracking-widest leading-none shadow-sm'; 
+                    // घड़ी और टिक वाले SVG हटा दिए ताकि टेक्स्ट 100% सेंटर में आ जाए
+                    sE.outerHTML = isP 
+                        ? `<div id="receipt-paystatus" style="display: inline-block; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; border-radius: 9999px; padding: 0 24px; height: 40px; white-space: nowrap; text-align: center;">
+                            <span style="display: inline-block; vertical-align: middle; line-height: 38px; font-size: 14px; font-weight: 900; letter-spacing: 0.1em;">PAID</span>
+                           </div>` 
+                        : `<div id="receipt-paystatus" style="display: inline-block; background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; border-radius: 9999px; padding: 0 24px; height: 40px; white-space: nowrap; text-align: center;">
+                            <span style="display: inline-block; vertical-align: middle; line-height: 38px; font-size: 14px; font-weight: 900; letter-spacing: 0.1em;">PENDING</span>
+                           </div>`;
+                }
+
+                // 🚀 2. CLEAN DOM & PERFECT PHONE NUMBER ALIGNMENT 🚀
+                const c = document.getElementById('receipt-container');
+                
+                const styleTags = c.querySelectorAll('style');
+                styleTags.forEach(style => {
+                    if(style.innerHTML.includes('@import')) {
+                        style.innerHTML = ".font-inter { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important; }";
+                    }
+                });
+                // फ़ोन आइकॉन को हल्का बड़ा (18x18) और हल्का नीचे (top: 2px) कर दिया
+                const phoneText = c.querySelector('#print-store-phone');
+                if(phoneText) {
+                    let parentP = phoneText.parentElement;
+                    parentP.outerHTML = `<p class="text-sm text-gray-600 mt-1 font-semibold" style="display: block; line-height: 18px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle; margin-right: 5px; position: relative; top: 2px; color: #6B7280;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        <span id="print-store-phone" style="display: inline-block; vertical-align: middle;">${globalShopData.phone || ""}</span>
+                    </p>`;
                 }
 
 
-                // 5. Only Wait for Logo
+
+                // 🚀 FIX 2: STRICT SAFE LOGO HANDLING (No DOMException) 🚀
                 const savedImg = localStorage.getItem('pixigenie_profile_img');
                 const billLogo = document.getElementById('bill-store-logo');
                 const watermark = document.getElementById('default-invoice-watermark');
                 
+                // ट्रांसपेरेंट पिक्सेल इस्तेमाल करेंगे ताकि src खाली ना रहे
+                const blankPixel = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+                
                 let logoPromise = Promise.resolve();
-                if (savedImg && billLogo) {
+                
+                if (isUpgraded && savedImg && savedImg.startsWith('data:image')) {
                     billLogo.classList.remove('hidden');
                     if (watermark) watermark.style.display = 'none';
+                    
+                    billLogo.removeAttribute('crossorigin');
+                    
                     logoPromise = new Promise((resolve) => {
                         billLogo.onload = resolve;
-                        billLogo.onerror = resolve; 
-                        billLogo.crossOrigin = "anonymous";
+                        billLogo.onerror = () => {
+                            billLogo.src = blankPixel;
+                            billLogo.classList.add('hidden');
+                            if (watermark) watermark.style.display = 'flex';
+                            resolve();
+                        };
                         billLogo.src = savedImg;
                     });
-                } else if (billLogo) {
-                    billLogo.classList.add('hidden');
+                } else {
+                    if (billLogo) {
+                        // VERY IMPORTANT: यहाँ src को रिमूव नहीं करना है, ब्लैंक पिक्सेल देना है!
+                        billLogo.src = blankPixel; 
+                        billLogo.classList.add('hidden');
+                    }
                     if (watermark) watermark.style.display = 'flex';
                 }
 
                 await logoPromise; 
 
-                // 6. Generate Canvas (A4 Dimensions)
+                // 3. GENERATE CANVAS
                 setTimeout(() => {
-                    const c = document.getElementById('receipt-container');
                     if (typeof html2canvas === 'undefined') {
                         alert("Library missing.");
                         if(btn) { btn.innerHTML = origHtml; btn.disabled = false; }
@@ -2385,7 +2460,8 @@
                     html2canvas(c, { 
                         scale: 2, 
                         backgroundColor: "#ffffff", 
-                        useCORS: true, 
+                        useCORS: false,       
+                        allowTaint: false,    
                         windowWidth: 800,  
                         width: 800,        
                         windowHeight: 1131, 
@@ -2398,7 +2474,7 @@
                         l.click();
                         if(btn) { btn.innerHTML = origHtml; btn.disabled = false; } 
                     }).catch(e => {
-                        alert("Failed generating image.");
+                        alert("Failed generating image: " + e.message);
                         if(btn) { btn.innerHTML = origHtml; btn.disabled = false; }
                     });
                 }, 100);
@@ -2406,8 +2482,11 @@
             } catch (err) {
                 console.error(err);
                 if(btn) { btn.innerHTML = origHtml; btn.disabled = false; }
+                alert("Error: " + err.message);
             }
         }
+
+
 
                          // ==========================================
         // 🚀 iOS PREMIUM SHARE & QR CODE LOGIC (URL & ENCODING FIXED)
@@ -7576,6 +7655,32 @@ td.mono {
                 modal.classList.add('hidden');
             }, 300); // 300ms baad hide karega jab animation khatam ho jaye
         }
+               // ==========================================
+        // ✨ NAYA: PREMIUM SOFT-LOCK LOGIC (FIXED) ✨
+        // ==========================================
+        function checkPremiumAndExecute(callback) {
+            const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
+            const isPremium = plan === 'plus' || plan === 'pro' || (typeof globalShopData !== 'undefined' && globalShopData.email === 'netajijhadustore@gmail.com');
+
+            if (!isPremium) {
+                // अगर बेसिक यूज़र है, तो अपग्रेड पॉपअप दिखाओ
+                iosConfirm(
+                    "Premium Feature", 
+                    "Upgrade to Plus or Pro VIP to unlock Smart Reports, Excel Exports, AI Analytics, and Live Orders.", 
+                    "View Plans", 
+                    "text-purple-600"
+                ).then((confirmed) => {
+                    if(confirmed) {
+                        // ✨ FIX: सीधा index.html के प्लान सेक्शन पर भेज दो ✨
+                        window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
+                    }
+                });
+            } else {
+                // अगर प्लस या प्रो है, तो फीचर नार्मल चलेगा
+                callback();
+            }
+        }
+
 
     </script>
     <!-- ✨ iOS STYLE PREMIUM SHARE MODAL (WITH QR CODE) ✨ -->
