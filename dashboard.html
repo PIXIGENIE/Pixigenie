@@ -508,13 +508,13 @@
                                     </h3>
                                 </div>
                                 
-                                <!-- ✨ NAYA: SEARCH & FILTER OPTIONS ✨ -->
+                                                               <!-- ✨ NAYA: SEARCH & FILTER OPTIONS ✨ -->
                                 <div class="flex flex-col sm:flex-row gap-3 mb-6">
                                     <div class="relative flex-1">
                                         <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]"></i>
-                                        <input type="text" id="live-order-search" onkeyup="filterLiveOrders()" placeholder="Search by Customer Name or ID..." class="w-full bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] focus:border-[#A855F7] rounded-[14px] h-[46px] pl-11 pr-4 text-sm font-semibold outline-none transition-all shadow-sm">
+                                        <input type="text" id="live-order-search" oninput="window.filterLiveOrders()" placeholder="Search Name, Phone or ID..." class="w-full bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] focus:border-[#A855F7] rounded-[14px] h-[46px] pl-11 pr-4 text-sm font-semibold outline-none transition-all shadow-sm">
                                     </div>
-                                    <select id="live-order-filter" onchange="filterLiveOrders()" class="w-full sm:w-40 bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] focus:border-[#A855F7] rounded-[14px] h-[46px] px-4 text-xs font-bold tracking-wide outline-none cursor-pointer transition-all shadow-sm">
+                                    <select id="live-order-filter" onchange="window.filterLiveOrders()" class="w-full sm:w-40 bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] focus:border-[#A855F7] rounded-[14px] h-[46px] px-4 text-xs font-bold tracking-wide outline-none cursor-pointer transition-all shadow-sm">
                                         <option value="All">ALL ORDERS</option>
                                         <option value="pending">PENDING</option>
                                         <option value="accepted">ACCEPTED</option>
@@ -522,6 +522,7 @@
                                         <option value="cancelled">CANCELLED</option>
                                     </select>
                                 </div>
+
 
                                 <div id="merchant-orders-list" class="flex flex-col gap-4 max-h-[65vh] overflow-y-auto custom-scrollbar p-1">
                                     <div class="text-center py-10">
@@ -1377,11 +1378,11 @@
                         live.push({id: doc.id, ...data});
                     });
                     
-                                        live.sort((a,b) => (b.createdAt?.toMillis()||0) - (a.createdAt?.toMillis()||0));
+                                                                                live.sort((a,b) => (b.createdAt?.toMillis()||0) - (a.createdAt?.toMillis()||0));
                     
-                    // ✨ NAYA: Data ko global variable me save karke filter apply karo ✨
-                    globalLiveOrders = live;
-                    filterLiveOrders();
+                    // ✨ NAYA: Window object me save kiya taaki hamesha available rahe ✨
+                    window.globalLiveOrders = live;
+                    window.filterLiveOrders();
 
                     // 🔔 Badge Update Logic
                     const badge = document.getElementById('live-orders-badge');
@@ -1395,39 +1396,46 @@
                     }
                 });
 
-
-              // ==========================================
-        // ✨ NAYA: LIVE ORDERS SEARCH & FILTER FUNCTION ✨
+                    // ==========================================
+        // ✨ NAYA: 100% BULLETPROOF FILTER FUNCTION ✨
         // ==========================================
         window.filterLiveOrders = function() {
+            // Agar data abhi tak load nahi hua hai toh kuch mat karo
+            if (!window.globalLiveOrders) return;
+
             const searchInput = document.getElementById('live-order-search');
             const filterInput = document.getElementById('live-order-filter');
             
             if(!searchInput || !filterInput) return;
 
             const searchVal = searchInput.value.toLowerCase().trim();
-            const statusVal = filterInput.value.toLowerCase(); // ✨ NAYA: Isko lowercase kar diya
+            const statusVal = filterInput.value.toLowerCase();
             
-            let filteredOrders = globalLiveOrders.filter(order => {
-                // 1. Search Condition
+            let filteredOrders = window.globalLiveOrders.filter(order => {
+                
+                // 1. Search Logic (Naam, Order ID ya Phone Number - teeno se search hoga)
                 let matchSearch = true;
                 if (searchVal !== "") {
-                    matchSearch = (order.customerName && order.customerName.toLowerCase().includes(searchVal)) || 
-                                  (order.id && order.id.toLowerCase().includes(searchVal));
+                    const cName = (order.customerName || "").toLowerCase();
+                    const oId = (order.id || "").toLowerCase();
+                    const cPhone = (order.customerPhone || "").toLowerCase();
+                    
+                    matchSearch = cName.includes(searchVal) || oId.includes(searchVal) || cPhone.includes(searchVal);
                 }
                 
-                // 2. Status Filter Condition
+                // 2. Status Filter Logic
                 let matchStatus = true;
                 if (statusVal !== 'all') {
-                    const orderStatus = (order.status || "").toLowerCase(); // ✨ NAYA: DB status ko bhi lowercase kiya
-                    matchStatus = orderStatus === statusVal;
+                    const orderStatus = (order.status || "").toLowerCase();
+                    matchStatus = (orderStatus === statusVal);
                 }
                 
                 return matchSearch && matchStatus;
             });
             
+            // Filter hui list ko print karo
             renderLiveOrders(filteredOrders);
-        }
+        };
 
 
             try { const snap = await shopRef.collection('products').orderBy('timestamp', 'desc').get();
