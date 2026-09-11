@@ -679,15 +679,42 @@ productsSnap.forEach(doc => {
     const product = doc.data();
     const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
     const unit = product.unit || 'pcs';
+    
+    // ✨ NAYA: DISCOUNT CALCULATION LOGIC ✨
+    let discountBadgeHtml = '';
+    let priceDisplayHtml = `<p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>`;
+
+    if (product.mrp && product.mrp > product.price) {
+        const discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
+        discountBadgeHtml = `
+            <div class="absolute top-2 right-2 bg-[#DC2626] text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm z-10 tracking-wider">
+                ${discountPercent}% OFF
+            </div>
+        `;
+        priceDisplayHtml = `
+            <div class="flex items-center gap-1.5 mt-1">
+                <p class="font-black text-[#16A34A] text-base">₹${product.price}</p>
+                <p class="text-[11px] text-gray-400 font-bold line-through mt-0.5">₹${product.mrp}</p>
+            </div>
+        `;
+    }
+
     html += `
-    <div class="grid-item p-4 flex flex-col active:bg-gray-50 transition">
+    <div class="grid-item p-4 flex flex-col active:bg-gray-50 transition relative">
         <div class="w-full aspect-square bg-gray-50 rounded-[14px] mb-3 flex items-center justify-center overflow-hidden relative">
             ${product.image ? `<img src="${product.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-3xl text-gray-200"></i>`}
+            
+            <!-- ✨ DISCOUNT BADGE ✨ -->
+            ${discountBadgeHtml}
+
             <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-700 shadow-sm">${qtySize} ${unit}</div>
         </div>
         <div class="flex-1">
             <h4 class="text-gray-900 font-semibold text-[13px] leading-tight line-clamp-2">${product.name}</h4>
-            <p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>
+            
+            <!-- ✨ PRICE & MRP ✨ -->
+            ${priceDisplayHtml}
+            
         </div>
         <div class="flex flex-col gap-2 w-full mt-3">
             <div class="flex gap-2 w-full">
@@ -1574,20 +1601,47 @@ async function loadMoreProducts() {
             btn.innerHTML = `Load More Products <i class="fas fa-arrow-down ml-1"></i>`;
         }
         
-        let html = '';
+                let html = '';
         snap.forEach(doc => {
             const product = doc.data();
             const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
             const unit = product.unit || 'pcs';
+            
+            // ✨ NAYA: DISCOUNT CALCULATION LOGIC ✨
+            let discountBadgeHtml = '';
+            let priceDisplayHtml = `<p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>`;
+
+            if (product.mrp && product.mrp > product.price) {
+                const discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
+                discountBadgeHtml = `
+                    <div class="absolute top-2 right-2 bg-[#DC2626] text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm z-10 tracking-wider">
+                        ${discountPercent}% OFF
+                    </div>
+                `;
+                priceDisplayHtml = `
+                    <div class="flex items-center gap-1.5 mt-1">
+                        <p class="font-black text-[#16A34A] text-base">₹${product.price}</p>
+                        <p class="text-[11px] text-gray-400 font-bold line-through mt-0.5">₹${product.mrp}</p>
+                    </div>
+                `;
+            }
+
             html += `
-            <div class="grid-item p-4 flex flex-col active:bg-gray-50 transition">
+            <div class="grid-item p-4 flex flex-col active:bg-gray-50 transition relative">
                 <div class="w-full aspect-square bg-gray-50 rounded-[14px] mb-3 flex items-center justify-center overflow-hidden relative">
                     ${product.image ? `<img src="${product.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-3xl text-gray-200"></i>`}
+                    
+                    <!-- ✨ DISCOUNT BADGE ✨ -->
+                    ${discountBadgeHtml}
+
                     <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-700 shadow-sm">${qtySize} ${unit}</div>
                 </div>
                 <div class="flex-1">
                     <h4 class="text-gray-900 font-semibold text-[13px] leading-tight line-clamp-2">${product.name}</h4>
-                    <p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>
+                    
+                    <!-- ✨ PRICE & MRP ✨ -->
+                    ${priceDisplayHtml}
+                    
                 </div>
                 <div class="flex flex-col gap-2 w-full mt-3">
                     <div class="flex gap-2 w-full">
@@ -1603,6 +1657,7 @@ async function loadMoreProducts() {
         });
         
         document.getElementById('products-grid').insertAdjacentHTML('beforeend', html);
+
     } catch (e) {
         console.error("Error loading more products:", e);
         btn.innerHTML = `Load More Products <i class="fas fa-arrow-down ml-1"></i>`;
