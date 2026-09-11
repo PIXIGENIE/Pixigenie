@@ -79,6 +79,19 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+            /* 🌟 VIP CROWN ANIMATIONS 🌟 */
+        @keyframes crownShine {
+            0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); }
+            50% { filter: drop-shadow(0 0 7px rgba(255, 215, 0, 1)); }
+        }
+        .animate-crown { animation: crownShine 2s infinite ease-in-out; }
+
+        @keyframes liteCrownShine {
+            0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5)); }
+            50% { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1)); }
+        }
+        .animate-lite-crown { animation: liteCrownShine 2s infinite ease-in-out; }
+
     </style>
 </head>
 <body class="font-sans text-gray-800 overflow-x-hidden flex flex-col min-h-screen">
@@ -1276,7 +1289,10 @@
             }
         }
 
-                                    function fetchLiveShops() {
+                                            // ===============================================
+        // 1. REPLACED: fetchLiveShops()
+        // ===============================================
+        function fetchLiveShops() {
             const grid = document.getElementById('dynamic-grid');
             let locationLoaded = false; 
 
@@ -1285,19 +1301,15 @@
                 locationLoaded = true;
 
                 try {
-                    // ✨ 1. DATA LIMIT LAGA DIYA (Sirf top 12 shops aayengi jisse speed 10x badhegi) ✨
                     const snapshot = await db.collection('shops').where('status', '==', 'active').limit(12).get();
                     if (snapshot.empty) { grid.innerHTML = `<p class="col-span-full text-center text-gray-500 py-8">No shops registered yet.</p>`; return; }
                     
-                    // ✨ 2. REVIEW WALA LOOP HATA DIYA (Ab map sync me chalega aur fast load hoga) ✨
                     const cardsHtmlArray = snapshot.docs.map((doc) => {
                         const shop = doc.data();
                         const shopId = doc.id;
-                        
-                        let avgRating = shop.rating ? shop.rating : "5.0"; // Default rating
+                        let avgRating = shop.rating ? shop.rating : "5.0"; 
 
                         let distanceHtml = "";
-                        // Distance calculate karna
                         if (typeof getDistanceFromLatLonInKm === "function" && custLat && custLng && shop.latitude && shop.longitude) {
                             let dist = getDistanceFromLatLonInKm(custLat, custLng, shop.latitude, shop.longitude);
                             distanceHtml = `<span class="flex items-center gap-1 truncate"><i class="fas fa-map-marker-alt text-gray-400 opacity-70 text-[10px]"></i> ${dist} km away</span>`;
@@ -1305,41 +1317,14 @@
                             distanceHtml = `<span class="flex items-center gap-1 truncate"><i class="fas fa-location-arrow text-gray-400 opacity-70 text-[10px]"></i> Turn on GPS</span>`;
                         }
                         
-                        // ✨ CHECK VIP STATUS FOR HOME PAGE BLUE TICK ✨
-                        const isVIP = shop.isVerified || shop.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
-                        
-                                                                      const verifiedTick = isVIP ? `
-                        <style>
-                            @keyframes crownShine {
-                                0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); }
-                                50% { filter: drop-shadow(0 0 7px rgba(255, 215, 0, 1)); }
-                            }
-                            .animate-crown { animation: crownShine 2s infinite ease-in-out; }
-                        </style>
-                        <span class="group inline-flex items-center justify-center ml-1.5 relative top-[2px] cursor-pointer outline-none" tabindex="0">
-                            <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="12" fill="#111827"></circle>
-                                <path class="animate-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="url(#pureGoldList)"></path>
-                                <defs>
-                                    <linearGradient id="pureGoldList" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stop-color="#FFF700"></stop>
-                                        <stop offset="50%" stop-color="#FFD700"></stop>
-                                        <stop offset="100%" stop-color="#FFAA00"></stop>
-                                    </linearGradient>
-                                </defs>
-                            </svg>
-                            <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2 py-0.5 bg-[#111827] text-[#FFD700] text-[9px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                                Verified
-                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[3px] border-transparent border-b-[#111827]"></span>
-                            </span>
-                        </span>` : '';
+                        // ✨ DYNAMIC VIP CHECK (Plan ke hisaab se) ✨
+                        const isVIP = shop.isVerified || shop.plan === 'plus' || shop.plan === 'pro' || shop.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
+                        const verifiedTick = getVIPBadge(isVIP, shop.plan);
 
-                                              // ✨ NAYA LOGIC: Premium Gol (Circle) Logo with Auto-SVG fallback ✨
                         const logoHtml = shop.storeLogo 
                             ? `<img src="${shop.storeLogo}" class="absolute inset-0 w-full h-full object-cover">` 
                             : `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path><path d="M2 7h20"></path><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"></path></svg>`;
 
-                        // ✨ SMART COLOR LOGIC: Type ke hisaab se ring aur badge ka color change hoga ✨
                         let premiumStyle = 'from-purple-500 to-pink-500 shadow-[0_2px_5px_rgba(168,85,247,0.4)]'; 
                         let ringColor = 'ring-purple-500'; 
                         let displayType = shop.businessType || '';
@@ -1356,7 +1341,6 @@
                             displayType = 'SERVICES'; 
                         }
 
-                        // ✨ NAYA: Overlapping Business Type Badge (with dynamic colors) ✨
                         const bizBadgeHtml = shop.businessType 
                             ? `<div class="absolute -bottom-2.5 left-1/2 transform -translate-x-1/2 z-20">
                                    <span class="bg-gradient-to-r ${premiumStyle} text-white text-[6.5px] sm:text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border-[1.5px] border-white whitespace-nowrap block">
@@ -1368,8 +1352,6 @@
                         return `
                         <div class="glass-card hover:bg-white rounded-[2rem] p-5 sm:p-6 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:-translate-y-2 transition-all duration-500 flex flex-col group relative overflow-hidden cursor-pointer active:scale-95 reveal">
                             <div class="flex items-start gap-4 mb-5 relative z-10">
-                                
-                                <!-- ✨ PREMIUM RING EFFECT CONTAINER ✨ -->
                                 <div class="relative shrink-0 group-hover:scale-110 transition-transform duration-500 mx-1 mt-1 mb-2">
                                     <div class="w-14 h-14 bg-gray-50 text-blue-500 rounded-full flex items-center justify-center relative z-10 ring-2 ${ringColor} ring-offset-[2px] ring-offset-white shadow-sm overflow-hidden">
                                         ${logoHtml}
@@ -1403,34 +1385,25 @@
                 }
             }
 
-            // ✨ 3. TIMEOUT KAM KAR DIYA (3000ms se 800ms kar diya) ✨
             const gpsTimeout = setTimeout(() => {
                 renderShopsWithLocation(null, null); 
             }, 800);
 
-            // 📍 GPS Request (Fast accuracy)
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
-                    (pos) => { 
-                        clearTimeout(gpsTimeout);
-                        renderShopsWithLocation(pos.coords.latitude, pos.coords.longitude); 
-                    },
-                    (error) => { 
-                        clearTimeout(gpsTimeout);
-                        renderShopsWithLocation(null, null); 
-                    },
+                    (pos) => { clearTimeout(gpsTimeout); renderShopsWithLocation(pos.coords.latitude, pos.coords.longitude); },
+                    (error) => { clearTimeout(gpsTimeout); renderShopsWithLocation(null, null); },
                     { enableHighAccuracy: false, timeout: 5000 } 
                 );
             } else {
-                clearTimeout(gpsTimeout);
-                renderShopsWithLocation(null, null);
+                clearTimeout(gpsTimeout); renderShopsWithLocation(null, null);
             }
         }
 
-
-
-
-                            async function fetchGlobalProducts() {
+        // ===============================================
+        // 2. REPLACED: fetchGlobalProducts()
+        // ===============================================
+        async function fetchGlobalProducts() {
             const grid = document.getElementById('dynamic-grid');
             try {
                 const snapshot = await db.collectionGroup('products').limit(12).get();
@@ -1441,7 +1414,8 @@
                     let shopName = "Local Shop";
                     let shopPhone = "";
                     let shopId = ""; 
-                    let isVerified = false; // ✨ NAYA: Verification status check
+                    let isVerified = false; 
+                    let shopPlan = ""; // ✨ Plan variable add kiya
                     
                     if (doc.ref.parent && doc.ref.parent.parent) {
                         try {
@@ -1451,14 +1425,16 @@
                                 shopName = sData.shopName || "Local Shop";
                                 shopPhone = sData.phone || "";
                                 shopId = shopDoc.id; 
+                                shopPlan = sData.plan || ""; 
+                                
                                 // ✨ Check for VIP/Verified status
-                                isVerified = sData.isVerified || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
+                                isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro' || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
                             }
                         } catch(e) {}
                     }
                     
-                    // Naye function me isVerified bhi bhej rahe hain
-                    return generateProductCard(product.name, product.price, shopName, shopPhone, product.image, shopId, isVerified);
+                    // ✨ Naye function me shopPlan bhi bhej rahe hain
+                    return generateProductCard(product.name, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan);
                 });
 
                 const cardsHtmlArray = await Promise.all(productPromises);
@@ -1467,46 +1443,24 @@
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
             } catch (error) { 
                 grid.innerHTML = `
-                    ${generateProductCard("Premium Quality Brooms", "150", "Netaji Jhadu Store", "9876543210", "", "netajijhadustore", true)}
-                    ${generateProductCard("Fast Charge Type-C Cable", "249", "Hariom Mobile", "9876543210", "", "hariommobile", false)}
+                    ${generateProductCard("Premium Quality Brooms", "150", "Netaji Jhadu Store", "9876543210", "", "netajijhadustore", true, "pro")}
                 `;
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
             }
         }
 
-        // ✨ NAYA: isVerified parameter add kiya aur Blue Tick lagaya ✨
-        function generateProductCard(name, price, shopName, shopPhone, image, shopId = "", isVerified = false) {
+        // ===============================================
+        // 3. REPLACED: generateProductCard()
+        // ===============================================
+        // ✨ NAYA: isVerified aur plan parameter accept karega ✨
+        function generateProductCard(name, price, shopName, shopPhone, image, shopId = "", isVerified = false, plan = "") {
             
-                              const verifiedTick = isVIP ? `
-                        <style>
-                            @keyframes crownShine {
-                                0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); }
-                                50% { filter: drop-shadow(0 0 7px rgba(255, 215, 0, 1)); }
-                            }
-                            .animate-crown { animation: crownShine 2s infinite ease-in-out; }
-                        </style>
-                        <span class="group inline-flex items-center justify-center ml-1.5 relative top-[2px] cursor-pointer outline-none" tabindex="0">
-                            <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="12" fill="#111827"></circle>
-                                <path class="animate-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="url(#pureGoldList)"></path>
-                                <defs>
-                                    <linearGradient id="pureGoldList" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stop-color="#FFF700"></stop>
-                                        <stop offset="50%" stop-color="#FFD700"></stop>
-                                        <stop offset="100%" stop-color="#FFAA00"></stop>
-                                    </linearGradient>
-                                </defs>
-                            </svg>
-                            <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2 py-0.5 bg-[#111827] text-[#FFD700] text-[9px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                                Verified
-                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[3px] border-transparent border-b-[#111827]"></span>
-                            </span>
-                        </span>` : '';
+            // Helper function use karke VIP badge nikal rahe hain
+            const verifiedTick = getVIPBadge(isVerified, plan);
 
             return `
             <div class="glass-card hover:bg-white rounded-[2rem] p-5 sm:p-6 hover:shadow-[0_20px_40px_rgba(168,85,247,0.08)] hover:-translate-y-2 transition-all duration-500 flex flex-col group cursor-pointer active:scale-95 reveal">
                 <div class="w-full aspect-square bg-gray-50 rounded-[1.5rem] mb-5 flex items-center justify-center relative overflow-hidden group-hover:opacity-90 transition-opacity">
-
                     ${image ? `<img src="${image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">` : `<i class="fas fa-box-open text-5xl text-gray-200 group-hover:scale-110 transition-transform duration-500"></i>`}
                     <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-sm font-black text-gray-900 shadow-sm border border-white/50">₹${price}</div>
                 </div>
@@ -1524,14 +1478,55 @@
                             Order Now
                         </button>
                     </div>
-                    <!-- ✨ Visit Store Button ✨ -->
                     <button onclick="window.location.href='store.html?shop=${shopId}'" class="w-full bg-gray-50 text-blue-600 border border-gray-100 hover:bg-blue-50 font-bold py-3 rounded-2xl transition-all duration-300 text-sm flex justify-center items-center gap-2 active:scale-95 mt-1">
                         <i class="fas fa-external-link-alt text-[12px]"></i> Visit Store
                     </button>
                 </div>
             </div>`;
         }
+        // ✨ DYNAMIC VIP BADGE GENERATOR ✨
+        function getVIPBadge(isVerified, plan) {
+            if (!isVerified) return '';
 
+            if (plan === 'plus') {
+                return `
+                <span class="group inline-flex items-center justify-center ml-1.5 relative top-[1px] cursor-pointer outline-none" tabindex="0">
+                    <svg class="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="litePinkPurpleList" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#A855F7"></stop>
+                                <stop offset="100%" stop-color="#EC4899"></stop>
+                            </linearGradient>
+                        </defs>
+                        <circle cx="12" cy="12" r="12" fill="url(#litePinkPurpleList)"></circle>
+                        <path class="animate-lite-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="#FFFFFF"></path>
+                    </svg>
+                    <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[9px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                        Verified Lite
+                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[3px] border-transparent border-b-purple-500"></span>
+                    </span>
+                </span>`;
+            } else {
+                return `
+                <span class="group inline-flex items-center justify-center ml-1.5 relative top-[1px] cursor-pointer outline-none" tabindex="0">
+                    <svg class="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="12" fill="#111827"></circle>
+                        <path class="animate-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="url(#pureGoldList)"></path>
+                        <defs>
+                            <linearGradient id="pureGoldList" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#FFF700"></stop>
+                                <stop offset="50%" stop-color="#FFD700"></stop>
+                                <stop offset="100%" stop-color="#FFAA00"></stop>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 px-2 py-0.5 bg-[#111827] text-[#FFD700] text-[9px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                        Verified
+                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[3px] border-transparent border-b-[#111827]"></span>
+                    </span>
+                </span>`;
+            }
+        }
 
             // ==========================================
         // 🛒 CART LOGIC (Add, Render, Checkout)
