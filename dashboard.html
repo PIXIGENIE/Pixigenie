@@ -1396,21 +1396,20 @@
                 });
 
 
-        // ==========================================
+              // ==========================================
         // ✨ NAYA: LIVE ORDERS SEARCH & FILTER FUNCTION ✨
         // ==========================================
-        function filterLiveOrders() {
+        window.filterLiveOrders = function() {
             const searchInput = document.getElementById('live-order-search');
             const filterInput = document.getElementById('live-order-filter');
             
-            // Agar HTML elements nahi mile toh kuch mat karo (Error prevent karne ke liye)
             if(!searchInput || !filterInput) return;
 
             const searchVal = searchInput.value.toLowerCase().trim();
-            const statusVal = filterInput.value;
+            const statusVal = filterInput.value.toLowerCase(); // ✨ NAYA: Isko lowercase kar diya
             
             let filteredOrders = globalLiveOrders.filter(order => {
-                // 1. Search Condition (Name ya ID match)
+                // 1. Search Condition
                 let matchSearch = true;
                 if (searchVal !== "") {
                     matchSearch = (order.customerName && order.customerName.toLowerCase().includes(searchVal)) || 
@@ -1419,14 +1418,14 @@
                 
                 // 2. Status Filter Condition
                 let matchStatus = true;
-                if (statusVal !== 'All') {
-                    matchStatus = order.status === statusVal;
+                if (statusVal !== 'all') {
+                    const orderStatus = (order.status || "").toLowerCase(); // ✨ NAYA: DB status ko bhi lowercase kiya
+                    matchStatus = orderStatus === statusVal;
                 }
                 
                 return matchSearch && matchStatus;
             });
             
-            // Filter hui list ko screen par dikhao
             renderLiveOrders(filteredOrders);
         }
 
