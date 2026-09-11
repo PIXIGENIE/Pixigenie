@@ -1158,55 +1158,29 @@ grid.innerHTML = html;
                 setTimeout(() => { window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(waMessage)}`, '_blank'); }, i * 1000);
             }
         }
-              let currentOrder = null;
 
-        function openOrderModal(itemName, itemPrice, shopName, shopPhone, shopPlan) {
-            
-            // 🚀 1. CHECK PREMIUM PLAN (100% BULLETPROOF) 🚀
-            let isPremium = false;
-            
-            // A. Agar parameter se plan aaya hai (index.html ke liye)
-            if (shopPlan === 'plus' || shopPlan === 'pro') {
-                isPremium = true;
-            } 
-            // B. Agar store.html wale page par hain jahan data hota hai
-            else if (typeof globalShopData !== 'undefined' && globalShopData) {
-                if (globalShopData.plan === 'plus' || globalShopData.plan === 'pro' || globalShopData.email === 'netajijhadustore@gmail.com') {
-                    isPremium = true;
-                }
-            }
-            // C. Fallback: Agar Netaji ka store hai, toh hamesha Premium manega
-            if (shopName && shopName.toLowerCase().includes('netaji')) {
-                isPremium = true;
-            }
+        // ==========================================
+        // ✨ DIRECT (SINGLE ITEM) ORDER LOGIC RESTORED ✨
+        // ==========================================
+        let currentOrder = null;
 
-            // 🚀 2. HIDE/SHOW 'PLACE ORDER NOW' BUTTON 🚀
-            const placeOrderBtn = document.getElementById('main-order-btn');
-            if (placeOrderBtn) {
-                if (isPremium) {
-                    placeOrderBtn.style.display = 'flex'; // Premium walon ko dikhega
-                } else {
-                    placeOrderBtn.style.display = 'none'; // Basic walon ka hide ho jayega
-                }
-            }
-
-            // ==========================================
-            // 👇 BAAKI SAB PURANA CODE SAME RAHEGA 👇
-            // ==========================================
+                function openOrderModal(itemName, itemPrice, shopName, shopPhone) {
             currentOrder = { itemName, itemPrice, shopName, shopPhone };
             document.getElementById('order-item-name').innerText = itemName;
             document.getElementById('order-item-price').innerText = `₹${itemPrice}`;
             document.getElementById('order-shop-name').innerText = shopName || 'Local Store';
             
-            // ✨ SMART PRE-FILL LOGIC ✨
+            // ✨ SMART PRE-FILL LOGIC (Email filter + Saved Address) ✨
             const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
             let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
             const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
 
+            // अगर फोन में '@' है (यानी ईमेल है), तो इसे खाली छोड़ दो
             if (savedPhone.includes('@')) {
                 savedPhone = '';
             }
 
+            // फॉर्म में डाटा डाल दो
             document.getElementById('order-cust-name').value = savedName;
             document.getElementById('order-cust-phone').value = savedPhone;
             document.getElementById('order-address').value = savedAddress;
@@ -1226,8 +1200,6 @@ grid.innerHTML = html;
             }, 10);
             document.body.style.overflow = 'hidden'; 
         }
-
-
 
 
         function closeOrderModal() {
