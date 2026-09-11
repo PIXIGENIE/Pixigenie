@@ -620,15 +620,23 @@
                                         Customers
                                     </h3>
                                     
-                                    <!-- ✨ NAYA: DUAL BUTTONS ✨ -->
+                                                                 <!-- ✨ NAYA: DUAL BUTTONS WITH PRO LOCK ✨ -->
                                     <div class="flex gap-2 w-full sm:w-auto">
                                         <button onclick="openAddCustomerModal()" class="flex-1 sm:w-auto bg-[#111827] hover:bg-black text-white text-sm font-bold px-4 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm active:scale-95">
                                             <i class="fas fa-user-plus"></i> Add Customer
                                         </button>
-                                        <button onclick="checkPremiumAndExecute(openOfferModal)" class="flex-1 sm:w-auto bg-gradient-to-r from-pink-500 to-rose-500 text-white text-sm font-bold px-4 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-[0_4px_15px_rgba(236,72,153,0.3)] active:scale-95">
+                                        
+                                        <!-- ✨ YAHAN checkProAndExecute LAGA HAI ✨ -->
+                                        <button onclick="checkProAndExecute(openOfferModal)" class="relative flex-1 sm:w-auto bg-gradient-to-r from-pink-500 to-rose-500 text-white text-sm font-bold px-4 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-[0_4px_15px_rgba(236,72,153,0.3)] active:scale-95">
                                             <i class="fas fa-gift"></i> Create Offer
+                                            
+                                            <!-- ✨ PRO VIP CROWN LOCK (DARK & GOLD) ✨ -->
+                                            <div class="pro-lock-icon hidden absolute -top-2 -right-1.5 bg-gray-900 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.3)] p-1 border border-yellow-400 z-10 flex items-center justify-center">
+                                                <i class="fas fa-crown text-yellow-400 text-[10px] mt-px"></i>
+                                            </div>
                                         </button>
                                     </div>
+
                                 </div>
 
                                 <div class="relative mb-6">
@@ -1243,8 +1251,16 @@
                         if (isUserPremium) icon.classList.add('hidden');
                         else icon.classList.remove('hidden');
                     });
+                    
+                    // ✨ NAYA: PRO-ONLY LOCK LOGIC YAHAN AAYEGA ✨
+                    const isUserPro = userPlan === 'pro' || globalShopData.email === 'netajijhadustore@gmail.com';
+                    document.querySelectorAll('.pro-lock-icon').forEach(icon => {
+                        if (isUserPro) icon.classList.add('hidden');
+                        else icon.classList.remove('hidden');
+                    });
 
                     const isSetupDone = globalShopData.setupCompleted === true || (globalShopData.shopName && globalShopData.category);
+
 
                     if (!isSetupDone) {
                         isEditMode = false;
@@ -7895,6 +7911,33 @@ td.mono {
                 alert("Error: " + error.message);
             }
             btn.innerHTML = orig; btn.disabled = false;
+        }
+        // ==========================================
+        // ✨ NAYA: PRO-ONLY SOFT-LOCK LOGIC ✨
+        // ==========================================
+        function checkProAndExecute(callback) {
+            const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
+            const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
+            
+            // 🚨 STRICT CHECK: Sirf 'pro' plan ya netajijhadustore admin ko allow
+            const isPro = plan === 'pro' || email === 'netajijhadustore@gmail.com';
+
+            if (!isPro) {
+                // Agar Basic ya Plus user hai, toh Upgrade Popup dikhao
+                iosConfirm(
+                    "Pro VIP Feature", 
+                    "Flash Offers is an advanced marketing tool. Upgrade to Pro VIP to unlock this feature.", 
+                    "Get Pro VIP", 
+                    "text-yellow-500"
+                ).then((confirmed) => {
+                    if(confirmed) {
+                        window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
+                    }
+                });
+            } else {
+                // Agar Pro hai, toh modal kholo
+                callback();
+            }
         }
 
     </script>
