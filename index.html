@@ -1400,7 +1400,7 @@
             }
         }
 
-        // ===============================================
+            // ===============================================
         // 2. REPLACED: fetchGlobalProducts()
         // ===============================================
         async function fetchGlobalProducts() {
@@ -1415,7 +1415,7 @@
                     let shopPhone = "";
                     let shopId = ""; 
                     let isVerified = false; 
-                    let shopPlan = ""; // ✨ Plan variable add kiya
+                    let shopPlan = ""; 
                     
                     if (doc.ref.parent && doc.ref.parent.parent) {
                         try {
@@ -1427,14 +1427,13 @@
                                 shopId = shopDoc.id; 
                                 shopPlan = sData.plan || ""; 
                                 
-                                // ✨ Check for VIP/Verified status
                                 isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro' || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
                             }
                         } catch(e) {}
                     }
                     
-                    // ✨ Naye function me shopPlan bhi bhej rahe hain
-                    return generateProductCard(product.name, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan);
+                    // ✨ NAYA: product.mrp pass kar rahe hain ✨
+                    return generateProductCard(product.name, product.mrp, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan);
                 });
 
                 const cardsHtmlArray = await Promise.all(productPromises);
@@ -1443,7 +1442,7 @@
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
             } catch (error) { 
                 grid.innerHTML = `
-                    ${generateProductCard("Premium Quality Brooms", "150", "Netaji Jhadu Store", "9876543210", "", "netajijhadustore", true, "pro")}
+                    ${generateProductCard("Premium Quality Brooms", "199", "150", "Netaji Jhadu Store", "9876543210", "", "netajijhadustore", true, "pro")}
                 `;
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
             }
@@ -1452,17 +1451,39 @@
         // ===============================================
         // 3. REPLACED: generateProductCard()
         // ===============================================
-        // ✨ NAYA: isVerified aur plan parameter accept karega ✨
-        function generateProductCard(name, price, shopName, shopPhone, image, shopId = "", isVerified = false, plan = "") {
+        // ✨ NAYA: mrp parameter accept karega aur discount dikhayega ✨
+        function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopId = "", isVerified = false, plan = "") {
             
-            // Helper function use karke VIP badge nikal rahe hain
             const verifiedTick = getVIPBadge(isVerified, plan);
+
+            // ✨ MRP & DISCOUNT CALCULATION ✨
+            let discountBadgeHtml = '';
+            let priceDisplayHtml = `<div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-sm font-black text-gray-900 shadow-sm border border-white/50">₹${price}</div>`;
+
+            if (mrp && mrp > price) {
+                const discountPercent = Math.round(((mrp - price) / mrp) * 100);
+                discountBadgeHtml = `
+                    <div class="absolute top-3 left-3 bg-[#DC2626] text-white text-[11px] font-black px-2 py-1 rounded-lg shadow-md z-10 tracking-wider">
+                        ${discountPercent}% OFF
+                    </div>
+                `;
+                priceDisplayHtml = `
+                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-sm font-black text-gray-900 shadow-sm border border-white/50 flex items-center gap-1.5">
+                        <span>₹${price}</span>
+                        <span class="text-[10px] text-gray-400 line-through">₹${mrp}</span>
+                    </div>
+                `;
+            }
 
             return `
             <div class="glass-card hover:bg-white rounded-[2rem] p-5 sm:p-6 hover:shadow-[0_20px_40px_rgba(168,85,247,0.08)] hover:-translate-y-2 transition-all duration-500 flex flex-col group cursor-pointer active:scale-95 reveal">
                 <div class="w-full aspect-square bg-gray-50 rounded-[1.5rem] mb-5 flex items-center justify-center relative overflow-hidden group-hover:opacity-90 transition-opacity">
                     ${image ? `<img src="${image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">` : `<i class="fas fa-box-open text-5xl text-gray-200 group-hover:scale-110 transition-transform duration-500"></i>`}
-                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-sm font-black text-gray-900 shadow-sm border border-white/50">₹${price}</div>
+                    
+                    <!-- ✨ YAHAN DISCOUNT AUR PRICE AAYEGA ✨ -->
+                    ${discountBadgeHtml}
+                    ${priceDisplayHtml}
+                    
                 </div>
                 <div class="min-w-0 flex-1 mb-5">
                     <h4 class="text-gray-900 font-bold text-lg leading-tight truncate group-hover:text-purple-600 transition-colors">${name}</h4>
@@ -1484,6 +1505,7 @@
                 </div>
             </div>`;
         }
+
              // ✨ DYNAMIC VIP BADGE GENERATOR ✨
         function getVIPBadge(isVerified, plan) {
             if (!isVerified) return '';
