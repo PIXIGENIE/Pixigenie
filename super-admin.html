@@ -31,6 +31,9 @@
         .glass-card { background: white; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 24px; }
         .ios-input { background: #F7F7F9; border-radius: 12px; height: 48px; border: 1px solid transparent; transition: 0.3s; padding: 0 16px; width: 100%; outline: none; }
         .ios-input:focus { background: white; border-color: #A855F7; }
+        /* Custom Scrollbar for list */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
 <body class="font-sans text-gray-800 pb-10">
@@ -40,7 +43,7 @@
         <h1 class="text-lg font-black tracking-widest uppercase flex items-center gap-2">
             <i class="fas fa-chess-king text-yellow-400 text-xl"></i> Super Admin
         </h1>
-        <button onclick="logoutAdmin()" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-bold transition">Logout</button>
+        <button onclick="logoutAdmin()" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-bold transition active:scale-95">Logout</button>
     </header>
 
     <main class="max-w-4xl mx-auto mt-8 px-4 space-y-6">
@@ -64,8 +67,7 @@
             <p class="text-xs text-gray-500 mb-5 font-semibold">Give a shop access to Plus or Pro VIP features.</p>
             
             <div class="flex flex-col sm:flex-row gap-3">
-           <input type="email" id="plan-shop-id" placeholder="Enter Shop Email ID" class="ios-input flex-1">
-
+                <input type="email" id="plan-shop-id" placeholder="Enter Shop Email ID" class="ios-input flex-1">
                 <select id="plan-select" class="ios-input sm:w-48 cursor-pointer font-bold text-gray-700">
                     <option value="basic">Basic (Free)</option>
                     <option value="plus">Plus (₹149)</option>
@@ -75,32 +77,27 @@
             </div>
         </div>
 
-        <!-- 3. SHOP CONTROL (BAN / DELETE) -->
+        <!-- 3. SHOP CONTROL (LIST & SEARCH BY NAME) -->
         <div class="glass-card border border-red-100">
             <h2 class="text-lg font-black text-gray-900 mb-1"><i class="fas fa-shield-alt text-red-500 mr-2"></i> Shop Control Center</h2>
-            <p class="text-xs text-gray-500 mb-5 font-semibold">Search a shop to View, Ban, or Delete it.</p>
+            <p class="text-xs text-gray-500 mb-5 font-semibold">Search by Shop Name or view recently registered shops.</p>
             
-            <div class="flex gap-3 mb-5">
-                <input type="text" id="search-shop-id" placeholder="Enter Exact Shop ID or Phone Number" class="ios-input flex-1">
-                <button id="btn-search-shop" onclick="searchShop()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 px-6 rounded-xl transition active:scale-95 whitespace-nowrap">Search</button>
+            <!-- Search Bar -->
+            <div class="flex gap-2 mb-5">
+                <input type="text" id="admin-search-shop" placeholder="Enter Shop Name to search..." class="ios-input flex-1 border border-gray-200">
+                <button onclick="adminSearchShop()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-bold transition active:scale-95 shadow-sm">Search</button>
             </div>
 
-            <!-- Search Result UI -->
-            <div id="shop-result-box" class="hidden bg-gray-50 rounded-2xl p-5 border border-gray-200">
-                <div class="flex justify-between items-start mb-4 border-b border-gray-200 pb-4">
-                    <div>
-                        <h3 id="res-shop-name" class="font-black text-lg text-gray-900">Store Name</h3>
-                        <p id="res-owner-info" class="text-sm font-bold text-gray-500 mt-1">Owner: Name | Phone: 0000</p>
-                        <span id="res-status-badge" class="inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest">STATUS</span>
-                    </div>
-                    <a id="res-visit-link" href="#" target="_blank" class="bg-white border border-gray-200 text-gray-700 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-gray-100 transition shadow-sm">Visit Store <i class="fas fa-external-link-alt ml-1"></i></a>
-                </div>
-                
-                <div class="flex gap-3">
-                    <button id="btn-toggle-ban" onclick="toggleBanShop()" class="flex-1 bg-orange-100 text-orange-700 border border-orange-200 font-bold py-3 rounded-xl transition active:scale-95">Ban Shop</button>
-                    <button id="btn-delete-shop" onclick="deleteShop()" class="flex-1 bg-red-100 text-red-700 border border-red-200 font-bold py-3 rounded-xl transition active:scale-95">Delete Permanently</button>
-                </div>
+            <!-- 🏪 Shop List Container -->
+            <div id="admin-shop-list" class="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                <!-- Shops yahan aayengi -->
+                <div class="text-center py-4"><i class="fas fa-spinner fa-spin text-gray-400"></i> Loading shops...</div>
             </div>
+
+            <!-- ⬇️ Load More Button -->
+            <button id="load-more-shops-btn" onclick="loadAdminShops(true)" class="w-full mt-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-bold py-3.5 rounded-xl transition active:scale-95 hidden flex justify-center items-center gap-2 text-sm">
+                Load More <i class="fas fa-arrow-down"></i>
+            </button>
         </div>
 
     </main>
@@ -114,24 +111,26 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadDashboardStats();
+            loadAdminShops(false); // Page load hote hi pehli 5 shops load karega
         });
 
-        // 1. Load Total Counts
+        // ==========================================
+        // 1. LIVE STATS LOGIC
+        // ==========================================
         async function loadDashboardStats() {
             try {
-                // Shops Count
                 const shopSnap = await db.collection('shops').get();
                 document.getElementById('stat-total-shops').innerText = shopSnap.size;
-
-                // Customers Count
                 const custSnap = await db.collection('customers').get();
                 document.getElementById('stat-total-customers').innerText = custSnap.size;
             } catch(e) { console.error("Error loading stats:", e); }
         }
 
-               // 2. Assign Plan Logic (Email ke zariye)
+        // ==========================================
+        // 2. ASSIGN PLAN LOGIC
+        // ==========================================
         async function assignPlan() {
-            const shopEmail = document.getElementById('plan-shop-id').value.trim().toLowerCase(); // Ab Email aayega
+            const shopEmail = document.getElementById('plan-shop-id').value.trim().toLowerCase(); 
             const selectedPlan = document.getElementById('plan-select').value;
             const btn = document.getElementById('btn-assign-plan');
 
@@ -140,18 +139,15 @@
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`; btn.disabled = true;
 
             try {
-                // Database mein Email se shop search karo
                 const shopQuery = await db.collection('shops').where('email', '==', shopEmail).get();
-                
                 if (shopQuery.empty) {
                     alert("⚠️ Is Email ID se koi bhi shop register nahi hai!");
                 } else {
-                    // Jo shop mili, uski asli ID nikal kar update kar do
                     const shopDoc = shopQuery.docs[0];
                     await db.collection('shops').doc(shopDoc.id).update({ plan: selectedPlan });
-                    
                     alert(`✅ Plan successfully updated to '${selectedPlan.toUpperCase()}' for: ${shopEmail}`);
-                    document.getElementById('plan-shop-id').value = ''; // Input box khali kar do
+                    document.getElementById('plan-shop-id').value = ''; 
+                    loadAdminShops(false); // Update hone ke baad list refresh kar do
                 }
             } catch (error) {
                 alert("Error updating plan: " + error.message);
@@ -159,116 +155,186 @@
             btn.innerHTML = `Assign Plan`; btn.disabled = false;
         }
 
+        // ==========================================
+        // 3. ADMIN SHOP LIST & PAGINATION
+        // ==========================================
+        let adminLastShopDoc = null;
+        let adminHasMoreShops = true;
 
-        // 3. Search Shop Logic
-        let currentSearchedShopId = null;
-        let currentShopStatus = "active";
+        async function loadAdminShops(isLoadMore = false) {
+            const listContainer = document.getElementById('admin-shop-list');
+            const loadMoreBtn = document.getElementById('load-more-shops-btn');
 
-        async function searchShop() {
-            const queryText = document.getElementById('search-shop-id').value.trim();
-            const btn = document.getElementById('btn-search-shop');
-            const resultBox = document.getElementById('shop-result-box');
-            
-            if (!queryText) return alert("Please enter Shop ID or Phone");
-            
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`; btn.disabled = true;
-            resultBox.classList.add('hidden');
-            currentSearchedShopId = null;
+            if (!isLoadMore) {
+                listContainer.innerHTML = '<div class="text-center py-6"><i class="fas fa-spinner fa-spin text-2xl text-blue-500 mb-2"></i><p class="text-sm text-gray-500">Loading shops...</p></div>';
+                adminLastShopDoc = null;
+                adminHasMoreShops = true;
+            }
+
+            if (!adminHasMoreShops) return;
+
+            if (isLoadMore && loadMoreBtn) {
+                loadMoreBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Loading...';
+                loadMoreBtn.disabled = true;
+            }
 
             try {
-                let shopDoc = null;
+                // Latest bani hui shop sabse upar ayegi, 5 ki limit
+                let query = db.collection('shops').orderBy('createdAt', 'desc').limit(5);
+                if (isLoadMore && adminLastShopDoc) { query = query.startAfter(adminLastShopDoc); }
 
-                // Pehle as Shop ID try karo
-                let docSnap = await db.collection('shops').doc(queryText).get();
-                if (docSnap.exists) {
-                    shopDoc = docSnap;
+                const snapshot = await query.get();
+
+                if (snapshot.empty) {
+                    if (!isLoadMore) listContainer.innerHTML = '<p class="text-center text-sm font-bold text-gray-500 py-6 bg-gray-50 rounded-xl">No shops registered yet.</p>';
+                    adminHasMoreShops = false;
+                    if (loadMoreBtn) loadMoreBtn.classList.add('hidden');
+                    return;
+                }
+
+                adminLastShopDoc = snapshot.docs[snapshot.docs.length - 1];
+
+                if (snapshot.docs.length < 5) {
+                    adminHasMoreShops = false;
+                    if (loadMoreBtn) loadMoreBtn.classList.add('hidden');
                 } else {
-                    // Agar nahi mila toh as Phone Number search karo
-                    const phoneSnap = await db.collection('shops').where('phone', '==', queryText).get();
-                    if (!phoneSnap.empty) {
-                        shopDoc = phoneSnap.docs[0];
+                    adminHasMoreShops = true;
+                    if (loadMoreBtn) {
+                        loadMoreBtn.classList.remove('hidden');
+                        loadMoreBtn.innerHTML = 'Load More <i class="fas fa-arrow-down"></i>';
+                        loadMoreBtn.disabled = false;
                     }
                 }
 
-                if (shopDoc) {
-                    const data = shopDoc.data();
-                    currentSearchedShopId = shopDoc.id;
-                    currentShopStatus = data.status || "active";
+                let html = '';
+                snapshot.forEach(doc => { html += generateAdminShopCard(doc.id, doc.data()); });
 
-                    document.getElementById('res-shop-name').innerText = data.shopName || "Unnamed Store";
-                    document.getElementById('res-owner-info').innerText = `Owner: ${data.ownerName || 'N/A'} | Phone: ${data.phone || 'N/A'}`;
-                    document.getElementById('res-visit-link').href = `store.html?shop=${shopDoc.id}`;
+                if (isLoadMore) listContainer.insertAdjacentHTML('beforeend', html);
+                else listContainer.innerHTML = html;
 
-                    const badge = document.getElementById('res-status-badge');
-                    const banBtn = document.getElementById('btn-toggle-ban');
-
-                    if (currentShopStatus === 'banned') {
-                        badge.innerText = "BANNED";
-                        badge.className = "inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest bg-red-100 text-red-700";
-                        banBtn.innerText = "Unban Shop";
-                        banBtn.className = "flex-1 bg-green-100 text-green-700 border border-green-200 font-bold py-3 rounded-xl transition active:scale-95";
-                    } else {
-                        badge.innerText = "ACTIVE";
-                        badge.className = "inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest bg-green-100 text-green-700";
-                        banBtn.innerText = "Ban Shop";
-                        banBtn.className = "flex-1 bg-orange-100 text-orange-700 border border-orange-200 font-bold py-3 rounded-xl transition active:scale-95";
-                    }
-
-                    resultBox.classList.remove('hidden');
-                } else {
-                    alert("❌ No shop found with this ID or Phone.");
-                }
             } catch (error) {
-                alert("Error searching: " + error.message);
+                console.error("Error loading shops:", error);
+                if (!isLoadMore) listContainer.innerHTML = `<p class="text-center text-red-500 text-sm py-4">Error loading shops. Ensure 'createdAt' index exists in Firebase.</p>`;
             }
-            btn.innerHTML = `Search`; btn.disabled = false;
         }
 
-        // 4. Ban / Unban Logic
-        async function toggleBanShop() {
-            if (!currentSearchedShopId) return;
+        // ==========================================
+        // 4. SEARCH SHOP BY NAME
+        // ==========================================
+        async function adminSearchShop() {
+            let searchVal = document.getElementById('admin-search-shop').value.trim();
+            const listContainer = document.getElementById('admin-shop-list');
+            const loadMoreBtn = document.getElementById('load-more-shops-btn');
+
+            if (!searchVal) {
+                loadAdminShops(false); // Box khali hone par wapas sab dikha do
+                return;
+            }
+
+            listContainer.innerHTML = '<div class="text-center py-6"><i class="fas fa-spinner fa-spin text-2xl text-blue-500 mb-2"></i><p class="text-sm text-gray-500">Searching...</p></div>';
+            if (loadMoreBtn) loadMoreBtn.classList.add('hidden'); // Search me pagination band
+
+            try {
+                // Name based search using startAt and endAt
+                const snapshot = await db.collection('shops')
+                    .orderBy('shopName')
+                    .startAt(searchVal)
+                    .endAt(searchVal + '\uf8ff')
+                    .limit(10)
+                    .get();
+
+                if (snapshot.empty) {
+                    listContainer.innerHTML = '<p class="text-center text-sm font-bold text-red-500 py-6 bg-red-50 rounded-xl">No shop found with this name.</p>';
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => { html += generateAdminShopCard(doc.id, doc.data()); });
+                listContainer.innerHTML = html;
+
+            } catch (error) {
+                console.error("Error searching:", error);
+                listContainer.innerHTML = `<p class="text-center text-red-500 text-[11px] py-4">Error: Need index for shopName. Check Firebase Console.</p>`;
+            }
+        }
+
+        // ==========================================
+        // 5. GENERATE SHOP CARD HTML (For Admin)
+        // ==========================================
+        function generateAdminShopCard(shopId, data) {
+            const isBanned = data.status === 'banned';
+            const statusColor = isBanned ? 'text-red-600 bg-red-100 border-red-200' : 'text-green-600 bg-green-100 border-green-200';
+            const statusText = isBanned ? 'BANNED' : 'ACTIVE';
+            const planText = data.plan ? data.plan.toUpperCase() : 'BASIC';
             
-            const isBanning = currentShopStatus !== 'banned';
+            return `
+            <div class="p-4 border border-gray-200 rounded-[16px] bg-white flex flex-col gap-3 shadow-sm hover:border-blue-300 transition-colors">
+                <div class="flex justify-between items-start">
+                    <div class="min-w-0 flex-1">
+                        <h4 class="font-black text-gray-900 text-[15px] truncate">${data.shopName || 'Unnamed Shop'}</h4>
+                        <p class="text-[11px] text-gray-500 mt-1 truncate font-medium"><i class="fas fa-fingerprint text-gray-400"></i> ${shopId}</p>
+                        <p class="text-[11px] text-gray-500 mt-1 truncate font-medium"><i class="fas fa-user text-gray-400"></i> ${data.ownerName || 'N/A'} | <i class="fas fa-phone-alt text-gray-400"></i> ${data.phone || 'N/A'}</p>
+                    </div>
+                    <div class="flex flex-col items-end gap-1.5 shrink-0 ml-2">
+                        <span class="px-2 py-0.5 rounded-md border text-[9px] font-black tracking-widest ${statusColor}">${statusText}</span>
+                        <span class="px-2 py-0.5 rounded-md border border-purple-200 text-[9px] font-black tracking-widest text-purple-600 bg-purple-50">${planText}</span>
+                    </div>
+                </div>
+                
+                <div class="flex gap-2 mt-2">
+                    <button onclick="window.open('store.html?shop=${shopId}', '_blank')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold py-2.5 rounded-xl hover:bg-gray-100 transition active:scale-95 shadow-sm"><i class="fas fa-external-link-alt"></i> View</button>
+                    <button onclick="toggleBanShop('${shopId}', '${data.status || 'active'}')" class="flex-1 ${isBanned ? 'bg-green-500 hover:bg-green-600' : 'bg-orange-500 hover:bg-orange-600'} text-white text-xs font-bold py-2.5 rounded-xl transition active:scale-95 shadow-sm"><i class="fas fa-ban"></i> ${isBanned ? 'Unban' : 'Ban'}</button>
+                    <button onclick="deleteShop('${shopId}')" class="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-xl transition active:scale-95 shadow-sm"><i class="fas fa-trash"></i> Delete</button>
+                </div>
+            </div>`;
+        }
+
+        // ==========================================
+        // 6. BAN / UNBAN LOGIC (Now dynamic per card)
+        // ==========================================
+        async function toggleBanShop(shopId, currentStatus) {
+            const isBanning = currentStatus !== 'banned';
             const confirmMsg = isBanning ? "Ban this shop? They won't be able to log in or sell." : "Unban this shop? They will be restored.";
             
             if (!confirm(confirmMsg)) return;
-
             const newStatus = isBanning ? "banned" : "active";
-            const btn = document.getElementById('btn-toggle-ban');
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
 
             try {
-                await db.collection('shops').doc(currentSearchedShopId).update({ status: newStatus });
+                await db.collection('shops').doc(shopId).update({ status: newStatus });
                 alert(`Shop successfully ${newStatus}!`);
-                searchShop(); // Refresh UI
-            } catch (error) {
-                alert("Error: " + error.message);
-                btn.innerHTML = "Error";
-            }
+                
+                // Agar search box me kuch tha toh search refresh karo, warna normal list
+                if (document.getElementById('admin-search-shop').value.trim()) {
+                    adminSearchShop();
+                } else {
+                    loadAdminShops(false); 
+                }
+            } catch (error) { alert("Error: " + error.message); }
         }
 
-        // 5. Delete Shop Logic
-        async function deleteShop() {
-            if (!currentSearchedShopId) return;
-            
+        // ==========================================
+        // 7. DELETE SHOP LOGIC
+        // ==========================================
+        async function deleteShop(shopId) {
             if (!confirm("🚨 WARNING: This will permanently delete the shop. Are you 100% sure?")) return;
 
-            const btn = document.getElementById('btn-delete-shop');
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
-
             try {
-                await db.collection('shops').doc(currentSearchedShopId).delete();
+                await db.collection('shops').doc(shopId).delete();
                 alert("🗑️ Shop deleted permanently.");
-                document.getElementById('shop-result-box').classList.add('hidden');
-                document.getElementById('search-shop-id').value = '';
-                loadDashboardStats(); // Update numbers
-            } catch (error) {
-                alert("Error deleting shop: " + error.message);
-                btn.innerHTML = "Delete Permanently";
-            }
+                
+                loadDashboardStats(); // Numbers update karega
+
+                if (document.getElementById('admin-search-shop').value.trim()) {
+                    adminSearchShop();
+                } else {
+                    loadAdminShops(false); 
+                }
+            } catch (error) { alert("Error deleting shop: " + error.message); }
         }
 
-        // 6. Logout Admin
+        // ==========================================
+        // 8. LOGOUT ADMIN
+        // ==========================================
         function logoutAdmin() {
             localStorage.removeItem('pixigenie_super_admin');
             window.location.href = "index.html";
