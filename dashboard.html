@@ -498,7 +498,7 @@
                             </div>
                         </div>
 
-                        <!-- ✨ TAB 5: LIVE ORDERS (NEW TAB) ✨ -->
+                                            <!-- ✨ TAB 5: LIVE ORDERS (NEW TAB) ✨ -->
                         <div id="tab-orders" class="tab-content hidden space-y-8">
                             <div class="ios-card p-5 sm:p-8 border border-[#E5E7EB]">
                                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -507,6 +507,22 @@
                                         Live Orders
                                     </h3>
                                 </div>
+                                
+                                <!-- ✨ NAYA: SEARCH & FILTER OPTIONS ✨ -->
+                                <div class="flex flex-col sm:flex-row gap-3 mb-6">
+                                    <div class="relative flex-1">
+                                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]"></i>
+                                        <input type="text" id="live-order-search" onkeyup="filterLiveOrders()" placeholder="Search by Customer Name or ID..." class="w-full bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] focus:border-[#A855F7] rounded-[14px] h-[46px] pl-11 pr-4 text-sm font-semibold outline-none transition-all shadow-sm">
+                                    </div>
+                                    <select id="live-order-filter" onchange="filterLiveOrders()" class="w-full sm:w-40 bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] focus:border-[#A855F7] rounded-[14px] h-[46px] px-4 text-xs font-bold tracking-wide outline-none cursor-pointer transition-all shadow-sm">
+                                        <option value="All">ALL ORDERS</option>
+                                        <option value="pending">PENDING</option>
+                                        <option value="accepted">ACCEPTED</option>
+                                        <option value="delivered">DELIVERED</option>
+                                        <option value="cancelled">CANCELLED</option>
+                                    </select>
+                                </div>
+
                                 <div id="merchant-orders-list" class="flex flex-col gap-4 max-h-[65vh] overflow-y-auto custom-scrollbar p-1">
                                     <div class="text-center py-10">
                                         <i class="fas fa-circle-notch fa-spin text-3xl text-[#A855F7] mb-3"></i>
@@ -515,6 +531,7 @@
                                 </div>
                             </div>
                         </div>
+
 
                                          <!-- ✨ TAB 2: INVENTORY ✨ -->
                         <div id="tab-inventory" class="tab-content hidden space-y-8">
@@ -597,15 +614,23 @@
                         <!-- ✨ TAB 4: CUSTOMERS ✨ -->
                         <div id="tab-crm" class="tab-content hidden space-y-8">
                             <div class="ios-card p-5 sm:p-8 border border-[#E5E7EB]">
-                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                                                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                                     <h3 class="text-xl font-bold text-[#111827] flex items-center gap-2">
                                         <div class="w-10 h-10 bg-[#FCE7F3] text-[#DB2777] rounded-[12px] flex items-center justify-center"><i class="fas fa-users"></i></div>
                                         Customers
                                     </h3>
-                                    <button onclick="openAddCustomerModal()" class="w-full sm:w-auto bg-[#111827] hover:bg-black text-white text-sm font-bold px-5 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm">
-                                        <i class="fas fa-user-plus"></i> Add Customer
-                                    </button>
+                                    
+                                    <!-- ✨ NAYA: DUAL BUTTONS ✨ -->
+                                    <div class="flex gap-2 w-full sm:w-auto">
+                                        <button onclick="openAddCustomerModal()" class="flex-1 sm:w-auto bg-[#111827] hover:bg-black text-white text-sm font-bold px-4 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-sm active:scale-95">
+                                            <i class="fas fa-user-plus"></i> Add Customer
+                                        </button>
+                                        <button onclick="checkPremiumAndExecute(openOfferModal)" class="flex-1 sm:w-auto bg-gradient-to-r from-pink-500 to-rose-500 text-white text-sm font-bold px-4 h-10 rounded-[12px] flex justify-center items-center gap-2 transition shadow-[0_4px_15px_rgba(236,72,153,0.3)] active:scale-95">
+                                            <i class="fas fa-gift"></i> Create Offer
+                                        </button>
+                                    </div>
                                 </div>
+
                                 <div class="relative mb-6">
                                     <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9CA3AF]"></i>
                                     <input type="text" id="admin-search-customer" onkeyup="renderAdminCustomers()" placeholder="Search by Name or Phone..." class="w-full ios-input pl-11 pr-4 text-sm font-semibold outline-none">
@@ -622,6 +647,37 @@
     </div>
 
     <!-- MODALS -->
+        <!-- ✨ CREATE OFFER MODAL ✨ -->
+    <div id="create-offer-modal" class="fixed inset-0 bg-[#111827]/60 backdrop-blur-sm z-[150] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+        <div class="bg-white rounded-[24px] shadow-2xl max-w-sm w-full p-6 relative transform scale-95 transition-all duration-300" id="create-offer-content">
+            <button onclick="closeOfferModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90"><i class="fas fa-times"></i></button>
+            
+            <div class="w-14 h-14 bg-pink-50 text-pink-500 rounded-[16px] flex items-center justify-center text-2xl mb-4 border border-pink-100">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+            <h3 class="text-xl font-black text-gray-900 mb-1">Create Flash Offer</h3>
+            <p class="text-xs text-gray-500 mb-5 font-medium">This will pop up on your store for every customer once.</p>
+
+            <form onsubmit="submitFlashOffer(event)" class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Hooking Message *</label>
+                    <textarea id="offer-msg" required rows="3" placeholder="e.g. 🎉 HURRY! Flat 50% OFF on all items today!" class="w-full bg-[#F7F7F9] focus:bg-white border border-gray-200 focus:border-pink-500 rounded-[14px] p-3 text-sm font-bold text-gray-900 outline-none resize-none transition-all"></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Link Product (Optional)</label>
+                    <select id="offer-product-id" class="w-full bg-[#F7F7F9] focus:bg-white border border-gray-200 focus:border-pink-500 rounded-[14px] h-[46px] px-3 text-sm font-bold text-gray-900 outline-none transition-all cursor-pointer">
+                        <!-- JS se load hoga -->
+                    </select>
+                </div>
+
+                <button type="submit" id="offer-submit-btn" class="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold h-[48px] rounded-[14px] mt-2 active:scale-95 transition-transform shadow-[0_8px_20px_rgba(236,72,153,0.3)] flex justify-center items-center gap-2">
+                    Publish Offer <i class="fas fa-rocket"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- CREATE BILL MODAL -->
     <div id="create-bill-modal" class="fixed inset-0 bg-[#111827]/40 backdrop-blur-sm z-[90] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
         <div class="bg-white rounded-[24px] shadow-2xl border border-[#E5E7EB] w-full max-w-xl max-h-[95vh] flex flex-col overflow-hidden">
@@ -957,8 +1013,10 @@
         let materialBatches = [];
         let draftBillItems = [];
         let insightChartInstance = null;
+        
         let liveOrdersUnsubscribe = null; // ✨ For Real-time Orders
-
+        let globalLiveOrders = []; // ✨ NAYA: For filtering live orders
+        
         if (currentShopId) {
             localStorage.setItem('pixigenie_active_shop', currentShopId);
             loadShopData();
@@ -1303,8 +1361,11 @@
                         live.push({id: doc.id, ...data});
                     });
                     
-                    live.sort((a,b) => (b.createdAt?.toMillis()||0) - (a.createdAt?.toMillis()||0));
-                    renderLiveOrders(live);
+                                        live.sort((a,b) => (b.createdAt?.toMillis()||0) - (a.createdAt?.toMillis()||0));
+                    
+                    // ✨ NAYA: Data ko global variable me save karke filter apply karo ✨
+                    globalLiveOrders = live;
+                    filterLiveOrders();
 
                     // 🔔 Badge Update Logic
                     const badge = document.getElementById('live-orders-badge');
@@ -1317,6 +1378,41 @@
                         }
                     }
                 });
+
+
+        // ==========================================
+        // ✨ NAYA: LIVE ORDERS SEARCH & FILTER FUNCTION ✨
+        // ==========================================
+        function filterLiveOrders() {
+            const searchInput = document.getElementById('live-order-search');
+            const filterInput = document.getElementById('live-order-filter');
+            
+            // Agar HTML elements nahi mile toh kuch mat karo (Error prevent karne ke liye)
+            if(!searchInput || !filterInput) return;
+
+            const searchVal = searchInput.value.toLowerCase().trim();
+            const statusVal = filterInput.value;
+            
+            let filteredOrders = globalLiveOrders.filter(order => {
+                // 1. Search Condition (Name ya ID match)
+                let matchSearch = true;
+                if (searchVal !== "") {
+                    matchSearch = (order.customerName && order.customerName.toLowerCase().includes(searchVal)) || 
+                                  (order.id && order.id.toLowerCase().includes(searchVal));
+                }
+                
+                // 2. Status Filter Condition
+                let matchStatus = true;
+                if (statusVal !== 'All') {
+                    matchStatus = order.status === statusVal;
+                }
+                
+                return matchSearch && matchStatus;
+            });
+            
+            // Filter hui list ko screen par dikhao
+            renderLiveOrders(filteredOrders);
+        }
 
 
             try { const snap = await shopRef.collection('products').orderBy('timestamp', 'desc').get();
@@ -7746,6 +7842,60 @@ td.mono {
             }
         }
 
+        // ==========================================
+        // ✨ FLASH OFFER LOGIC (DASHBOARD) ✨
+        // ==========================================
+        function openOfferModal() {
+            const select = document.getElementById('offer-product-id');
+            select.innerHTML = '<option value="">-- No specific product --</option>';
+            storeProducts.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.name} (₹${p.price})</option>`;
+            });
+
+            document.getElementById('offer-msg').value = '';
+            
+            const modal = document.getElementById('create-offer-modal');
+            const content = document.getElementById('create-offer-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+        }
+
+        function closeOfferModal() {
+            const modal = document.getElementById('create-offer-modal');
+            const content = document.getElementById('create-offer-content');
+            modal.classList.add('opacity-0'); content.classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        async function submitFlashOffer(e) {
+            e.preventDefault();
+            const msg = document.getElementById('offer-msg').value.trim();
+            const prodId = document.getElementById('offer-product-id').value;
+            
+            const btn = document.getElementById('offer-submit-btn');
+            const orig = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Publishing...`;
+            btn.disabled = true;
+
+            // Generate unique ID based on time so store knows it's a NEW offer
+            const uniqueOfferId = 'offer_' + Date.now();
+
+            try {
+                await db.collection('shops').doc(currentShopId).update({
+                    activeFlashOffer: {
+                        offerId: uniqueOfferId,
+                        message: msg,
+                        productId: prodId || null,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    }
+                });
+                iosAlert("Success!", "Your eye-catching offer is now LIVE on your store.");
+                closeOfferModal();
+            } catch(error) {
+                alert("Error: " + error.message);
+            }
+            btn.innerHTML = orig; btn.disabled = false;
+        }
 
     </script>
     <!-- ✨ iOS STYLE PREMIUM SHARE MODAL (WITH QR CODE) ✨ -->
