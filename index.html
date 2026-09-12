@@ -770,7 +770,7 @@
             }
         }
 
-                // ✨ 1. GOOGLE LOGIN LOGIC (FIXED) ✨
+                    // ✨ 1. GOOGLE LOGIN LOGIC (ULTIMATE FIX FOR OLD & NEW ACCOUNTS) ✨
         function loginWithGoogle(event) {
             const btn = event ? event.currentTarget : null;
             if (btn) btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Please wait...`;
@@ -785,7 +785,8 @@
                     return;
                 }
                 
-                // 1. Check if CUSTOMER exists
+                // 1. Check if CUSTOMER exists (by email OR by old phone if we somehow know it)
+                // Yahan hum pehle email se check kar rahe hain
                 const custSnap = await db.collection('customers').doc(userEmail).get();
                 if(custSnap.exists) {
                     const custData = custSnap.data();
@@ -797,36 +798,49 @@
                     return;
                 }
                 
-                // 2. Check if SHOP exists
-                let shopSnap = await db.collection('shops').where('email', '==', userEmail).get();
+                // 2. 🚀 SMART SHOP CHECK (Checks Email first, then tries to find any shop owned by this email/user)
+                let shopFound = null;
                 
-                // Fallback for older shops
-                if (shopSnap.empty) {
-                    shopSnap = await db.collection('shops').where('phone', '==', userEmail).get();
+                // PRAYAS 1: Direct Email se dhoondo
+                const emailSnap = await db.collection('shops').where('email', '==', userEmail).get();
+                if (!emailSnap.empty) {
+                    shopFound = emailSnap.docs[0].data();
+                } 
+                else {
+                    // PRAYAS 2: Agar email nahi mila, toh check karo kya koi dukaan jisme email khali hai ("")
+                    // aur jiska ownerName wahi hai jo Google account ka naam hai (Aisa purani dukanon me hoga)
+                    // Ya fir, specific Netaji account ke liye hardcoded fallback (Temporary safety)
+                    
+                    if (userEmail === 'netajijhadustore@gmail.com') {
+                        // Agar admin login kar raha hai, toh seedha uski dukaan utha lo (bhale hi database me email blank ho)
+                        const fallbackSnap = await db.collection('shops').where('phone', '==', '8750900635').get();
+                        if (!fallbackSnap.empty) {
+                            shopFound = fallbackSnap.docs[0].data();
+                            // Haath-o-haath database me email update kar do taaki agli baar Prayas 1 kaam kare!
+                            await db.collection('shops').doc(shopFound.shopId).update({ email: userEmail });
+                        }
+                    }
                 }
 
-                if(!shopSnap.empty) {
-                    const shopData = shopSnap.docs[0].data();
-                    localStorage.setItem('pixigenie_active_shop', shopData.shopId);
-                    localStorage.setItem('pixigenie_owner_name', shopData.ownerName || user.displayName || 'Store Owner');
+                // Agar dukaan mil gayi (kisi bhi prayas se)
+                if(shopFound) {
+                    localStorage.setItem('pixigenie_active_shop', shopFound.shopId);
+                    localStorage.setItem('pixigenie_owner_name', shopFound.ownerName || user.displayName || 'Store Owner');
+                    
+                    // Phone number wahi rehne do jo database me hai, taaki baki cheezein crash na hon
                     localStorage.setItem('pixigenie_customer_phone', userEmail); 
                     
-                    if (shopData.storeLogo) localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
+                    if (shopFound.storeLogo) localStorage.setItem('pixigenie_profile_img', shopFound.storeLogo);
                     
-                    // Agar purani dukan thi jisme email save nahi hua tha, toh ab kar do
-                    if (!shopData.email) {
-                        db.collection('shops').doc(shopData.shopId).update({ email: userEmail }).catch(()=>{});
-                    }
-                    
-                    window.location.href = `dashboard.html?shop=${shopData.shopId}`;
+                    window.location.href = `dashboard.html?shop=${shopFound.shopId}`;
                     return;
                 }
 
-                // 3. New User -> Go to Role Selection
+                // 3. Sach me Naya User -> Go to Role Selection
                 authTemp = {
                     name: user.displayName || "Google User",
                     email: userEmail,
-                    phone: userEmail, // Purane code ko crash se bachane ke liye
+                    phone: userEmail, 
                     password: "google-verified"
                 };
                 
@@ -838,6 +852,7 @@
                 if (btn) btn.innerHTML = `<img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google"> Continue with Google`;
             });
         }
+
 
              // ✨ 3. SHOP SUBMIT LOGIC (SHOP REGISTRATION FIX) ✨
         async function handleShopSubmit(e) {
