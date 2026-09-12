@@ -1298,7 +1298,7 @@
                     document.getElementById('store-name-display').innerText = globalShopData.shopName;
                     document.getElementById('menu-owner-name').innerText = globalShopData.ownerName;
                     
-                                   // ==========================================
+                                                   // ==========================================
                     // ✨ NAYA: DYNAMIC TERMINOLOGY (Product vs Service) ✨
                     // ==========================================
                     const isService = (globalShopData.businessType === 'Service Provider');
@@ -1335,13 +1335,13 @@
 
                     // Add Form Update
                     updatePlaceholder('prod-name', 'Product Name (e.g. Amul Milk)', 'Service Name (e.g. AC Repair)');
-                    updatePlaceholder('prod-price', 'Selling Price', 'Service Charge');
+                    updatePlaceholder('prod-price', 'Selling Price', 'Charge'); 
                     updatePlaceholder('prod-mrp', 'MRP (Max Price)', 'Regular Fee');
                     updatePlaceholder('prod-desc', 'Product Description (Optional)', 'Service Description (Optional)');
 
                     // Edit Form Update
                     updatePlaceholder('edit-prod-name', 'Product Name', 'Service Name');
-                    updatePlaceholder('edit-prod-price', 'Sale Price', 'Service Charge');
+                    updatePlaceholder('edit-prod-price', 'Sale Price', 'Charge');
                     updatePlaceholder('edit-prod-mrp', 'MRP', 'Regular Fee');
                     updatePlaceholder('edit-prod-desc', 'Product Description (Optional)', 'Service Description (Optional)');
 
@@ -2261,7 +2261,21 @@
             const imgBase64 = await processImage(document.getElementById('prod-image'));
 
             try { 
-                let pd = { name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: desc, image: imgBase64, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
+             // 🔥 NAYA: Dukaandar ki jo rank hai, wahi rank uske product ko bhi mil jayegi
+let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
+
+let pd = { 
+    name: n, 
+    mrp: mrpVal, 
+    price: p, 
+    qtySize: qtySize, 
+    unit: unit, 
+    description: desc, 
+    image: imgBase64, 
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    searchRank: currentRank // 🔥 PRODUCT KO BHI RANK MIL GAYI
+};
+
 
                 const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
                 pd.id = doc.id; storeProducts.unshift(pd); e.target.reset(); renderAdminProducts(); 
@@ -3105,6 +3119,17 @@
             btn.disabled = true;
 
             try {
+                // ✨ NAYA LOGIC: Plan ke hisaab se Search Rank set karna ✨
+                let currentPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
+                let rankScore = 0; 
+                
+                // Admin aur Pro ko Rank 100
+                if (currentPlan === 'pro' || storeEmail === 'netajijhadustore@gmail.com') {
+                    rankScore = 100; 
+                } else if (currentPlan === 'plus') {
+                    rankScore = 50;  
+                }
+
                 const updateData = {
                     shopName: shopName, 
                     ownerName: ownerName,
@@ -3115,13 +3140,12 @@
                     category: category,
                     homeDelivery: offersDelivery,   // ✨ Naya Field
                     deliveryArea: deliveryRange,    // ✨ Naya Field
-                                     
-                                     
                     address: address,
                     landmark: landmark,
                     googleMapLink: mapLink,
                     setupCompleted: true,
-                    status: "active"
+                    status: "active",
+                    searchRank: rankScore  // 🔥 YAHAN ADD KIYA HAI!
                 };
                 
                 if(typeof shopLat !== 'undefined' && shopLat !== null) updateData.latitude = shopLat;
@@ -3414,14 +3438,15 @@ function downloadSmartReport(e) {
             // 1. BASIC HELPERS
             // ====================================================
 
-            const esc = (value) => {
-                return String(value ?? "")
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
-            };
+          const esc = (value) => {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+};
+
 
             const money = (value) => {
                 const n = Number(value) || 0;
