@@ -1414,44 +1414,53 @@ searchInput.placeholder = "Search products, services, or shops...";
             }
         }
 
-            // ===============================================
-        // 2. REPLACED: fetchGlobalProducts()
+                    // ===============================================
+        // ✨ NAYA FUNCTION: Safe Global Products (JS Sorting Fix) ✨
         // ===============================================
         async function fetchGlobalProducts() {
             const grid = document.getElementById('dynamic-grid');
             try {
-              // 🔥 MAGIC: Jis dukaandar ka rank 100 (Pro) hai, uska product automatically pehle dikhega!
-const snapshot = await db.collectionGroup('products')
-    .orderBy('searchRank', 'desc')
-    .limit(12)
-    .get();
+                // 🔥 SAFE FETCH: Bina orderBy ke mangwayenge taaki purane products gayab na hon
+                const snapshot = await db.collectionGroup('products').limit(60).get();
 
                 if (snapshot.empty) throw new Error("No products");
                 
-                const productPromises = snapshot.docs.map(async (doc) => {
-                    const product = doc.data();
+                let allProducts = [];
+                snapshot.forEach(doc => {
+                    let data = doc.data();
+                    data.docRef = doc.ref; // Shop info nikalne ke liye reference save kiya
+                    allProducts.push(data);
+                });
+
+                // 🔥 JAVASCRIPT SORTING: Jiske paas searchRank nahi hai use 0 maan lenge (Pro products top par)
+                allProducts.sort((a, b) => (b.searchRank || 0) - (a.searchRank || 0));
+
+                // Sirf top 20 products dikhayenge
+                allProducts = allProducts.slice(0, 20);
+
+                const productPromises = allProducts.map(async (product) => {
                     let shopName = "Local Shop";
                     let shopPhone = "";
                     let shopId = ""; 
                     let isVerified = false; 
                     let shopPlan = ""; 
+                    let isService = false;
                     
-                    if (doc.ref.parent && doc.ref.parent.parent) {
+                    if (product.docRef.parent && product.docRef.parent.parent) {
                         try {
-                            const shopDoc = await doc.ref.parent.parent.get();
+                            const shopDoc = await product.docRef.parent.parent.get();
                             if (shopDoc.exists) {
                                 const sData = shopDoc.data();
                                 shopName = sData.shopName || "Local Shop";
                                 shopPhone = sData.phone || "";
                                 shopId = shopDoc.id; 
                                 shopPlan = sData.plan || ""; 
-                                
                                 isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro' || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
+                                if (sData.businessType === 'Service Provider') isService = true;
                             }
                         } catch(e) {}
                     }
                     
-                    // ✨ NAYA: product.mrp pass kar rahe hain ✨
                     return generateProductCard(product.name, product.mrp, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan, isService);
                 });
 
@@ -1460,76 +1469,80 @@ const snapshot = await db.collectionGroup('products')
                 
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
             } catch (error) { 
-                grid.innerHTML = `
-                    ${generateProductCard("Premium Quality Brooms", "199", "150", "Netaji Jhadu Store", "9876543210", "", "netajijhadustore", true, "pro")}
-                `;
-                if(typeof initScrollAnimations === 'function') initScrollAnimations();
+                console.error("Fetch Error: ", error);
+                grid.innerHTML = `<div class="col-span-full text-center py-10"><p class="text-gray-500 font-medium">No products found around you.</p></div>`;
             }
         }
-// Naya function: Products aur Services ko alag-alag load karne ke liye
-async function fetchGlobalItems(itemType) {
-    const grid = document.getElementById('dynamic-grid');
-    try {
-        // Firebase se items fetch karein
-        const snapshot = await db.collectionGroup('products')
-            .orderBy('searchRank', 'desc')
-            .limit(20)
-            .get();
 
-        if (snapshot.empty) throw new Error("No items");
-        
-        const itemPromises = snapshot.docs.map(async (doc) => {
-            const product = doc.data();
-            let shopName = "Local Shop";
-            let shopPhone = "";
-            let shopId = ""; 
-            let isVerified = false; 
-            let shopPlan = ""; 
-            let isService = false; // Check karne ke liye ki item service hai ya nahi
-            
-            if (doc.ref.parent && doc.ref.parent.parent) {
-                try {
-                    const shopDoc = await doc.ref.parent.parent.get();
-                    if (shopDoc.exists) {
-                        const sData = shopDoc.data();
-                        shopName = sData.shopName || "Local Shop";
-                        shopPhone = sData.phone || "";
-                        shopId = shopDoc.id; 
-                        shopPlan = sData.plan || ""; 
-                        isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro' || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
-                        
-                        // Check karein ki shop owner 'Service Provider' hai kya
-                        if (sData.businessType === 'Service Provider') {
-                            isService = true;
-                        }
+        // ===============================================
+        // ✨ NAYA FUNCTION: Safe Item Loader (JS Sorting Fix) ✨
+        // ===============================================
+        async function fetchGlobalItems(itemType) {
+            const grid = document.getElementById('dynamic-grid');
+            try {
+                // 🔥 SAFE FETCH
+                const snapshot = await db.collectionGroup('products').limit(60).get();
+
+                if (snapshot.empty) throw new Error("No items");
+                
+                let allItems = [];
+                snapshot.forEach(doc => {
+                    let data = doc.data();
+                    data.docRef = doc.ref; 
+                    allItems.push(data);
+                });
+
+                // 🔥 JAVASCRIPT SORTING (Pro products & services top par)
+                allItems.sort((a, b) => (b.searchRank || 0) - (a.searchRank || 0));
+
+                const itemPromises = allItems.map(async (product) => {
+                    let shopName = "Local Shop";
+                    let shopPhone = "";
+                    let shopId = ""; 
+                    let isVerified = false; 
+                    let shopPlan = ""; 
+                    let isService = false; 
+                    
+                    if (product.docRef.parent && product.docRef.parent.parent) {
+                        try {
+                            const shopDoc = await product.docRef.parent.parent.get();
+                            if (shopDoc.exists) {
+                                const sData = shopDoc.data();
+                                shopName = sData.shopName || "Local Shop";
+                                shopPhone = sData.phone || "";
+                                shopId = shopDoc.id; 
+                                shopPlan = sData.plan || ""; 
+                                isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro' || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
+                                
+                                if (sData.businessType === 'Service Provider') {
+                                    isService = true;
+                                }
+                            }
+                        } catch(e) {}
                     }
-                } catch(e) {}
+                    
+                    // 🔥 FILTER LOGIC 🔥
+                    if (itemType === 'product' && isService) return null;
+                    if (itemType === 'service' && !isService) return null;
+
+                    return generateProductCard(product.name, product.mrp, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan, isService);
+                });
+
+                // Filter out nulls aur sirf top 20 dikhao
+                const cardsHtmlArray = (await Promise.all(itemPromises)).filter(card => card !== null).slice(0, 20); 
+                
+                if (cardsHtmlArray.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full text-center py-16"><i class="fas fa-box-open text-4xl text-gray-200 mb-3"></i><p class="text-gray-500 font-medium">No ${itemType}s found.</p></div>`;
+                } else {
+                    grid.innerHTML = cardsHtmlArray.join('');
+                }
+                
+                if(typeof initScrollAnimations === 'function') initScrollAnimations();
+            } catch (error) { 
+                console.error("Fetch Error: ", error);
+                grid.innerHTML = `<div class="col-span-full text-center py-10"><p class="text-red-500 font-medium">No active ${itemType}s available right now.</p></div>`;
             }
-            
-            // 🔥 FILTER LOGIC 🔥
-            // Agar tab 'product' hai par dukaan 'service' wali hai, toh isko hata do
-            if (itemType === 'product' && isService) return null;
-            // Agar tab 'service' hai par dukaan 'product' wali hai, toh isko hata do
-            if (itemType === 'service' && !isService) return null;
-
-         return generateProductCard(product.name, product.mrp, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan, isService);
-        });
-
-        // Saare filtered items ko resolve karein aur null values ko hata dein
-        const cardsHtmlArray = (await Promise.all(itemPromises)).filter(card => card !== null);
-        
-        if (cardsHtmlArray.length === 0) {
-            grid.innerHTML = `<div class="col-span-full text-center py-16"><i class="fas fa-box-open text-4xl text-gray-200 mb-3"></i><p class="text-gray-500 font-medium">No ${itemType}s found around you.</p></div>`;
-        } else {
-            grid.innerHTML = cardsHtmlArray.join('');
         }
-        
-        if(typeof initScrollAnimations === 'function') initScrollAnimations();
-    } catch (error) { 
-        console.error(error);
-        grid.innerHTML = `<div class="col-span-full text-center py-10"><p class="text-red-500 font-medium">Failed to load ${itemType}s.</p></div>`;
-    }
-}
 
    // ✨ NAYA: isService parameter end me add kiya hai ✨
 function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopId = "", isVerified = false, plan = "", isService = false) {
