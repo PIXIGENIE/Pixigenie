@@ -749,17 +749,19 @@
             btn.disabled = false;
         }
 
+                // ✨ 2. SELECT ROLE LOGIC (FIXED) ✨
         async function selectRole(role) {
             if (role === 'customer') {
                 try {
-                    await db.collection('customers').doc(authTemp.phone).set({
+                    await db.collection('customers').doc(authTemp.email).set({
                         name: authTemp.name,
-                        phone: authTemp.phone,
+                        email: authTemp.email,
+                        phone: authTemp.email, 
                         password: authTemp.password,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     localStorage.setItem('pixigenie_customer_name', authTemp.name);
-                    localStorage.setItem('pixigenie_customer_phone', authTemp.phone);
+                    localStorage.setItem('pixigenie_customer_phone', authTemp.email);
                     closeAuthModal(); 
                     updateUIBasedOnLogin();
                 } catch (error) { alert("Error: " + error.message); }
@@ -768,85 +770,76 @@
             }
         }
 
-              // ✨ GOOGLE LOGIN LOGIC (SMART FIX: Email, Phone & Super Admin check karega) ✨
+                // ✨ 1. GOOGLE LOGIN LOGIC (FIXED) ✨
         function loginWithGoogle(event) {
             const btn = event ? event.currentTarget : null;
             if (btn) btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Please wait...`;
             
             auth.signInWithPopup(googleProvider).then(async (result) => {
                 const user = result.user;
-                const userEmailOrId = user.email || user.uid;
+                const userEmail = user.email || user.uid; 
                 
-                // 🚀 1. SUPER ADMIN CHECK 🚀
-                if (user.email === 'pixigenie8750@gmail.com') {
+                if (userEmail === 'pixigenie8750@gmail.com') {
                     localStorage.setItem('pixigenie_super_admin', 'true');
                     window.location.href = 'super-admin.html';
-                    return; // Admin hai toh code yahin se naye page par chala jayega
+                    return;
                 }
                 
-                // 2. अगर पुराना कस्टमर है तो सीधा लॉगिन
-                const custSnap = await db.collection('customers').doc(userEmailOrId).get();
+                // 1. Check if CUSTOMER exists
+                const custSnap = await db.collection('customers').doc(userEmail).get();
                 if(custSnap.exists) {
                     const custData = custSnap.data();
                     localStorage.setItem('pixigenie_customer_name', custData.name);
-                    localStorage.setItem('pixigenie_customer_phone', custData.phone);
-                    
-                    if (custData.profileImage) {
-                        localStorage.setItem('pixigenie_profile_img', custData.profileImage);
-                    }
-                    
+                    localStorage.setItem('pixigenie_customer_phone', userEmail); 
+                    if (custData.profileImage) localStorage.setItem('pixigenie_profile_img', custData.profileImage);
                     closeAuthModal();
                     updateUIBasedOnLogin();
                     return;
                 }
                 
-                            // 3. 🚀 SHOP CHECK BY EMAIL OR PHONE (N/A Fix)
-                let shopSnap = await db.collection('shops').where('email', '==', user.email).get();
-                if (shopSnap.empty && user.email) {
-                    shopSnap = await db.collection('shops').where('phone', '==', user.email).get();
+                // 2. Check if SHOP exists
+                let shopSnap = await db.collection('shops').where('email', '==', userEmail).get();
+                
+                // Fallback for older shops
+                if (shopSnap.empty) {
+                    shopSnap = await db.collection('shops').where('phone', '==', userEmail).get();
                 }
 
                 if(!shopSnap.empty) {
                     const shopData = shopSnap.docs[0].data();
                     localStorage.setItem('pixigenie_active_shop', shopData.shopId);
                     localStorage.setItem('pixigenie_owner_name', shopData.ownerName || user.displayName || 'Store Owner');
+                    localStorage.setItem('pixigenie_customer_phone', userEmail); 
                     
-                    // ✨ NAYA LOGIC: Agar phone "N/A" hai toh direct Email use karega
-                    let validContact = shopData.email || user.email; 
-                    if (shopData.phone && shopData.phone !== 'N/A' && shopData.phone !== '') {
-                        validContact = shopData.phone;
-                    }
-                    localStorage.setItem('pixigenie_customer_phone', validContact);
+                    if (shopData.storeLogo) localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
                     
-                    if (shopData.storeLogo) {
-                        localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
-                    }
-                    
-                    // Agar purani dukan me email save nahi tha, toh ab background me update kar dega
-                    if (!shopData.email && user.email) {
-                        db.collection('shops').doc(shopData.shopId).update({ email: user.email }).catch(() => {});
+                    // Agar purani dukan thi jisme email save nahi hua tha, toh ab kar do
+                    if (!shopData.email) {
+                        db.collection('shops').doc(shopData.shopId).update({ email: userEmail }).catch(()=>{});
                     }
                     
                     window.location.href = `dashboard.html?shop=${shopData.shopId}`;
                     return;
                 }
 
-                // 4. ✨ अगर सच में नया यूज़र है, तो Role Selection दिखाओ
-                authTemp.name = user.displayName || "Google User";
-                authTemp.phone = userEmailOrId; 
-                authTemp.password = "google-verified";
+                // 3. New User -> Go to Role Selection
+                authTemp = {
+                    name: user.displayName || "Google User",
+                    email: userEmail,
+                    phone: userEmail, // Purane code ko crash se bachane ke liye
+                    password: "google-verified"
+                };
                 
                 showStep('auth-step-2'); 
 
             }).catch((error) => {
                 console.error(error);
                 alert("Login Error: " + error.message);
-                if (btn) btn.innerHTML = `<img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Log in with Google`;
+                if (btn) btn.innerHTML = `<img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google"> Continue with Google`;
             });
         }
 
-
-
+        // ✨ 3. SHOP SUBMIT LOGIC (FIXED) ✨
         async function handleShopSubmit(e) {
             e.preventDefault();
             const shopName = document.getElementById('final-shop-name').value.trim();
@@ -855,11 +848,14 @@
             btn.disabled = true;
 
             const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
+            
+            // ✨ Yahan Email Save Hoga Database me! ✨
             const newShopData = { 
                 shopId: shopSlug, 
                 shopName: shopName, 
                 ownerName: authTemp.name, 
-                phone: authTemp.phone, 
+                email: authTemp.email, 
+                phone: authTemp.email, 
                 password: authTemp.password, 
                 status: "active", 
                 createdAt: firebase.firestore.FieldValue.serverTimestamp() 
@@ -869,8 +865,13 @@
                 await db.collection('shops').doc(shopSlug).set(newShopData);
                 localStorage.setItem('pixigenie_active_shop', shopSlug);
                 localStorage.setItem('pixigenie_owner_name', authTemp.name);
+                localStorage.setItem('pixigenie_customer_phone', authTemp.email);
                 window.location.href = `dashboard.html?shop=${shopSlug}`;
-            } catch (error) { alert(error.message); btn.disabled = false; }
+            } catch (error) { 
+                alert(error.message); 
+                btn.innerHTML = `Launch Store <i class="fas fa-rocket ml-1"></i>`;
+                btn.disabled = false; 
+            }
         }
 
         function getInitials(name) {
