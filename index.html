@@ -126,123 +126,67 @@
         </div>
     </header>
 
-    <!-- ✨ FORCED LOGIN MODAL (STRICT / NO CLOSE BUTTON) ✨ -->
+    <!-- ✨ FORCED LOGIN MODAL (STRICT / ONLY GOOGLE) ✨ -->
     <div id="auth-modal" class="fixed inset-0 bg-[#111827]/60 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
         <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-sm p-6 sm:p-8 text-center transform scale-95 transition-transform duration-300 relative" id="auth-modal-content">
             
-            <!-- 🚫 Close (X) बटन हटा दिया गया है ताकि यूजर भाग न सके 🚫 -->
+            <!-- 🚫 Close (X) बटन नहीं है ताकि यूजर भाग न सके 🚫 -->
 
-            <!-- STEP 1A (LOGIN SCREEN) -->
+            <!-- ✨ STEP 1: GOOGLE LOGIN ONLY ✨ -->
             <div id="auth-step-login" class="transition-all">
-                <div class="w-14 h-14 bg-[#111827] rounded-[16px] flex items-center justify-center text-white text-xl mx-auto mb-4"><i class="fas fa-lock"></i></div>
-                <h3 class="text-2xl font-bold text-[#111827] mb-1">Welcome Back</h3>
-                <p class="text-[13px] text-[#6B7280] mb-6">Log in to Pixigenie to continue</p>
-
-              <button type="button" onclick="loginWithGoogle(event)" class="w-full flex items-center justify-center gap-3 bg-white border border-[#E5E7EB] hover:bg-[#F7F7F9] text-[#111827] font-semibold h-[52px] rounded-[16px] transition-colors mb-5 active:scale-[0.98]">
-    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Log in with Google
-</button>
-
-
-                <div class="flex items-center gap-3 mb-5">
-                    <div class="h-px bg-[#E5E7EB] flex-1"></div>
-                    <span class="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Or with Phone</span>
-                    <div class="h-px bg-[#E5E7EB] flex-1"></div>
+                <!-- App Icon -->
+                <div class="w-16 h-16 bg-[#111827] rounded-[18px] flex items-center justify-center text-white text-3xl mx-auto mb-5 shadow-[0_8px_20px_rgba(0,0,0,0.15)]">
+                    <i class="fas fa-magic"></i>
                 </div>
+                
+                <h3 class="text-2xl font-black text-[#111827] mb-2 tracking-tight">Welcome to Pixigenie</h3>
+                <p class="text-[13px] text-[#6B7280] mb-8 font-medium">Please sign in to continue</p>
 
-                <form onsubmit="handleLoginSubmit(event)" class="space-y-3 mt-4">
-                    <!-- Phone -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <span class="text-[#6B7280] font-semibold text-sm border-r border-[#E5E7EB] pr-3 mr-3">+91</span>
-                        <input type="tel" id="login-phone" placeholder="WhatsApp Number" pattern="[0-9]{10}" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
+                <!-- Google Button -->
+                <button type="button" onclick="loginWithGoogle(event)" class="w-full flex items-center justify-center gap-3 bg-white border border-[#E5E7EB] hover:bg-[#F7F7F9] text-[#111827] font-bold h-[56px] rounded-[16px] transition-all mb-3 active:scale-[0.98] shadow-sm hover:shadow-md">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google"> Continue with Google
+                </button>
 
-                    <!-- Password -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <i class="fas fa-lock text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
-                        <input type="password" id="login-password" placeholder="Password" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
-                    
-                    <button type="submit" id="login-btn" class="w-full bg-[#111827] text-white font-semibold h-[52px] rounded-[16px] active:scale-[0.98] transition-transform flex justify-center items-center gap-2 mt-4">
-                        Log in <i class="fas fa-arrow-right text-xs"></i>
-                    </button>
-                    
-                    <p class="text-[12px] text-[#6B7280] text-center mt-5">
-                        Don't have an account? <br> <a href="#" onclick="showStep('auth-step-register'); return false;" class="text-[#A855F7] font-bold hover:underline">Create account now</a>
-                    </p>
-                </form>
+                <p class="text-[11px] text-[#9CA3AF] mt-5 font-medium px-4 leading-relaxed">
+                    By continuing, you agree to our <br><span class="text-gray-500">Terms of Service & Privacy Policy.</span>
+                </p>
             </div>
 
-            <!-- STEP 1B (REGISTER SCREEN) -->
-            <div id="auth-step-register" class="hidden transition-all">
-                <div class="w-14 h-14 bg-[#111827] rounded-[16px] flex items-center justify-center text-white text-xl mx-auto mb-4"><i class="fas fa-magic"></i></div>
-                <h3 class="text-2xl font-bold text-[#111827] mb-1">Get Started</h3>
-                <p class="text-[13px] text-[#6B7280] mb-6">Create your Pixigenie account</p>
-
-                <form onsubmit="handleRegisterSubmit(event)" class="space-y-3 mt-4">
-                    <!-- Name -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <i class="fas fa-user text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
-                        <input type="text" id="reg-name" placeholder="Full Name" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
-                    
-                    <!-- Phone -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <span class="text-[#6B7280] font-semibold text-sm border-r border-[#E5E7EB] pr-3 mr-3">+91</span>
-                        <input type="tel" id="reg-phone" placeholder="WhatsApp Number" pattern="[0-9]{10}" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
-
-                    <!-- Password -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <i class="fas fa-lock text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
-                        <input type="password" id="reg-password" placeholder="Create Password" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
-
-                    <!-- Confirm Password -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <i class="fas fa-check-circle text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
-                        <input type="password" id="reg-confirm-password" placeholder="Confirm Password" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
-                    
-                    <button type="submit" id="reg-btn" class="w-full bg-[#111827] text-white font-semibold h-[52px] rounded-[16px] active:scale-[0.98] transition-transform flex justify-center items-center gap-2 mt-4">
-                        Continue <i class="fas fa-arrow-right text-xs"></i>
-                    </button>
-                    
-                    <p class="text-[12px] text-[#6B7280] text-center mt-5">
-                        Already have an account? <br> <a href="#" onclick="showStep('auth-step-login'); return false;" class="text-[#A855F7] font-bold hover:underline">Log in here</a>
-                    </p>
-                </form>
-            </div>
-
-            <!-- STEP 2 (ROLE SELECTION) -->
+            <!-- ✨ STEP 2: ROLE SELECTION (NEW USERS) ✨ -->
             <div id="auth-step-2" class="hidden transition-all text-left">
-                <h3 class="text-2xl font-bold text-[#111827] mb-1">Welcome!</h3>
-                <p class="text-[13px] text-[#6B7280] mb-6">How do you want to use Pixigenie?</p>
+                <h3 class="text-2xl font-black text-[#111827] mb-1">Welcome!</h3>
+                <p class="text-[13px] text-[#6B7280] mb-6 font-medium">How do you want to use Pixigenie?</p>
+                
                 <div class="space-y-3">
-                    <button onclick="selectRole('shop')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left">
-                        <div class="w-12 h-12 bg-[#F7F7F9] text-[#111827] rounded-[12px] flex items-center justify-center text-lg"><i class="fas fa-store"></i></div>
-                        <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Shop Owner</h4><p class="text-[12px] text-[#6B7280]">Manage my digital store</p></div>
+                    <button onclick="selectRole('shop')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white hover:bg-gray-50 active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left shadow-sm">
+                        <div class="w-12 h-12 bg-[#F3E8FF] text-[#A855F7] rounded-[14px] flex items-center justify-center text-xl"><i class="fas fa-store"></i></div>
+                        <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Shop Owner</h4><p class="text-[12px] text-[#6B7280] font-medium">Manage my digital store</p></div>
                     </button>
-                    <!-- ✨ CUSTOMER SELECT AB SEEDHA LOGIN KAREGA ✨ -->
-                    <button onclick="selectRole('customer')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left">
-                        <div class="w-12 h-12 bg-[#F7F7F9] text-[#111827] rounded-[12px] flex items-center justify-center text-lg"><i class="fas fa-shopping-bag"></i></div>
-                        <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Customer</h4><p class="text-[12px] text-[#6B7280]">Start shopping immediately</p></div>
+                    
+                    <button onclick="selectRole('customer')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white hover:bg-gray-50 active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left shadow-sm">
+                        <div class="w-12 h-12 bg-[#DBEAFE] text-[#2563EB] rounded-[14px] flex items-center justify-center text-xl"><i class="fas fa-shopping-bag"></i></div>
+                        <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Customer</h4><p class="text-[12px] text-[#6B7280] font-medium">Start shopping immediately</p></div>
                     </button>
                 </div>
             </div>
 
-            <!-- STEP 3 (ONLY FOR SHOP OWNERS NOW) -->
+            <!-- ✨ STEP 3: SETUP STORE (FOR SHOP OWNERS) ✨ -->
             <div id="auth-step-shop" class="hidden transition-all text-left">
-                <button onclick="showStep('auth-step-2')" class="mb-4 text-[#6B7280] active:text-[#111827]"><i class="fas fa-arrow-left"></i> Back</button>
-                <h3 class="text-2xl font-bold text-[#111827] mb-6">Setup Store</h3>
-                <form onsubmit="handleShopSubmit(event)" class="space-y-3">
-                    <input type="text" id="final-shop-name" placeholder="Enter Shop Name" required class="w-full px-4 py-4 rounded-xl border border-gray-200 focus:border-blue-500 outline-none bg-[#F7F7F9] text-sm font-semibold transition">
-                    <button type="submit" id="final-shop-btn" class="w-full bg-[#111827] text-white font-bold py-4 rounded-xl shadow-lg mt-2 active:scale-95 transition-transform">Launch Store <i class="fas fa-rocket ml-1"></i></button>
+                <button onclick="showStep('auth-step-2')" class="mb-5 text-[#6B7280] hover:text-[#111827] font-bold text-[13px] transition-colors flex items-center gap-1.5"><i class="fas fa-arrow-left"></i> Back</button>
+                
+                <h3 class="text-2xl font-black text-[#111827] mb-1">Setup Store</h3>
+                <p class="text-[13px] text-[#6B7280] mb-6 font-medium">Enter your business name</p>
+                
+                <form onsubmit="handleShopSubmit(event)" class="space-y-4">
+                    <input type="text" id="final-shop-name" placeholder="e.g. Netaji Jhadu Store" required class="w-full px-4 py-4 rounded-[16px] border border-gray-200 focus:border-blue-500 outline-none bg-[#F7F7F9] focus:bg-white text-sm font-bold transition shadow-sm">
+                    <button type="submit" id="final-shop-btn" class="w-full bg-[#111827] text-white font-bold h-[56px] rounded-[16px] shadow-[0_8px_20px_rgba(0,0,0,0.15)] mt-2 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                        Launch Store <i class="fas fa-rocket text-sm"></i>
+                    </button>
                 </form>
             </div>
             
         </div>
     </div>
-
 
     <!-- ✨ HYBRID CHECKOUT MODAL ✨ -->
     <div id="order-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[80] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
