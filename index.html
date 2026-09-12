@@ -360,11 +360,11 @@
             <div class="absolute inset-0 bg-grid-pattern opacity-50 z-0 mask-image:linear-gradient(to_bottom,white,transparent)"></div>
             
             <div id="hero-content" class="relative z-10 w-full flex flex-col items-center text-center">
-                <!-- Dynamically populated -->
+                <!-- JS se populate hoga, including "Why Choose Us" -->
             </div>
         </section>
 
-        <!-- ✨ MARKETPLACE / PRODUCTS SECTION ✨ -->
+        <!-- ✨ MARKETPLACE / PRODUCTS SECTION ✨ (Ye tumhara gayab ho gaya hoga) -->
         <section id="marketplace" class="flex-1 py-16 sm:py-20 px-4 bg-white border-t border-gray-100 relative z-20 rounded-t-[2.5rem] shadow-[0_-5px_30px_rgba(0,0,0,0.02)]">
             <div class="max-w-6xl mx-auto">
                 
@@ -378,44 +378,32 @@
                         <i class="fas fa-location-arrow text-blue-500"></i> Near Me
                     </button>
                 </div>
-                <!-- ✨ NAYA PARENT CONTAINER START ✨ -->
-<div id="filter-search-container">
-                              <!-- ✨ COMPACT FILTER PILLS (Near Me ke bagal mein fit hone ke liye) ✨ -->
-                <div id="shopkeeper-filters-hide" class="flex items-center gap-2 overflow-x-auto pb-2 mb-4 custom-scrollbar reveal delay-100">
 
-                  
+                <!-- ✨ FILTER PILLS & SEARCH BAR ✨ -->
+                <div id="filter-search-container">
+                    <div id="shopkeeper-filters-hide" class="flex items-center gap-2 overflow-x-auto pb-2 mb-4 custom-scrollbar reveal delay-100">
+                        <button id="tab-all" onclick="switchMarketTab('all')" class="market-tab shrink-0 bg-gray-900 text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-sm transition-all active:scale-95 whitespace-nowrap">
+                            All
+                        </button>
+                        <button id="tab-products" onclick="switchMarketTab('products')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
+                            Products
+                        </button>
+                        <button id="tab-services" onclick="switchMarketTab('services')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
+                            Services
+                        </button>
+                        <button id="tab-shops" onclick="switchMarketTab('shops')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
+                            Shops
+                        </button>
+                    </div>
 
-                  <!-- ✨ NAYA 'ALL' BUTTON (Default Active) ✨ -->
-    <button id="tab-all" onclick="switchMarketTab('all')" class="market-tab shrink-0 bg-gray-900 text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-sm transition-all active:scale-95 whitespace-nowrap">
-    All
-</button>
-
-    <button id="tab-products" onclick="switchMarketTab('products')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
-         Products
-    </button>
-    <button id="tab-services" onclick="switchMarketTab('services')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
-         Services
-    </button>
-    <button id="tab-shops" onclick="switchMarketTab('shops')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
-        Shops
-    </button>
-</div>
-
-                <!-- ✨ NAYA: UNIVERSAL SEARCH BAR WITH DROPDOWN ✨ -->
-                <div class="relative w-full mb-10 sm:mb-12 reveal delay-100 z-[60]">
-                    <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
-                    
-                    <!-- Search Input (Ab ye dropdown ko trigger karega) -->
-                    <input type="text" id="search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search products, services, or shops..." autocomplete="off" class="w-full bg-white hover:bg-gray-50 focus:bg-white px-5 py-4 pl-14 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none text-base font-semibold transition-all shadow-sm">
-                    
-                    
-                    <!-- Search Dropdown Box -->
-                    <div id="search-dropdown" class="absolute w-full bg-white mt-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden hidden max-h-80 overflow-y-auto custom-scrollbar flex-col divide-y divide-gray-100 z-[100]">
-                        <!-- JS se results yahan aayenge -->
+                    <div class="relative w-full mb-10 sm:mb-12 reveal delay-100 z-[60]">
+                        <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
+                        <input type="text" id="search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search products, services, or shops..." autocomplete="off" class="w-full bg-white hover:bg-gray-50 focus:bg-white px-5 py-4 pl-14 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none text-base font-semibold transition-all shadow-sm">
+                        <div id="search-dropdown" class="absolute w-full bg-white mt-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden hidden max-h-80 overflow-y-auto custom-scrollbar flex-col divide-y divide-gray-100 z-[100]"></div>
                     </div>
                 </div>
 
-                </div>
+                <!-- ✨ DYNAMIC GRID ✨ -->
                 <div id="dynamic-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                     <div class="col-span-full text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
                         <i class="fas fa-circle-notch fa-spin text-4xl text-blue-600 mb-3"></i>
@@ -425,6 +413,9 @@
 
             </div>
         </section>
+
+        
+
      <!-- ✨ PIXIGENIE MONTHLY PRICING (WITH DISCOUNTS & TAGS) ✨ -->
 <section id="merchant-upgrade-plans" class="hidden py-16 px-4 max-w-6xl mx-auto border-t border-gray-100 relative z-20 bg-white w-full">
     <div class="text-center mb-12 reveal active">
