@@ -433,18 +433,25 @@
                         <i class="fas fa-location-arrow text-blue-500"></i> Near Me
                     </button>
                 </div>
-                <!-- ✨ NAYA: MARKETPLACE FILTER TABS ✨ -->
-                <div class="flex overflow-x-auto gap-3 pb-2 mb-6 custom-scrollbar reveal delay-100">
-                    <button id="tab-products" onclick="switchMarketTab('products')" class="market-tab bg-gray-900 text-white px-5 py-2.5 rounded-full text-[13px] font-bold whitespace-nowrap shadow-md transition-all active:scale-95">
-                        🛍️ Products
-                    </button>
-                    <button id="tab-services" onclick="switchMarketTab('services')" class="market-tab bg-white text-gray-600 border border-gray-200 px-5 py-2.5 rounded-full text-[13px] font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
-                        🛠️ Services
-                    </button>
-                    <button id="tab-shops" onclick="switchMarketTab('shops')" class="market-tab bg-white text-gray-600 border border-gray-200 px-5 py-2.5 rounded-full text-[13px] font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
-                        🏬 Local Shops
-                    </button>
-                </div>
+                              <!-- ✨ COMPACT FILTER PILLS (Near Me ke bagal mein fit hone ke liye) ✨ -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-4 custom-scrollbar reveal delay-100">
+                  
+
+                  <!-- ✨ NAYA 'ALL' BUTTON (Default Active) ✨ -->
+    <button id="tab-all" onclick="switchMarketTab('all')" class="market-tab shrink-0 bg-gray-900 text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-sm transition-all active:scale-95 whitespace-nowrap">
+    All
+</button>
+
+    <button id="tab-products" onclick="switchMarketTab('products')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
+         Products
+    </button>
+    <button id="tab-services" onclick="switchMarketTab('services')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
+         Services
+    </button>
+    <button id="tab-shops" onclick="switchMarketTab('shops')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
+        Shops
+    </button>
+</div>
 
                 <!-- ✨ NAYA: UNIVERSAL SEARCH BAR WITH DROPDOWN ✨ -->
                 <div class="relative w-full mb-10 sm:mb-12 reveal delay-100 z-[60]">
@@ -452,6 +459,7 @@
                     
                     <!-- Search Input (Ab ye dropdown ko trigger karega) -->
                     <input type="text" id="search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search products, services, or shops..." autocomplete="off" class="w-full bg-white hover:bg-gray-50 focus:bg-white px-5 py-4 pl-14 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none text-base font-semibold transition-all shadow-sm">
+                    
                     
                     <!-- Search Dropdown Box -->
                     <div id="search-dropdown" class="absolute w-full bg-white mt-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden hidden max-h-80 overflow-y-auto custom-scrollbar flex-col divide-y divide-gray-100 z-[100]">
@@ -1260,8 +1268,9 @@
                 `;
 
                 document.getElementById('section-title').innerText = "Trending Products";
-                document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
-                searchInput.placeholder = "Search products...";
+document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
+
+searchInput.placeholder = "Search products, services, or shops...";
                 fetchGlobalProducts(); 
                 return true;
 
@@ -1466,7 +1475,7 @@ const snapshot = await db.collectionGroup('products')
                     }
                     
                     // ✨ NAYA: product.mrp pass kar rahe hain ✨
-                    return generateProductCard(product.name, product.mrp, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan);
+                    return generateProductCard(product.name, product.mrp, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan, isService);
                 });
 
                 const cardsHtmlArray = await Promise.all(productPromises);
@@ -1480,64 +1489,126 @@ const snapshot = await db.collectionGroup('products')
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
             }
         }
+// Naya function: Products aur Services ko alag-alag load karne ke liye
+async function fetchGlobalItems(itemType) {
+    const grid = document.getElementById('dynamic-grid');
+    try {
+        // Firebase se items fetch karein
+        const snapshot = await db.collectionGroup('products')
+            .orderBy('searchRank', 'desc')
+            .limit(20)
+            .get();
 
-        // ===============================================
-        // 3. REPLACED: generateProductCard()
-        // ===============================================
-        // ✨ NAYA: mrp parameter accept karega aur discount dikhayega ✨
-        function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopId = "", isVerified = false, plan = "") {
+        if (snapshot.empty) throw new Error("No items");
+        
+        const itemPromises = snapshot.docs.map(async (doc) => {
+            const product = doc.data();
+            let shopName = "Local Shop";
+            let shopPhone = "";
+            let shopId = ""; 
+            let isVerified = false; 
+            let shopPlan = ""; 
+            let isService = false; // Check karne ke liye ki item service hai ya nahi
             
-            const verifiedTick = getVIPBadge(isVerified, plan);
-
-            // ✨ MRP & DISCOUNT CALCULATION ✨
-            let discountBadgeHtml = '';
-            let priceDisplayHtml = `<div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-sm font-black text-gray-900 shadow-sm border border-white/50">₹${price}</div>`;
-
-            if (mrp && mrp > price) {
-                const discountPercent = Math.round(((mrp - price) / mrp) * 100);
-                discountBadgeHtml = `
-                    <div class="absolute top-3 left-3 bg-[#DC2626] text-white text-[11px] font-black px-2 py-1 rounded-lg shadow-md z-10 tracking-wider">
-                        ${discountPercent}% OFF
-                    </div>
-                `;
-                priceDisplayHtml = `
-                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-sm font-black text-gray-900 shadow-sm border border-white/50 flex items-center gap-1.5">
-                        <span>₹${price}</span>
-                        <span class="text-[10px] text-gray-400 line-through">₹${mrp}</span>
-                    </div>
-                `;
+            if (doc.ref.parent && doc.ref.parent.parent) {
+                try {
+                    const shopDoc = await doc.ref.parent.parent.get();
+                    if (shopDoc.exists) {
+                        const sData = shopDoc.data();
+                        shopName = sData.shopName || "Local Shop";
+                        shopPhone = sData.phone || "";
+                        shopId = shopDoc.id; 
+                        shopPlan = sData.plan || ""; 
+                        isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro' || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
+                        
+                        // Check karein ki shop owner 'Service Provider' hai kya
+                        if (sData.businessType === 'Service Provider') {
+                            isService = true;
+                        }
+                    }
+                } catch(e) {}
             }
+            
+            // 🔥 FILTER LOGIC 🔥
+            // Agar tab 'product' hai par dukaan 'service' wali hai, toh isko hata do
+            if (itemType === 'product' && isService) return null;
+            // Agar tab 'service' hai par dukaan 'product' wali hai, toh isko hata do
+            if (itemType === 'service' && !isService) return null;
 
-            return `
-            <div class="glass-card hover:bg-white rounded-[2rem] p-5 sm:p-6 hover:shadow-[0_20px_40px_rgba(168,85,247,0.08)] hover:-translate-y-2 transition-all duration-500 flex flex-col group cursor-pointer active:scale-95 reveal">
-                <div class="w-full aspect-square bg-gray-50 rounded-[1.5rem] mb-5 flex items-center justify-center relative overflow-hidden group-hover:opacity-90 transition-opacity">
-                    ${image ? `<img src="${image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">` : `<i class="fas fa-box-open text-5xl text-gray-200 group-hover:scale-110 transition-transform duration-500"></i>`}
-                    
-                    <!-- ✨ YAHAN DISCOUNT AUR PRICE AAYEGA ✨ -->
-                    ${discountBadgeHtml}
-                    ${priceDisplayHtml}
-                    
-                </div>
-                <div class="min-w-0 flex-1 mb-5">
-                    <h4 class="text-gray-900 font-bold text-lg leading-tight truncate group-hover:text-purple-600 transition-colors">${name}</h4>
-                    <p class="text-gray-500 text-xs mt-2 flex items-center gap-1.5 truncate"><i class="fas fa-store text-gray-400"></i> ${shopName || 'Local Shop'} ${verifiedTick}</p>
-                </div>
-                
-                <div class="mt-auto flex flex-col gap-2 w-full">
-                    <div class="flex gap-2 w-full">
-                        <button onclick="addToCart(event, '${name}', '${price}', '${shopName}', '${shopPhone}')" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-3 rounded-2xl transition-all duration-300 text-sm flex justify-center items-center gap-2 active:scale-95">
-                            <i class="fas fa-cart-plus text-lg"></i> Cart
-                        </button>
-                        <button onclick="openOrderModal('${name}', '${price}', '${shopName}', '${shopPhone}')" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-3 rounded-2xl transition-all duration-300 text-sm flex justify-center items-center gap-2 shadow-md hover:shadow-lg active:scale-95">
-                            Order Now
-                        </button>
-                    </div>
-                    <button onclick="window.location.href='store.html?shop=${shopId}'" class="w-full bg-gray-50 text-blue-600 border border-gray-100 hover:bg-blue-50 font-bold py-3 rounded-2xl transition-all duration-300 text-sm flex justify-center items-center gap-2 active:scale-95 mt-1">
-                        <i class="fas fa-external-link-alt text-[12px]"></i> Visit Store
-                    </button>
-                </div>
-            </div>`;
+         return generateProductCard(product.name, product.mrp, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan, isService);
+        });
+
+        // Saare filtered items ko resolve karein aur null values ko hata dein
+        const cardsHtmlArray = (await Promise.all(itemPromises)).filter(card => card !== null);
+        
+        if (cardsHtmlArray.length === 0) {
+            grid.innerHTML = `<div class="col-span-full text-center py-16"><i class="fas fa-box-open text-4xl text-gray-200 mb-3"></i><p class="text-gray-500 font-medium">No ${itemType}s found around you.</p></div>`;
+        } else {
+            grid.innerHTML = cardsHtmlArray.join('');
         }
+        
+        if(typeof initScrollAnimations === 'function') initScrollAnimations();
+    } catch (error) { 
+        console.error(error);
+        grid.innerHTML = `<div class="col-span-full text-center py-10"><p class="text-red-500 font-medium">Failed to load ${itemType}s.</p></div>`;
+    }
+}
+
+   // ✨ NAYA: isService parameter end me add kiya hai ✨
+function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopId = "", isVerified = false, plan = "", isService = false) {
+    
+    const verifiedTick = typeof getVIPBadge === 'function' ? getVIPBadge(isVerified, plan) : '';
+
+    let discountBadgeHtml = '';
+    let priceDisplayHtml = `<div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-sm font-black text-gray-900 shadow-sm border border-white/50">₹${price}</div>`;
+
+    if (mrp && mrp > price) {
+        const discountPercent = Math.round(((mrp - price) / mrp) * 100);
+        discountBadgeHtml = `
+            <div class="absolute top-3 left-3 bg-[#DC2626] text-white text-[11px] font-black px-2 py-1 rounded-lg shadow-md z-10 tracking-wider">
+                ${discountPercent}% OFF
+            </div>
+        `;
+        priceDisplayHtml = `
+            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-sm font-black text-gray-900 shadow-sm border border-white/50 flex items-center gap-1.5">
+                <span>₹${price}</span>
+                <span class="text-[10px] text-gray-400 line-through">₹${mrp}</span>
+            </div>
+        `;
+    }
+
+    // ✨ NAYA LOGIC: Button text decide karna ✨
+    const buttonText = isService ? "Book Now" : "Order Now";
+
+    return `
+    <div class="glass-card hover:bg-white rounded-[2rem] p-5 sm:p-6 hover:shadow-[0_20px_40px_rgba(168,85,247,0.08)] hover:-translate-y-2 transition-all duration-500 flex flex-col group cursor-pointer active:scale-95 reveal">
+        <div class="w-full aspect-square bg-gray-50 rounded-[1.5rem] mb-5 flex items-center justify-center relative overflow-hidden group-hover:opacity-90 transition-opacity">
+            ${image ? `<img src="${image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">` : `<i class="fas fa-box-open text-5xl text-gray-200 group-hover:scale-110 transition-transform duration-500"></i>`}
+            ${discountBadgeHtml}
+            ${priceDisplayHtml}
+        </div>
+        <div class="min-w-0 flex-1 mb-5">
+            <h4 class="text-gray-900 font-bold text-lg leading-tight truncate group-hover:text-purple-600 transition-colors">${name}</h4>
+            <p class="text-gray-500 text-xs mt-2 flex items-center gap-1.5 truncate"><i class="fas fa-store text-gray-400"></i> ${shopName || 'Local Shop'} ${verifiedTick}</p>
+        </div>
+        
+        <div class="mt-auto flex flex-col gap-2 w-full">
+            <div class="flex gap-2 w-full">
+                <button onclick="addToCart(event, '${name}', '${price}', '${shopName}', '${shopPhone}')" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-3 rounded-2xl transition-all duration-300 text-sm flex justify-center items-center gap-2 active:scale-95">
+                    <i class="fas fa-cart-plus text-lg"></i> Cart
+                </button>
+                <!-- ✨ YAHAN DYNAMIC BUTTON TEXT AAYEGA ✨ -->
+                <button onclick="openOrderModal('${name}', '${price}', '${shopName}', '${shopPhone}')" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-3 rounded-2xl transition-all duration-300 text-sm flex justify-center items-center gap-2 shadow-md hover:shadow-lg active:scale-95">
+                    ${buttonText}
+                </button>
+            </div>
+            <button onclick="window.location.href='store.html?shop=${shopId}'" class="w-full bg-gray-50 text-blue-600 border border-gray-100 hover:bg-blue-50 font-bold py-3 rounded-2xl transition-all duration-300 text-sm flex justify-center items-center gap-2 active:scale-95 mt-1">
+                <i class="fas fa-external-link-alt text-[12px]"></i> Visit Store
+            </button>
+        </div>
+    </div>`;
+}
+
 
              // ✨ DYNAMIC VIP BADGE GENERATOR ✨
         function getVIPBadge(isVerified, plan) {
@@ -3000,60 +3071,73 @@ const snapshot = await db.collectionGroup('products')
             } catch(e) { console.log("Search Data Load Error:", e); }
         }
 
-        // Search Bar me type karte hi ye function chalega
-        function handleGlobalSearch(query) {
-            const dropdown = document.getElementById('search-dropdown');
-            query = query.toLowerCase().trim();
+    // Search Bar me type karte hi ye function chalega
+function handleGlobalSearch(query) {
+    const dropdown = document.getElementById('search-dropdown');
+    query = query.toLowerCase().trim();
+    
+    if (query.length === 0) {
+        dropdown.classList.add('hidden'); dropdown.classList.remove('flex'); return;
+    }
+
+    // ✨ NAYA LOGIC: Active Tab ke hisaab se pehle data filter karo ✨
+    let filteredData = globalSearchData;
+    
+    if (currentMarketTab === 'products') {
+        filteredData = globalSearchData.filter(item => item.type === 'product');
+    } else if (currentMarketTab === 'services') {
+        filteredData = globalSearchData.filter(item => item.type === 'service');
+    } else if (currentMarketTab === 'shops') {
+        filteredData = globalSearchData.filter(item => item.type === 'shop');
+    }
+    // Agar 'all' select hai toh filteredData me koi change nahi hoga, sab aayega.
+
+    // Ab filter hue data me search query match karo
+    const results = filteredData.filter(item => item.searchString.includes(query)).slice(0, 8);
+
+    if (results.length === 0) {
+        dropdown.innerHTML = `<div class="p-5 text-center text-gray-500 font-medium text-sm">No results found for "${query}"</div>`;
+        dropdown.classList.remove('hidden'); dropdown.classList.add('flex'); return;
+    }
+
+    let html = '';
+    results.forEach(item => {
+        if (item.type === 'shop') {
+            // DUKAAN KA UI
+            const iconHtml = item.image ? `<img src="${item.image}" class="w-10 h-10 rounded-full object-cover">` : `<div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-store"></i></div>`;
+            html += `
+            <div onclick="window.location.href='store.html?shop=${item.id}'" class="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition">
+                ${iconHtml}
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-sm font-bold text-gray-900 truncate">${item.name}</h4>
+                    <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Store • ${item.businessType}</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+            </div>`;
+        } else {
+            // PRODUCT / SERVICE KA UI
+            const iconHtml = item.image ? `<img src="${item.image}" class="w-10 h-10 rounded-xl object-cover">` : `<div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center"><i class="fas fa-box-open"></i></div>`;
+            const typeLabel = item.type === 'service' ? 'Service' : 'Product';
+            const typeColor = item.type === 'service' ? 'text-orange-500' : 'text-purple-500';
             
-            if (query.length === 0) {
-                dropdown.classList.add('hidden'); dropdown.classList.remove('flex'); return;
-            }
-
-            // Sirf top 8 results dikhayenge matching ke hisaab se
-            const results = globalSearchData.filter(item => item.searchString.includes(query)).slice(0, 8);
-
-            if (results.length === 0) {
-                dropdown.innerHTML = `<div class="p-5 text-center text-gray-500 font-medium text-sm">No results found for "${query}"</div>`;
-                dropdown.classList.remove('hidden'); dropdown.classList.add('flex'); return;
-            }
-
-            let html = '';
-            results.forEach(item => {
-                if (item.type === 'shop') {
-                    // DUKAAN KA UI
-                    const iconHtml = item.image ? `<img src="${item.image}" class="w-10 h-10 rounded-full object-cover">` : `<div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-store"></i></div>`;
-                    html += `
-                    <div onclick="window.location.href='store.html?shop=${item.id}'" class="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition">
-                        ${iconHtml}
-                        <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 truncate">${item.name}</h4>
-                            <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Store • ${item.businessType}</p>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
-                    </div>`;
-                } else {
-                    // PRODUCT / SERVICE KA UI
-                    const iconHtml = item.image ? `<img src="${item.image}" class="w-10 h-10 rounded-xl object-cover">` : `<div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center"><i class="fas fa-box-open"></i></div>`;
-                    const typeLabel = item.type === 'service' ? 'Service' : 'Product';
-                    const typeColor = item.type === 'service' ? 'text-orange-500' : 'text-purple-500';
-                    
-                    html += `
-                    <div onclick="openOrderModal('${item.name}', '${item.price}', '${item.shopName}', '${item.shopPhone}')" class="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition">
-                        ${iconHtml}
-                        <div class="flex-1 min-w-0">
-                            <h4 class="text-sm font-bold text-gray-900 truncate">${item.name}</h4>
-                            <p class="text-[10px] font-semibold text-gray-500 truncate"><span class="${typeColor} uppercase tracking-wider font-bold">${typeLabel}</span> • from ${item.shopName}</p>
-                        </div>
-                        <div class="text-right shrink-0">
-                            <p class="text-sm font-black text-green-600">₹${item.price}</p>
-                        </div>
-                    </div>`;
-                }
-            });
-
-            dropdown.innerHTML = html;
-            dropdown.classList.remove('hidden'); dropdown.classList.add('flex');
+            html += `
+            <div onclick="openOrderModal('${item.name}', '${item.price}', '${item.shopName}', '${item.shopPhone}')" class="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition">
+                ${iconHtml}
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-sm font-bold text-gray-900 truncate">${item.name}</h4>
+                    <p class="text-[10px] font-semibold text-gray-500 truncate"><span class="${typeColor} uppercase tracking-wider font-bold">${typeLabel}</span> • from ${item.shopName}</p>
+                </div>
+                <div class="text-right shrink-0">
+                    <p class="text-sm font-black text-green-600">₹${item.price}</p>
+                </div>
+            </div>`;
         }
+    });
+
+    dropdown.innerHTML = html;
+    dropdown.classList.remove('hidden'); dropdown.classList.add('flex');
+}
+
 
         // Screen par kahin bhi click karne par dropdown band ho jaye
         document.addEventListener('click', function(e) {
@@ -3069,7 +3153,69 @@ const snapshot = await db.collectionGroup('products')
         // Background data loader ko trigger karna
         document.addEventListener('DOMContentLoaded', () => {
             loadAllSearchData();
+            
         });
+        
+
+        // ===============================================
+        // ✨ UPDATED MARKET TAB / FILTER SWITCHING LOGIC ✨
+        // ===============================================
+        let currentMarketTab = 'all'; // Default 'all' rakha hai taaki shuru mein sab dikhe
+
+         function switchMarketTab(tabName) {
+    currentMarketTab = tabName;
+    
+    // Step 1: Sabhi buttons ko inactive bana do aur unme hover class wapas laga do
+    document.querySelectorAll('.market-tab').forEach(btn => {
+        btn.classList.remove('bg-gray-900', 'text-white', 'shadow-sm', 'border-transparent');
+        btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200', 'hover:bg-gray-50');
+    });
+    
+    // Step 2: Sirf active wale button ko dark bana do aur usme se hover class hata do
+    const activeBtn = document.getElementById('tab-' + tabName);
+    if (activeBtn) {
+        activeBtn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200', 'hover:bg-gray-50');
+        activeBtn.classList.add('bg-gray-900', 'text-white', 'shadow-sm');
+    }
+
+ 
+
+
+            const title = document.getElementById('section-title');
+            const subtitle = document.getElementById('section-subtitle');
+            const searchInput = document.getElementById('search-input');
+            const grid = document.getElementById('dynamic-grid');
+            
+            if(grid) grid.innerHTML = `<div class="col-span-full text-center py-20 bg-white rounded-3xl"><i class="fas fa-circle-notch fa-spin text-4xl text-blue-600 mb-3"></i><p class="text-gray-500 font-medium">Loading...</p></div>`;
+
+                if (tabName === 'all') {
+        if(title) title.innerText = "Trending Products";
+        if(subtitle) subtitle.innerText = "Explore and buy directly from your local stores.";
+        if(searchInput) searchInput.placeholder = "Search products, services, or shops...";
+        // Main grid me sirf products load honge:
+        if(typeof fetchGlobalProducts === 'function') fetchGlobalProducts();
+    } 
+
+            else if (tabName === 'products') {
+                if(title) title.innerText = "Trending Products";
+                if(subtitle) subtitle.innerText = "Explore and buy directly from your local stores.";
+                if(searchInput) searchInput.placeholder = "Search products...";
+                if(typeof fetchGlobalItems === 'function') fetchGlobalItems('product');
+            } 
+            else if (tabName === 'services') {
+                if(title) title.innerText = "Local Services";
+                if(subtitle) subtitle.innerText = "Book trusted professionals around you.";
+                if(searchInput) searchInput.placeholder = "Search local services...";
+                if(typeof fetchGlobalItems === 'function') fetchGlobalItems('service');
+            } 
+            else if (tabName === 'shops') {
+                if(title) title.innerText = "Live Local Shops";
+                if(subtitle) subtitle.innerText = "Visit and support neighborhood businesses.";
+                if(searchInput) searchInput.placeholder = "Search local shops...";
+                if(typeof fetchLiveShops === 'function') fetchLiveShops();
+            }
+        }
+
 
     </script>
     <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
