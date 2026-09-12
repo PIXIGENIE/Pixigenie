@@ -433,11 +433,32 @@
                         <i class="fas fa-location-arrow text-blue-500"></i> Near Me
                     </button>
                 </div>
-
-                <div class="relative w-full mb-10 sm:mb-12 reveal delay-100">
-                    <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
-                    <input type="text" id="search-input" onkeyup="filterItems(this.value)" placeholder="Search here..." class="w-full bg-white hover:bg-gray-50 focus:bg-white px-5 py-4 pl-14 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none text-base font-semibold transition-all shadow-sm">
+                <!-- ✨ NAYA: MARKETPLACE FILTER TABS ✨ -->
+                <div class="flex overflow-x-auto gap-3 pb-2 mb-6 custom-scrollbar reveal delay-100">
+                    <button id="tab-products" onclick="switchMarketTab('products')" class="market-tab bg-gray-900 text-white px-5 py-2.5 rounded-full text-[13px] font-bold whitespace-nowrap shadow-md transition-all active:scale-95">
+                        🛍️ Products
+                    </button>
+                    <button id="tab-services" onclick="switchMarketTab('services')" class="market-tab bg-white text-gray-600 border border-gray-200 px-5 py-2.5 rounded-full text-[13px] font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
+                        🛠️ Services
+                    </button>
+                    <button id="tab-shops" onclick="switchMarketTab('shops')" class="market-tab bg-white text-gray-600 border border-gray-200 px-5 py-2.5 rounded-full text-[13px] font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
+                        🏬 Local Shops
+                    </button>
                 </div>
+
+                <!-- ✨ NAYA: UNIVERSAL SEARCH BAR WITH DROPDOWN ✨ -->
+                <div class="relative w-full mb-10 sm:mb-12 reveal delay-100 z-[60]">
+                    <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
+                    
+                    <!-- Search Input (Ab ye dropdown ko trigger karega) -->
+                    <input type="text" id="search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search products, services, or shops..." autocomplete="off" class="w-full bg-white hover:bg-gray-50 focus:bg-white px-5 py-4 pl-14 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none text-base font-semibold transition-all shadow-sm">
+                    
+                    <!-- Search Dropdown Box -->
+                    <div id="search-dropdown" class="absolute w-full bg-white mt-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden hidden max-h-80 overflow-y-auto custom-scrollbar flex-col divide-y divide-gray-100 z-[100]">
+                        <!-- JS se results yahan aayenge -->
+                    </div>
+                </div>
+
                 
                 <div id="dynamic-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                     <div class="col-span-full text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
@@ -2922,6 +2943,133 @@ const snapshot = await db.collectionGroup('products')
         }
 
 
+        // ===============================================
+        // ✨ UNIVERSAL SEARCH DROPDOWN LOGIC ✨
+        // ===============================================
+        let globalSearchData = [];
+
+        // Page khulte hi chupke se data background mein load kar lenge
+        async function loadAllSearchData() {
+            try {
+                // 1. Saari Active Dukaanein Load Karo
+                const shopSnap = await db.collection('shops').where('status', '==', 'active').get();
+                let shopPhoneMap = {}; // Phone number store karne ke liye
+                
+                shopSnap.forEach(doc => {
+                    const s = doc.data();
+                    shopPhoneMap[doc.id] = s.phone;
+                    globalSearchData.push({
+                        type: 'shop',
+                        id: doc.id,
+                        name: s.shopName,
+                        shopName: s.shopName,
+                        businessType: s.businessType || 'Retailer',
+                        image: s.storeLogo || '',
+                        searchString: (s.shopName + ' ' + (s.category || '')).toLowerCase()
+                    });
+                });
+
+                // 2. Saare Products & Services Load Karo (Fast search ke liye)
+                const prodSnap = await db.collectionGroup('products').limit(200).get();
+                prodSnap.forEach(doc => {
+                    const p = doc.data();
+                    let shopId = "", shopName = "", shopPhone = "", isService = false;
+                    
+                    if (doc.ref.parent && doc.ref.parent.parent) {
+                        shopId = doc.ref.parent.parent.id;
+                        const parentShop = globalSearchData.find(x => x.type === 'shop' && x.id === shopId);
+                        if (parentShop) {
+                            shopName = parentShop.name;
+                            shopPhone = shopPhoneMap[shopId] || '';
+                            isService = parentShop.businessType === 'Service Provider';
+                        }
+                    }
+
+                    globalSearchData.push({
+                        type: isService ? 'service' : 'product',
+                        id: doc.id,
+                        name: p.name,
+                        price: p.price,
+                        image: p.image || '',
+                        shopId: shopId,
+                        shopName: shopName,
+                        shopPhone: shopPhone,
+                        searchString: (p.name + ' ' + shopName).toLowerCase()
+                    });
+                });
+            } catch(e) { console.log("Search Data Load Error:", e); }
+        }
+
+        // Search Bar me type karte hi ye function chalega
+        function handleGlobalSearch(query) {
+            const dropdown = document.getElementById('search-dropdown');
+            query = query.toLowerCase().trim();
+            
+            if (query.length === 0) {
+                dropdown.classList.add('hidden'); dropdown.classList.remove('flex'); return;
+            }
+
+            // Sirf top 8 results dikhayenge matching ke hisaab se
+            const results = globalSearchData.filter(item => item.searchString.includes(query)).slice(0, 8);
+
+            if (results.length === 0) {
+                dropdown.innerHTML = `<div class="p-5 text-center text-gray-500 font-medium text-sm">No results found for "${query}"</div>`;
+                dropdown.classList.remove('hidden'); dropdown.classList.add('flex'); return;
+            }
+
+            let html = '';
+            results.forEach(item => {
+                if (item.type === 'shop') {
+                    // DUKAAN KA UI
+                    const iconHtml = item.image ? `<img src="${item.image}" class="w-10 h-10 rounded-full object-cover">` : `<div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-store"></i></div>`;
+                    html += `
+                    <div onclick="window.location.href='store.html?shop=${item.id}'" class="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition">
+                        ${iconHtml}
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-bold text-gray-900 truncate">${item.name}</h4>
+                            <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Store • ${item.businessType}</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
+                    </div>`;
+                } else {
+                    // PRODUCT / SERVICE KA UI
+                    const iconHtml = item.image ? `<img src="${item.image}" class="w-10 h-10 rounded-xl object-cover">` : `<div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center"><i class="fas fa-box-open"></i></div>`;
+                    const typeLabel = item.type === 'service' ? 'Service' : 'Product';
+                    const typeColor = item.type === 'service' ? 'text-orange-500' : 'text-purple-500';
+                    
+                    html += `
+                    <div onclick="openOrderModal('${item.name}', '${item.price}', '${item.shopName}', '${item.shopPhone}')" class="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition">
+                        ${iconHtml}
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-bold text-gray-900 truncate">${item.name}</h4>
+                            <p class="text-[10px] font-semibold text-gray-500 truncate"><span class="${typeColor} uppercase tracking-wider font-bold">${typeLabel}</span> • from ${item.shopName}</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <p class="text-sm font-black text-green-600">₹${item.price}</p>
+                        </div>
+                    </div>`;
+                }
+            });
+
+            dropdown.innerHTML = html;
+            dropdown.classList.remove('hidden'); dropdown.classList.add('flex');
+        }
+
+        // Screen par kahin bhi click karne par dropdown band ho jaye
+        document.addEventListener('click', function(e) {
+            const searchInput = document.getElementById('search-input');
+            const dropdown = document.getElementById('search-dropdown');
+            if (searchInput && dropdown) {
+                if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.add('hidden'); dropdown.classList.remove('flex');
+                }
+            }
+        });
+
+        // Background data loader ko trigger karna
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllSearchData();
+        });
 
     </script>
     <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
