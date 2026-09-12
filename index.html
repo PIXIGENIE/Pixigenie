@@ -1300,9 +1300,16 @@
                 if (locationLoaded) return; 
                 locationLoaded = true;
 
-                try {
-                    const snapshot = await db.collection('shops').where('status', '==', 'active').limit(12).get();
+                                try {
+                    // 🔥 NAYA MAGIC: Pro stores ab top par aayenge (searchRank ke hisaab se)
+                    const snapshot = await db.collection('shops')
+                        .where('status', '==', 'active')
+                        .orderBy('searchRank', 'desc') 
+                        .limit(12)
+                        .get();
+                        
                     if (snapshot.empty) { grid.innerHTML = `<p class="col-span-full text-center text-gray-500 py-8">No shops registered yet.</p>`; return; }
+
                     
                     const cardsHtmlArray = snapshot.docs.map((doc) => {
                         const shop = doc.data();
@@ -1406,7 +1413,12 @@
         async function fetchGlobalProducts() {
             const grid = document.getElementById('dynamic-grid');
             try {
-                const snapshot = await db.collectionGroup('products').limit(12).get();
+              // 🔥 MAGIC: Jis dukaandar ka rank 100 (Pro) hai, uska product automatically pehle dikhega!
+const snapshot = await db.collectionGroup('products')
+    .orderBy('searchRank', 'desc')
+    .limit(12)
+    .get();
+
                 if (snapshot.empty) throw new Error("No products");
                 
                 const productPromises = snapshot.docs.map(async (doc) => {
@@ -2806,7 +2818,7 @@
             
             closeMapPicker();
         }
-                     // ✨ NAYA: DYNAMIC PRICING FEATURES (FULL LIST RESTORED WITH CORRECT ICONS) ✨
+                         // ✨ NAYA: DYNAMIC PRICING FEATURES (PRO VIP ME "CREATE FLASH OFFERS" ADD KIYA HAI) ✨
         function updateDynamicPricing(businessType) {
             let features = { starter: '', plus: '', pro: '' };
 
@@ -2830,7 +2842,8 @@
                     <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Services</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>`; // ✨ NAYA
             
             } else if (businessType === 'Wholesaler') {
                 features.starter = `
@@ -2852,7 +2865,8 @@
                    <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Bulk Items</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>`; // ✨ NAYA
             
             } else if (businessType === 'Manufacturer') {
                 features.starter = `
@@ -2874,7 +2888,8 @@
                     <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Catalog Items</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>`; // ✨ NAYA
             
             } else {
                 // Default Retailer (Normal Shop)
@@ -2897,13 +2912,15 @@
                     <li class="flex items-start gap-2"><i class="fas fa-trophy text-yellow-400 mt-1"></i> <span>#1 Top Search Ranking</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-boxes text-yellow-400 mt-1"></i> <span>Expand to 500 Products</span></li>
                     <li class="flex items-start gap-2"><i class="fas fa-headset text-yellow-400 mt-1"></i> <span>Priority WhatsApp Support</span></li>
-                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>`;
+                    <li class="flex items-start gap-2"><i class="fab fa-whatsapp text-yellow-400 mt-1"></i> <span class="text-white font-bold">1-Click Reminders + Pro CRM</span></li>
+                    <li class="flex items-start gap-2"><i class="fas fa-gift text-yellow-400 mt-1"></i> <span class="text-white font-bold">Create Flash Offers</span></li>`; // ✨ NAYA
             }
 
             if(document.getElementById('plan-features-starter')) document.getElementById('plan-features-starter').innerHTML = features.starter;
             if(document.getElementById('plan-features-plus')) document.getElementById('plan-features-plus').innerHTML = features.plus;
             if(document.getElementById('plan-features-pro')) document.getElementById('plan-features-pro').innerHTML = features.pro;
         }
+
 
 
     </script>
