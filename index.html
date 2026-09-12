@@ -126,67 +126,123 @@
         </div>
     </header>
 
-    <!-- ✨ FORCED LOGIN MODAL (STRICT / ONLY GOOGLE) ✨ -->
+    <!-- ✨ FORCED LOGIN MODAL (STRICT / NO CLOSE BUTTON) ✨ -->
     <div id="auth-modal" class="fixed inset-0 bg-[#111827]/60 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
         <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-sm p-6 sm:p-8 text-center transform scale-95 transition-transform duration-300 relative" id="auth-modal-content">
             
-            <!-- 🚫 Close (X) बटन नहीं है ताकि यूजर भाग न सके 🚫 -->
+            <!-- 🚫 Close (X) बटन हटा दिया गया है ताकि यूजर भाग न सके 🚫 -->
 
-            <!-- ✨ STEP 1: GOOGLE LOGIN ONLY ✨ -->
+            <!-- STEP 1A (LOGIN SCREEN) -->
             <div id="auth-step-login" class="transition-all">
-                <!-- App Icon -->
-                <div class="w-16 h-16 bg-[#111827] rounded-[18px] flex items-center justify-center text-white text-3xl mx-auto mb-5 shadow-[0_8px_20px_rgba(0,0,0,0.15)]">
-                    <i class="fas fa-magic"></i>
+                <div class="w-14 h-14 bg-[#111827] rounded-[16px] flex items-center justify-center text-white text-xl mx-auto mb-4"><i class="fas fa-lock"></i></div>
+                <h3 class="text-2xl font-bold text-[#111827] mb-1">Welcome Back</h3>
+                <p class="text-[13px] text-[#6B7280] mb-6">Log in to Pixigenie to continue</p>
+
+              <button type="button" onclick="loginWithGoogle(event)" class="w-full flex items-center justify-center gap-3 bg-white border border-[#E5E7EB] hover:bg-[#F7F7F9] text-[#111827] font-semibold h-[52px] rounded-[16px] transition-colors mb-5 active:scale-[0.98]">
+    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Log in with Google
+</button>
+
+
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="h-px bg-[#E5E7EB] flex-1"></div>
+                    <span class="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Or with Phone</span>
+                    <div class="h-px bg-[#E5E7EB] flex-1"></div>
                 </div>
-                
-                <h3 class="text-2xl font-black text-[#111827] mb-2 tracking-tight">Welcome to Pixigenie</h3>
-                <p class="text-[13px] text-[#6B7280] mb-8 font-medium">Please sign in to continue</p>
 
-                <!-- Google Button -->
-                <button type="button" onclick="loginWithGoogle(event)" class="w-full flex items-center justify-center gap-3 bg-white border border-[#E5E7EB] hover:bg-[#F7F7F9] text-[#111827] font-bold h-[56px] rounded-[16px] transition-all mb-3 active:scale-[0.98] shadow-sm hover:shadow-md">
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google"> Continue with Google
-                </button>
+                <form onsubmit="handleLoginSubmit(event)" class="space-y-3 mt-4">
+                    <!-- Phone -->
+                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
+                        <span class="text-[#6B7280] font-semibold text-sm border-r border-[#E5E7EB] pr-3 mr-3">+91</span>
+                        <input type="tel" id="login-phone" placeholder="WhatsApp Number" pattern="[0-9]{10}" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
+                    </div>
 
-                <p class="text-[11px] text-[#9CA3AF] mt-5 font-medium px-4 leading-relaxed">
-                    By continuing, you agree to our <br><span class="text-gray-500">Terms of Service & Privacy Policy.</span>
-                </p>
-            </div>
-
-            <!-- ✨ STEP 2: ROLE SELECTION (NEW USERS) ✨ -->
-            <div id="auth-step-2" class="hidden transition-all text-left">
-                <h3 class="text-2xl font-black text-[#111827] mb-1">Welcome!</h3>
-                <p class="text-[13px] text-[#6B7280] mb-6 font-medium">How do you want to use Pixigenie?</p>
-                
-                <div class="space-y-3">
-                    <button onclick="selectRole('shop')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white hover:bg-gray-50 active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left shadow-sm">
-                        <div class="w-12 h-12 bg-[#F3E8FF] text-[#A855F7] rounded-[14px] flex items-center justify-center text-xl"><i class="fas fa-store"></i></div>
-                        <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Shop Owner</h4><p class="text-[12px] text-[#6B7280] font-medium">Manage my digital store</p></div>
+                    <!-- Password -->
+                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
+                        <i class="fas fa-lock text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
+                        <input type="password" id="login-password" placeholder="Password" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
+                    </div>
+                    
+                    <button type="submit" id="login-btn" class="w-full bg-[#111827] text-white font-semibold h-[52px] rounded-[16px] active:scale-[0.98] transition-transform flex justify-center items-center gap-2 mt-4">
+                        Log in <i class="fas fa-arrow-right text-xs"></i>
                     </button>
                     
-                    <button onclick="selectRole('customer')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white hover:bg-gray-50 active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left shadow-sm">
-                        <div class="w-12 h-12 bg-[#DBEAFE] text-[#2563EB] rounded-[14px] flex items-center justify-center text-xl"><i class="fas fa-shopping-bag"></i></div>
-                        <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Customer</h4><p class="text-[12px] text-[#6B7280] font-medium">Start shopping immediately</p></div>
+                    <p class="text-[12px] text-[#6B7280] text-center mt-5">
+                        Don't have an account? <br> <a href="#" onclick="showStep('auth-step-register'); return false;" class="text-[#A855F7] font-bold hover:underline">Create account now</a>
+                    </p>
+                </form>
+            </div>
+
+            <!-- STEP 1B (REGISTER SCREEN) -->
+            <div id="auth-step-register" class="hidden transition-all">
+                <div class="w-14 h-14 bg-[#111827] rounded-[16px] flex items-center justify-center text-white text-xl mx-auto mb-4"><i class="fas fa-magic"></i></div>
+                <h3 class="text-2xl font-bold text-[#111827] mb-1">Get Started</h3>
+                <p class="text-[13px] text-[#6B7280] mb-6">Create your Pixigenie account</p>
+
+                <form onsubmit="handleRegisterSubmit(event)" class="space-y-3 mt-4">
+                    <!-- Name -->
+                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
+                        <i class="fas fa-user text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
+                        <input type="text" id="reg-name" placeholder="Full Name" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
+                    </div>
+                    
+                    <!-- Phone -->
+                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
+                        <span class="text-[#6B7280] font-semibold text-sm border-r border-[#E5E7EB] pr-3 mr-3">+91</span>
+                        <input type="tel" id="reg-phone" placeholder="WhatsApp Number" pattern="[0-9]{10}" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
+                        <i class="fas fa-lock text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
+                        <input type="password" id="reg-password" placeholder="Create Password" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
+                        <i class="fas fa-check-circle text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
+                        <input type="password" id="reg-confirm-password" placeholder="Confirm Password" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
+                    </div>
+                    
+                    <button type="submit" id="reg-btn" class="w-full bg-[#111827] text-white font-semibold h-[52px] rounded-[16px] active:scale-[0.98] transition-transform flex justify-center items-center gap-2 mt-4">
+                        Continue <i class="fas fa-arrow-right text-xs"></i>
+                    </button>
+                    
+                    <p class="text-[12px] text-[#6B7280] text-center mt-5">
+                        Already have an account? <br> <a href="#" onclick="showStep('auth-step-login'); return false;" class="text-[#A855F7] font-bold hover:underline">Log in here</a>
+                    </p>
+                </form>
+            </div>
+
+            <!-- STEP 2 (ROLE SELECTION) -->
+            <div id="auth-step-2" class="hidden transition-all text-left">
+                <h3 class="text-2xl font-bold text-[#111827] mb-1">Welcome!</h3>
+                <p class="text-[13px] text-[#6B7280] mb-6">How do you want to use Pixigenie?</p>
+                <div class="space-y-3">
+                    <button onclick="selectRole('shop')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left">
+                        <div class="w-12 h-12 bg-[#F7F7F9] text-[#111827] rounded-[12px] flex items-center justify-center text-lg"><i class="fas fa-store"></i></div>
+                        <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Shop Owner</h4><p class="text-[12px] text-[#6B7280]">Manage my digital store</p></div>
+                    </button>
+                    <!-- ✨ CUSTOMER SELECT AB SEEDHA LOGIN KAREGA ✨ -->
+                    <button onclick="selectRole('customer')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left">
+                        <div class="w-12 h-12 bg-[#F7F7F9] text-[#111827] rounded-[12px] flex items-center justify-center text-lg"><i class="fas fa-shopping-bag"></i></div>
+                        <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Customer</h4><p class="text-[12px] text-[#6B7280]">Start shopping immediately</p></div>
                     </button>
                 </div>
             </div>
 
-            <!-- ✨ STEP 3: SETUP STORE (FOR SHOP OWNERS) ✨ -->
+            <!-- STEP 3 (ONLY FOR SHOP OWNERS NOW) -->
             <div id="auth-step-shop" class="hidden transition-all text-left">
-                <button onclick="showStep('auth-step-2')" class="mb-5 text-[#6B7280] hover:text-[#111827] font-bold text-[13px] transition-colors flex items-center gap-1.5"><i class="fas fa-arrow-left"></i> Back</button>
-                
-                <h3 class="text-2xl font-black text-[#111827] mb-1">Setup Store</h3>
-                <p class="text-[13px] text-[#6B7280] mb-6 font-medium">Enter your business name</p>
-                
-                <form onsubmit="handleShopSubmit(event)" class="space-y-4">
-                    <input type="text" id="final-shop-name" placeholder="e.g. Netaji Jhadu Store" required class="w-full px-4 py-4 rounded-[16px] border border-gray-200 focus:border-blue-500 outline-none bg-[#F7F7F9] focus:bg-white text-sm font-bold transition shadow-sm">
-                    <button type="submit" id="final-shop-btn" class="w-full bg-[#111827] text-white font-bold h-[56px] rounded-[16px] shadow-[0_8px_20px_rgba(0,0,0,0.15)] mt-2 active:scale-95 transition-transform flex items-center justify-center gap-2">
-                        Launch Store <i class="fas fa-rocket text-sm"></i>
-                    </button>
+                <button onclick="showStep('auth-step-2')" class="mb-4 text-[#6B7280] active:text-[#111827]"><i class="fas fa-arrow-left"></i> Back</button>
+                <h3 class="text-2xl font-bold text-[#111827] mb-6">Setup Store</h3>
+                <form onsubmit="handleShopSubmit(event)" class="space-y-3">
+                    <input type="text" id="final-shop-name" placeholder="Enter Shop Name" required class="w-full px-4 py-4 rounded-xl border border-gray-200 focus:border-blue-500 outline-none bg-[#F7F7F9] text-sm font-semibold transition">
+                    <button type="submit" id="final-shop-btn" class="w-full bg-[#111827] text-white font-bold py-4 rounded-xl shadow-lg mt-2 active:scale-95 transition-transform">Launch Store <i class="fas fa-rocket ml-1"></i></button>
                 </form>
             </div>
             
         </div>
     </div>
+
 
     <!-- ✨ HYBRID CHECKOUT MODAL ✨ -->
     <div id="order-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[80] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
@@ -360,11 +416,11 @@
             <div class="absolute inset-0 bg-grid-pattern opacity-50 z-0 mask-image:linear-gradient(to_bottom,white,transparent)"></div>
             
             <div id="hero-content" class="relative z-10 w-full flex flex-col items-center text-center">
-                <!-- JS se populate hoga, including "Why Choose Us" -->
+                <!-- Dynamically populated -->
             </div>
         </section>
 
-        <!-- ✨ MARKETPLACE / PRODUCTS SECTION ✨ (Ye tumhara gayab ho gaya hoga) -->
+        <!-- ✨ MARKETPLACE / PRODUCTS SECTION ✨ -->
         <section id="marketplace" class="flex-1 py-16 sm:py-20 px-4 bg-white border-t border-gray-100 relative z-20 rounded-t-[2.5rem] shadow-[0_-5px_30px_rgba(0,0,0,0.02)]">
             <div class="max-w-6xl mx-auto">
                 
@@ -378,32 +434,44 @@
                         <i class="fas fa-location-arrow text-blue-500"></i> Near Me
                     </button>
                 </div>
+                <!-- ✨ NAYA PARENT CONTAINER START ✨ -->
+<div id="filter-search-container">
+                              <!-- ✨ COMPACT FILTER PILLS (Near Me ke bagal mein fit hone ke liye) ✨ -->
+                <div id="shopkeeper-filters-hide" class="flex items-center gap-2 overflow-x-auto pb-2 mb-4 custom-scrollbar reveal delay-100">
 
-                <!-- ✨ FILTER PILLS & SEARCH BAR ✨ -->
-                <div id="filter-search-container">
-                    <div id="shopkeeper-filters-hide" class="flex items-center gap-2 overflow-x-auto pb-2 mb-4 custom-scrollbar reveal delay-100">
-                        <button id="tab-all" onclick="switchMarketTab('all')" class="market-tab shrink-0 bg-gray-900 text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-sm transition-all active:scale-95 whitespace-nowrap">
-                            All
-                        </button>
-                        <button id="tab-products" onclick="switchMarketTab('products')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
-                            Products
-                        </button>
-                        <button id="tab-services" onclick="switchMarketTab('services')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
-                            Services
-                        </button>
-                        <button id="tab-shops" onclick="switchMarketTab('shops')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
-                            Shops
-                        </button>
-                    </div>
+                  
 
-                    <div class="relative w-full mb-10 sm:mb-12 reveal delay-100 z-[60]">
-                        <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
-                        <input type="text" id="search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search products, services, or shops..." autocomplete="off" class="w-full bg-white hover:bg-gray-50 focus:bg-white px-5 py-4 pl-14 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none text-base font-semibold transition-all shadow-sm">
-                        <div id="search-dropdown" class="absolute w-full bg-white mt-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden hidden max-h-80 overflow-y-auto custom-scrollbar flex-col divide-y divide-gray-100 z-[100]"></div>
+                  <!-- ✨ NAYA 'ALL' BUTTON (Default Active) ✨ -->
+    <button id="tab-all" onclick="switchMarketTab('all')" class="market-tab shrink-0 bg-gray-900 text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-sm transition-all active:scale-95 whitespace-nowrap">
+    All
+</button>
+
+    <button id="tab-products" onclick="switchMarketTab('products')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
+         Products
+    </button>
+    <button id="tab-services" onclick="switchMarketTab('services')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
+         Services
+    </button>
+    <button id="tab-shops" onclick="switchMarketTab('shops')" class="market-tab shrink-0 bg-white text-gray-600 border border-gray-200 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap hover:bg-gray-50 transition-all active:scale-95">
+        Shops
+    </button>
+</div>
+
+                <!-- ✨ NAYA: UNIVERSAL SEARCH BAR WITH DROPDOWN ✨ -->
+                <div class="relative w-full mb-10 sm:mb-12 reveal delay-100 z-[60]">
+                    <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
+                    
+                    <!-- Search Input (Ab ye dropdown ko trigger karega) -->
+                    <input type="text" id="search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search products, services, or shops..." autocomplete="off" class="w-full bg-white hover:bg-gray-50 focus:bg-white px-5 py-4 pl-14 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none text-base font-semibold transition-all shadow-sm">
+                    
+                    
+                    <!-- Search Dropdown Box -->
+                    <div id="search-dropdown" class="absolute w-full bg-white mt-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden hidden max-h-80 overflow-y-auto custom-scrollbar flex-col divide-y divide-gray-100 z-[100]">
+                        <!-- JS se results yahan aayenge -->
                     </div>
                 </div>
 
-                <!-- ✨ DYNAMIC GRID ✨ -->
+                </div>
                 <div id="dynamic-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                     <div class="col-span-full text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
                         <i class="fas fa-circle-notch fa-spin text-4xl text-blue-600 mb-3"></i>
@@ -413,9 +481,6 @@
 
             </div>
         </section>
-
-        
-
      <!-- ✨ PIXIGENIE MONTHLY PRICING (WITH DISCOUNTS & TAGS) ✨ -->
 <section id="merchant-upgrade-plans" class="hidden py-16 px-4 max-w-6xl mx-auto border-t border-gray-100 relative z-20 bg-white w-full">
     <div class="text-center mb-12 reveal active">
@@ -740,19 +805,17 @@
             btn.disabled = false;
         }
 
-                // ✨ 2. SELECT ROLE LOGIC (FIXED) ✨
         async function selectRole(role) {
             if (role === 'customer') {
                 try {
-                    await db.collection('customers').doc(authTemp.email).set({
+                    await db.collection('customers').doc(authTemp.phone).set({
                         name: authTemp.name,
-                        email: authTemp.email,
-                        phone: authTemp.email, 
+                        phone: authTemp.phone,
                         password: authTemp.password,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     localStorage.setItem('pixigenie_customer_name', authTemp.name);
-                    localStorage.setItem('pixigenie_customer_phone', authTemp.email);
+                    localStorage.setItem('pixigenie_customer_phone', authTemp.phone);
                     closeAuthModal(); 
                     updateUIBasedOnLogin();
                 } catch (error) { alert("Error: " + error.message); }
@@ -761,91 +824,78 @@
             }
         }
 
-                    // ✨ 1. GOOGLE LOGIN LOGIC (ULTIMATE FIX FOR OLD & NEW ACCOUNTS) ✨
+              // ✨ GOOGLE LOGIN LOGIC (SMART FIX: Email, Phone & Super Admin check karega) ✨
         function loginWithGoogle(event) {
             const btn = event ? event.currentTarget : null;
             if (btn) btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Please wait...`;
             
             auth.signInWithPopup(googleProvider).then(async (result) => {
                 const user = result.user;
-                const userEmail = user.email || user.uid; 
+                const userEmailOrId = user.email || user.uid;
                 
-                if (userEmail === 'pixigenie8750@gmail.com') {
+                // 🚀 1. SUPER ADMIN CHECK 🚀
+                if (user.email === 'pixigenie8750@gmail.com') {
                     localStorage.setItem('pixigenie_super_admin', 'true');
                     window.location.href = 'super-admin.html';
-                    return;
+                    return; // Admin hai toh code yahin se naye page par chala jayega
                 }
                 
-                // 1. Check if CUSTOMER exists (by email OR by old phone if we somehow know it)
-                // Yahan hum pehle email se check kar rahe hain
-                const custSnap = await db.collection('customers').doc(userEmail).get();
+                // 2. अगर पुराना कस्टमर है तो सीधा लॉगिन
+                const custSnap = await db.collection('customers').doc(userEmailOrId).get();
                 if(custSnap.exists) {
                     const custData = custSnap.data();
                     localStorage.setItem('pixigenie_customer_name', custData.name);
-                    localStorage.setItem('pixigenie_customer_phone', userEmail); 
-                    if (custData.profileImage) localStorage.setItem('pixigenie_profile_img', custData.profileImage);
+                    localStorage.setItem('pixigenie_customer_phone', custData.phone);
+                    
+                    if (custData.profileImage) {
+                        localStorage.setItem('pixigenie_profile_img', custData.profileImage);
+                    }
+                    
                     closeAuthModal();
                     updateUIBasedOnLogin();
                     return;
                 }
                 
-                // 2. 🚀 SMART SHOP CHECK (Checks Email first, then tries to find any shop owned by this email/user)
-                let shopFound = null;
+                // 3. 🚀 SMART FIX: अगर पुराना दुकानदार है तो सीधा डैशबोर्ड (Email और Phone दोनों से ढूंढेगा)
+                // Pehle hum as a 'email' field me check karenge (Dashboard update ke baad wali sthiti)
+                let shopSnap = await db.collection('shops').where('email', '==', user.email).get();
                 
-                // PRAYAS 1: Direct Email se dhoondo
-                const emailSnap = await db.collection('shops').where('email', '==', userEmail).get();
-                if (!emailSnap.empty) {
-                    shopFound = emailSnap.docs[0].data();
-                } 
-                else {
-                    // PRAYAS 2: Agar email nahi mila, toh check karo kya koi dukaan jisme email khali hai ("")
-                    // aur jiska ownerName wahi hai jo Google account ka naam hai (Aisa purani dukanon me hoga)
-                    // Ya fir, specific Netaji account ke liye hardcoded fallback (Temporary safety)
-                    
-                    if (userEmail === 'netajijhadustore@gmail.com') {
-                        // Agar admin login kar raha hai, toh seedha uski dukaan utha lo (bhale hi database me email blank ho)
-                        const fallbackSnap = await db.collection('shops').where('phone', '==', '8750900635').get();
-                        if (!fallbackSnap.empty) {
-                            shopFound = fallbackSnap.docs[0].data();
-                            // Haath-o-haath database me email update kar do taaki agli baar Prayas 1 kaam kare!
-                            await db.collection('shops').doc(shopFound.shopId).update({ email: userEmail });
-                        }
-                    }
+                // Agar email me nahi mila, toh 'phone' wale field me check karenge (Pehli baar login wali sthiti)
+                if (shopSnap.empty) {
+                    shopSnap = await db.collection('shops').where('phone', '==', userEmailOrId).get();
                 }
 
-                // Agar dukaan mil gayi (kisi bhi prayas se)
-                if(shopFound) {
-                    localStorage.setItem('pixigenie_active_shop', shopFound.shopId);
-                    localStorage.setItem('pixigenie_owner_name', shopFound.ownerName || user.displayName || 'Store Owner');
+                // Agar dono me se kisi me bhi shop mil gayi, toh seedha andar!
+                if(!shopSnap.empty) {
+                    const shopData = shopSnap.docs[0].data();
+                    localStorage.setItem('pixigenie_active_shop', shopData.shopId);
+                    localStorage.setItem('pixigenie_owner_name', shopData.ownerName);
+                    localStorage.setItem('pixigenie_customer_phone', shopData.phone || userEmailOrId);
                     
-                    // Phone number wahi rehne do jo database me hai, taaki baki cheezein crash na hon
-                    localStorage.setItem('pixigenie_customer_phone', userEmail); 
+                    if (shopData.storeLogo) {
+                        localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
+                    }
                     
-                    if (shopFound.storeLogo) localStorage.setItem('pixigenie_profile_img', shopFound.storeLogo);
-                    
-                    window.location.href = `dashboard.html?shop=${shopFound.shopId}`;
+                    window.location.href = `dashboard.html?shop=${shopData.shopId}`;
                     return;
                 }
 
-                // 3. Sach me Naya User -> Go to Role Selection
-                authTemp = {
-                    name: user.displayName || "Google User",
-                    email: userEmail,
-                    phone: userEmail, 
-                    password: "google-verified"
-                };
+                // 4. ✨ अगर सच में नया यूज़र है, तो Role Selection दिखाओ
+                authTemp.name = user.displayName || "Google User";
+                authTemp.phone = userEmailOrId; 
+                authTemp.password = "google-verified";
                 
                 showStep('auth-step-2'); 
 
             }).catch((error) => {
                 console.error(error);
                 alert("Login Error: " + error.message);
-                if (btn) btn.innerHTML = `<img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google"> Continue with Google`;
+                if (btn) btn.innerHTML = `<img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Log in with Google`;
             });
         }
 
 
-             // ✨ 3. SHOP SUBMIT LOGIC (SHOP REGISTRATION FIX) ✨
+
         async function handleShopSubmit(e) {
             e.preventDefault();
             const shopName = document.getElementById('final-shop-name').value.trim();
@@ -854,14 +904,11 @@
             btn.disabled = true;
 
             const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
-            
-            // ✨ Yahan hum explicitly email pass kar rahe hain ✨
             const newShopData = { 
                 shopId: shopSlug, 
                 shopName: shopName, 
                 ownerName: authTemp.name, 
-                email: authTemp.email, 
-                phone: authTemp.email, // Phone ko bhi email rakha taaki aage koi crash na ho
+                phone: authTemp.phone, 
                 password: authTemp.password, 
                 status: "active", 
                 createdAt: firebase.firestore.FieldValue.serverTimestamp() 
@@ -871,13 +918,8 @@
                 await db.collection('shops').doc(shopSlug).set(newShopData);
                 localStorage.setItem('pixigenie_active_shop', shopSlug);
                 localStorage.setItem('pixigenie_owner_name', authTemp.name);
-                localStorage.setItem('pixigenie_customer_phone', authTemp.email);
                 window.location.href = `dashboard.html?shop=${shopSlug}`;
-            } catch (error) { 
-                alert(error.message); 
-                btn.innerHTML = `Launch Store <i class="fas fa-rocket ml-1"></i>`;
-                btn.disabled = false; 
-            }
+            } catch (error) { alert(error.message); btn.disabled = false; }
         }
 
         function getInitials(name) {
@@ -1180,8 +1222,7 @@
 
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Customer Profile</p>
                             <h4 class="font-black text-gray-900 text-lg leading-tight truncate">${customerName}</h4>
-                            ${(customerPhone && customerPhone !== 'N/A') ? `<p class="text-xs text-gray-500 mt-1.5 font-medium flex items-center gap-1.5"><i class="fas fa-${customerPhone.includes('@') ? 'envelope' : 'phone-alt'} text-gray-400"></i> ${customerPhone.includes('@') ? '' : '+91 '}${customerPhone}</p>` : ''}
-
+                            ${customerPhone ? `<p class="text-xs text-gray-500 mt-1.5 font-medium flex items-center gap-1.5"><i class="fas fa-phone-alt text-gray-400"></i> +91 ${customerPhone}</p>` : ''}
                         </div>
                         <div class="p-2">
                             <button onclick="showLogoutModal()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -1405,53 +1446,44 @@ searchInput.placeholder = "Search products, services, or shops...";
             }
         }
 
-                    // ===============================================
-        // ✨ NAYA FUNCTION: Safe Global Products (JS Sorting Fix) ✨
+            // ===============================================
+        // 2. REPLACED: fetchGlobalProducts()
         // ===============================================
         async function fetchGlobalProducts() {
             const grid = document.getElementById('dynamic-grid');
             try {
-                // 🔥 SAFE FETCH: Bina orderBy ke mangwayenge taaki purane products gayab na hon
-                const snapshot = await db.collectionGroup('products').limit(60).get();
+              // 🔥 MAGIC: Jis dukaandar ka rank 100 (Pro) hai, uska product automatically pehle dikhega!
+const snapshot = await db.collectionGroup('products')
+    .orderBy('searchRank', 'desc')
+    .limit(12)
+    .get();
 
                 if (snapshot.empty) throw new Error("No products");
                 
-                let allProducts = [];
-                snapshot.forEach(doc => {
-                    let data = doc.data();
-                    data.docRef = doc.ref; // Shop info nikalne ke liye reference save kiya
-                    allProducts.push(data);
-                });
-
-                // 🔥 JAVASCRIPT SORTING: Jiske paas searchRank nahi hai use 0 maan lenge (Pro products top par)
-                allProducts.sort((a, b) => (b.searchRank || 0) - (a.searchRank || 0));
-
-                // Sirf top 20 products dikhayenge
-                allProducts = allProducts.slice(0, 20);
-
-                const productPromises = allProducts.map(async (product) => {
+                const productPromises = snapshot.docs.map(async (doc) => {
+                    const product = doc.data();
                     let shopName = "Local Shop";
                     let shopPhone = "";
                     let shopId = ""; 
                     let isVerified = false; 
                     let shopPlan = ""; 
-                    let isService = false;
                     
-                    if (product.docRef.parent && product.docRef.parent.parent) {
+                    if (doc.ref.parent && doc.ref.parent.parent) {
                         try {
-                            const shopDoc = await product.docRef.parent.parent.get();
+                            const shopDoc = await doc.ref.parent.parent.get();
                             if (shopDoc.exists) {
                                 const sData = shopDoc.data();
                                 shopName = sData.shopName || "Local Shop";
                                 shopPhone = sData.phone || "";
                                 shopId = shopDoc.id; 
                                 shopPlan = sData.plan || ""; 
+                                
                                 isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro' || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
-                                if (sData.businessType === 'Service Provider') isService = true;
                             }
                         } catch(e) {}
                     }
                     
+                    // ✨ NAYA: product.mrp pass kar rahe hain ✨
                     return generateProductCard(product.name, product.mrp, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan, isService);
                 });
 
@@ -1460,80 +1492,76 @@ searchInput.placeholder = "Search products, services, or shops...";
                 
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
             } catch (error) { 
-                console.error("Fetch Error: ", error);
-                grid.innerHTML = `<div class="col-span-full text-center py-10"><p class="text-gray-500 font-medium">No products found around you.</p></div>`;
-            }
-        }
-
-        // ===============================================
-        // ✨ NAYA FUNCTION: Safe Item Loader (JS Sorting Fix) ✨
-        // ===============================================
-        async function fetchGlobalItems(itemType) {
-            const grid = document.getElementById('dynamic-grid');
-            try {
-                // 🔥 SAFE FETCH
-                const snapshot = await db.collectionGroup('products').limit(60).get();
-
-                if (snapshot.empty) throw new Error("No items");
-                
-                let allItems = [];
-                snapshot.forEach(doc => {
-                    let data = doc.data();
-                    data.docRef = doc.ref; 
-                    allItems.push(data);
-                });
-
-                // 🔥 JAVASCRIPT SORTING (Pro products & services top par)
-                allItems.sort((a, b) => (b.searchRank || 0) - (a.searchRank || 0));
-
-                const itemPromises = allItems.map(async (product) => {
-                    let shopName = "Local Shop";
-                    let shopPhone = "";
-                    let shopId = ""; 
-                    let isVerified = false; 
-                    let shopPlan = ""; 
-                    let isService = false; 
-                    
-                    if (product.docRef.parent && product.docRef.parent.parent) {
-                        try {
-                            const shopDoc = await product.docRef.parent.parent.get();
-                            if (shopDoc.exists) {
-                                const sData = shopDoc.data();
-                                shopName = sData.shopName || "Local Shop";
-                                shopPhone = sData.phone || "";
-                                shopId = shopDoc.id; 
-                                shopPlan = sData.plan || ""; 
-                                isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro' || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
-                                
-                                if (sData.businessType === 'Service Provider') {
-                                    isService = true;
-                                }
-                            }
-                        } catch(e) {}
-                    }
-                    
-                    // 🔥 FILTER LOGIC 🔥
-                    if (itemType === 'product' && isService) return null;
-                    if (itemType === 'service' && !isService) return null;
-
-                    return generateProductCard(product.name, product.mrp, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan, isService);
-                });
-
-                // Filter out nulls aur sirf top 20 dikhao
-                const cardsHtmlArray = (await Promise.all(itemPromises)).filter(card => card !== null).slice(0, 20); 
-                
-                if (cardsHtmlArray.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full text-center py-16"><i class="fas fa-box-open text-4xl text-gray-200 mb-3"></i><p class="text-gray-500 font-medium">No ${itemType}s found.</p></div>`;
-                } else {
-                    grid.innerHTML = cardsHtmlArray.join('');
-                }
-                
+                grid.innerHTML = `
+                    ${generateProductCard("Premium Quality Brooms", "199", "150", "Netaji Jhadu Store", "9876543210", "", "netajijhadustore", true, "pro")}
+                `;
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
-            } catch (error) { 
-                console.error("Fetch Error: ", error);
-                grid.innerHTML = `<div class="col-span-full text-center py-10"><p class="text-red-500 font-medium">No active ${itemType}s available right now.</p></div>`;
             }
         }
+// Naya function: Products aur Services ko alag-alag load karne ke liye
+async function fetchGlobalItems(itemType) {
+    const grid = document.getElementById('dynamic-grid');
+    try {
+        // Firebase se items fetch karein
+        const snapshot = await db.collectionGroup('products')
+            .orderBy('searchRank', 'desc')
+            .limit(20)
+            .get();
+
+        if (snapshot.empty) throw new Error("No items");
+        
+        const itemPromises = snapshot.docs.map(async (doc) => {
+            const product = doc.data();
+            let shopName = "Local Shop";
+            let shopPhone = "";
+            let shopId = ""; 
+            let isVerified = false; 
+            let shopPlan = ""; 
+            let isService = false; // Check karne ke liye ki item service hai ya nahi
+            
+            if (doc.ref.parent && doc.ref.parent.parent) {
+                try {
+                    const shopDoc = await doc.ref.parent.parent.get();
+                    if (shopDoc.exists) {
+                        const sData = shopDoc.data();
+                        shopName = sData.shopName || "Local Shop";
+                        shopPhone = sData.phone || "";
+                        shopId = shopDoc.id; 
+                        shopPlan = sData.plan || ""; 
+                        isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro' || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
+                        
+                        // Check karein ki shop owner 'Service Provider' hai kya
+                        if (sData.businessType === 'Service Provider') {
+                            isService = true;
+                        }
+                    }
+                } catch(e) {}
+            }
+            
+            // 🔥 FILTER LOGIC 🔥
+            // Agar tab 'product' hai par dukaan 'service' wali hai, toh isko hata do
+            if (itemType === 'product' && isService) return null;
+            // Agar tab 'service' hai par dukaan 'product' wali hai, toh isko hata do
+            if (itemType === 'service' && !isService) return null;
+
+         return generateProductCard(product.name, product.mrp, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan, isService);
+        });
+
+        // Saare filtered items ko resolve karein aur null values ko hata dein
+        const cardsHtmlArray = (await Promise.all(itemPromises)).filter(card => card !== null);
+        
+        if (cardsHtmlArray.length === 0) {
+            grid.innerHTML = `<div class="col-span-full text-center py-16"><i class="fas fa-box-open text-4xl text-gray-200 mb-3"></i><p class="text-gray-500 font-medium">No ${itemType}s found around you.</p></div>`;
+        } else {
+            grid.innerHTML = cardsHtmlArray.join('');
+        }
+        
+        if(typeof initScrollAnimations === 'function') initScrollAnimations();
+    } catch (error) { 
+        console.error(error);
+        grid.innerHTML = `<div class="col-span-full text-center py-10"><p class="text-red-500 font-medium">Failed to load ${itemType}s.</p></div>`;
+    }
+}
 
    // ✨ NAYA: isService parameter end me add kiya hai ✨
 function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopId = "", isVerified = false, plan = "", isService = false) {
@@ -2541,20 +2569,11 @@ function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopI
             const oldDropdown = document.getElementById('profile-dropdown'); 
             if(oldDropdown) oldDropdown.classList.add('hidden');
 
-                    if (modal.classList.contains('hidden')) {
-            const name = localStorage.getItem('pixigenie_customer_name') || localStorage.getItem('pixigenie_owner_name') || 'Customer';
-            let phoneStr = localStorage.getItem('pixigenie_customer_phone') || 'N/A'; 
-            
-            // ✨ NAYA LOGIC: Agar phone ki jagah 'N/A' hai, toh direct Google se Email nikal lo! ✨
-            const user = firebase.auth().currentUser;
-            if (user && user.email && (phoneStr === 'N/A' || !phoneStr.includes('@'))) {
-                phoneStr = user.email;
-                localStorage.setItem('pixigenie_customer_phone', phoneStr); // LocalStorage ko fix kar dega
-            }
-
-            const activeShop = localStorage.getItem('pixigenie_active_shop'); 
-            const isEmail = phoneStr.includes('@');
-
+            if (modal.classList.contains('hidden')) {
+                const name = localStorage.getItem('pixigenie_customer_name') || localStorage.getItem('pixigenie_owner_name') || 'Customer';
+                const phoneStr = localStorage.getItem('pixigenie_customer_phone') || 'N/A'; 
+                const activeShop = localStorage.getItem('pixigenie_active_shop'); 
+                const isEmail = phoneStr.includes('@');
 
                 const profNameEl = document.getElementById('prof-name');
                 if(profNameEl) profNameEl.innerText = name;
@@ -2643,19 +2662,10 @@ function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopI
                 }
                 if(initialText) initialText.innerText = name.charAt(0).toUpperCase();
 
-                        const profPhoneEl = document.getElementById('prof-phone');
+                const profPhoneEl = document.getElementById('prof-phone');
                 if(profPhoneEl) {
-                    if (isEmail) { 
-                        // Agar Email hai toh Envelope icon aayega aur +91 nahi lagega
-                        profPhoneEl.innerHTML = `<i class="fas fa-envelope text-gray-400 mr-1.5"></i> ${phoneStr}`;
-                    } 
-                    else if (phoneStr && phoneStr !== 'N/A' && phoneStr !== '') { 
-                        // Agar Phone hai toh Call icon aayega
-                        profPhoneEl.innerHTML = `<i class="fas fa-phone-alt text-gray-400 mr-1.5"></i> +91 ${phoneStr}`;
-                    } 
-                    else {
-                        profPhoneEl.innerText = 'Email Not Found';
-                    }
+                    if (isEmail) { profPhoneEl.innerText = phoneStr; } 
+                    else { profPhoneEl.innerText = phoneStr !== 'N/A' ? '+91 ' + phoneStr : 'N/A'; }
                 }
 
                 const sName = document.getElementById('saved-name');
