@@ -388,6 +388,7 @@
     <script>
         let globalShopPhone = "";
         let globalShopName = "";
+        let globalBusinessType = "";
         let currentShopId = new URLSearchParams(window.location.search).get('shop') || localStorage.getItem('pixigenie_active_shop');
         
         let fullDesc = "";
@@ -420,7 +421,7 @@ let hasMoreProducts = true;
 
                     globalShopPhone = shopData.phone;
                     globalShopName = shopData.shopName;
-                    
+                    globalBusinessType = shopData.businessType || '';
                     const safeOwnerName = shopData.ownerName || "Shop Owner";
 
                     document.title = `${shopData.shopName} | Pixigenie`;                                                                     // ✨✨ PROFILE PIC PREMIUM VIP BADGE & RING LOGIC ✨✨
@@ -777,6 +778,12 @@ productsSnap.forEach(doc => {
     const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
     const unit = product.unit || 'pcs';
     
+    // ✨ NAYA: BUTTON TEXT LOGIC ✨
+    let isServiceItem = (globalBusinessType === 'Service Provider') || 
+                        (product.name && product.name.toLowerCase().includes('service')) || 
+                        (unit.toLowerCase() === 'hr');
+    const buttonText = isServiceItem ? "Book Now" : "Order Now";
+    
     // ✨ NAYA: DISCOUNT CALCULATION LOGIC ✨
     let discountBadgeHtml = '';
     let priceDisplayHtml = `<p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>`;
@@ -819,7 +826,7 @@ productsSnap.forEach(doc => {
                     <i class="fas fa-cart-plus text-sm"></i> Cart
                 </button>
                 <button onclick="openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
-                    Order Now
+                    ${buttonText}
                 </button>
             </div>
         </div>
@@ -1703,7 +1710,11 @@ async function loadMoreProducts() {
             const product = doc.data();
             const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
             const unit = product.unit || 'pcs';
-            
+            // ✨ NAYA: BUTTON TEXT LOGIC ✨
+            let isServiceItem = (globalBusinessType === 'Service Provider') || 
+                                (product.name && product.name.toLowerCase().includes('service')) || 
+                                (unit.toLowerCase() === 'hr');
+            const buttonText = isServiceItem ? "Book Now" : "Order Now";
             // ✨ NAYA: DISCOUNT CALCULATION LOGIC ✨
             let discountBadgeHtml = '';
             let priceDisplayHtml = `<p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>`;
@@ -1746,7 +1757,7 @@ async function loadMoreProducts() {
                             <i class="fas fa-cart-plus text-sm"></i> Cart
                         </button>
                         <button onclick="openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
-                            Order Now
+                             ${buttonText}
                         </button>
                     </div>
                 </div>
