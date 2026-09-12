@@ -839,7 +839,7 @@
             });
         }
 
-        // ✨ 3. SHOP SUBMIT LOGIC (FIXED) ✨
+             // ✨ 3. SHOP SUBMIT LOGIC (SHOP REGISTRATION FIX) ✨
         async function handleShopSubmit(e) {
             e.preventDefault();
             const shopName = document.getElementById('final-shop-name').value.trim();
@@ -849,13 +849,13 @@
 
             const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
             
-            // ✨ Yahan Email Save Hoga Database me! ✨
+            // ✨ Yahan hum explicitly email pass kar rahe hain ✨
             const newShopData = { 
                 shopId: shopSlug, 
                 shopName: shopName, 
                 ownerName: authTemp.name, 
                 email: authTemp.email, 
-                phone: authTemp.email, 
+                phone: authTemp.email, // Phone ko bhi email rakha taaki aage koi crash na ho
                 password: authTemp.password, 
                 status: "active", 
                 createdAt: firebase.firestore.FieldValue.serverTimestamp() 
