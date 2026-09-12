@@ -800,24 +800,31 @@
                     return;
                 }
                 
-                // 3. 🚀 SMART FIX: अगर पुराना दुकानदार है तो सीधा डैशबोर्ड (Email और Phone दोनों से ढूंढेगा)
-                // Pehle hum as a 'email' field me check karenge (Dashboard update ke baad wali sthiti)
+                            // 3. 🚀 SHOP CHECK BY EMAIL OR PHONE (N/A Fix)
                 let shopSnap = await db.collection('shops').where('email', '==', user.email).get();
-                
-                // Agar email me nahi mila, toh 'phone' wale field me check karenge (Pehli baar login wali sthiti)
-                if (shopSnap.empty) {
-                    shopSnap = await db.collection('shops').where('phone', '==', userEmailOrId).get();
+                if (shopSnap.empty && user.email) {
+                    shopSnap = await db.collection('shops').where('phone', '==', user.email).get();
                 }
 
-                // Agar dono me se kisi me bhi shop mil gayi, toh seedha andar!
                 if(!shopSnap.empty) {
                     const shopData = shopSnap.docs[0].data();
                     localStorage.setItem('pixigenie_active_shop', shopData.shopId);
-                    localStorage.setItem('pixigenie_owner_name', shopData.ownerName);
-                    localStorage.setItem('pixigenie_customer_phone', shopData.phone || userEmailOrId);
+                    localStorage.setItem('pixigenie_owner_name', shopData.ownerName || user.displayName || 'Store Owner');
+                    
+                    // ✨ NAYA LOGIC: Agar phone "N/A" hai toh direct Email use karega
+                    let validContact = shopData.email || user.email; 
+                    if (shopData.phone && shopData.phone !== 'N/A' && shopData.phone !== '') {
+                        validContact = shopData.phone;
+                    }
+                    localStorage.setItem('pixigenie_customer_phone', validContact);
                     
                     if (shopData.storeLogo) {
                         localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
+                    }
+                    
+                    // Agar purani dukan me email save nahi tha, toh ab background me update kar dega
+                    if (!shopData.email && user.email) {
+                        db.collection('shops').doc(shopData.shopId).update({ email: user.email }).catch(() => {});
                     }
                     
                     window.location.href = `dashboard.html?shop=${shopData.shopId}`;
@@ -1166,7 +1173,8 @@
 
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Customer Profile</p>
                             <h4 class="font-black text-gray-900 text-lg leading-tight truncate">${customerName}</h4>
-                            ${customerPhone ? `<p class="text-xs text-gray-500 mt-1.5 font-medium flex items-center gap-1.5"><i class="fas fa-phone-alt text-gray-400"></i> +91 ${customerPhone}</p>` : ''}
+                            ${(customerPhone && customerPhone !== 'N/A') ? `<p class="text-xs text-gray-500 mt-1.5 font-medium flex items-center gap-1.5"><i class="fas fa-${customerPhone.includes('@') ? 'envelope' : 'phone-alt'} text-gray-400"></i> ${customerPhone.includes('@') ? '' : '+91 '}${customerPhone}</p>` : ''}
+
                         </div>
                         <div class="p-2">
                             <button onclick="showLogoutModal()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -2606,10 +2614,19 @@ function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopI
                 }
                 if(initialText) initialText.innerText = name.charAt(0).toUpperCase();
 
-                const profPhoneEl = document.getElementById('prof-phone');
+                        const profPhoneEl = document.getElementById('prof-phone');
                 if(profPhoneEl) {
-                    if (isEmail) { profPhoneEl.innerText = phoneStr; } 
-                    else { profPhoneEl.innerText = phoneStr !== 'N/A' ? '+91 ' + phoneStr : 'N/A'; }
+                    if (isEmail) { 
+                        // Agar Email hai toh Envelope icon aayega aur +91 nahi lagega
+                        profPhoneEl.innerHTML = `<i class="fas fa-envelope text-gray-400 mr-1.5"></i> ${phoneStr}`;
+                    } 
+                    else if (phoneStr && phoneStr !== 'N/A' && phoneStr !== '') { 
+                        // Agar Phone hai toh Call icon aayega
+                        profPhoneEl.innerHTML = `<i class="fas fa-phone-alt text-gray-400 mr-1.5"></i> +91 ${phoneStr}`;
+                    } 
+                    else {
+                        profPhoneEl.innerText = 'Email Not Found';
+                    }
                 }
 
                 const sName = document.getElementById('saved-name');
