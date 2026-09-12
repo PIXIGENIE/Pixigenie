@@ -2521,11 +2521,20 @@ function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopI
             const oldDropdown = document.getElementById('profile-dropdown'); 
             if(oldDropdown) oldDropdown.classList.add('hidden');
 
-            if (modal.classList.contains('hidden')) {
-                const name = localStorage.getItem('pixigenie_customer_name') || localStorage.getItem('pixigenie_owner_name') || 'Customer';
-                const phoneStr = localStorage.getItem('pixigenie_customer_phone') || 'N/A'; 
-                const activeShop = localStorage.getItem('pixigenie_active_shop'); 
-                const isEmail = phoneStr.includes('@');
+                    if (modal.classList.contains('hidden')) {
+            const name = localStorage.getItem('pixigenie_customer_name') || localStorage.getItem('pixigenie_owner_name') || 'Customer';
+            let phoneStr = localStorage.getItem('pixigenie_customer_phone') || 'N/A'; 
+            
+            // ✨ NAYA LOGIC: Agar phone ki jagah 'N/A' hai, toh direct Google se Email nikal lo! ✨
+            const user = firebase.auth().currentUser;
+            if (user && user.email && (phoneStr === 'N/A' || !phoneStr.includes('@'))) {
+                phoneStr = user.email;
+                localStorage.setItem('pixigenie_customer_phone', phoneStr); // LocalStorage ko fix kar dega
+            }
+
+            const activeShop = localStorage.getItem('pixigenie_active_shop'); 
+            const isEmail = phoneStr.includes('@');
+
 
                 const profNameEl = document.getElementById('prof-name');
                 if(profNameEl) profNameEl.innerText = name;
