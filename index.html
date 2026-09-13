@@ -2690,7 +2690,7 @@ function getVIPBadge(isVerified, plan) {
         let selectedLat = 28.7041; 
         let selectedLng = 77.1025;
 
-        function openMapPicker(addressId, latId, lngId) {
+             function openMapPicker(addressId, latId, lngId) {
             currentTargetAddressId = addressId;
             currentTargetLatId = latId;
             currentTargetLngId = lngId;
@@ -2702,16 +2702,29 @@ function getVIPBadge(isVerified, plan) {
             const preview = document.getElementById('map-address-preview');
             preview.innerHTML = `<i class="fas fa-circle-notch fa-spin text-purple-500 mr-1"></i> Getting your live location...`;
 
-            // Agar pehle se coordinate save hai, to usko use karo
-            const existingLat = document.getElementById(latId) ? parseFloat(document.getElementById(latId).value) : null;
-            const existingLng = document.getElementById(lngId) ? parseFloat(document.getElementById(lngId).value) : null;
+            let existingLat = document.getElementById(latId) ? parseFloat(document.getElementById(latId).value) : null;
+            let existingLng = document.getElementById(lngId) ? parseFloat(document.getElementById(lngId).value) : null;
 
-            if (existingLat && existingLng && !isNaN(existingLat)) {
+            if (isNaN(existingLat) || isNaN(existingLng) || existingLat === null || existingLng === null) {
+                const savedLat = localStorage.getItem('pixigenie_saved_lat');
+                const savedLng = localStorage.getItem('pixigenie_saved_lng');
+                if (savedLat && savedLng) {
+                    existingLat = parseFloat(savedLat);
+                    existingLng = parseFloat(savedLng);
+                }
+            }
+
+            // ✨ BUG FIX 1: Agar GPS galti se default Delhi (28.7041) par atak gaya hai, toh usko reject karo
+            if (existingLat === 28.7041 || existingLng === 77.1025) {
+                existingLat = null;
+                existingLng = null;
+            }
+
+            if (existingLat && existingLng && !isNaN(existingLat) && !isNaN(existingLng)) {
                 selectedLat = existingLat;
                 selectedLng = existingLng;
                 initOrUpdateMap();
             } else {
-                // ✨ NAYA LOGIC: Agar naya address hai toh Map khulte hi Live Location fetch karo
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (pos) => {
@@ -2719,14 +2732,36 @@ function getVIPBadge(isVerified, plan) {
                             selectedLng = pos.coords.longitude;
                             initOrUpdateMap();
                         },
-                        (err) => { initOrUpdateMap(); }, // Agar GPS band hai, toh default location khul jayegi
-                        { enableHighAccuracy: true, timeout: 5000 }
+                        (err) => { 
+                            selectedLat = 28.7041; selectedLng = 77.1025; 
+                            initOrUpdateMap(); 
+                        },
+                        { enableHighAccuracy: true, timeout: 8000 } // ✨ GPS Timeout badha diya
                     );
                 } else {
+                    selectedLat = 28.7041; selectedLng = 77.1025;
                     initOrUpdateMap();
                 }
             }
         }
+
+        // ✨ BUG FIX 2: Agar user keyboard se address type kare, toh purana galat GPS delete kar do
+        document.addEventListener('DOMContentLoaded', () => {
+            const addressFields = ['saved-address', 'order-address', 'cart-address'];
+            addressFields.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.addEventListener('input', function() {
+                        const prefix = this.id.split('-')[0];
+                        if(document.getElementById(prefix + '-lat')) document.getElementById(prefix + '-lat').value = '';
+                        if(document.getElementById(prefix + '-lng')) document.getElementById(prefix + '-lng').value = '';
+                        localStorage.removeItem('pixigenie_saved_lat');
+                        localStorage.removeItem('pixigenie_saved_lng');
+                    });
+                }
+            });
+        });
+
 
         function initOrUpdateMap() {
             if (!mapInstance) {
