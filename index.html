@@ -1845,8 +1845,14 @@ function getVIPBadge(isVerified, plan) {
     // फॉर्म में डाटा डाल दो
     document.getElementById('order-cust-name').value = savedName;
     document.getElementById('order-cust-phone').value = savedPhone;
-    document.getElementById('order-address').value = savedAddress;
+        document.getElementById('order-address').value = savedAddress;
     
+    // ✨ NAYA LOGIC: Hidden GPS fields me LocalStorage ka data wapas dalo ✨
+    const savedLat = localStorage.getItem('pixigenie_saved_lat') || '';
+    const savedLng = localStorage.getItem('pixigenie_saved_lng') || '';
+    if (document.getElementById('order-lat')) document.getElementById('order-lat').value = savedLat;
+    if (document.getElementById('order-lng')) document.getElementById('order-lng').value = savedLng;
+
     if (document.getElementById('order-shop-phone')) {
         document.getElementById('order-shop-phone').value = shopPhone || '';
     }
@@ -2535,8 +2541,14 @@ function getVIPBadge(isVerified, plan) {
                 const sLand = document.getElementById('saved-landmark');
                 if(sLand) sLand.value = localStorage.getItem('pixigenie_saved_landmark') || '';
                 
-                const sAddr = document.getElementById('saved-address');
+                                const sAddr = document.getElementById('saved-address');
                 if(sAddr) sAddr.value = localStorage.getItem('pixigenie_saved_address') || '';
+
+                // ✨ NAYA LOGIC: Profile me bhi purane GPS coordinates load karo ✨
+                const savedLat = localStorage.getItem('pixigenie_saved_lat') || '';
+                const savedLng = localStorage.getItem('pixigenie_saved_lng') || '';
+                if (document.getElementById('saved-lat')) document.getElementById('saved-lat').value = savedLat;
+                if (document.getElementById('saved-lng')) document.getElementById('saved-lng').value = savedLng;
 
                 if (!localStorage.getItem('pixigenie_saved_address') && !activeShop && phoneStr !== 'N/A') {
                     db.collection('customers').doc(phoneStr).get().then(doc => {
@@ -2547,13 +2559,24 @@ function getVIPBadge(isVerified, plan) {
                             if(sLand) sLand.value = d.savedLandmark || '';
                             if(sAddr) sAddr.value = d.savedAddress || '';
                             
+                            // ✨ Firebase se aate waqt GPS bhi load aur save karo ✨
+                            if (document.getElementById('saved-lat')) document.getElementById('saved-lat').value = d.savedLat || '';
+                            if (document.getElementById('saved-lng')) document.getElementById('saved-lng').value = d.savedLng || '';
+
                             localStorage.setItem('pixigenie_saved_name', d.savedName || '');
                             localStorage.setItem('pixigenie_saved_phone', d.savedPhone || '');
                             localStorage.setItem('pixigenie_saved_landmark', d.savedLandmark || '');
                             localStorage.setItem('pixigenie_saved_address', d.savedAddress || '');
+                            
+                            if(d.savedLat && d.savedLng) {
+                                localStorage.setItem('pixigenie_saved_lat', d.savedLat);
+                                localStorage.setItem('pixigenie_saved_lng', d.savedLng);
+                            }
                         }
                     }).catch(e => console.log(e));
                 }
+
+                
 
                 modal.classList.remove('hidden');
                 setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-90'); content.classList.add('scale-100'); }, 10);
