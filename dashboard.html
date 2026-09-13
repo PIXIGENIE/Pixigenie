@@ -1294,9 +1294,13 @@
                         let userEmail = globalShopData.email || localStorage.getItem('pixigenie_customer_phone') || '';
                         if (!userEmail.includes('@')) userEmail = '';
                         if(document.getElementById('setup-email')) document.getElementById('setup-email').value = userEmail;
-                        if(document.getElementById('setup-phone')) document.getElementById('setup-phone').value = globalShopData.phone || '';
+                                                // ✨ FIX: Phone number me email aane se rokna ✨
+                        let userPhone = globalShopData.phone || '';
+                        if (userPhone.includes('@')) userPhone = '';
+                        if(document.getElementById('setup-phone')) document.getElementById('setup-phone').value = userPhone;
                         
                         return;
+
                     }
 
                     
@@ -3026,8 +3030,11 @@ let pd = {
             if (document.getElementById('setup-shop-name')) document.getElementById('setup-shop-name').value = globalShopData.shopName || '';
             if (document.getElementById('setup-owner-name')) document.getElementById('setup-owner-name').value = globalShopData.ownerName || '';
             
-            // ✨ Naye Fields Load Karo
-                        if (document.getElementById('setup-phone')) document.getElementById('setup-phone').value = globalShopData.phone || '';
+                      // ✨ FIX: Phone number me email aane se rokna ✨
+            let userPhone = globalShopData.phone || '';
+            if (userPhone.includes('@')) userPhone = ''; // Agar email ghus gaya hai, toh khali kar do
+            if (document.getElementById('setup-phone')) document.getElementById('setup-phone').value = userPhone;
+
             
             // ✨ NAYA LOGIC: Email Autofill (Firebase se ya Google Login se) ✨
             let userEmail = globalShopData.email || localStorage.getItem('pixigenie_customer_phone') || '';
