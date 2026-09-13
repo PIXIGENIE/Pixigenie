@@ -362,19 +362,29 @@
                             <i class="fas fa-pen text-[#9CA3AF] text-[10px] ml-1"></i>
                         </div>
                     </div>
-                    <div class="relative flex items-center shrink-0 ml-2">
+                                  <div class="relative flex items-center shrink-0 ml-2">
                         <button onclick="shareStoreLink()" class="hidden sm:flex items-center gap-2 bg-[#111827] text-white hover:bg-black px-4 h-10 rounded-[12px] text-xs font-bold transition shadow-sm mr-3"><i class="fas fa-external-link-alt"></i> Share Store</button>
-                        <button onclick="toggleProfileMenu()" class="w-10 h-10 bg-[#E0E7FF] text-[#2563EB] rounded-full flex items-center justify-center font-bold border border-[#BFDBFE] active:scale-95 transition"><i class="fas fa-user-tie text-sm"></i></button>
-                        <div id="profile-menu" class="hidden absolute right-0 top-14 mt-2 w-64 bg-white rounded-[24px] shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-[#E5E7EB] overflow-hidden z-50 transform origin-top-right transition-all">
-                            <div class="p-6 bg-[#F7F7F9] border-b border-[#E5E7EB]"><p class="text-[10px] text-[#6B7280] font-bold uppercase tracking-widest mb-1">Store Owner</p><h4 id="menu-owner-name" class="font-black text-[#111827] text-xl leading-tight truncate">Loading...</h4></div>
-                            <div class="p-2 space-y-1">
-                                <button onclick="openSettings()" class="w-full flex items-center gap-3 px-4 py-3 text-[#111827] hover:bg-[#F7F7F9] rounded-[16px] font-bold transition text-sm"><i class="fas fa-pen text-[#A855F7]"></i> Edit Store Profile</button>
-                                <button onclick="showLogoutModal()"
+                        
+                        <!-- ✨ NAYA: Profile Photo wala Button ✨ -->
+                        <button onclick="toggleProfileMenu()" class="w-10 h-10 bg-[#E0E7FF] text-[#2563EB] rounded-full flex items-center justify-center font-bold border border-[#BFDBFE] active:scale-95 transition overflow-hidden">
+                            <i id="header-profile-icon" class="fas fa-user-tie text-sm"></i>
+                            <img id="header-profile-img" src="" class="w-full h-full object-cover hidden">
+                        </button>
 
- class="w-full flex items-center gap-3 px-4 py-3 text-[#DC2626] hover:bg-[#FEF2F2] rounded-[16px] font-bold transition text-sm"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                        <div id="profile-menu" class="hidden absolute right-0 top-14 mt-2 w-64 bg-white rounded-[24px] shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-[#E5E7EB] overflow-hidden z-50 transform origin-top-right transition-all">
+                            <div class="p-6 bg-[#F7F7F9] border-b border-[#E5E7EB]">
+                                <p class="text-[10px] text-[#6B7280] font-bold uppercase tracking-widest mb-1">Store Owner</p>
+                                <h4 id="menu-owner-name" class="font-black text-[#111827] text-xl leading-tight truncate">Loading...</h4>
+                            </div>
+                            <div class="p-2 space-y-1">
+                                <!-- ✨ FIX: Faltu ka Edit Profile button yahan se hata diya gaya hai ✨ -->
+                                <button onclick="showLogoutModal()" class="w-full flex items-center gap-3 px-4 py-3 text-[#DC2626] hover:bg-[#FEF2F2] rounded-[16px] font-bold transition text-sm">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
                             </div>
                         </div>
                     </div>
+
                 </header>
 
               <div class="bg-white border-b border-[#E5E7EB] px-4 py-3 flex gap-2 overflow-x-auto custom-scrollbar shrink-0">
@@ -1308,6 +1318,18 @@
                     document.getElementById('main-dashboard')?.classList.remove('hidden');
                     document.getElementById('store-name-display').innerText = globalShopData.shopName;
                     document.getElementById('menu-owner-name').innerText = globalShopData.ownerName;
+                                        // ✨ NAYA: Dashboard header me logo/photo lagane ka code ✨
+                    const savedLogo = globalShopData.storeLogo || localStorage.getItem('pixigenie_profile_img');
+                    if (savedLogo) {
+                        const hImg = document.getElementById('header-profile-img');
+                        const hIcon = document.getElementById('header-profile-icon');
+                        if (hImg && hIcon) {
+                            hImg.src = savedLogo;
+                            hImg.classList.remove('hidden');
+                            hIcon.style.display = 'none';
+                        }
+                    }
+                    
                     
                                                    // ==========================================
                     // ✨ NAYA: DYNAMIC TERMINOLOGY (Product vs Service) ✨
