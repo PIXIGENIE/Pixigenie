@@ -658,76 +658,90 @@ let hasMoreProducts = true;
                         }
                       } catch(e) {}
 
-                   // ✨✨ AUTO VERIFY BADGE LOGIC (CRITERIA + LIFETIME VIP) ✨✨
-let totalOrders = 0;
-let totalFollowers = 0;
-if(document.getElementById('stat-orders')) totalOrders = parseInt(document.getElementById('stat-orders').innerText) || 0;
-if(document.getElementById('stat-followers')) totalFollowers = parseInt(document.getElementById('stat-followers').innerText) || 0;
+                                // ✨✨ AUTO VERIFY BADGE LOGIC (CRITERIA + LIFETIME VIP) ✨✨
+                    let totalOrders = 0;
+                    let totalFollowers = 0;
+                    if(document.getElementById('stat-orders')) totalOrders = parseInt(document.getElementById('stat-orders').innerText) || 0;
+                    if(document.getElementById('stat-followers')) totalFollowers = parseInt(document.getElementById('stat-followers').innerText) || 0;
 
-const ownerEmail = localStorage.getItem('pixigenie_user_email') || shopData.email || "";
-const isVIP = shopData.isVerified || (totalOrders >= 50 && totalFollowers >= 100);
+                    // ✨ FIX: Ab plan 'plus' ya 'pro' hone par bhi isVIP true ho jayega ✨
+                    const isVIP = shopData.isVerified || shopData.plan === 'plus' || shopData.plan === 'pro' || (totalOrders >= 50 && totalFollowers >= 100);
 
-if (isVIP) {
-    let finalBadgeHtml = "";
+                    if (isVIP) {
+                        let finalBadgeHtml = "";
 
-    // 👇 PLUS PLAN: "Verified Plus" (Pink Badge)
-    if (shopData.plan === 'plus') {
-        finalBadgeHtml = `
-        <style>
-            @keyframes liteCrownShine {
-                0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5)); }
-                50% { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1)); }
-            }
-            .animate-lite-crown { animation: liteCrownShine 2s infinite ease-in-out; }
-        </style>
-        <span class="group relative inline-block ml-1.5 align-middle cursor-pointer outline-none" tabindex="0">
-            <svg class="w-[17px] h-[17px] relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="litePinkPurple" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#A855F7"></stop>
-                        <stop offset="100%" stop-color="#EC4899"></stop>
-                    </linearGradient>
-                </defs>
-                <circle cx="12" cy="12" r="12" fill="url(#litePinkPurple)"></circle>
-                <path class="animate-lite-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="#FFFFFF"></path>
-            </svg>
-            <span class="absolute left-1/2 -translate-x-1/2 top-[24px] px-2.5 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999] shadow-lg">
-                Verified Plus
-                <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-purple-500"></span>
-            </span>
-        </span>`;
-    } 
-    // 👇 PRO PLAN: "Verified Pro" (Gold Badge)
-    else {
-        finalBadgeHtml = `
-        <style>
-            @keyframes crownShine {
-                0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); }
-                50% { filter: drop-shadow(0 0 7px rgba(255, 215, 0, 1)); }
-            }
-            .animate-crown { animation: crownShine 2s infinite ease-in-out; }
-        </style>
-        <span class="group relative inline-block ml-1.5 align-middle cursor-pointer outline-none" tabindex="0">
-            <svg class="w-[17px] h-[17px] relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="12" fill="#111827"></circle>
-                <path class="animate-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="url(#pureGold)"></path>
-                <defs>
-                    <linearGradient id="pureGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#FFF700"></stop>
-                        <stop offset="50%" stop-color="#FFD700"></stop>
-                        <stop offset="100%" stop-color="#FFAA00"></stop>
-                    </linearGradient>
-                </defs>
-            </svg>
-            <span class="absolute left-1/2 -translate-x-1/2 top-[24px] px-2.5 py-1 bg-[#111827] text-[#FFD700] text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999] shadow-lg">
-                Verified Pro
-                <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-[#111827]"></span>
-            </span>
-        </span>`;
-    }
+                        // 👇 PLUS PLAN: "Verified Plus" (Pink Badge)
+                        if (shopData.plan === 'plus') {
+                            finalBadgeHtml = `
+                            <style>
+                                @keyframes liteCrownShine {
+                                    0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5)); }
+                                    50% { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1)); }
+                                }
+                                .animate-lite-crown { animation: liteCrownShine 2s infinite ease-in-out; }
+                            </style>
+                            <span class="group relative inline-block ml-1.5 align-middle cursor-pointer outline-none" tabindex="0">
+                                <svg class="w-[17px] h-[17px] relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="litePinkPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#A855F7"></stop>
+                                            <stop offset="100%" stop-color="#EC4899"></stop>
+                                        </linearGradient>
+                                    </defs>
+                                    <circle cx="12" cy="12" r="12" fill="url(#litePinkPurple)"></circle>
+                                    <path class="animate-lite-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="#FFFFFF"></path>
+                                </svg>
+                                <span class="absolute left-1/2 -translate-x-1/2 top-[24px] px-2.5 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999] shadow-lg">
+                                    Verified Plus
+                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-purple-500"></span>
+                                </span>
+                            </span>`;
+                        } 
+                        // 👇 PRO PLAN: "Verified Pro" (Gold Badge)
+                        else if (shopData.plan === 'pro') {
+                            finalBadgeHtml = `
+                            <style>
+                                @keyframes crownShine {
+                                    0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); }
+                                    50% { filter: drop-shadow(0 0 7px rgba(255, 215, 0, 1)); }
+                                }
+                                .animate-crown { animation: crownShine 2s infinite ease-in-out; }
+                            </style>
+                            <span class="group relative inline-block ml-1.5 align-middle cursor-pointer outline-none" tabindex="0">
+                                <svg class="w-[17px] h-[17px] relative z-10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="12" fill="#111827"></circle>
+                                    <path class="animate-crown" d="M6.5 16h11v1.5h-11v-1.5zM18 8l-3 3.5-3-5-3 5-3-3.5 1.5 6.5h10l1.5-6.5z" fill="url(#pureGold)"></path>
+                                    <defs>
+                                        <linearGradient id="pureGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#FFF700"></stop>
+                                            <stop offset="50%" stop-color="#FFD700"></stop>
+                                            <stop offset="100%" stop-color="#FFAA00"></stop>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <span class="absolute left-1/2 -translate-x-1/2 top-[24px] px-2.5 py-1 bg-[#111827] text-[#FFD700] text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999] shadow-lg">
+                                    Verified Pro
+                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-[#111827]"></span>
+                                </span>
+                            </span>`;
+                        }
+                        // 👇 FREE / STARTER PLAN: "Verified Store" (Standard Blue Tick for 50+ orders)
+                        else {
+                            finalBadgeHtml = `
+                            <span class="group relative inline-block ml-1.5 align-middle cursor-pointer outline-none" tabindex="0">
+                                <svg class="w-[17px] h-[17px] relative z-10 text-blue-500" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"/>
+                                </svg>
+                                <span class="absolute left-1/2 -translate-x-1/2 top-[24px] px-2.5 py-1 bg-blue-500 text-white text-[10px] font-bold tracking-wider rounded-md opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999] shadow-lg">
+                                    Verified Store
+                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-b-blue-500"></span>
+                                </span>
+                            </span>`;
+                        }
 
-    document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${finalBadgeHtml}`;
-}
+                        document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${finalBadgeHtml}`;
+                    }
+
 
 
 
