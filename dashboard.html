@@ -387,42 +387,38 @@
 
                 </header>
 
-                            <!-- ✨ NAYA: Relative wrapper for Tabs and Animated Hint ✨ -->
-              <div class="relative shrink-0 border-b border-[#E5E7EB] bg-white">
+                                      <!-- ✨ NAYA: Relative wrapper for Tabs and Animated Hint ✨ -->
+              <div class="relative w-full shrink-0 border-b border-[#E5E7EB] bg-white">
                 <style>
-                    /* Mast left-right swipe animation */
-                    @keyframes swipeHint {
+                    /* Mast soft left-right bounce animation */
+                    @keyframes nudgeRight {
                         0%, 100% { transform: translateX(0); }
-                        50% { transform: translateX(-5px); }
+                        50% { transform: translateX(4px); }
                     }
                 </style>
                 
-                <!-- Tab Buttons (onscroll function added) -->
+                <!-- Tab Buttons -->
                 <div onscroll="hideScrollHint()" class="px-4 py-3 flex gap-2 overflow-x-auto custom-scrollbar scroll-smooth relative z-0">
                     
                     <button onclick="switchTab('tab-dashboard', this)" class="tab-btn bg-[#111827] text-white px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition shadow-md">Dashboard</button>
                     
-                    <!-- NEW ORDERS TAB BUTTON -->
                     <button onclick="let btn=this; checkPremiumAndExecute(() => switchTab('tab-orders', btn))" class="relative tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition flex items-center gap-1.5">
                         Orders
                         <span id="live-orders-badge" class="hidden bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-black min-w-[18px] text-center shadow-sm">0</span>
-                        <div class="premium-lock-icon hidden absolute -top-1.5 -right-1 bg-white rounded-full shadow-sm p-0.5 border border-yellow-200 z-10">
-                            <i class="fas fa-crown text-yellow-500 text-[9px]"></i>
-                        </div>
+                        <div class="premium-lock-icon hidden absolute -top-1.5 -right-1 bg-white rounded-full shadow-sm p-0.5 border border-yellow-200 z-10"><i class="fas fa-crown text-yellow-500 text-[9px]"></i></div>
                     </button>
                     
                     <button onclick="switchTab('tab-inventory', this)" class="tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition">Inventory</button>
                     <button onclick="switchTab('tab-billing', this)" class="tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition">Billing</button>
                     <button onclick="switchTab('tab-crm', this)" class="tab-btn bg-[#F7F7F9] text-[#6B7280] px-5 py-2 rounded-[14px] text-[13px] font-bold whitespace-nowrap transition">Customers</button>
                     
-                    <!-- Faltu cut na ho isliye thodi end padding -->
                     <div class="pr-6 shrink-0"></div> 
                 </div>
 
-                <!-- ✨ ANIMATED SWIPE HINT (Mobile par Right Side Overlay) ✨ -->
-                <div id="scroll-hint-overlay" class="absolute right-0 top-0 bottom-0 w-28 bg-gradient-to-l from-white via-white/90 to-transparent pointer-events-none flex items-center justify-end pr-2 md:hidden z-10 transition-opacity duration-500">
-                    <div class="bg-gray-900 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-full shadow-md flex items-center gap-1.5" style="animation: swipeHint 1.5s infinite;">
-                        <i class="fas fa-hand-point-up -rotate-90"></i> Swipe
+                <!-- ✨ PREMIUM SUBTLE HINT (Clean iOS Gradient & Arrow) ✨ -->
+                <div id="scroll-hint-overlay" class="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none flex items-center justify-end pr-2 md:hidden z-10 transition-opacity duration-500">
+                    <div class="w-7 h-7 rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.1)] border border-gray-100 flex items-center justify-center text-gray-400" style="animation: nudgeRight 1.5s infinite;">
+                        <i class="fas fa-chevron-right text-[11px] ml-0.5"></i>
                     </div>
                 </div>
             </div>
