@@ -841,47 +841,17 @@
         </div>
 
 
-        <!-- WEBSITE VISITS -->
-
-        <div class="bg-white border border-slate-200
-                    rounded-[22px] p-4 sm:p-5 shadow-sm">
-
+          <!-- SEARCH IMPRESSIONS (Replaced Website Visits) -->
+        <div class="bg-white border border-slate-200 rounded-[22px] p-4 sm:p-5 shadow-sm">
             <div class="flex items-center justify-between mb-4">
-
-                <div class="w-10 h-10 rounded-2xl
-                            bg-violet-50 text-violet-600
-                            flex items-center justify-center">
-
-                    <i class="fas fa-globe"></i>
-
+                <div class="w-10 h-10 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center">
+                    <i class="fas fa-search"></i>
                 </div>
-
-                <span id="visits-change"
-                      class="text-[10px] font-bold text-slate-400">
-                    —
-                </span>
-
+                <span id="visits-change" class="text-[10px] font-bold text-slate-400">—</span>
             </div>
-
-            <p class="text-[10px] sm:text-[11px] font-bold
-                      uppercase tracking-wider text-slate-500">
-
-                Website Visits
-
-            </p>
-
-            <h3 id="metric-visits"
-                class="text-2xl sm:text-3xl font-black
-                       text-slate-900 mt-1 break-words">
-
-                0
-
-            </h3>
-
-            <p class="text-[10px] text-slate-400 mt-2">
-                Visitors who opened your website
-            </p>
-
+            <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500">Search Impressions</p>
+            <h3 id="metric-visits" class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 break-words">0</h3>
+            <p class="text-[10px] text-slate-400 mt-2">Times appeared in search list</p>
         </div>
 
 
@@ -1129,12 +1099,8 @@
 
             </div>
 
-                 <select id="growth-metric"
-                    onchange="updateGrowthChart()"
-                    class="bg-slate-50 border border-slate-200
-                           rounded-xl px-3 py-2.5
-                           text-xs font-bold text-slate-700
-                           outline-none">
+            <select id="growth-metric" onchange="updateGrowthChart(this.value)" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 outline-none">
+
                 <!-- ✨ सिर्फ रियल डेटा वाले ऑप्शंस ✨ -->
                 <option value="orders" selected>Orders Received</option>
                 <option value="revenue">Recorded Sales</option>
@@ -1216,21 +1182,13 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
 
 
-            <div class="rounded-2xl bg-slate-50
-                        border border-slate-100 p-4">
-
-                <i class="fas fa-phone text-blue-500 mb-3"></i>
-
-                <p class="text-xs font-bold text-slate-600">
-                    Phone Calls
-                </p>
-
-                <h4 id="activity-calls"
-                    class="text-2xl font-black text-slate-900 mt-1">
-                    0
-                </h4>
-
+                        <!-- ITEMS SOLD (Replaced Phone Calls) -->
+            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+                <i class="fas fa-box-open text-blue-500 mb-3"></i>
+                <p class="text-xs font-bold text-slate-600">Total Items Sold</p>
+                <h4 id="activity-calls" class="text-2xl font-black text-slate-900 mt-1">0</h4>
             </div>
+
 
 
             <div class="rounded-2xl bg-slate-50
@@ -9115,12 +9073,13 @@ async function initPremiumAnalytics() {
     if (!globalShopData || !globalShopData.phone) return;
 
     try {
-        // 1. Fetch Real Orders & Revenue
+        // 1. Fetch Real Orders, Revenue & Items Sold
         const range = getAnalyticsDateRange();
         const snapshot = await db.collection("orders").where("shopPhone", "==", globalShopData.phone).get();
 
         let totalOrders = 0;
         let totalRevenue = 0;
+        let totalItemsSold = 0; // ✨ NAYA METRIC
         const allOrders = [];
 
         snapshot.forEach(doc => {
@@ -9130,42 +9089,45 @@ async function initPremiumAnalytics() {
             
             allOrders.push({ ...order, _analyticsDate: orderDate });
             
-            // सिर्फ सिलेक्टेड डेट रेंज का डेटा जोड़ो
+            // Sirf selected date range ka data jodo
             if (orderDate >= range.startDate && orderDate <= range.endDate) {
                 totalOrders++;
                 totalRevenue += getOrderAmount(order);
+                
+                // ✨ Kitne products bike, unki quantity ginn lo ✨
+                if (order.items) {
+                    order.items.forEach(item => {
+                        totalItemsSold += (parseInt(item.qty) || 0);
+                    });
+                }
             }
         });
 
         analyticsState.orders = allOrders;
 
-        // 2. Fetch REAL Events from Firebase (जो Event Tracker से आएंगे)
+        // 2. Fetch REAL Events from Firebase Tracker
         let views = globalShopData.profileViews || 0;
         let impressions = globalShopData.searchImpressions || 0;
-        let visits = globalShopData.webVisits || 0;
-        let phoneCalls = globalShopData.phoneCalls || 0;
         let waClicks = globalShopData.whatsappClicks || 0;
         let directions = globalShopData.directionClicks || 0;
 
-        let totalEnquiries = phoneCalls + waClicks;
-
-        // 3. Update UI Cards (अब 0 दिखेंगे जब तक असली क्लिक न हों)
+        // 3. Update UI Cards
         setAnalyticsValue("metric-views", formatNumber(views));
-        setAnalyticsValue("metric-visits", formatNumber(visits));
-        setAnalyticsValue("metric-enquiries", formatNumber(totalEnquiries));
+        setAnalyticsValue("metric-visits", formatNumber(impressions)); // ✨ Website Visits ki jagah Impressions
+        setAnalyticsValue("metric-enquiries", formatNumber(waClicks)); // ✨ Enquiries mein sirf WhatsApp
         setAnalyticsValue("metric-orders", formatNumber(totalOrders));
         setAnalyticsValue("metric-revenue", formatCurrency(totalRevenue));
         setAnalyticsValue("metric-impressions", formatNumber(impressions));
 
         // Customer Activity Section Updates
-        if(document.getElementById('activity-calls')) document.getElementById('activity-calls').innerText = formatNumber(phoneCalls);
+        if(document.getElementById('activity-calls')) document.getElementById('activity-calls').innerText = formatNumber(totalItemsSold); // ✨ Phone ki jagah Items Sold
         if(document.getElementById('activity-whatsapp')) document.getElementById('activity-whatsapp').innerText = formatNumber(waClicks);
         if(document.getElementById('activity-directions')) document.getElementById('activity-directions').innerText = formatNumber(directions);
 
         // Funnel Updates
         setAnalyticsValue("funnel-imp", formatNumber(impressions));
         setAnalyticsValue("funnel-view", formatNumber(views));
-        setAnalyticsValue("funnel-enquiries", formatNumber(totalEnquiries));
+        setAnalyticsValue("funnel-enquiries", formatNumber(waClicks));
         setAnalyticsValue("funnel-orders", formatNumber(totalOrders));
 
         // 4. Update Charts
@@ -9176,6 +9138,7 @@ async function initPremiumAnalytics() {
         console.error("Store analytics error:", error);
     }
 }
+
 
 
 
@@ -9671,6 +9634,25 @@ document
         }, 150);
 
     });
+// A. TRACK PROFILE VIEWS (Jaise hi store khulega, view count +1 ho jayega)
+setTimeout(() => {
+    // Check karte hain ki shopId available hai ya nahi
+    if (typeof shopId !== 'undefined' && shopId) {
+        db.collection('shops').doc(shopId).update({
+            profileViews: firebase.firestore.FieldValue.increment(1)
+        }).catch(err => console.log("View track error:", err));
+    }
+}, 2500); // 2.5 second delay taaki page poora load ho jaye
+
+// B. TRACK CLICKS (WhatsApp, Call, Directions)
+function trackEvent(eventType) {
+    if (typeof shopId !== 'undefined' && shopId) {
+        let updateData = {};
+        updateData[eventType] = firebase.firestore.FieldValue.increment(1);
+        db.collection('shops').doc(shopId).update(updateData)
+          .catch(err => console.log("Event track error:", err));
+    }
+}
 
     </script>
     <!-- ✨ iOS STYLE PREMIUM SHARE MODAL (WITH QR CODE) ✨ -->
