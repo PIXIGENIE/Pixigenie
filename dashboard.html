@@ -1129,20 +1129,17 @@
 
             </div>
 
-            <select id="growth-metric"
+                 <select id="growth-metric"
                     onchange="updateGrowthChart()"
                     class="bg-slate-50 border border-slate-200
                            rounded-xl px-3 py-2.5
                            text-xs font-bold text-slate-700
                            outline-none">
-
-                <option value="views">Profile Views</option>
-                <option value="visits">Website Visits</option>
-                <option value="enquiries">Enquiries</option>
-                <option value="orders">Orders</option>
-                <option value="revenue">Sales</option>
-
+                <!-- ✨ सिर्फ रियल डेटा वाले ऑप्शंस ✨ -->
+                <option value="orders" selected>Orders Received</option>
+                <option value="revenue">Recorded Sales</option>
             </select>
+
 
         </div>
 
@@ -9112,96 +9109,74 @@ function getAnalyticsDateRange() {
 
 
 /* =====================================================
-   3. INITIALIZE ANALYTICS
+   3. INITIALIZE ANALYTICS (100% REAL DATA)
 ===================================================== */
-
 async function initPremiumAnalytics() {
-
-    if (!globalShopData || !globalShopData.phone) {
-        console.warn("Shop data is unavailable.");
-        return;
-    }
-
-    const refreshButton =
-        document.querySelector(
-            '#tab-performance button[aria-label="Refresh analytics"]'
-        );
-
-    if (refreshButton) {
-        refreshButton.disabled = true;
-        refreshButton.classList.add("opacity-50");
-    }
+    if (!globalShopData || !globalShopData.phone) return;
 
     try {
-
+        // 1. Fetch Real Orders & Revenue
         const range = getAnalyticsDateRange();
+        const snapshot = await db.collection("orders").where("shopPhone", "==", globalShopData.phone).get();
 
-        analyticsState.period = range.period;
-        analyticsState.startDate = range.startDate;
-        analyticsState.endDate = range.endDate;
-
-        const snapshot = await db
-            .collection("orders")
-            .where("shopPhone", "==", globalShopData.phone)
-            .get();
-
+        let totalOrders = 0;
+        let totalRevenue = 0;
         const allOrders = [];
 
         snapshot.forEach(doc => {
-
-            const order = {
-                id: doc.id,
-                ...doc.data()
-            };
-
+            const order = { id: doc.id, ...doc.data() };
             const orderDate = getOrderDate(order);
-
             if (!orderDate) return;
-
-            allOrders.push({
-                ...order,
-                _analyticsDate: orderDate
-            });
-
+            
+            allOrders.push({ ...order, _analyticsDate: orderDate });
+            
+            // सिर्फ सिलेक्टेड डेट रेंज का डेटा जोड़ो
+            if (orderDate >= range.startDate && orderDate <= range.endDate) {
+                totalOrders++;
+                totalRevenue += getOrderAmount(order);
+            }
         });
 
-        const filteredOrders = allOrders.filter(order => {
+        analyticsState.orders = allOrders;
 
-            return (
-                order._analyticsDate >= range.startDate &&
-                order._analyticsDate <= range.endDate
-            );
+        // 2. Fetch REAL Events from Firebase (जो Event Tracker से आएंगे)
+        let views = globalShopData.profileViews || 0;
+        let impressions = globalShopData.searchImpressions || 0;
+        let visits = globalShopData.webVisits || 0;
+        let phoneCalls = globalShopData.phoneCalls || 0;
+        let waClicks = globalShopData.whatsappClicks || 0;
+        let directions = globalShopData.directionClicks || 0;
 
-        });
+        let totalEnquiries = phoneCalls + waClicks;
 
-        analyticsState.orders = filteredOrders;
+        // 3. Update UI Cards (अब 0 दिखेंगे जब तक असली क्लिक न हों)
+        setAnalyticsValue("metric-views", formatNumber(views));
+        setAnalyticsValue("metric-visits", formatNumber(visits));
+        setAnalyticsValue("metric-enquiries", formatNumber(totalEnquiries));
+        setAnalyticsValue("metric-orders", formatNumber(totalOrders));
+        setAnalyticsValue("metric-revenue", formatCurrency(totalRevenue));
+        setAnalyticsValue("metric-impressions", formatNumber(impressions));
 
-        renderAnalyticsOverview(filteredOrders);
+        // Customer Activity Section Updates
+        if(document.getElementById('activity-calls')) document.getElementById('activity-calls').innerText = formatNumber(phoneCalls);
+        if(document.getElementById('activity-whatsapp')) document.getElementById('activity-whatsapp').innerText = formatNumber(waClicks);
+        if(document.getElementById('activity-directions')) document.getElementById('activity-directions').innerText = formatNumber(directions);
 
-        renderAnalyticsFunnel(filteredOrders);
+        // Funnel Updates
+        setAnalyticsValue("funnel-imp", formatNumber(impressions));
+        setAnalyticsValue("funnel-view", formatNumber(views));
+        setAnalyticsValue("funnel-enquiries", formatNumber(totalEnquiries));
+        setAnalyticsValue("funnel-orders", formatNumber(totalOrders));
 
-        renderAnalyticsInsights(filteredOrders);
-
+        // 4. Update Charts
         updateGrowthChart("orders");
-
         updateAnalyticsTimestamp();
 
     } catch (error) {
-
         console.error("Store analytics error:", error);
-
-        renderAnalyticsError();
-
-    } finally {
-
-        if (refreshButton) {
-            refreshButton.disabled = false;
-            refreshButton.classList.remove("opacity-50");
-        }
-
     }
-
 }
+
 
 
 /* =====================================================
