@@ -1287,11 +1287,18 @@
                         if(document.getElementById('setup-owner-name')) document.getElementById('setup-owner-name').value = globalShopData.ownerName || '';
                         if(document.getElementById('setup-desc')) document.getElementById('setup-desc').value = globalShopData.description || '';
                         if(document.getElementById('setup-address')) document.getElementById('setup-address').value = globalShopData.address || '';
-                        if(document.getElementById('setup-landmark')) document.getElementById('setup-landmark').value = globalShopData.landmark || '';
+                                                if(document.getElementById('setup-landmark')) document.getElementById('setup-landmark').value = globalShopData.landmark || '';
                         if(document.getElementById('setup-map-link')) document.getElementById('setup-map-link').value = globalShopData.googleMapLink || '';
+                        
+                        // ✨ NAYA LOGIC: First time Setup me bhi email/phone autofill hoga ✨
+                        let userEmail = globalShopData.email || localStorage.getItem('pixigenie_customer_phone') || '';
+                        if (!userEmail.includes('@')) userEmail = '';
+                        if(document.getElementById('setup-email')) document.getElementById('setup-email').value = userEmail;
+                        if(document.getElementById('setup-phone')) document.getElementById('setup-phone').value = globalShopData.phone || '';
                         
                         return;
                     }
+
                     
                     document.getElementById('store-setup-modal')?.classList.add('hidden');
                     document.getElementById('main-dashboard')?.classList.remove('hidden');
@@ -3020,8 +3027,13 @@ let pd = {
             if (document.getElementById('setup-owner-name')) document.getElementById('setup-owner-name').value = globalShopData.ownerName || '';
             
             // ✨ Naye Fields Load Karo
-            if (document.getElementById('setup-phone')) document.getElementById('setup-phone').value = globalShopData.phone || '';
-            if (document.getElementById('setup-email')) document.getElementById('setup-email').value = globalShopData.email || '';
+                        if (document.getElementById('setup-phone')) document.getElementById('setup-phone').value = globalShopData.phone || '';
+            
+            // ✨ NAYA LOGIC: Email Autofill (Firebase se ya Google Login se) ✨
+            let userEmail = globalShopData.email || localStorage.getItem('pixigenie_customer_phone') || '';
+            if (!userEmail.includes('@')) userEmail = ''; // Ye check karega ki wo number nahi, email hi ho
+            if (document.getElementById('setup-email')) document.getElementById('setup-email').value = userEmail;
+
                     
 
                         // ✨ Delivery Data Load ✨
@@ -3130,24 +3142,28 @@ let pd = {
                     rankScore = 50;  
                 }
 
-                const updateData = {
+                          const updateData = {
                     shopName: shopName, 
                     ownerName: ownerName,
-                    phone: storePhone,         // ✨ Saved!
-                    email: storeEmail,         // ✨ Saved!
-                    businessType: businessType,// ✨ Saved!
+                    phone: storePhone,         
+                    businessType: businessType,
                     description: desc,
                     category: category,
-                    homeDelivery: offersDelivery,   // ✨ Naya Field
-                    deliveryArea: deliveryRange,    // ✨ Naya Field
+                    homeDelivery: offersDelivery,   
+                    deliveryArea: deliveryRange,    
                     address: address,
                     landmark: landmark,
                     googleMapLink: mapLink,
                     setupCompleted: true,
                     status: "active",
-                    searchRank: rankScore  // 🔥 YAHAN ADD KIYA HAI!
+                    searchRank: rankScore  
                 };
                 
+                // ✨ FIX: Sirf tabhi email update karo jab user manual type kare (werna purani bachao)
+                if (storeEmail && storeEmail.trim() !== '') {
+                    updateData.email = storeEmail;
+                }
+
                 if(typeof shopLat !== 'undefined' && shopLat !== null) updateData.latitude = shopLat;
                 if(typeof shopLng !== 'undefined' && shopLng !== null) updateData.longitude = shopLng;
 
