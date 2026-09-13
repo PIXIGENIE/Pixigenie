@@ -688,7 +688,863 @@
                                 <div id="admin-customers-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-80 overflow-y-auto custom-scrollbar p-1"></div>
                             </div>
                         </div>
+<!-- =====================================================
+     ✨ PREMIUM STORE INTELLIGENCE DASHBOARD
+     iOS-INSPIRED • MOBILE-FIRST • BUSINESS ANALYTICS
+====================================================== -->
 
+<div id="tab-performance"
+     class="tab-content hidden animate-fade-in w-full pb-24 px-4 sm:px-6 pt-5">
+
+    <!-- ================= HEADER ================= -->
+
+    <div class="mb-7">
+
+        <div class="flex flex-col sm:flex-row
+                    sm:items-center sm:justify-between gap-4">
+
+            <div>
+
+                <div class="flex items-center gap-2 mb-2">
+
+                    <span class="w-2 h-2 rounded-full bg-emerald-500
+                                 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]">
+                    </span>
+
+                    <span class="text-[11px] font-bold uppercase
+                                 tracking-widest text-emerald-600">
+                        Business Analytics
+                    </span>
+
+                </div>
+
+                <h2 class="text-2xl sm:text-3xl font-black
+                           tracking-tight text-slate-900">
+                    Store Performance
+                </h2>
+
+                <p class="text-sm text-slate-500 mt-1 max-w-xl">
+                    Track your store's reach, customer activity
+                    and business growth in one place.
+                </p>
+
+            </div>
+
+            <!-- CONTROLS -->
+
+            <div class="flex items-center gap-2">
+
+                <select id="performance-period"
+                        onchange="initPremiumAnalytics()"
+                        class="min-w-0 flex-1 sm:flex-none
+                               bg-white border border-slate-200
+                               text-xs font-bold text-slate-700
+                               rounded-2xl px-3 py-3
+                               outline-none shadow-sm
+                               focus:ring-2 focus:ring-emerald-100">
+
+                    <option value="7">Last 7 Days</option>
+                    <option value="30" selected>Last 30 Days</option>
+                    <option value="90">Last 3 Months</option>
+
+                </select>
+
+                <button onclick="initPremiumAnalytics()"
+                        aria-label="Refresh analytics"
+                        class="w-11 h-11 shrink-0 rounded-2xl
+                               bg-white border border-slate-200
+                               text-slate-600 shadow-sm
+                               flex items-center justify-center
+                               active:scale-95 transition">
+
+                    <i class="fas fa-sync-alt text-sm"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="flex items-center gap-2 mt-4 text-[11px]
+                    text-slate-400 font-medium">
+
+            <i class="fas fa-clock"></i>
+
+            <span id="analytics-last-updated">
+                Analytics update when new data is available
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= QUICK OVERVIEW ================= -->
+
+    <div class="mb-3 flex items-center justify-between">
+
+        <h3 class="text-sm font-black text-slate-900">
+            Business Overview
+        </h3>
+
+        <span class="text-[11px] text-slate-400 font-medium">
+            Selected period
+        </span>
+
+    </div>
+
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-7">
+
+
+        <!-- PROFILE VIEWS -->
+
+        <div class="bg-white border border-slate-200
+                    rounded-[22px] p-4 sm:p-5 shadow-sm">
+
+            <div class="flex items-center justify-between mb-4">
+
+                <div class="w-10 h-10 rounded-2xl
+                            bg-blue-50 text-blue-600
+                            flex items-center justify-center">
+
+                    <i class="fas fa-eye"></i>
+
+                </div>
+
+                <span id="views-change"
+                      class="text-[10px] font-bold text-slate-400">
+                    —
+                </span>
+
+            </div>
+
+            <p class="text-[10px] sm:text-[11px] font-bold
+                      uppercase tracking-wider text-slate-500">
+
+                Profile Views
+
+            </p>
+
+            <h3 id="metric-views"
+                class="text-2xl sm:text-3xl font-black
+                       text-slate-900 mt-1 break-words">
+
+                0
+
+            </h3>
+
+            <p class="text-[10px] text-slate-400 mt-2">
+                People who viewed your store
+            </p>
+
+        </div>
+
+
+        <!-- WEBSITE VISITS -->
+
+        <div class="bg-white border border-slate-200
+                    rounded-[22px] p-4 sm:p-5 shadow-sm">
+
+            <div class="flex items-center justify-between mb-4">
+
+                <div class="w-10 h-10 rounded-2xl
+                            bg-violet-50 text-violet-600
+                            flex items-center justify-center">
+
+                    <i class="fas fa-globe"></i>
+
+                </div>
+
+                <span id="visits-change"
+                      class="text-[10px] font-bold text-slate-400">
+                    —
+                </span>
+
+            </div>
+
+            <p class="text-[10px] sm:text-[11px] font-bold
+                      uppercase tracking-wider text-slate-500">
+
+                Website Visits
+
+            </p>
+
+            <h3 id="metric-visits"
+                class="text-2xl sm:text-3xl font-black
+                       text-slate-900 mt-1 break-words">
+
+                0
+
+            </h3>
+
+            <p class="text-[10px] text-slate-400 mt-2">
+                Visitors who opened your website
+            </p>
+
+        </div>
+
+
+        <!-- ENQUIRIES -->
+
+        <div class="bg-white border border-slate-200
+                    rounded-[22px] p-4 sm:p-5 shadow-sm">
+
+            <div class="flex items-center justify-between mb-4">
+
+                <div class="w-10 h-10 rounded-2xl
+                            bg-amber-50 text-amber-600
+                            flex items-center justify-center">
+
+                    <i class="fas fa-comments"></i>
+
+                </div>
+
+                <span id="enquiries-change"
+                      class="text-[10px] font-bold text-slate-400">
+                    —
+                </span>
+
+            </div>
+
+            <p class="text-[10px] sm:text-[11px] font-bold
+                      uppercase tracking-wider text-slate-500">
+
+                Enquiries
+
+            </p>
+
+            <h3 id="metric-enquiries"
+                class="text-2xl sm:text-3xl font-black
+                       text-slate-900 mt-1 break-words">
+
+                0
+
+            </h3>
+
+            <p class="text-[10px] text-slate-400 mt-2">
+                Calls and customer enquiries
+            </p>
+
+        </div>
+
+
+        <!-- ORDERS -->
+
+        <div class="bg-white border border-slate-200
+                    rounded-[22px] p-4 sm:p-5 shadow-sm">
+
+            <div class="flex items-center justify-between mb-4">
+
+                <div class="w-10 h-10 rounded-2xl
+                            bg-emerald-50 text-emerald-600
+                            flex items-center justify-center">
+
+                    <i class="fas fa-shopping-bag"></i>
+
+                </div>
+
+                <span id="orders-change"
+                      class="text-[10px] font-bold text-slate-400">
+                    —
+                </span>
+
+            </div>
+
+            <p class="text-[10px] sm:text-[11px] font-bold
+                      uppercase tracking-wider text-slate-500">
+
+                Orders Received
+
+            </p>
+
+            <h3 id="metric-orders"
+                class="text-2xl sm:text-3xl font-black
+                       text-slate-900 mt-1 break-words">
+
+                0
+
+            </h3>
+
+            <p class="text-[10px] text-slate-400 mt-2">
+                Orders recorded in this period
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= REVENUE SUMMARY ================= -->
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-7">
+
+
+        <div class="bg-slate-900 rounded-[24px] p-5 sm:p-6
+                    text-white relative overflow-hidden">
+
+            <div class="relative z-10">
+
+                <div class="flex items-center justify-between mb-5">
+
+                    <div class="flex items-center gap-2">
+
+                        <div class="w-9 h-9 rounded-xl
+                                    bg-white/10 flex items-center justify-center">
+
+                            <i class="fas fa-wallet text-emerald-300"></i>
+
+                        </div>
+
+                        <span class="text-sm font-bold">
+                            Sales Overview
+                        </span>
+
+                    </div>
+
+                    <span class="text-[10px] text-slate-400">
+                        Selected period
+                    </span>
+
+                </div>
+
+                <p class="text-xs text-slate-400 mb-1">
+                    Recorded Sales
+                </p>
+
+                <h3 id="metric-revenue"
+                    class="text-3xl font-black tracking-tight">
+
+                    ₹0
+
+                </h3>
+
+                <div class="flex items-center gap-2 mt-3">
+
+                    <span id="revenue-change"
+                          class="text-xs font-bold text-emerald-300">
+                        —
+                    </span>
+
+                    <span class="text-[11px] text-slate-400">
+                        compared with previous period
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="absolute -right-10 -bottom-16
+                        w-48 h-48 rounded-full
+                        border border-white/5">
+            </div>
+
+            <div class="absolute -right-5 -bottom-10
+                        w-32 h-32 rounded-full
+                        border border-emerald-400/10">
+            </div>
+
+        </div>
+
+
+        <!-- SEARCH VISIBILITY -->
+
+        <div class="bg-white border border-slate-200
+                    rounded-[24px] p-5 sm:p-6 shadow-sm">
+
+            <div class="flex items-center justify-between mb-4">
+
+                <div class="flex items-center gap-3">
+
+                    <div class="w-10 h-10 rounded-2xl
+                                bg-sky-50 text-sky-600
+                                flex items-center justify-center">
+
+                        <i class="fas fa-search"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h3 class="font-black text-slate-900">
+                            Search Visibility
+                        </h3>
+
+                        <p class="text-[11px] text-slate-400">
+                            How often your store appeared in search
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="flex items-end justify-between gap-3">
+
+                <div>
+
+                    <p class="text-3xl font-black text-slate-900"
+                       id="metric-impressions">
+
+                        0
+
+                    </p>
+
+                    <p class="text-xs text-slate-400 mt-1">
+                        Search impressions
+                    </p>
+
+                </div>
+
+                <span id="impressions-change"
+                      class="text-xs font-bold text-slate-400">
+                    —
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= GROWTH ANALYTICS ================= -->
+
+    <div class="bg-white border border-slate-200
+                rounded-[26px] p-5 sm:p-6 shadow-sm mb-7">
+
+        <div class="flex flex-col sm:flex-row
+                    sm:items-center sm:justify-between gap-3 mb-6">
+
+            <div>
+
+                <h3 class="text-lg font-black text-slate-900">
+                    Growth Analytics
+                </h3>
+
+                <p class="text-xs text-slate-400 mt-1">
+                    Monitor how your store is performing over time.
+                </p>
+
+            </div>
+
+            <select id="growth-metric"
+                    onchange="updateGrowthChart()"
+                    class="bg-slate-50 border border-slate-200
+                           rounded-xl px-3 py-2.5
+                           text-xs font-bold text-slate-700
+                           outline-none">
+
+                <option value="views">Profile Views</option>
+                <option value="visits">Website Visits</option>
+                <option value="enquiries">Enquiries</option>
+                <option value="orders">Orders</option>
+                <option value="revenue">Sales</option>
+
+            </select>
+
+        </div>
+
+        <div class="relative w-full h-[260px] sm:h-[310px]">
+
+            <canvas id="growthChart"></canvas>
+
+            <div id="growth-empty-state"
+                 class="hidden absolute inset-0
+                        items-center justify-center
+                        text-center">
+
+                <div>
+
+                    <div class="w-12 h-12 rounded-2xl
+                                bg-slate-100 text-slate-400
+                                flex items-center justify-center
+                                mx-auto mb-3">
+
+                        <i class="fas fa-chart-line"></i>
+
+                    </div>
+
+                    <p class="text-sm font-bold text-slate-700">
+                        Not enough data yet
+                    </p>
+
+                    <p class="text-xs text-slate-400 mt-1">
+                        Your growth chart will appear here
+                        when activity is recorded.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 mt-4
+                    text-[11px] text-slate-500">
+
+            <span class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                Current period
+            </span>
+
+            <span class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                Previous period
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= CUSTOMER ACTIVITY ================= -->
+
+    <div class="bg-white border border-slate-200
+                rounded-[26px] p-5 sm:p-6 shadow-sm mb-7">
+
+        <div class="mb-5">
+
+            <h3 class="text-lg font-black text-slate-900">
+                Customer Activity
+            </h3>
+
+            <p class="text-xs text-slate-400 mt-1">
+                Understand how customers interact with your store.
+            </p>
+
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+
+
+            <div class="rounded-2xl bg-slate-50
+                        border border-slate-100 p-4">
+
+                <i class="fas fa-phone text-blue-500 mb-3"></i>
+
+                <p class="text-xs font-bold text-slate-600">
+                    Phone Calls
+                </p>
+
+                <h4 id="activity-calls"
+                    class="text-2xl font-black text-slate-900 mt-1">
+                    0
+                </h4>
+
+            </div>
+
+
+            <div class="rounded-2xl bg-slate-50
+                        border border-slate-100 p-4">
+
+                <i class="fab fa-whatsapp text-emerald-500 mb-3"></i>
+
+                <p class="text-xs font-bold text-slate-600">
+                    WhatsApp Enquiries
+                </p>
+
+                <h4 id="activity-whatsapp"
+                    class="text-2xl font-black text-slate-900 mt-1">
+                    0
+                </h4>
+
+            </div>
+
+
+            <div class="rounded-2xl bg-slate-50
+                        border border-slate-100 p-4">
+
+                <i class="fas fa-map-marker-alt text-rose-500 mb-3"></i>
+
+                <p class="text-xs font-bold text-slate-600">
+                    Direction Requests
+                </p>
+
+                <h4 id="activity-directions"
+                    class="text-2xl font-black text-slate-900 mt-1">
+                    0
+                </h4>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= CONVERSION FUNNEL ================= -->
+
+    <div class="bg-white border border-slate-200
+                rounded-[26px] p-5 sm:p-6 shadow-sm mb-7">
+
+        <div class="mb-5">
+
+            <h3 class="text-lg font-black text-slate-900">
+                From Discovery to Customer
+            </h3>
+
+            <p class="text-xs text-slate-400 mt-1">
+                See how visitors move from finding your store
+                to placing an order.
+            </p>
+
+        </div>
+
+        <div class="space-y-3">
+
+
+            <div class="flex items-center justify-between gap-3
+                        rounded-2xl bg-slate-50
+                        border border-slate-100 p-4">
+
+                <div class="flex items-center gap-3">
+
+                    <div class="w-9 h-9 rounded-xl bg-white
+                                flex items-center justify-center
+                                text-slate-500">
+
+                        <i class="fas fa-search"></i>
+
+                    </div>
+
+                    <div>
+
+                        <p class="text-sm font-bold text-slate-700">
+                            Search Impressions
+                        </p>
+
+                        <p class="text-[10px] text-slate-400">
+                            Times your store appeared in search
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <strong id="funnel-imp"
+                        class="text-lg font-black text-slate-900">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="flex items-center justify-between gap-3
+                        rounded-2xl bg-blue-50
+                        border border-blue-100 p-4">
+
+                <div class="flex items-center gap-3">
+
+                    <div class="w-9 h-9 rounded-xl bg-white
+                                flex items-center justify-center
+                                text-blue-500">
+
+                        <i class="fas fa-eye"></i>
+
+                    </div>
+
+                    <div>
+
+                        <p class="text-sm font-bold text-slate-700">
+                            Profile Views
+                        </p>
+
+                        <p class="text-[10px] text-slate-400">
+                            People who opened your profile
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <strong id="funnel-view"
+                        class="text-lg font-black text-slate-900">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="flex items-center justify-between gap-3
+                        rounded-2xl bg-amber-50
+                        border border-amber-100 p-4">
+
+                <div class="flex items-center gap-3">
+
+                    <div class="w-9 h-9 rounded-xl bg-white
+                                flex items-center justify-center
+                                text-amber-500">
+
+                        <i class="fas fa-comments"></i>
+
+                    </div>
+
+                    <div>
+
+                        <p class="text-sm font-bold text-slate-700">
+                            Customer Enquiries
+                        </p>
+
+                        <p class="text-[10px] text-slate-400">
+                            Customers who contacted you
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <strong id="funnel-enquiries"
+                        class="text-lg font-black text-slate-900">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="flex items-center justify-between gap-3
+                        rounded-2xl bg-emerald-50
+                        border border-emerald-100 p-4">
+
+                <div class="flex items-center gap-3">
+
+                    <div class="w-9 h-9 rounded-xl bg-white
+                                flex items-center justify-center
+                                text-emerald-500">
+
+                        <i class="fas fa-shopping-bag"></i>
+
+                    </div>
+
+                    <div>
+
+                        <p class="text-sm font-bold text-slate-700">
+                            Orders Received
+                        </p>
+
+                        <p class="text-[10px] text-slate-400">
+                            Successfully recorded orders
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <strong id="funnel-orders"
+                        class="text-lg font-black text-emerald-700">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= PRODUCT PERFORMANCE ================= -->
+
+    <div class="bg-white border border-slate-200
+                rounded-[26px] p-5 sm:p-6 shadow-sm mb-7">
+
+        <div class="flex items-center justify-between mb-5">
+
+            <div>
+
+                <h3 class="text-lg font-black text-slate-900">
+                    Product Performance
+                </h3>
+
+                <p class="text-xs text-slate-400 mt-1">
+                    Discover which products attract the most attention.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div id="top-products-list"
+             class="space-y-3">
+
+            <div class="rounded-2xl bg-slate-50
+                        border border-slate-100 p-5 text-center">
+
+                <i class="fas fa-box-open text-slate-300 text-2xl mb-3"></i>
+
+                <p class="text-sm font-bold text-slate-600">
+                    Product insights will appear here
+                </p>
+
+                <p class="text-xs text-slate-400 mt-1">
+                    Product activity data is not available yet.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= PERFORMANCE INSIGHTS ================= -->
+
+    <div class="bg-white border border-slate-200
+                rounded-[26px] p-5 sm:p-6 shadow-sm">
+
+        <div class="flex items-center gap-3 mb-5">
+
+            <div class="w-11 h-11 rounded-2xl
+                        bg-emerald-50 text-emerald-600
+                        flex items-center justify-center">
+
+                <i class="fas fa-lightbulb"></i>
+
+            </div>
+
+            <div>
+
+                <h3 class="text-lg font-black text-slate-900">
+                    Performance Insights
+                </h3>
+
+                <p class="text-xs text-slate-400 mt-1">
+                    Useful suggestions based on your store's activity.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div id="insights-list"
+             class="space-y-3">
+
+            <div class="rounded-2xl bg-slate-50
+                        border border-slate-100 p-4 flex gap-3">
+
+                <i class="fas fa-info-circle
+                          text-slate-400 mt-0.5"></i>
+
+                <div>
+
+                    <p class="text-sm font-bold text-slate-700">
+                        Your insights will appear here
+                    </p>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        More activity is needed to generate
+                        meaningful store recommendations.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
                     </div>
                 </div>
             </main>
@@ -727,208 +1583,6 @@
             </form>
         </div>
     </div>
-<!-- ✨ PREMIUM PERFORMANCE TAB (SAAS ANALYTICS) ✨ -->
-<div id="tab-performance" class="hidden animate-fade-in pb-24 px-4 sm:px-6 pt-6 bg-slate-50/50 min-h-screen">
-    
-    <!-- 1. HEADER -->
-    <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Store Performance</h2>
-                <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-2 py-0.5 rounded-md border border-emerald-200">Live Data</span>
-            </div>
-            <p class="text-sm text-slate-500 font-medium">Understand your store's reach, customer activity and business growth.</p>
-        </div>
-        <div class="flex items-center gap-2 shrink-0">
-            <select id="analytics-date-range" class="bg-white border border-slate-200 text-xs font-bold text-slate-700 rounded-xl px-4 py-2.5 outline-none cursor-pointer hover:bg-slate-50 shadow-sm transition">
-                <option value="7">Last 7 Days</option>
-                <option value="30" selected>Last 30 Days</option>
-                <option value="90">Last 3 Months</option>
-            </select>
-            <button onclick="initPremiumAnalytics()" class="w-10 h-10 bg-white border border-slate-200 text-slate-600 rounded-xl flex items-center justify-center hover:bg-slate-50 shadow-sm transition active:scale-95 text-sm">
-                <i class="fas fa-sync-alt"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- 2. OVERVIEW METRIC CARDS -->
-    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        
-        <!-- Views -->
-        <div class="bg-white border border-slate-200/80 p-5 rounded-[20px] shadow-[0_2px_10px_-3px_rgba(15,23,42,0.05)] flex flex-col relative overflow-hidden">
-            <div class="flex items-center gap-2 mb-3">
-                <div class="w-7 h-7 bg-slate-50 text-slate-600 rounded-lg flex items-center justify-center text-xs border border-slate-100"><i class="fas fa-eye"></i></div>
-                <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Profile Views</p>
-            </div>
-            <h3 class="text-3xl font-black text-slate-900 mb-1" id="metric-views">0</h3>
-            <div class="flex items-center justify-between mt-auto">
-                <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md flex items-center gap-1"><i class="fas fa-arrow-up"></i> 12%</span>
-                <span class="text-[10px] text-slate-400 font-medium">vs last period</span>
-            </div>
-        </div>
-
-        <!-- Enquiries -->
-        <div class="bg-white border border-slate-200/80 p-5 rounded-[20px] shadow-[0_2px_10px_-3px_rgba(15,23,42,0.05)] flex flex-col">
-            <div class="flex items-center gap-2 mb-3">
-                <div class="w-7 h-7 bg-slate-50 text-slate-600 rounded-lg flex items-center justify-center text-xs border border-slate-100"><i class="fas fa-comment-dots"></i></div>
-                <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Enquiries</p>
-            </div>
-            <h3 class="text-3xl font-black text-slate-900 mb-1" id="metric-enquiries">0</h3>
-            <div class="flex items-center justify-between mt-auto">
-                <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md flex items-center gap-1"><i class="fas fa-arrow-up"></i> 8%</span>
-                <span class="text-[10px] text-slate-400 font-medium">vs last period</span>
-            </div>
-        </div>
-
-        <!-- Orders -->
-        <div class="bg-white border border-slate-200/80 p-5 rounded-[20px] shadow-[0_2px_10px_-3px_rgba(15,23,42,0.05)] flex flex-col">
-            <div class="flex items-center gap-2 mb-3">
-                <div class="w-7 h-7 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-xs border border-emerald-100"><i class="fas fa-shopping-bag"></i></div>
-                <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Total Orders</p>
-            </div>
-            <h3 class="text-3xl font-black text-slate-900 mb-1" id="metric-orders">0</h3>
-            <div class="flex items-center justify-between mt-auto">
-                <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md flex items-center gap-1"><i class="fas fa-arrow-up"></i> 24%</span>
-                <span class="text-[10px] text-slate-400 font-medium">vs last period</span>
-            </div>
-        </div>
-
-        <!-- Revenue -->
-        <div class="bg-white border border-slate-200/80 p-5 rounded-[20px] shadow-[0_2px_10px_-3px_rgba(15,23,42,0.05)] flex flex-col">
-            <div class="flex items-center gap-2 mb-3">
-                <div class="w-7 h-7 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-xs border border-emerald-100"><i class="fas fa-wallet"></i></div>
-                <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Est. Revenue</p>
-            </div>
-            <h3 class="text-3xl font-black text-slate-900 mb-1" id="metric-revenue">₹0</h3>
-            <div class="flex items-center justify-between mt-auto">
-                <span class="text-[11px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md flex items-center gap-1"><i class="fas fa-minus"></i> 0%</span>
-                <span class="text-[10px] text-slate-400 font-medium">vs last period</span>
-            </div>
-        </div>
-        
-        <!-- Impressions -->
-        <div class="bg-white border border-slate-200/80 p-5 rounded-[20px] shadow-[0_2px_10px_-3px_rgba(15,23,42,0.05)] flex flex-col">
-            <div class="flex items-center gap-2 mb-3">
-                <div class="w-7 h-7 bg-slate-50 text-slate-600 rounded-lg flex items-center justify-center text-xs border border-slate-100"><i class="fas fa-search"></i></div>
-                <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Search Imp.</p>
-            </div>
-            <h3 class="text-3xl font-black text-slate-900 mb-1" id="metric-impressions">0</h3>
-            <p class="text-[11px] text-slate-400 font-medium mt-auto leading-tight">Times appeared in local search.</p>
-        </div>
-
-        <!-- Website Visits -->
-        <div class="bg-white border border-slate-200/80 p-5 rounded-[20px] shadow-[0_2px_10px_-3px_rgba(15,23,42,0.05)] flex flex-col">
-            <div class="flex items-center gap-2 mb-3">
-                <div class="w-7 h-7 bg-slate-50 text-slate-600 rounded-lg flex items-center justify-center text-xs border border-slate-100"><i class="fas fa-globe"></i></div>
-                <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Web Visits</p>
-            </div>
-            <h3 class="text-3xl font-black text-slate-900 mb-1" id="metric-visits">0</h3>
-            <p class="text-[11px] text-slate-400 font-medium mt-auto leading-tight">Direct link clicks to store.</p>
-        </div>
-    </div>
-
-    <!-- 3. STORE GROWTH OVERVIEW -->
-    <div class="bg-white border border-slate-200/80 rounded-[24px] p-5 sm:p-6 shadow-[0_4px_20px_-5px_rgba(15,23,42,0.05)] mb-8">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div>
-                <h3 class="font-black text-slate-900 text-lg">Store Growth Overview</h3>
-                <p class="text-xs text-slate-500 font-medium mt-0.5">Track how your store is performing over time.</p>
-            </div>
-            <div class="flex bg-slate-100 p-1 rounded-xl w-full sm:w-auto">
-                <button onclick="updateGrowthChart('views')" id="tab-chart-views" class="flex-1 sm:flex-none px-4 py-1.5 text-xs font-bold bg-white shadow-sm rounded-lg text-slate-900 transition">Views</button>
-                <button onclick="updateGrowthChart('orders')" id="tab-chart-orders" class="flex-1 sm:flex-none px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition">Orders</button>
-                <button onclick="updateGrowthChart('revenue')" id="tab-chart-revenue" class="flex-1 sm:flex-none px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition">Sales</button>
-            </div>
-        </div>
-        <div class="w-full h-[280px] relative">
-            <canvas id="growthChart"></canvas>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <!-- 4. CONVERSION FUNNEL -->
-        <div class="bg-white border border-slate-200/80 rounded-[24px] p-5 sm:p-6 shadow-[0_4px_20px_-5px_rgba(15,23,42,0.05)]">
-            <h3 class="font-black text-slate-900 text-lg mb-1">From Discovery to Customer</h3>
-            <p class="text-xs text-slate-500 font-medium mb-6">How users convert into buyers.</p>
-            
-            <div class="space-y-1 relative">
-                <!-- Funnel Lines connecting boxes -->
-                <div class="absolute left-6 top-8 bottom-8 w-0.5 bg-slate-100 z-0"></div>
-                
-                <div class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl relative z-10 border border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px] text-slate-500"><i class="fas fa-search"></i></div>
-                        <span class="text-sm font-bold text-slate-700">Search Impressions</span>
-                    </div>
-                    <span class="font-black text-slate-900" id="funnel-imp">0</span>
-                </div>
-                
-                <div class="flex justify-center"><i class="fas fa-long-arrow-alt-down text-slate-300 text-[10px]"></i></div>
-                
-                <div class="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl relative z-10 border border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-[10px] text-blue-600"><i class="fas fa-eye"></i></div>
-                        <span class="text-sm font-bold text-slate-700">Profile Views</span>
-                    </div>
-                    <span class="font-black text-slate-900" id="funnel-view">0</span>
-                </div>
-
-                <div class="flex justify-center"><i class="fas fa-long-arrow-alt-down text-slate-300 text-[10px]"></i></div>
-                
-                <div class="flex items-center justify-between p-3.5 bg-emerald-50/50 rounded-xl relative z-10 border border-emerald-100/50">
-                    <div class="flex items-center gap-3">
-                        <div class="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-[10px] text-emerald-600"><i class="fas fa-shopping-bag"></i></div>
-                        <span class="text-sm font-bold text-slate-700">Orders Received</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="font-black text-emerald-700 block leading-none" id="funnel-orders">0</span>
-                        <span class="text-[9px] font-bold text-emerald-500" id="funnel-conv">0% Conv.</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 5. CUSTOMER SOURCES -->
-        <div class="bg-white border border-slate-200/80 rounded-[24px] p-5 sm:p-6 shadow-[0_4px_20px_-5px_rgba(15,23,42,0.05)]">
-            <h3 class="font-black text-slate-900 text-lg mb-1">Customer Sources</h3>
-            <p class="text-xs text-slate-500 font-medium mb-6">Where your traffic is coming from.</p>
-            
-            <div class="flex items-center justify-center h-[200px] relative">
-                <canvas id="sourcesChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <!-- 6. TOP PRODUCTS -->
-        <div class="bg-white border border-slate-200/80 rounded-[24px] p-5 sm:p-6 shadow-[0_4px_20px_-5px_rgba(15,23,42,0.05)]">
-            <h3 class="font-black text-slate-900 text-lg mb-1">Top Performing Products</h3>
-            <p class="text-xs text-slate-500 font-medium mb-4">Items generating the most interest.</p>
-            
-            <div id="top-products-list" class="space-y-3">
-                <!-- Dynamically loaded. Empty state below: -->
-                <div class="text-center py-6">
-                    <div class="w-12 h-12 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-2 text-lg"><i class="fas fa-box-open"></i></div>
-                    <p class="text-xs font-semibold text-slate-500">Not enough data to show top products.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 7. PERFORMANCE INSIGHTS -->
-        <div class="bg-white border border-slate-200/80 rounded-[24px] p-5 sm:p-6 shadow-[0_4px_20px_-5px_rgba(15,23,42,0.05)]">
-            <h3 class="font-black text-slate-900 text-lg mb-1">Performance Insights</h3>
-            <p class="text-xs text-slate-500 font-medium mb-4">Actionable tips based on your real data.</p>
-            
-            <div class="space-y-3" id="insights-list">
-                <!-- Dynamically Generated -->
-                <div class="p-4 bg-blue-50/50 border border-blue-100 rounded-xl flex gap-3">
-                    <i class="fas fa-lightbulb text-blue-500 mt-0.5 text-sm"></i>
-                    <p class="text-xs text-slate-700 font-medium leading-relaxed">Keep your catalog updated. Stores with active products get 3x more search impressions.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
     <!-- CREATE BILL MODAL -->
     <div id="create-bill-modal" class="fixed inset-0 bg-[#111827]/40 backdrop-blur-sm z-[90] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
@@ -8333,178 +8987,715 @@ td.mono {
                 setTimeout(() => hint.classList.add('hidden'), 500); 
             }
         }
-// ✨ PREMIUM SAAS PERFORMANCE LOGIC ✨
+/* =====================================================
+   ✨ STORE INTELLIGENCE ANALYTICS
+   REAL DATA • FIRESTORE • iOS-STYLE DASHBOARD
+===================================================== */
+
 let premiumGrowthChart = null;
-let premiumSourcesChart = null;
-let currentChartMetric = 'views';
-let storedMetrics = {}; // Cache for tabs
+let currentChartMetric = "orders";
 
-async function initPremiumAnalytics() {
-    if (!globalShopData) return;
+let analyticsState = {
+    orders: [],
+    period: 30,
+    startDate: null,
+    endDate: null
+};
 
-    // 1. Fetch Real Data
-    let totalOrders = 0;
-    let totalRevenue = 0;
-    try {
-        const orderSnap = await db.collection('orders').where('shopPhone', '==', globalShopData.phone).get();
-        totalOrders = orderSnap.size;
-        orderSnap.forEach(doc => { totalRevenue += (doc.data().totalAmount || 0); });
-    } catch(e) { console.log("Analytics fetch error:", e); }
 
-    // Base Math (Simulating missing fields based on real orders for now)
-    const baseRank = globalShopData.searchRank || 10;
-    let views = (totalOrders === 0) ? (baseRank === 100 ? 142 : 45) : (totalOrders * 22) + 50;
-    let impressions = views * 4.5;
-    let visits = Math.round(views * 0.4);
-    let enquiries = totalOrders + Math.round(views * 0.15);
+/* =====================================================
+   1. SAFE HELPERS
+===================================================== */
 
-    // Save for chart tabs
-    storedMetrics = {
-        views: { total: views, label: 'Profile Views', color: '#64748B', bg: 'rgba(100, 116, 139, 0.1)' },
-        orders: { total: totalOrders, label: 'Orders Received', color: '#10B981', bg: 'rgba(16, 185, 129, 0.1)' },
-        revenue: { total: totalRevenue, label: 'Est. Sales (₹)', color: '#0F172A', bg: 'rgba(15, 23, 42, 0.05)' }
-    };
-
-    // 2. Update Top Cards
-    document.getElementById('metric-views').innerText = Math.round(views).toLocaleString();
-    document.getElementById('metric-enquiries').innerText = Math.round(enquiries).toLocaleString();
-    document.getElementById('metric-orders').innerText = totalOrders.toLocaleString();
-    document.getElementById('metric-revenue').innerText = "₹" + totalRevenue.toLocaleString();
-    document.getElementById('metric-impressions').innerText = Math.round(impressions).toLocaleString();
-    document.getElementById('metric-visits').innerText = Math.round(visits).toLocaleString();
-
-    // 3. Update Funnel
-    document.getElementById('funnel-imp').innerText = Math.round(impressions).toLocaleString();
-    document.getElementById('funnel-view').innerText = Math.round(views).toLocaleString();
-    document.getElementById('funnel-orders').innerText = totalOrders.toLocaleString();
-    let convRate = views > 0 ? ((totalOrders / views) * 100).toFixed(1) : 0;
-    document.getElementById('funnel-conv').innerText = convRate + "% Conv.";
-
-    // 4. Update Insights
-    const insightsHtml = `
-        <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl flex gap-3">
-            <i class="fas fa-chart-line text-emerald-500 mt-0.5 text-sm"></i>
-            <p class="text-xs text-slate-700 font-medium leading-relaxed">Your conversion rate from view to order is <b>${convRate}%</b>. Share your store link on WhatsApp to boost this.</p>
-        </div>
-        ${totalOrders === 0 ? `
-        <div class="p-4 bg-amber-50 border border-amber-100 rounded-xl flex gap-3">
-            <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5 text-sm"></i>
-            <p class="text-xs text-slate-700 font-medium leading-relaxed">Add more products to your catalog to appear in more local searches.</p>
-        </div>` : ''}
-    `;
-    document.getElementById('insights-list').innerHTML = insightsHtml;
-
-    // 5. Initialize Charts
-    updateGrowthChart('views');
-    renderSourcesChart(views);
+function analyticsElement(id) {
+    return document.getElementById(id);
 }
 
-function updateGrowthChart(metricKey) {
-    currentChartMetric = metricKey;
-    const dataObj = storedMetrics[metricKey];
-    if(!dataObj) return;
 
-    // Tab Styling Updates
-    ['views', 'orders', 'revenue'].forEach(id => {
-        const btn = document.getElementById('tab-chart-' + id);
-        if(id === metricKey) {
-            btn.className = "flex-1 sm:flex-none px-4 py-1.5 text-xs font-bold bg-white shadow-sm rounded-lg text-slate-900 transition";
-        } else {
-            btn.className = "flex-1 sm:flex-none px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition";
-        }
+function setAnalyticsValue(id, value) {
+    const element = analyticsElement(id);
+
+    if (element) {
+        element.textContent = value;
+    }
+}
+
+
+function formatNumber(value) {
+    return Number(value || 0).toLocaleString("en-IN");
+}
+
+
+function formatCurrency(value) {
+    return "₹" + Number(value || 0).toLocaleString("en-IN");
+}
+
+
+function formatDate(date) {
+    return date.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short"
     });
+}
 
-    // Date generation (Last 7 days logic for realistic SaaS feel)
-    const labels = [];
-    const dateData = [];
-    const today = new Date();
-    
-    // Smooth growth curve logic leading to today's total
-    let runningTotal = dataObj.total;
-    for (let i = 6; i >= 0; i--) {
-        let d = new Date(today);
-        d.setDate(d.getDate() - i);
-        labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-        
-        let pointVal = Math.round(runningTotal * (1 - (i * 0.12))); // Fake historical drop-off
-        dateData.push(pointVal < 0 ? 0 : pointVal);
+
+function getOrderDate(order) {
+
+    const rawDate =
+        order.createdAt ||
+        order.timestamp ||
+        order.date ||
+        order.created_date;
+
+    if (!rawDate) return null;
+
+    if (rawDate.toDate instanceof Function) {
+        return rawDate.toDate();
     }
 
-    const ctx = document.getElementById('growthChart');
-    if(!ctx) return;
-    
-    if(premiumGrowthChart) premiumGrowthChart.destroy();
+    if (rawDate.seconds) {
+        return new Date(rawDate.seconds * 1000);
+    }
 
-    // Premium SaaS Styling for Chart.js
-    Chart.defaults.font.family = 'sans-serif';
-    premiumGrowthChart = new Chart(ctx, {
-        type: 'line',
+    if (rawDate instanceof Date) {
+        return rawDate;
+    }
+
+    const parsed = new Date(rawDate);
+
+    return isNaN(parsed.getTime()) ? null : parsed;
+}
+
+
+function getOrderAmount(order) {
+
+    return Number(
+        order.totalAmount ??
+        order.total ??
+        order.amount ??
+        0
+    ) || 0;
+
+}
+
+
+/* =====================================================
+   2. DATE RANGE
+===================================================== */
+
+function getAnalyticsDateRange() {
+
+    const periodElement =
+        analyticsElement("performance-period");
+
+    const period = Number(
+        periodElement?.value || 30
+    );
+
+    const endDate = new Date();
+
+    endDate.setHours(23, 59, 59, 999);
+
+    const startDate = new Date();
+
+    startDate.setDate(startDate.getDate() - period + 1);
+
+    startDate.setHours(0, 0, 0, 0);
+
+    return {
+        period,
+        startDate,
+        endDate
+    };
+
+}
+
+
+/* =====================================================
+   3. INITIALIZE ANALYTICS
+===================================================== */
+
+async function initPremiumAnalytics() {
+
+    if (!globalShopData || !globalShopData.phone) {
+        console.warn("Shop data is unavailable.");
+        return;
+    }
+
+    const refreshButton =
+        document.querySelector(
+            '#tab-performance button[aria-label="Refresh analytics"]'
+        );
+
+    if (refreshButton) {
+        refreshButton.disabled = true;
+        refreshButton.classList.add("opacity-50");
+    }
+
+    try {
+
+        const range = getAnalyticsDateRange();
+
+        analyticsState.period = range.period;
+        analyticsState.startDate = range.startDate;
+        analyticsState.endDate = range.endDate;
+
+        const snapshot = await db
+            .collection("orders")
+            .where("shopPhone", "==", globalShopData.phone)
+            .get();
+
+        const allOrders = [];
+
+        snapshot.forEach(doc => {
+
+            const order = {
+                id: doc.id,
+                ...doc.data()
+            };
+
+            const orderDate = getOrderDate(order);
+
+            if (!orderDate) return;
+
+            allOrders.push({
+                ...order,
+                _analyticsDate: orderDate
+            });
+
+        });
+
+        const filteredOrders = allOrders.filter(order => {
+
+            return (
+                order._analyticsDate >= range.startDate &&
+                order._analyticsDate <= range.endDate
+            );
+
+        });
+
+        analyticsState.orders = filteredOrders;
+
+        renderAnalyticsOverview(filteredOrders);
+
+        renderAnalyticsFunnel(filteredOrders);
+
+        renderAnalyticsInsights(filteredOrders);
+
+        updateGrowthChart("orders");
+
+        updateAnalyticsTimestamp();
+
+    } catch (error) {
+
+        console.error("Store analytics error:", error);
+
+        renderAnalyticsError();
+
+    } finally {
+
+        if (refreshButton) {
+            refreshButton.disabled = false;
+            refreshButton.classList.remove("opacity-50");
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   4. OVERVIEW METRICS
+===================================================== */
+
+function renderAnalyticsOverview(orders) {
+
+    const totalOrders = orders.length;
+
+    const totalRevenue = orders.reduce(
+        (sum, order) => sum + getOrderAmount(order),
+        0
+    );
+
+    /*
+       These metrics require actual tracking.
+
+       Do not generate estimated numbers.
+    */
+
+    setAnalyticsValue("metric-views", "—");
+
+    setAnalyticsValue("metric-visits", "—");
+
+    setAnalyticsValue("metric-enquiries", "—");
+
+    setAnalyticsValue(
+        "metric-orders",
+        formatNumber(totalOrders)
+    );
+
+    setAnalyticsValue(
+        "metric-revenue",
+        formatCurrency(totalRevenue)
+    );
+
+    setAnalyticsValue("metric-impressions", "—");
+
+    setAnalyticsValue("views-change", "Not tracked");
+
+    setAnalyticsValue("visits-change", "Not tracked");
+
+    setAnalyticsValue("enquiries-change", "Not tracked");
+
+    setAnalyticsValue("orders-change", "Recorded data");
+
+    setAnalyticsValue("revenue-change", "Recorded data");
+
+    setAnalyticsValue("impressions-change", "Not tracked");
+
+}
+
+
+/* =====================================================
+   5. CONVERSION / DISCOVERY FUNNEL
+===================================================== */
+
+function renderAnalyticsFunnel(orders) {
+
+    /*
+       Only orders are currently available
+       from the provided Firestore logic.
+    */
+
+    setAnalyticsValue("funnel-imp", "Not tracked");
+
+    setAnalyticsValue("funnel-view", "Not tracked");
+
+    setAnalyticsValue("funnel-enquiries", "Not tracked");
+
+    setAnalyticsValue(
+        "funnel-orders",
+        formatNumber(orders.length)
+    );
+
+}
+
+
+/* =====================================================
+   6. GROWTH CHART
+===================================================== */
+
+function updateGrowthChart(metricKey = "orders") {
+
+    currentChartMetric = metricKey;
+
+    const canvas = analyticsElement("growthChart");
+
+    if (!canvas || typeof Chart === "undefined") {
+        return;
+    }
+
+    const orders = analyticsState.orders;
+
+    const range = getAnalyticsDateRange();
+
+    const labels = [];
+    const chartData = [];
+
+    /*
+       Only actual order data is plotted.
+       No artificial historical growth.
+    */
+
+    for (let i = 0; i < range.period; i++) {
+
+        const date = new Date(range.startDate);
+
+        date.setDate(date.getDate() + i);
+
+        const nextDate = new Date(date);
+
+        nextDate.setDate(nextDate.getDate() + 1);
+
+        const dayOrders = orders.filter(order => {
+
+            return (
+                order._analyticsDate >= date &&
+                order._analyticsDate < nextDate
+            );
+
+        });
+
+        labels.push(formatDate(date));
+
+        if (metricKey === "revenue") {
+
+            const dailyRevenue = dayOrders.reduce(
+                (sum, order) => sum + getOrderAmount(order),
+                0
+            );
+
+            chartData.push(dailyRevenue);
+
+        } else {
+
+            chartData.push(dayOrders.length);
+
+        }
+
+    }
+
+    if (premiumGrowthChart) {
+        premiumGrowthChart.destroy();
+    }
+
+    const hasData = chartData.some(value => value > 0);
+
+    const emptyState = analyticsElement("growth-empty-state");
+
+    if (emptyState) {
+
+        emptyState.classList.toggle("hidden", hasData);
+
+        emptyState.classList.toggle("flex", !hasData);
+
+    }
+
+    premiumGrowthChart = new Chart(canvas, {
+
+        type: "line",
+
         data: {
-            labels: labels,
-            datasets: [{
-                label: dataObj.label,
-                data: dateData,
-                borderColor: dataObj.color,
-                backgroundColor: dataObj.bg,
-                borderWidth: 2.5,
-                tension: 0.4,
-                fill: true,
-                pointBackgroundColor: '#FFFFFF',
-                pointBorderColor: dataObj.color,
-                pointBorderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: { 
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#0F172A', titleFont: { size: 12 },
-                    bodyFont: { size: 13, weight: 'bold' }, padding: 12, cornerRadius: 8, displayColors: false
+
+            labels,
+
+            datasets: [
+
+                {
+
+                    label:
+                        metricKey === "revenue"
+                            ? "Recorded Sales"
+                            : "Orders Received",
+
+                    data: chartData,
+
+                    borderColor: "#10B981",
+
+                    backgroundColor: "rgba(16,185,129,0.08)",
+
+                    borderWidth: 2.5,
+
+                    tension: 0.35,
+
+                    fill: true,
+
+                    pointRadius: hasData ? 3 : 0,
+
+                    pointHoverRadius: 6,
+
+                    pointBackgroundColor: "#FFFFFF",
+
+                    pointBorderColor: "#10B981",
+
+                    pointBorderWidth: 2
+
                 }
-            },
-            scales: {
-                x: { grid: { display: false }, ticks: { font: { size: 10, weight: '600' }, color: '#94A3B8' }, border: { display: false } },
-                y: { grid: { borderDash: [4, 4], color: '#F1F5F9' }, ticks: { font: { size: 10, weight: '600' }, color: '#94A3B8', maxTicksLimit: 5 }, border: { display: false }, beginAtZero: true }
-            }
-        }
-    });
-}
 
-function renderSourcesChart(totalViews) {
-    const ctx = document.getElementById('sourcesChart');
-    if(!ctx) return;
-    if(premiumSourcesChart) premiumSourcesChart.destroy();
+            ]
 
-    // Default distribution for a local store
-    const data = totalViews === 0 ? [1] : [60, 25, 15]; 
-    const labels = totalViews === 0 ? ['No Data'] : ['In-App Search', 'Direct Link', 'WhatsApp'];
-    const colors = totalViews === 0 ? ['#F1F5F9'] : ['#10B981', '#3B82F6', '#8B5CF6'];
-
-    premiumSourcesChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: labels,
-            datasets: [{ data: data, backgroundColor: colors, borderWidth: 0, hoverOffset: 4 }]
         },
+
         options: {
-            responsive: true, maintainAspectRatio: false, cutout: '75%',
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
+
             plugins: {
-                legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, font: { size: 11, weight: '600' }, color: '#475569' } },
-                tooltip: { enabled: totalViews > 0 }
+
+                legend: {
+                    display: false
+                },
+
+                tooltip: {
+
+                    backgroundColor: "#0F172A",
+
+                    padding: 12,
+
+                    cornerRadius: 12,
+
+                    displayColors: false,
+
+                    callbacks: {
+
+                        label: function(context) {
+
+                            const value = context.parsed.y || 0;
+
+                            return metricKey === "revenue"
+                                ? "Sales: " + formatCurrency(value)
+                                : "Orders: " + formatNumber(value);
+
+                        }
+
+                    }
+
+                }
+
+            },
+
+            scales: {
+
+                x: {
+
+                    grid: {
+                        display: false
+                    },
+
+                    ticks: {
+                        color: "#94A3B8",
+                        font: {
+                            size: 10,
+                            weight: "600"
+                        },
+
+                        maxTicksLimit: 6
+                    },
+
+                    border: {
+                        display: false
+                    }
+
+                },
+
+                y: {
+
+                    beginAtZero: true,
+
+                    grid: {
+                        color: "#F1F5F9",
+                        borderDash: [4, 4]
+                    },
+
+                    ticks: {
+                        color: "#94A3B8",
+                        font: {
+                            size: 10,
+                            weight: "600"
+                        },
+
+                        precision: 0,
+
+                        callback: function(value) {
+
+                            return metricKey === "revenue"
+                                ? "₹" + value
+                                : value;
+
+                        }
+
+                    },
+
+                    border: {
+                        display: false
+                    }
+
+                }
+
             }
+
         }
+
     });
+
 }
 
-// Automatically load analytics when tab is opened
-document.querySelector("button[onclick*=\"switchTab('tab-performance'\"]")?.addEventListener("click", () => {
-    setTimeout(initPremiumAnalytics, 150);
-});
 
+/* =====================================================
+   7. PERFORMANCE INSIGHTS
+===================================================== */
+
+function renderAnalyticsInsights(orders) {
+
+    const container = analyticsElement("insights-list");
+
+    if (!container) return;
+
+    const totalOrders = orders.length;
+
+    const totalRevenue = orders.reduce(
+        (sum, order) => sum + getOrderAmount(order),
+        0
+    );
+
+    let insights = [];
+
+    if (totalOrders === 0) {
+
+        insights.push({
+
+            icon: "fa-chart-line",
+
+            color: "text-blue-500",
+
+            bg: "bg-blue-50",
+
+            border: "border-blue-100",
+
+            title: "No orders recorded yet",
+
+            message:
+                "Orders recorded during the selected period will appear in your performance analytics."
+
+        });
+
+    } else {
+
+        insights.push({
+
+            icon: "fa-shopping-bag",
+
+            color: "text-emerald-500",
+
+            bg: "bg-emerald-50",
+
+            border: "border-emerald-100",
+
+            title: `${formatNumber(totalOrders)} orders recorded`,
+
+            message:
+                `Your store recorded ${formatNumber(totalOrders)} order(s) during the selected period, with recorded sales of ${formatCurrency(totalRevenue)}.`
+
+        });
+
+    }
+
+    insights.push({
+
+        icon: "fa-info-circle",
+
+        color: "text-slate-500",
+
+        bg: "bg-slate-50",
+
+        border: "border-slate-100",
+
+        title: "More analytics coming soon",
+
+        message:
+            "Profile views, website visits, enquiries and search visibility require event tracking. They are not estimated from order data."
+
+    });
+
+    container.innerHTML = insights.map(item => `
+
+        <div class="p-4 ${item.bg} border ${item.border}
+                    rounded-2xl flex gap-3">
+
+            <i class="fas ${item.icon} ${item.color}
+                      mt-0.5 text-sm"></i>
+
+            <div>
+
+                <p class="text-sm font-bold text-slate-700">
+                    ${item.title}
+                </p>
+
+                <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    ${item.message}
+                </p>
+
+            </div>
+
+        </div>
+
+    `).join("");
+
+}
+
+
+/* =====================================================
+   8. TIMESTAMP
+===================================================== */
+
+function updateAnalyticsTimestamp() {
+
+    const element =
+        analyticsElement("analytics-last-updated");
+
+    if (!element) return;
+
+    element.textContent =
+        "Updated " +
+        new Date().toLocaleTimeString("en-IN", {
+            hour: "numeric",
+            minute: "2-digit"
+        });
+
+}
+
+
+/* =====================================================
+   9. ERROR STATE
+===================================================== */
+
+function renderAnalyticsError() {
+
+    const container = analyticsElement("insights-list");
+
+    if (!container) return;
+
+    container.innerHTML = `
+
+        <div class="p-4 bg-rose-50 border border-rose-100
+                    rounded-2xl flex gap-3">
+
+            <i class="fas fa-exclamation-circle
+                      text-rose-500 mt-0.5"></i>
+
+            <div>
+
+                <p class="text-sm font-bold text-rose-700">
+                    Unable to load analytics
+                </p>
+
+                <p class="text-xs text-rose-600 mt-1">
+                    Please check your connection and try refreshing.
+                </p>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =====================================================
+   10. LOAD WHEN PERFORMANCE TAB OPENS
+===================================================== */
+
+document
+    .querySelector(
+        "button[onclick*=\"switchTab('tab-performance'\"]"
+    )
+    ?.addEventListener("click", () => {
+
+        setTimeout(() => {
+
+            initPremiumAnalytics();
+
+        }, 150);
+
+    });
 
     </script>
     <!-- ✨ iOS STYLE PREMIUM SHARE MODAL (WITH QR CODE) ✨ -->
