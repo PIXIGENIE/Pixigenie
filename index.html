@@ -1289,17 +1289,17 @@ searchInput.placeholder = "Search products, services, or shops...";
             }
         }
 
-            // ===============================================
+               // ===============================================
         // 2. REPLACED: fetchGlobalProducts()
         // ===============================================
         async function fetchGlobalProducts() {
             const grid = document.getElementById('dynamic-grid');
             try {
-              // 🔥 MAGIC: Jis dukaandar ka rank 100 (Pro) hai, uska product automatically pehle dikhega!
-const snapshot = await db.collectionGroup('products')
-    .orderBy('searchRank', 'desc')
-    .limit(12)
-    .get();
+                // 🔥 MAGIC: Jis dukaandar ka rank 100 (Pro) hai, uska product automatically pehle dikhega!
+                const snapshot = await db.collectionGroup('products')
+                    .orderBy('searchRank', 'desc')
+                    .limit(12)
+                    .get();
 
                 if (snapshot.empty) throw new Error("No products");
                 
@@ -1311,6 +1311,8 @@ const snapshot = await db.collectionGroup('products')
                     let isVerified = false; 
                     let shopPlan = ""; 
                     
+                    let isService = false; // ✨ YAHI BUG THA! Ye line missing thi ✨
+                    
                     if (doc.ref.parent && doc.ref.parent.parent) {
                         try {
                             const shopDoc = await doc.ref.parent.parent.get();
@@ -1320,13 +1322,16 @@ const snapshot = await db.collectionGroup('products')
                                 shopPhone = sData.phone || "";
                                 shopId = shopDoc.id; 
                                 shopPlan = sData.plan || ""; 
-                                
-                               isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro';
+                                isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro';
+
+                                // ✨ FIX: Yahan check karna zaroori hai ki wo Service provider hai ya nahi ✨
+                                if (sData.businessType === 'Service Provider') {
+                                    isService = true;
+                                }
                             }
                         } catch(e) {}
                     }
                     
-                    // ✨ NAYA: product.mrp pass kar rahe hain ✨
                     return generateProductCard(product.name, product.mrp, product.price, shopName, shopPhone, product.image, shopId, isVerified, shopPlan, isService);
                 });
 
@@ -1334,12 +1339,13 @@ const snapshot = await db.collectionGroup('products')
                 grid.innerHTML = cardsHtmlArray.join('');
                 
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
-                      } catch (error) { 
+            } catch (error) { 
+                console.error("Fetch All Error: ", error); // Console me error check karne ke liye
                 grid.innerHTML = `<div class="col-span-full text-center py-16"><i class="fas fa-box-open text-4xl text-gray-200 mb-3"></i><p class="text-gray-500 font-medium">No products found around you.</p></div>`;
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
             }
-
         }
+
 // Naya function: Products aur Services ko alag-alag load karne ke liye
 async function fetchGlobalItems(itemType) {
     const grid = document.getElementById('dynamic-grid');
