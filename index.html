@@ -126,122 +126,53 @@
         </div>
     </header>
 
-    <!-- ✨ FORCED LOGIN MODAL (STRICT / NO CLOSE BUTTON) ✨ -->
-    <div id="auth-modal" class="fixed inset-0 bg-[#111827]/60 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
-        <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-sm p-6 sm:p-8 text-center transform scale-95 transition-transform duration-300 relative" id="auth-modal-content">
-            
-            <!-- 🚫 Close (X) बटन हटा दिया गया है ताकि यूजर भाग न सके 🚫 -->
+<!-- ✨ GOOGLE ONLY LOGIN MODAL ✨ -->
+<div id="auth-modal" class="fixed inset-0 bg-[#111827]/60 backdrop-blur-md z-[70] hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+    <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-sm p-6 sm:p-8 text-center transform scale-95 transition-transform duration-300 relative" id="auth-modal-content">
+        
+        <!-- STEP 1 (GOOGLE LOGIN SCREEN) -->
+        <div id="auth-step-login" class="transition-all">
+            <div class="w-14 h-14 bg-[#111827] rounded-[16px] flex items-center justify-center text-white text-xl mx-auto mb-4"><i class="fas fa-shield-alt"></i></div>
+            <h3 class="text-2xl font-bold text-[#111827] mb-1">Welcome to Pixigenie</h3>
+            <p class="text-[13px] text-[#6B7280] mb-8">Securely log in to continue</p>
 
-            <!-- STEP 1A (LOGIN SCREEN) -->
-            <div id="auth-step-login" class="transition-all">
-                <div class="w-14 h-14 bg-[#111827] rounded-[16px] flex items-center justify-center text-white text-xl mx-auto mb-4"><i class="fas fa-lock"></i></div>
-                <h3 class="text-2xl font-bold text-[#111827] mb-1">Welcome Back</h3>
-                <p class="text-[13px] text-[#6B7280] mb-6">Log in to Pixigenie to continue</p>
+            <button type="button" onclick="loginWithGoogle(event)" class="w-full flex items-center justify-center gap-3 bg-white border border-[#E5E7EB] hover:bg-[#F7F7F9] text-[#111827] font-semibold h-[56px] rounded-[16px] shadow-sm transition-all active:scale-[0.98]">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Continue with Google
+            </button>
+            <p class="text-[11px] text-[#6B7280] text-center mt-6">By continuing, you agree to our Terms & Privacy Policy.</p>
+        </div>
 
-              <button type="button" onclick="loginWithGoogle(event)" class="w-full flex items-center justify-center gap-3 bg-white border border-[#E5E7EB] hover:bg-[#F7F7F9] text-[#111827] font-semibold h-[52px] rounded-[16px] transition-colors mb-5 active:scale-[0.98]">
-    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Log in with Google
-</button>
+        <!-- STEP 2 (ROLE SELECTION) -->
+        <div id="auth-step-2" class="hidden transition-all text-left">
+            <h3 class="text-2xl font-bold text-[#111827] mb-1">Welcome!</h3>
+            <p class="text-[13px] text-[#6B7280] mb-6">How do you want to use Pixigenie?</p>
+            <div class="space-y-3">
+                <button onclick="selectRole('shop')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left shadow-sm hover:border-blue-500">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-[12px] flex items-center justify-center text-lg"><i class="fas fa-store"></i></div>
+                    <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Shop Owner</h4><p class="text-[12px] text-[#6B7280]">Manage my digital store</p></div>
+                </button>
+                <button onclick="selectRole('customer')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left shadow-sm hover:border-purple-500">
+                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-[12px] flex items-center justify-center text-lg"><i class="fas fa-shopping-bag"></i></div>
+                    <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Customer</h4><p class="text-[12px] text-[#6B7280]">Start shopping immediately</p></div>
+                </button>
+            </div>
+        </div>
 
-
-                <div class="flex items-center gap-3 mb-5">
-                    <div class="h-px bg-[#E5E7EB] flex-1"></div>
-                    <span class="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Or with Phone</span>
-                    <div class="h-px bg-[#E5E7EB] flex-1"></div>
+        <!-- STEP 3 (SHOP OWNER SETUP) -->
+        <div id="auth-step-shop" class="hidden transition-all text-left">
+            <button onclick="showStep('auth-step-2')" class="mb-4 text-[#6B7280] hover:text-[#111827] transition-colors"><i class="fas fa-arrow-left"></i> Back</button>
+            <h3 class="text-2xl font-bold text-[#111827] mb-6">Setup Store</h3>
+            <form onsubmit="handleShopSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Shop Name</label>
+                    <input type="text" id="final-shop-name" placeholder="e.g. Verma Groceries" required class="w-full px-4 py-4 rounded-xl border border-gray-200 focus:border-blue-500 outline-none bg-[#F7F7F9] focus:bg-white text-sm font-semibold transition shadow-sm">
                 </div>
-
-                <form onsubmit="handleLoginSubmit(event)" class="space-y-3 mt-4">
-                    <!-- Phone -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <span class="text-[#6B7280] font-semibold text-sm border-r border-[#E5E7EB] pr-3 mr-3">+91</span>
-                        <input type="tel" id="login-phone" placeholder="WhatsApp Number" pattern="[0-9]{10}" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
-
-                    <!-- Password -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <i class="fas fa-lock text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
-                        <input type="password" id="login-password" placeholder="Password" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
-                    
-                    <button type="submit" id="login-btn" class="w-full bg-[#111827] text-white font-semibold h-[52px] rounded-[16px] active:scale-[0.98] transition-transform flex justify-center items-center gap-2 mt-4">
-                        Log in <i class="fas fa-arrow-right text-xs"></i>
-                    </button>
-                    
-                    <p class="text-[12px] text-[#6B7280] text-center mt-5">
-                        Don't have an account? <br> <a href="#" onclick="showStep('auth-step-register'); return false;" class="text-[#A855F7] font-bold hover:underline">Create account now</a>
-                    </p>
-                </form>
-            </div>
-
-            <!-- STEP 1B (REGISTER SCREEN) -->
-            <div id="auth-step-register" class="hidden transition-all">
-                <div class="w-14 h-14 bg-[#111827] rounded-[16px] flex items-center justify-center text-white text-xl mx-auto mb-4"><i class="fas fa-magic"></i></div>
-                <h3 class="text-2xl font-bold text-[#111827] mb-1">Get Started</h3>
-                <p class="text-[13px] text-[#6B7280] mb-6">Create your Pixigenie account</p>
-
-                <form onsubmit="handleRegisterSubmit(event)" class="space-y-3 mt-4">
-                    <!-- Name -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <i class="fas fa-user text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
-                        <input type="text" id="reg-name" placeholder="Full Name" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
-                    
-                    <!-- Phone -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <span class="text-[#6B7280] font-semibold text-sm border-r border-[#E5E7EB] pr-3 mr-3">+91</span>
-                        <input type="tel" id="reg-phone" placeholder="WhatsApp Number" pattern="[0-9]{10}" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
-
-                    <!-- Password -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <i class="fas fa-lock text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
-                        <input type="password" id="reg-password" placeholder="Create Password" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
-
-                    <!-- Confirm Password -->
-                    <div class="flex items-center bg-[#F7F7F9] rounded-[16px] border border-transparent focus-within:border-[#A855F7] transition-colors overflow-hidden px-4 h-[52px]">
-                        <i class="fas fa-check-circle text-[#6B7280] border-r border-[#E5E7EB] pr-3 mr-3"></i>
-                        <input type="password" id="reg-confirm-password" placeholder="Confirm Password" required class="w-full bg-transparent outline-none text-sm font-semibold text-[#111827] placeholder-[#6B7280]">
-                    </div>
-                    
-                    <button type="submit" id="reg-btn" class="w-full bg-[#111827] text-white font-semibold h-[52px] rounded-[16px] active:scale-[0.98] transition-transform flex justify-center items-center gap-2 mt-4">
-                        Continue <i class="fas fa-arrow-right text-xs"></i>
-                    </button>
-                    
-                    <p class="text-[12px] text-[#6B7280] text-center mt-5">
-                        Already have an account? <br> <a href="#" onclick="showStep('auth-step-login'); return false;" class="text-[#A855F7] font-bold hover:underline">Log in here</a>
-                    </p>
-                </form>
-            </div>
-
-            <!-- STEP 2 (ROLE SELECTION) -->
-            <div id="auth-step-2" class="hidden transition-all text-left">
-                <h3 class="text-2xl font-bold text-[#111827] mb-1">Welcome!</h3>
-                <p class="text-[13px] text-[#6B7280] mb-6">How do you want to use Pixigenie?</p>
-                <div class="space-y-3">
-                    <button onclick="selectRole('shop')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left">
-                        <div class="w-12 h-12 bg-[#F7F7F9] text-[#111827] rounded-[12px] flex items-center justify-center text-lg"><i class="fas fa-store"></i></div>
-                        <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Shop Owner</h4><p class="text-[12px] text-[#6B7280]">Manage my digital store</p></div>
-                    </button>
-                    <!-- ✨ CUSTOMER SELECT AB SEEDHA LOGIN KAREGA ✨ -->
-                    <button onclick="selectRole('customer')" class="w-full p-4 border border-[#E5E7EB] rounded-[18px] bg-white active:bg-[#F7F7F9] active:scale-[0.98] transition-all flex items-center gap-4 text-left">
-                        <div class="w-12 h-12 bg-[#F7F7F9] text-[#111827] rounded-[12px] flex items-center justify-center text-lg"><i class="fas fa-shopping-bag"></i></div>
-                        <div><h4 class="font-bold text-[#111827] text-[15px]">I am a Customer</h4><p class="text-[12px] text-[#6B7280]">Start shopping immediately</p></div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- STEP 3 (ONLY FOR SHOP OWNERS NOW) -->
-            <div id="auth-step-shop" class="hidden transition-all text-left">
-                <button onclick="showStep('auth-step-2')" class="mb-4 text-[#6B7280] active:text-[#111827]"><i class="fas fa-arrow-left"></i> Back</button>
-                <h3 class="text-2xl font-bold text-[#111827] mb-6">Setup Store</h3>
-                <form onsubmit="handleShopSubmit(event)" class="space-y-3">
-                    <input type="text" id="final-shop-name" placeholder="Enter Shop Name" required class="w-full px-4 py-4 rounded-xl border border-gray-200 focus:border-blue-500 outline-none bg-[#F7F7F9] text-sm font-semibold transition">
-                    <button type="submit" id="final-shop-btn" class="w-full bg-[#111827] text-white font-bold py-4 rounded-xl shadow-lg mt-2 active:scale-95 transition-transform">Launch Store <i class="fas fa-rocket ml-1"></i></button>
-                </form>
-            </div>
-            
+                <button type="submit" id="final-shop-btn" class="w-full bg-[#111827] text-white font-bold py-4 rounded-xl shadow-lg mt-2 active:scale-95 transition-transform flex justify-center items-center gap-2">Launch Store <i class="fas fa-rocket"></i></button>
+            </form>
         </div>
     </div>
+</div>
+
 
 
     <!-- ✨ HYBRID CHECKOUT MODAL ✨ -->
@@ -622,7 +553,7 @@
             return d.toFixed(1); // 1 decimal tak dikhayega (e.g. 1.9 km)
         }
 
-        let authTemp = { phone: '', name: '' };
+    
 
                                 window.addEventListener('DOMContentLoaded', () => {
             const isLoggedIn = updateUIBasedOnLogin();
@@ -704,223 +635,130 @@
             const customerName = localStorage.getItem('pixigenie_customer_name');
             if (!activeShop && !customerName) openAuthModal();
         }
-        // ✨ 1. LOGIN LOGIC (Photo Fetch Update)
-        async function handleLoginSubmit(e) {
-            e.preventDefault();
-            const phone = document.getElementById('login-phone').value.trim();
-            const password = document.getElementById('login-password').value.trim();
-            const btn = document.getElementById('login-btn');
-            
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i>`;
-            btn.disabled = true;
+ // ✨ GLOBAL AUTH VARIABLE ✨
+let authTemp = { email: '', name: '', photoURL: '', uid: '' };
 
-            try {
-                // Check Shop
-                const shopSnap = await db.collection('shops').where('phone', '==', phone).get();
-                if (!shopSnap.empty) {
-                    const shopData = shopSnap.docs[0].data();
-                    if (shopData.password === password) {
-                        localStorage.setItem('pixigenie_active_shop', shopData.shopId);
-                        localStorage.setItem('pixigenie_owner_name', shopData.ownerName);
-                        localStorage.setItem('pixigenie_customer_phone', shopData.phone);
-                        
-                        // ✨ NAYA: Firebase se wapas photo load karo ✨
-                        if (shopData.storeLogo) {
-                            localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
-                        }
-                        
-                        window.location.href = `dashboard.html?shop=${shopData.shopId}`;
-                        return;
-                    } else {
-                        alert("⚠️ Incorrect Password for Shop Account!");
-                        btn.innerHTML = `Log in <i class="fas fa-arrow-right text-xs"></i>`;
-                        btn.disabled = false; return;
-                    }
-                } 
-                
-                // Check Customer
-                const custSnap = await db.collection('customers').where('phone', '==', phone).get();
-                if (!custSnap.empty) {
-                    const custData = custSnap.docs[0].data();
-                    if (custData.password === password) {
-                        localStorage.setItem('pixigenie_customer_name', custData.name);
-                        localStorage.setItem('pixigenie_customer_phone', custData.phone);
-                        
-                        // ✨ NAYA: Firebase se wapas photo load karo ✨
-                        if (custData.profileImage) {
-                            localStorage.setItem('pixigenie_profile_img', custData.profileImage);
-                        }
-                        
-                        closeAuthModal(); 
-                        updateUIBasedOnLogin();
-                        return;
-                    } else {
-                        alert("⚠️ Incorrect Password for Customer Account!");
-                        btn.innerHTML = `Log in <i class="fas fa-arrow-right text-xs"></i>`;
-                        btn.disabled = false; return;
-                    }
-                }
-
-                alert("Account not found! Please create a new account.");
-            } catch (error) { alert("Error: " + error.message); }
+// ✨ 1. SECURE GOOGLE LOGIN LOGIC ✨
+function loginWithGoogle(event) {
+    const btn = event ? event.currentTarget : null;
+    const originalHtml = btn ? btn.innerHTML : '';
+    if (btn) btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Authenticating...`;
+    
+    auth.signInWithPopup(googleProvider).then(async (result) => {
+        const user = result.user;
+        const email = user.email;
+        
+        if (email === 'pixigenie8750@gmail.com') {
+            localStorage.setItem('pixigenie_super_admin', 'true');
+            window.location.href = 'super-admin.html';
+            return;
+        }
+        
+        const custSnap = await db.collection('customers').doc(email).get();
+        if (custSnap.exists) {
+            const custData = custSnap.data();
+            localStorage.setItem('pixigenie_customer_name', custData.name);
+            localStorage.setItem('pixigenie_customer_phone', email); 
+            if (custData.profileImage) localStorage.setItem('pixigenie_profile_img', custData.profileImage);
             
-            btn.innerHTML = `Log in <i class="fas fa-arrow-right text-xs"></i>`;
-            btn.disabled = false;
+            closeAuthModal();
+            updateUIBasedOnLogin();
+            return;
+        }
+        
+        const shopSnap = await db.collection('shops').where('email', '==', email).get();
+        if (!shopSnap.empty) {
+            const shopData = shopSnap.docs[0].data();
+            localStorage.setItem('pixigenie_active_shop', shopData.shopId);
+            localStorage.setItem('pixigenie_owner_name', shopData.ownerName);
+            localStorage.setItem('pixigenie_customer_phone', email);
+            if (shopData.storeLogo) localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
+            
+            window.location.href = `dashboard.html?shop=${shopData.shopId}`;
+            return;
         }
 
-        // ✨ 2. REGISTER LOGIC
-        async function handleRegisterSubmit(e) {
-            e.preventDefault();
-            const name = document.getElementById('reg-name').value.trim();
-            const phone = document.getElementById('reg-phone').value.trim();
-            const password = document.getElementById('reg-password').value.trim();
-            const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
-            const btn = document.getElementById('reg-btn');
+        authTemp.name = user.displayName || "Google User";
+        authTemp.email = email; 
+        authTemp.photoURL = user.photoURL || '';
+        authTemp.uid = user.uid;
+        
+        showStep('auth-step-2'); 
 
-            if (password !== confirmPassword) {
-                alert("Passwords do not match!");
-                return;
-            }
-
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i>`;
-            btn.disabled = true;
-
-            try {
-                // Check if account already exists
-                const shopSnap = await db.collection('shops').where('phone', '==', phone).get();
-                const custSnap = await db.collection('customers').where('phone', '==', phone).get();
-                
-                if (!shopSnap.empty || !custSnap.empty) {
-                    alert("Account with this number already exists. Please log in.");
-                    showStep('auth-step-login');
-                    btn.innerHTML = `Continue <i class="fas fa-arrow-right text-xs"></i>`;
-                    btn.disabled = false; return;
-                }
-
-                authTemp = { name, phone, password };
-                showStep('auth-step-2');
-            } catch(error) { alert(error.message); }
-
-            btn.innerHTML = `Continue <i class="fas fa-arrow-right text-xs"></i>`;
-            btn.disabled = false;
+    }).catch((error) => {
+        console.error(error);
+        if (btn) btn.innerHTML = originalHtml;
+        if(error.code !== 'auth/popup-closed-by-user') {
+            alert("Login Failed: " + error.message);
         }
+    });
+}
 
-        async function selectRole(role) {
-            if (role === 'customer') {
-                try {
-                    await db.collection('customers').doc(authTemp.phone).set({
-                        name: authTemp.name,
-                        phone: authTemp.phone,
-                        password: authTemp.password,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    localStorage.setItem('pixigenie_customer_name', authTemp.name);
-                    localStorage.setItem('pixigenie_customer_phone', authTemp.phone);
-                    closeAuthModal(); 
-                    updateUIBasedOnLogin();
-                } catch (error) { alert("Error: " + error.message); }
-            } else {
-                showStep('auth-step-shop');
-            }
-        }
-
-              // ✨ GOOGLE LOGIN LOGIC (SMART FIX: Email, Phone & Super Admin check karega) ✨
-        function loginWithGoogle(event) {
-            const btn = event ? event.currentTarget : null;
-            if (btn) btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Please wait...`;
-            
-            auth.signInWithPopup(googleProvider).then(async (result) => {
-                const user = result.user;
-                const userEmailOrId = user.email || user.uid;
-                
-                // 🚀 1. SUPER ADMIN CHECK 🚀
-                if (user.email === 'pixigenie8750@gmail.com') {
-                    localStorage.setItem('pixigenie_super_admin', 'true');
-                    window.location.href = 'super-admin.html';
-                    return; // Admin hai toh code yahin se naye page par chala jayega
-                }
-                
-                // 2. अगर पुराना कस्टमर है तो सीधा लॉगिन
-                const custSnap = await db.collection('customers').doc(userEmailOrId).get();
-                if(custSnap.exists) {
-                    const custData = custSnap.data();
-                    localStorage.setItem('pixigenie_customer_name', custData.name);
-                    localStorage.setItem('pixigenie_customer_phone', custData.phone);
-                    
-                    if (custData.profileImage) {
-                        localStorage.setItem('pixigenie_profile_img', custData.profileImage);
-                    }
-                    
-                    closeAuthModal();
-                    updateUIBasedOnLogin();
-                    return;
-                }
-                
-                // 3. 🚀 SMART FIX: अगर पुराना दुकानदार है तो सीधा डैशबोर्ड (Email और Phone दोनों से ढूंढेगा)
-                // Pehle hum as a 'email' field me check karenge (Dashboard update ke baad wali sthiti)
-                let shopSnap = await db.collection('shops').where('email', '==', user.email).get();
-                
-                // Agar email me nahi mila, toh 'phone' wale field me check karenge (Pehli baar login wali sthiti)
-                if (shopSnap.empty) {
-                    shopSnap = await db.collection('shops').where('phone', '==', userEmailOrId).get();
-                }
-
-                // Agar dono me se kisi me bhi shop mil gayi, toh seedha andar!
-                if(!shopSnap.empty) {
-                    const shopData = shopSnap.docs[0].data();
-                    localStorage.setItem('pixigenie_active_shop', shopData.shopId);
-                    localStorage.setItem('pixigenie_owner_name', shopData.ownerName);
-                    localStorage.setItem('pixigenie_customer_phone', shopData.phone || userEmailOrId);
-                    
-                    if (shopData.storeLogo) {
-                        localStorage.setItem('pixigenie_profile_img', shopData.storeLogo);
-                    }
-                    
-                    window.location.href = `dashboard.html?shop=${shopData.shopId}`;
-                    return;
-                }
-
-                // 4. ✨ अगर सच में नया यूज़र है, तो Role Selection दिखाओ
-                authTemp.name = user.displayName || "Google User";
-                authTemp.phone = userEmailOrId; 
-                authTemp.password = "google-verified";
-                
-                showStep('auth-step-2'); 
-
-            }).catch((error) => {
-                console.error(error);
-                alert("Login Error: " + error.message);
-                if (btn) btn.innerHTML = `<img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google"> Log in with Google`;
+// ✨ 2. CREATE CUSTOMER LOGIC ✨
+async function selectRole(role) {
+    if (role === 'customer') {
+        try {
+            await db.collection('customers').doc(authTemp.email).set({
+                name: authTemp.name,
+                email: authTemp.email,
+                phone: authTemp.email, 
+                profileImage: authTemp.photoURL,
+                uid: authTemp.uid,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-        }
-
-
-
-        async function handleShopSubmit(e) {
-            e.preventDefault();
-            const shopName = document.getElementById('final-shop-name').value.trim();
-            const btn = document.getElementById('final-shop-btn');
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i>`;
-            btn.disabled = true;
-
-            const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
-            const newShopData = { 
-                shopId: shopSlug, 
-                shopName: shopName, 
-                ownerName: authTemp.name, 
-                phone: authTemp.phone, 
-                password: authTemp.password, 
-                status: "active", 
-                createdAt: firebase.firestore.FieldValue.serverTimestamp() 
-            };
             
-            try {
-                await db.collection('shops').doc(shopSlug).set(newShopData);
-                localStorage.setItem('pixigenie_active_shop', shopSlug);
-                localStorage.setItem('pixigenie_owner_name', authTemp.name);
-                window.location.href = `dashboard.html?shop=${shopSlug}`;
-            } catch (error) { alert(error.message); btn.disabled = false; }
+            localStorage.setItem('pixigenie_customer_name', authTemp.name);
+            localStorage.setItem('pixigenie_customer_phone', authTemp.email);
+            localStorage.setItem('pixigenie_profile_img', authTemp.photoURL);
+            
+            closeAuthModal(); 
+            updateUIBasedOnLogin();
+        } catch (error) { 
+            alert("Database Error: " + error.message); 
         }
+    } else {
+        showStep('auth-step-shop');
+    }
+}
+
+// ✨ 3. CREATE SHOP LOGIC ✨
+async function handleShopSubmit(e) {
+    e.preventDefault();
+    const shopName = document.getElementById('final-shop-name').value.trim();
+    const btn = document.getElementById('final-shop-btn');
+    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Creating Store...`;
+    btn.disabled = true;
+
+    const shopSlug = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
+    
+    const newShopData = { 
+        shopId: shopSlug, 
+        shopName: shopName, 
+        ownerName: authTemp.name, 
+        email: authTemp.email, 
+        phone: authTemp.email, 
+        storeLogo: authTemp.photoURL,
+        uid: authTemp.uid,
+        status: "active", 
+        plan: "starter",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+    };
+    
+    try {
+        await db.collection('shops').doc(shopSlug).set(newShopData);
+        localStorage.setItem('pixigenie_active_shop', shopSlug);
+        localStorage.setItem('pixigenie_owner_name', authTemp.name);
+        localStorage.setItem('pixigenie_profile_img', authTemp.photoURL);
+        localStorage.setItem('pixigenie_customer_phone', authTemp.email);
+        
+        window.location.href = `dashboard.html?shop=${shopSlug}`;
+    } catch (error) { 
+        alert(error.message); 
+        btn.innerHTML = `Launch Store <i class="fas fa-rocket"></i>`;
+        btn.disabled = false; 
+    }
+}
+
 
         function getInitials(name) {
             if (!name) return 'U';
