@@ -9079,7 +9079,7 @@ async function initPremiumAnalytics() {
 
         let totalOrders = 0;
         let totalRevenue = 0;
-        let totalItemsSold = 0; // ✨ NAYA METRIC
+        let totalItemsSold = 0;
         const allOrders = [];
 
         snapshot.forEach(doc => {
@@ -9089,12 +9089,10 @@ async function initPremiumAnalytics() {
             
             allOrders.push({ ...order, _analyticsDate: orderDate });
             
-            // Sirf selected date range ka data jodo
             if (orderDate >= range.startDate && orderDate <= range.endDate) {
                 totalOrders++;
                 totalRevenue += getOrderAmount(order);
                 
-                // ✨ Kitne products bike, unki quantity ginn lo ✨
                 if (order.items) {
                     order.items.forEach(item => {
                         totalItemsSold += (parseInt(item.qty) || 0);
@@ -9113,14 +9111,14 @@ async function initPremiumAnalytics() {
 
         // 3. Update UI Cards
         setAnalyticsValue("metric-views", formatNumber(views));
-        setAnalyticsValue("metric-visits", formatNumber(impressions)); // ✨ Website Visits ki jagah Impressions
-        setAnalyticsValue("metric-enquiries", formatNumber(waClicks)); // ✨ Enquiries mein sirf WhatsApp
+        setAnalyticsValue("metric-visits", formatNumber(impressions)); 
+        setAnalyticsValue("metric-enquiries", formatNumber(waClicks)); 
         setAnalyticsValue("metric-orders", formatNumber(totalOrders));
         setAnalyticsValue("metric-revenue", formatCurrency(totalRevenue));
         setAnalyticsValue("metric-impressions", formatNumber(impressions));
 
         // Customer Activity Section Updates
-        if(document.getElementById('activity-calls')) document.getElementById('activity-calls').innerText = formatNumber(totalItemsSold); // ✨ Phone ki jagah Items Sold
+        if(document.getElementById('activity-calls')) document.getElementById('activity-calls').innerText = formatNumber(totalItemsSold); 
         if(document.getElementById('activity-whatsapp')) document.getElementById('activity-whatsapp').innerText = formatNumber(waClicks);
         if(document.getElementById('activity-directions')) document.getElementById('activity-directions').innerText = formatNumber(directions);
 
@@ -9130,6 +9128,61 @@ async function initPremiumAnalytics() {
         setAnalyticsValue("funnel-enquiries", formatNumber(waClicks));
         setAnalyticsValue("funnel-orders", formatNumber(totalOrders));
 
+
+        // 👇👇 YAHAN DALNA THA WOH NAYA CODE 👇👇
+
+        // --- ✨ DYNAMIC PRODUCT PERFORMANCE LOGIC ✨ ---
+        let productSalesCount = {};
+        allOrders.forEach(order => {
+            if(order.items) {
+                order.items.forEach(item => {
+                    productSalesCount[item.name] = (productSalesCount[item.name] || 0) + (parseInt(item.qty) || 0);
+                });
+            }
+        });
+
+        const topProdList = document.getElementById('top-products-list');
+        if (Object.keys(productSalesCount).length > 0 && topProdList) {
+            let sortedProds = Object.entries(productSalesCount).sort((a,b) => b[1] - a[1]).slice(0, 3);
+            let phtml = '';
+            sortedProds.forEach((p, i) => {
+                phtml += `
+                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4 flex items-center justify-between shadow-sm mb-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-[10px] bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs">${i+1}</div>
+                        <span class="font-bold text-slate-700 text-sm truncate max-w-[150px]">${p[0]}</span>
+                    </div>
+                    <span class="text-xs font-black text-emerald-600 bg-emerald-100 px-2 py-1 rounded-md border border-emerald-200">${p[1]} Sold</span>
+                </div>`;
+            });
+            topProdList.innerHTML = phtml;
+        }
+
+        // --- ✨ DYNAMIC INSIGHTS LOGIC ✨ ---
+        const insightsList = document.getElementById('insights-list');
+        if(insightsList) {
+            let convRate = views > 0 ? ((totalOrders / views) * 100).toFixed(1) : 0;
+            insightsList.innerHTML = `
+                <div class="rounded-2xl bg-blue-50 border border-blue-100 p-4 flex gap-3 mb-2 shadow-sm">
+                    <i class="fas fa-lightbulb text-blue-500 mt-0.5"></i>
+                    <div>
+                        <p class="text-sm font-bold text-slate-700">Conversion Rate: ${convRate}%</p>
+                        <p class="text-xs text-slate-500 mt-1">For every 100 profile views, you get approx ${Math.round(convRate)} orders.</p>
+                    </div>
+                </div>
+                ${totalOrders === 0 ? `
+                <div class="rounded-2xl bg-amber-50 border border-amber-100 p-4 flex gap-3 shadow-sm">
+                    <i class="fas fa-bullhorn text-amber-500 mt-0.5"></i>
+                    <div>
+                        <p class="text-sm font-bold text-slate-700">Boost Your Sales</p>
+                        <p class="text-xs text-slate-500 mt-1">Share your store link on WhatsApp status to get your first order!</p>
+                    </div>
+                </div>` : ''}
+            `;
+        }
+        // 👆👆 YAHAN TAK THA WOH NAYA CODE 👆👆
+
+
         // 4. Update Charts
         updateGrowthChart("orders");
         updateAnalyticsTimestamp();
@@ -9138,7 +9191,6 @@ async function initPremiumAnalytics() {
         console.error("Store analytics error:", error);
     }
 }
-
 
 
 
