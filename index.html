@@ -648,11 +648,14 @@ function loginWithGoogle(event) {
         const user = result.user;
         const email = user.email;
         
-        if (email === 'pixigenie8750@gmail.com') {
+                // 1. SECURE SUPER ADMIN CHECK (Database se check karega)
+        const adminSnap = await db.collection('admins').doc(email).get();
+        if (adminSnap.exists) {
             localStorage.setItem('pixigenie_super_admin', 'true');
             window.location.href = 'super-admin.html';
             return;
         }
+
         
         const custSnap = await db.collection('customers').doc(email).get();
         if (custSnap.exists) {
@@ -1202,9 +1205,11 @@ searchInput.placeholder = "Search products, services, or shops...";
                         }
                         
                         // ✨ DYNAMIC VIP CHECK (Plan ke hisaab se) ✨
-                        const isVIP = shop.isVerified || shop.plan === 'plus' || shop.plan === 'pro' || shop.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
+                        const isVIP = shop.isVerified || shop.plan === 'plus' || shop.plan === 'pro';
                         const verifiedTick = getVIPBadge(isVIP, shop.plan);
-
+                        
+                        
+                        
                         const logoHtml = shop.storeLogo 
                             ? `<img src="${shop.storeLogo}" class="absolute inset-0 w-full h-full object-cover">` 
                             : `<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path><path d="M2 7h20"></path><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"></path></svg>`;
@@ -1316,7 +1321,7 @@ const snapshot = await db.collectionGroup('products')
                                 shopId = shopDoc.id; 
                                 shopPlan = sData.plan || ""; 
                                 
-                                isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro' || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
+                               isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro';
                             }
                         } catch(e) {}
                     }
@@ -1365,7 +1370,7 @@ async function fetchGlobalItems(itemType) {
                         shopPhone = sData.phone || "";
                         shopId = shopDoc.id; 
                         shopPlan = sData.plan || ""; 
-                        isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro' || sData.email === 'netajijhadustore@gmail.com' || shopId.includes('netajijhadustore');
+                        isVerified = sData.isVerified || sData.plan === 'plus' || sData.plan === 'pro';
                         
                         // Check karein ki shop owner 'Service Provider' hai kya
                         if (sData.businessType === 'Service Provider') {
@@ -2434,8 +2439,7 @@ function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopI
                                 const validEl = document.getElementById('prof-plan-validity');
                                 
                                 const plan = shopData.plan || 'basic';
-                                const isVerified = shopData.isVerified || plan === 'plus' || plan === 'pro' || shopData.email === 'netajijhadustore@gmail.com' || activeShop.includes('netajijhadustore');
-                                
+                                const isVerified = shopData.isVerified || plan === 'plus' || plan === 'pro';
                                 let badge = typeof getVIPBadge === 'function' ? getVIPBadge(isVerified, plan) : ''; 
                                 
                                 if(planEl) {
@@ -2449,7 +2453,7 @@ function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopI
                                 }
                                 
                                 if(validEl) {
-                                    if (plan === 'basic') {
+                                   if (plan === 'basic' || plan === 'starter') {
                                         validEl.innerHTML = `<i class="fas fa-infinity text-gray-400 text-[11px]"></i> Lifetime`;
                                         validEl.className = "flex items-center gap-1.5 text-[13px] font-bold text-gray-700";
                                     } else {
