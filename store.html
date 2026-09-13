@@ -665,7 +665,7 @@ if(document.getElementById('stat-orders')) totalOrders = parseInt(document.getEl
 if(document.getElementById('stat-followers')) totalFollowers = parseInt(document.getElementById('stat-followers').innerText) || 0;
 
 const ownerEmail = localStorage.getItem('pixigenie_user_email') || shopData.email || "";
-const isVIP = shopData.isVerified || (totalOrders >= 50 && totalFollowers >= 100) || ownerEmail === 'netajijhadustore@gmail.com';
+const isVIP = shopData.isVerified || (totalOrders >= 50 && totalFollowers >= 100);
 
 if (isVIP) {
     let finalBadgeHtml = "";
@@ -743,7 +743,7 @@ if (isVIP) {
                     // ==========================================
                     let storeMaxLimit = 20; // Default Starter Plan
                     if (shopData.plan === 'plus') storeMaxLimit = 100;
-                    if (shopData.plan === 'pro' || shopData.email === 'netajijhadustore@gmail.com') storeMaxLimit = 500;
+                 if (shopData.plan === 'pro') storeMaxLimit = 500;
                     
                     window.storeMaxLimit = storeMaxLimit;
                     window.currentLoadedCount = 0;
