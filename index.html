@@ -1329,12 +1329,11 @@ const snapshot = await db.collectionGroup('products')
                 grid.innerHTML = cardsHtmlArray.join('');
                 
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
-            } catch (error) { 
-                grid.innerHTML = `
-                    ${generateProductCard("Premium Quality Brooms", "199", "150", "Netaji Jhadu Store", "9876543210", "", "netajijhadustore", true, "pro")}
-                `;
+                      } catch (error) { 
+                grid.innerHTML = `<div class="col-span-full text-center py-16"><i class="fas fa-box-open text-4xl text-gray-200 mb-3"></i><p class="text-gray-500 font-medium">No products found around you.</p></div>`;
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
             }
+
         }
 // Naya function: Products aur Services ko alag-alag load karne ke liye
 async function fetchGlobalItems(itemType) {
