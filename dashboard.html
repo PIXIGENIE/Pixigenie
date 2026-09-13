@@ -1255,14 +1255,14 @@
                     globalShopData = doc.data();
                                        // Check Premium and Show/Hide Crown Locks on Buttons
                     const userPlan = globalShopData.plan || 'basic';
-                    const isUserPremium = userPlan === 'plus' || userPlan === 'pro' || globalShopData.email === 'netajijhadustore@gmail.com';
+                    const isUserPremium = userPlan === 'plus' || userPlan === 'pro';
                     document.querySelectorAll('.premium-lock-icon').forEach(icon => {
                         if (isUserPremium) icon.classList.add('hidden');
                         else icon.classList.remove('hidden');
                     });
                     
                     // ✨ NAYA: PRO-ONLY LOCK LOGIC YAHAN AAYEGA ✨
-                    const isUserPro = userPlan === 'pro' || globalShopData.email === 'netajijhadustore@gmail.com';
+                    const isUserPro = userPlan === 'pro';
                     document.querySelectorAll('.pro-lock-icon').forEach(icon => {
                         if (isUserPro) icon.classList.add('hidden');
                         else icon.classList.remove('hidden');
@@ -2233,7 +2233,7 @@
             
             let maxLimit = 20; // Default Starter Plan
             if (plan === 'plus') maxLimit = 100;
-            if (plan === 'pro' || email === 'netajijhadustore@gmail.com') maxLimit = 500; // VIP/Admin
+            if (plan === 'pro') maxLimit = 500; // VIP/Admin
 
             // Agar store me products limit ke barabar ya zyada ho gaye hain toh rok do
             if (storeProducts.length >= maxLimit) {
@@ -2453,7 +2453,7 @@ let pd = {
             
             // ✨ NAYA: Check Premium Status for Crown Icon directly in Modal ✨
             const userPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
-            const isPremium = userPlan === 'plus' || userPlan === 'pro' || (typeof globalShopData !== 'undefined' && globalShopData.email === 'netajijhadustore@gmail.com');
+            const isPremium = userPlan === 'plus' || userPlan === 'pro';
             const crownHtml = isPremium ? '' : `<div class="absolute top-1/2 -translate-y-1/2 right-3 bg-white rounded-full shadow-md p-1 border border-yellow-200"><i class="fas fa-crown text-yellow-500 text-[10px]"></i></div>`;
 
             let oHtml = c.orders.sort((a,b)=>b.timestamp-a.timestamp).map(o => {
@@ -3247,7 +3247,7 @@ let pd = {
             const userEmail = localStorage.getItem('pixigenie_user_email') || "";
             
             // Criteria: 50+ Orders & 100+ Followers (OR if user is Netaji Jhadu Store)
-            const isEligible = (totalOrders >= 50 && totalFollowers >= 100) || userEmail === 'netajijhadustore@gmail.com';
+            const isEligible = (totalOrders >= 50 && totalFollowers >= 100);
 
             if (isEligible) {
                 // Check in localStorage agar pehle se celebrate ho chuka hai ya nahi
@@ -7950,7 +7950,7 @@ td.mono {
         // ==========================================
         function checkPremiumAndExecute(callback) {
             const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
-            const isPremium = plan === 'plus' || plan === 'pro' || (typeof globalShopData !== 'undefined' && globalShopData.email === 'netajijhadustore@gmail.com');
+            const isPremium = plan === 'plus' || plan === 'pro';
 
             if (!isPremium) {
                 // अगर बेसिक यूज़र है, तो अपग्रेड पॉपअप दिखाओ
@@ -8033,7 +8033,7 @@ td.mono {
             const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
             
             // 🚨 STRICT CHECK: Sirf 'pro' plan ya netajijhadustore admin ko allow
-            const isPro = plan === 'pro' || email === 'netajijhadustore@gmail.com';
+            const isPro = plan === 'pro';
 
             if (!isPro) {
                 // Agar Basic ya Plus user hai, toh Upgrade Popup dikhao
