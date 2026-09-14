@@ -213,6 +213,13 @@
                 </div>
             </div>
 
+                       <!-- Description Area (AB YE UPAR AAYEGA) -->
+            <div class="bg-white p-5 border-b border-gray-200 mb-2 shadow-sm text-left">
+                <h3 class="text-sm font-black text-gray-900 mb-3 uppercase tracking-wider">Product Details</h3>
+                <div class="text-[13px] text-gray-600 font-medium leading-relaxed whitespace-pre-wrap"><span id="detail-desc"></span><button id="detail-desc-toggle-btn" onclick="toggleModalDescription()" class="text-blue-600 font-bold ml-1 hidden active:opacity-70 transition">more</button></div>
+            </div>
+
+            <!-- Store Info (SOLD BY) (AB YE NEECHE AAYEGA) -->
             <div class="bg-white p-4 flex items-center justify-between border-b border-gray-200 mb-2 shadow-sm">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 overflow-hidden border border-gray-100 shrink-0">
@@ -225,14 +232,6 @@
                     </div>
                 </div>
                 <button id="detail-store-btn" class="text-blue-600 font-bold text-xs bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 active:scale-95 transition">View Shop</button>
-            </div>
-            <!-- Description Area (Updated with More button) -->
-            <div class="bg-white p-5 border-b border-gray-200 mb-2 shadow-sm">
-                <h3 class="text-sm font-black text-gray-900 mb-3 uppercase tracking-wider">Product Details</h3>
-                <div class="text-[13px] text-gray-600 font-medium leading-relaxed whitespace-pre-wrap">
-                    <span id="detail-desc"></span>
-                    <button id="detail-desc-toggle-btn" onclick="toggleModalDescription()" class="text-blue-600 font-bold ml-1 hidden active:opacity-70 transition">more</button>
-                </div>
             </div>
 
             <!-- Similar Products Area (Updated with Load More button) -->
@@ -870,8 +869,8 @@
             
             document.getElementById('detail-store-btn').onclick = () => window.location.href = `store.html?shop=${shopId}`;
             
-                      // ✨ NAYA: Description Text Set Karna ✨
-            currentModalDesc = desc;
+                              // ✨ NAYA: Description Text Set Karna (Trim spaces) ✨
+            currentModalDesc = desc.trim();
             isModalDescExpanded = false;
             renderModalDescription();
 
