@@ -412,20 +412,22 @@
 
             </div>
         </section>
-  <!-- ✨ PIXIGENIE MONTHLY PRICING (WITH DISCOUNTS & TAGS) ✨ -->
+<!-- ✨ PIXIGENIE MONTHLY PRICING (CENTERED iOS BADGES) ✨ -->
 <section id="merchant-upgrade-plans" class="hidden py-16 px-4 max-w-6xl mx-auto border-t border-gray-100 relative z-20 bg-white w-full">
     <div class="text-center mb-12 reveal active">
         <h2 class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">Upgrade Your Store</h2>
         <p class="text-gray-500 mt-2 font-medium text-sm sm:text-base">No long-term commitments. Upgrade or cancel anytime.</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch reveal active delay-100 mt-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 items-stretch reveal active delay-100 mt-6">
         
         <!-- 🟢 1. STARTER PLAN (FREE) -->
         <div class="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-sm flex flex-col opacity-90 relative">
-            <div id="badge-starter" class="hidden"></div>
+            <div class="flex justify-center mb-4">
+                <span id="badge-starter" class="hidden"></span>
+            </div>
             
-            <h3 class="text-xl font-black text-gray-900 mb-1 mt-2">Starter</h3>
+            <h3 class="text-xl font-black text-gray-900 mb-1">Starter</h3>
             <p class="text-xs text-gray-500 mb-5 font-medium">Basic features to get your store online.</p>
             
             <div class="mb-6">
@@ -442,9 +444,11 @@
 
         <!-- 🟣 2. PLUS PLAN (₹149/mo) -->
         <div class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-purple-500 shadow-[0_15px_40px_rgba(168,85,247,0.15)] flex flex-col relative transform md:scale-105 z-10">
-            <div id="badge-plus" class="hidden"></div>
+            <div class="flex justify-center mb-4">
+                <span id="badge-plus" class="bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-[10px] font-black uppercase px-4 py-1.5 rounded-full shadow-sm tracking-wider">Most Popular</span>
+            </div>
             
-            <h3 class="text-xl font-black text-gray-900 mb-1 mt-2">Plus</h3>
+            <h3 class="text-xl font-black text-gray-900 mb-1">Plus</h3>
             <p class="text-xs text-gray-500 mb-5 font-medium">Perfect for growing local shops & services.</p>
             
             <div class="mb-6">
@@ -462,9 +466,12 @@
         <!-- 🚀 3. PRO VIP PLAN (₹299/mo) -->
         <div class="bg-[#111827] rounded-3xl p-6 sm:p-8 border border-gray-800 shadow-[0_20px_50px_rgba(0,0,0,0.4)] flex flex-col relative group">
             <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-500 rounded-full filter blur-[70px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
-            <div id="badge-pro" class="hidden"></div>
             
-            <h3 class="text-xl font-black text-white mb-1 mt-2 relative z-10">Pro VIP</h3>
+            <div class="flex justify-center mb-4 relative z-20">
+                <span id="badge-pro" class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-[10px] font-black uppercase px-4 py-1.5 rounded-full shadow-sm tracking-wider">Best For Business</span>
+            </div>
+            
+            <h3 class="text-xl font-black text-white mb-1 relative z-10">Pro VIP</h3>
             <p class="text-xs text-gray-400 mb-5 font-medium relative z-10">Advanced tools for serious retailers.</p>
             
             <div class="mb-6 relative z-10">
@@ -3177,7 +3184,7 @@ function trackSearchImpression(shopIdToTrack) {
         }).catch(err => console.log(err));
     }
 }
-              // ✨ NAYA: CLEAN APPLE iOS STYLE PLAN UI ✨
+                     // ✨ NAYA: CENTERED iOS STYLE PLAN UI ✨
         function updatePlanUI(activePlan) {
             const btnStarter = document.getElementById('btn-starter');
             const btnPlus = document.getElementById('btn-plus');
@@ -3204,25 +3211,28 @@ function trackSearchImpression(shopIdToTrack) {
 
             // 2. Reset Badges
             badgeStarter.innerHTML = '';
+            badgeStarter.className = 'hidden';
+            
             badgePlus.innerHTML = 'Most Popular';
-            badgePlus.className = 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full shadow-sm';
+            badgePlus.className = 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-[10px] font-black uppercase px-4 py-1.5 rounded-full shadow-sm tracking-wider';
             
             badgePro.innerHTML = 'Best For Business';
-            badgePro.className = 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full shadow-sm';
+            badgePro.className = 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-[10px] font-black uppercase px-4 py-1.5 rounded-full shadow-sm tracking-wider';
 
             // Common iOS Active Styles
             const activeBtnClass = 'w-full bg-white/10 text-white font-bold py-4 rounded-xl cursor-not-allowed border border-white/20 mt-auto flex items-center justify-center gap-2';
             const activePlusBtnClass = 'w-full bg-purple-100 text-purple-700 font-bold py-3.5 rounded-xl cursor-not-allowed border border-purple-200 mt-auto flex items-center justify-center gap-2';
             
-            const activeBadgeClass = 'bg-yellow-400/20 text-yellow-300 border border-yellow-400/30 text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full flex items-center gap-1.5 tracking-wider';
-            const activePlusBadgeClass = 'bg-purple-600 text-white text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full shadow-sm flex items-center gap-1.5';
+            const activeBadgeClass = 'bg-yellow-400/20 text-yellow-300 border border-yellow-400/30 text-[10px] font-black uppercase px-4 py-1.5 rounded-full flex items-center gap-1.5 tracking-wider';
+            const activePlusBadgeClass = 'bg-purple-600 text-white text-[10px] font-black uppercase px-4 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 tracking-wider';
 
             if (activePlan === 'starter') {
                 btnStarter.innerHTML = 'Current Plan';
                 btnStarter.className = 'w-full bg-gray-100 text-gray-400 font-bold py-3.5 rounded-xl cursor-not-allowed border mt-auto';
                 btnStarter.disabled = true;
                 badgeStarter.innerHTML = 'Active';
-                badgeStarter.className = 'bg-gray-100 text-gray-500 text-[10px] font-black uppercase px-3 py-1.5 rounded-full border border-gray-200';
+                badgeStarter.className = 'bg-gray-100 text-gray-500 text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full border border-gray-200 tracking-wider';
+                badgeStarter.classList.remove('hidden');
             } 
             else if (activePlan === 'plus') {
                 btnPlus.innerHTML = '<i class="fas fa-check text-purple-600"></i> Current Plan';
@@ -3242,7 +3252,7 @@ function trackSearchImpression(shopIdToTrack) {
                 badgePro.innerHTML = '✨ Active Plan';
                 badgePro.className = activeBadgeClass;
 
-                // Pro Card Border Glow (Clean iOS Look)
+                // Pro Card Border Glow
                 const proCard = btnPro.closest('.group');
                 if(proCard) {
                     proCard.classList.add('ring-2', 'ring-yellow-400/40', 'shadow-[0_10px_30px_rgba(234,179,8,0.1)]');
@@ -3252,6 +3262,7 @@ function trackSearchImpression(shopIdToTrack) {
                 btnPlus.innerHTML = 'Downgrade';
             }
         }
+
 
     </script>
     <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
