@@ -3347,42 +3347,48 @@ function trackSearchImpression(shopIdToTrack) {
 // ✨ PRODUCT DETAILS PAGE LOGIC ✨
 // ===============================================
 
-        function openProductDetails(safeName, mrp, price, safeShopName, shopPhone, image, shopId, isService, safeDesc) {
+                function openProductDetails(safeName, mrp, price, safeShopName, shopPhone, image, shopId, isService, safeDesc) {
             const name = decodeURIComponent(safeName);
             const shopName = decodeURIComponent(safeShopName);
             const desc = decodeURIComponent(safeDesc);
             const numMrp = parseInt(mrp) || 0;
 
             const page = document.getElementById('product-details-page');
+            if (!page) { console.error("Error: product-details-page element not found!"); return; }
             
-            // 1. Data Inject
-            document.getElementById('detail-img').src = image || 'https://via.placeholder.com/400?text=No+Image';
-            document.getElementById('detail-title').innerText = name;
-            document.getElementById('detail-price').innerText = `₹${price}`;
-            
-            document.getElementById('detail-store-btn').onclick = () => window.location.href = `store.html?shop=${shopId}`;
+            // Safe Elements Injection
+            const imgEl = document.getElementById('detail-img');
+            if (imgEl) imgEl.src = image || 'https://via.placeholder.com/400?text=No+Image';
 
-            // ✨ NAYA LOGIC: Logo aur Badge (Tick) dono fetch karna ✨
+            const titleEl = document.getElementById('detail-title');
+            if (titleEl) titleEl.innerText = name;
+
+            const priceEl = document.getElementById('detail-price');
+            if (priceEl) priceEl.innerText = `₹${price}`;
+            
+            const storeBtn = document.getElementById('detail-store-btn');
+            if (storeBtn) storeBtn.onclick = () => window.location.href = `store.html?shop=${shopId}`;
+
+            // Logo & Badge elements
             const logoImg = document.getElementById('detail-store-logo');
             const logoIcon = document.getElementById('detail-store-icon');
             const storeNameEl = document.getElementById('detail-store-name');
             
-            logoImg.classList.add('hidden'); logoIcon.classList.remove('hidden');
-            storeNameEl.innerText = shopName || 'Local Shop'; 
+            if (logoImg) logoImg.classList.add('hidden'); 
+            if (logoIcon) logoIcon.classList.remove('hidden');
+            if (storeNameEl) storeNameEl.innerText = shopName || 'Local Shop'; 
 
             if (shopId) {
                 db.collection('shops').doc(shopId).get().then(doc => {
-                    if (doc.exists) {
+                    if (doc.exists && storeNameEl) {
                         const sData = doc.data();
                         
-                        // Logo Set Karo
-                        if (sData.storeLogo) {
+                        if (sData.storeLogo && logoImg && logoIcon) {
                             logoImg.src = sData.storeLogo;
                             logoImg.classList.remove('hidden'); 
                             logoIcon.classList.add('hidden');
                         }
 
-                        // VIP Badge Set Karo
                         const plan = sData.plan || 'basic';
                         const isVerified = sData.isVerified || plan === 'plus' || plan === 'pro';
                         let badgeHtml = '';
@@ -3401,41 +3407,51 @@ function trackSearchImpression(shopIdToTrack) {
                 }).catch(e => console.log("Shop data fetch err:", e));
             }
 
-            // ✨ FIX 1: Purana if-else hata diya aur naya trim wala code lagaya ✨
-            currentModalDesc = desc.trim();
-            isModalDescExpanded = false;
-            renderModalDescription();
+            // Description toggle check
+            if (typeof currentModalDesc !== 'undefined') {
+                currentModalDesc = desc.trim();
+                isModalDescExpanded = false;
+                if (typeof renderModalDescription === 'function') renderModalDescription();
+            }
 
             // MRP & Discount
             const badge = document.getElementById('detail-discount-badge');
             const mrpBox = document.getElementById('detail-mrp-box');
             if (numMrp > price) {
-                document.getElementById('detail-mrp').innerText = `₹${numMrp}`;
-                let discount = Math.round(((numMrp - price) / numMrp) * 100);
-                document.getElementById('detail-discount-val').innerText = discount + "%";
-                badge.classList.remove('hidden'); mrpBox.classList.remove('hidden');
+                const mrpEl = document.getElementById('detail-mrp');
+                if (mrpEl) mrpEl.innerText = `₹${numMrp}`;
+                const discValEl = document.getElementById('detail-discount-val');
+                if (discValEl) discValEl.innerText = Math.round(((numMrp - price) / numMrp) * 100) + "%";
+                if (badge) badge.classList.remove('hidden'); 
+                if (mrpBox) mrpBox.classList.remove('hidden');
             } else {
-                badge.classList.add('hidden'); mrpBox.classList.add('hidden');
+                if (badge) badge.classList.add('hidden'); 
+                if (mrpBox) mrpBox.classList.add('hidden');
             }
 
-            document.getElementById('detail-cart-btn').onclick = function(e) {
-                addToCart(e, name, price, shopName, shopPhone);
-                let orig = this.innerHTML;
-                this.innerHTML = '<i class="fas fa-check text-green-500"></i> Added';
-                setTimeout(() => this.innerHTML = orig, 1000);
-            };
+            const cartBtn = document.getElementById('detail-cart-btn');
+            if (cartBtn) {
+                cartBtn.onclick = function(e) {
+                    addToCart(e, name, price, shopName, shopPhone);
+                    let orig = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check text-green-500"></i> Added';
+                    setTimeout(() => this.innerHTML = orig, 1000);
+                };
+            }
             
-            document.getElementById('detail-order-btn').innerHTML = isService ? `Book Now <i class="fas fa-bolt text-yellow-300"></i>` : `Order Now <i class="fas fa-bolt text-yellow-300"></i>`;
-            document.getElementById('detail-order-btn').onclick = () => {
-                openOrderModal(name, price, shopName, shopPhone);
-            };
+            const orderBtn = document.getElementById('detail-order-btn');
+            if (orderBtn) {
+                orderBtn.innerHTML = isService ? `Book Now <i class="fas fa-bolt text-yellow-300"></i>` : `Order Now <i class="fas fa-bolt text-yellow-300"></i>`;
+                orderBtn.onclick = () => { openOrderModal(name, price, shopName, shopPhone); };
+            }
 
-            // ✨ FIX 2: Naya 10-item Load More wala function call kiya ✨
-            loadStoreSimilarProducts(shopId, encodeURIComponent(shopName), shopPhone, isService);
+            if (typeof loadStoreSimilarProducts === 'function') {
+                loadStoreSimilarProducts(shopId, encodeURIComponent(shopName), shopPhone, isService);
+            }
 
-            document.getElementById('detail-scroll-area').scrollTop = 0;
+            const scrollArea = document.getElementById('detail-scroll-area');
+            if (scrollArea) scrollArea.scrollTop = 0;
             
-            // UI Slide-in
             page.classList.remove('hidden');
             setTimeout(() => {
                 page.classList.remove('translate-x-full');
@@ -3443,6 +3459,7 @@ function trackSearchImpression(shopIdToTrack) {
             }, 10);
             document.body.style.overflow = 'hidden';
         }
+
 
            function closeProductDetails() {
             const page = document.getElementById('product-details-page');
