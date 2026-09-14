@@ -1195,7 +1195,7 @@ searchInput.placeholder = "Search products, services, or shops...";
                         const shop = doc.data();
                         const shopId = doc.id;
                         let avgRating = shop.rating ? shop.rating : "5.0"; 
-
+trackSearchImpression(shopId);
                         let distanceHtml = "";
                         if (typeof getDistanceFromLatLonInKm === "function" && custLat && custLng && shop.latitude && shop.longitude) {
                             let dist = getDistanceFromLatLonInKm(custLat, custLng, shop.latitude, shop.longitude);
@@ -3045,10 +3045,19 @@ function handleGlobalSearch(query) {
         dropdown.classList.remove('hidden'); dropdown.classList.add('flex'); return;
     }
 
-    let html = '';
+        let html = '';
     results.forEach(item => {
+        // ✨ YAHAN IMPRESSION TRACK HOGA ✨
+        if (item.type === 'shop') {
+            trackSearchImpression(item.id); // Dukaan ka impression badhega
+        } else {
+            trackSearchImpression(item.shopId); // Product ki dukaan ka impression badhega
+        }
+
         if (item.type === 'shop') {
             // DUKAAN KA UI
+            
+
             const iconHtml = item.image ? `<img src="${item.image}" class="w-10 h-10 rounded-full object-cover">` : `<div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-store"></i></div>`;
             html += `
             <div onclick="window.location.href='store.html?shop=${item.id}'" class="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition">
@@ -3161,6 +3170,14 @@ function handleGlobalSearch(query) {
             }
         }
 
+// C. TRACK SEARCH IMPRESSIONS
+function trackSearchImpression(shopIdToTrack) {
+    if(shopIdToTrack) {
+        db.collection('shops').doc(shopIdToTrack).update({
+            searchImpressions: firebase.firestore.FieldValue.increment(1)
+        }).catch(err => console.log(err));
+    }
+}
 
     </script>
     <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
