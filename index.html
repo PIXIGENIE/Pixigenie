@@ -215,10 +215,14 @@
                 </div>
             </div>
 
-            <!-- Store Info -->
+                   <!-- Store Info -->
             <div class="bg-white p-4 flex items-center justify-between border-b border-gray-200 mb-2 shadow-sm">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500"><i class="fas fa-store"></i></div>
+                    <!-- ✨ NAYA: Logo container -->
+                    <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 overflow-hidden border border-gray-100 shrink-0">
+                        <img id="detail-store-logo" src="" class="w-full h-full object-cover hidden">
+                        <i id="detail-store-icon" class="fas fa-store"></i>
+                    </div>
                     <div>
                         <p class="text-[10px] text-gray-500 font-bold uppercase">Sold By</p>
                         <p id="detail-store-name" class="text-sm font-bold text-gray-900">Store Name</p>
@@ -226,6 +230,7 @@
                 </div>
                 <button id="detail-store-btn" class="text-blue-600 font-bold text-xs bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 active:scale-95 transition">View Shop</button>
             </div>
+
 
             <!-- Description -->
             <div class="bg-white p-5 border-b border-gray-200 mb-2 shadow-sm">
@@ -3368,7 +3373,22 @@ function openProductDetails(safeName, mrp, price, safeShopName, shopPhone, image
     document.getElementById('detail-price').innerText = `₹${price}`;
     document.getElementById('detail-store-name').innerText = shopName || 'Local Shop';
     document.getElementById('detail-store-btn').onclick = () => window.location.href = `store.html?shop=${shopId}`;
-    
+        // ✨ NAYA LOGIC: Shop Logo Fetch karna ✨
+    const logoImg = document.getElementById('detail-store-logo');
+    const logoIcon = document.getElementById('detail-store-icon');
+    logoImg.classList.add('hidden');
+    logoIcon.classList.remove('hidden');
+
+    if (shopId) {
+        db.collection('shops').doc(shopId).get().then(doc => {
+            if (doc.exists && doc.data().storeLogo) {
+                logoImg.src = doc.data().storeLogo;
+                logoImg.classList.remove('hidden');
+                logoIcon.classList.add('hidden');
+            }
+        }).catch(e => console.log("Logo load error", e));
+    }
+
     if (desc.trim() !== '') {
         document.getElementById('detail-desc').innerText = desc;
     } else {
@@ -3439,7 +3459,6 @@ async function loadSimilarProducts() {
             return;
         }
 
-        // ✨ NAYA LOGIC: Har product ki shop detail nikalna ✨
         const itemPromises = snap.docs.map(async (doc) => {
             const p = doc.data();
             if(!p.name) return null;
@@ -3449,7 +3468,6 @@ async function loadSimilarProducts() {
             let shopId = "";
             let isService = false;
 
-            // Parent shop ka data fetch karo
             if (doc.ref.parent && doc.ref.parent.parent) {
                 try {
                     const shopDoc = await doc.ref.parent.parent.get();
@@ -3467,11 +3485,19 @@ async function loadSimilarProducts() {
             const safeDesc = encodeURIComponent(p.description || "");
             const safeShopName = encodeURIComponent(shopName);
 
-            // Ab 'Local Store' ki jagah asli safeShopName, shopPhone, aur shopId pass ho raha hai
+            // ✨ NAYA LOGIC: Discount Percentage Calculate karna ✨
+            let discountHtml = '';
+            if (p.mrp && p.mrp > p.price) {
+                let discountPercent = Math.round(((p.mrp - p.price) / p.mrp) * 100);
+                discountHtml = `<div class="absolute top-1.5 left-1.5 bg-red-50 text-red-600 border border-red-100 text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm">${discountPercent}% OFF</div>`;
+            }
+
             return `
             <div onclick="openProductDetails('${safeName}', '${p.mrp||0}', '${p.price}', '${safeShopName}', '${shopPhone}', '${p.image||''}', '${shopId}', ${isService}, '${safeDesc}')" class="w-36 shrink-0 snap-start bg-white border border-gray-100 rounded-[1rem] overflow-hidden cursor-pointer hover:shadow-md transition pb-2 shadow-sm">
-                <div class="w-full h-32 bg-gray-50 flex items-center justify-center">
+                <!-- Image Wrapper is now relative to hold the absolute discount tag -->
+                <div class="relative w-full h-32 bg-gray-50 flex items-center justify-center">
                     ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-gray-300 text-2xl"></i>`}
+                    ${discountHtml}
                 </div>
                 <div class="p-2.5">
                     <p class="text-[11px] font-bold text-gray-800 truncate">${p.name}</p>
