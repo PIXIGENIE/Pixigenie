@@ -182,23 +182,24 @@
                 <i class="fas fa-arrow-left"></i>
             </button>
             
-            <!-- ✨ Pixigenie Name in Header ✨ -->
             <h2 class="font-black text-xl text-gray-900 tracking-tight text-center flex-1">Pixigenie</h2>
 
+            <!-- ✨ NAYA: Cart Badge Added Here ✨ -->
             <button class="w-10 h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center active:scale-95 transition relative" onclick="closeProductDetails(); setTimeout(toggleCartModal, 300);">
                 <i class="fas fa-shopping-cart"></i>
+                <span id="detail-cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full hidden shadow-sm border border-white">0</span>
             </button>
         </div>
 
-        <!-- 🟢 SCROLLABLE CONTENT (Absolute Bounds - Guarantee Smooth Scroll) -->
-        <div class="absolute top-[60px] bottom-[75px] left-0 w-full overflow-y-auto bg-[#F2F2F7] custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
+        <!-- 🟢 SCROLLABLE CONTENT (Added ID: detail-scroll-area) -->
+        <div id="detail-scroll-area" class="absolute top-[60px] bottom-[75px] left-0 w-full overflow-y-auto bg-[#F2F2F7] custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
             
             <!-- Image -->
             <div class="bg-white w-full aspect-square flex items-center justify-center overflow-hidden border-b border-gray-100">
                 <img id="detail-img" src="" class="w-full h-full object-cover">
             </div>
 
-            <!-- Price & Title -->
+            <!-- Price & Title (Taxes Line Removed) -->
             <div class="bg-white p-5 border-b border-gray-200 mb-2 shadow-sm">
                 <div class="flex items-center gap-2 mb-2">
                     <span id="detail-discount-badge" class="bg-red-50 text-red-600 border border-red-200 text-[10px] font-black px-2 py-1 rounded-md tracking-wider hidden"><span id="detail-discount-val">0%</span> OFF</span>
@@ -212,7 +213,6 @@
                         <span id="detail-mrp" class="text-sm text-gray-400 font-bold line-through">₹0</span>
                     </div>
                 </div>
-                <p class="text-xs text-green-600 font-bold mt-2"><i class="fas fa-check-circle"></i> Inclusive of all taxes</p>
             </div>
 
             <!-- Store Info -->
@@ -242,7 +242,7 @@
             </div>
         </div>
 
-        <!-- 🟢 BOTTOM BAR (Absolute Fixed) -->
+        <!-- 🟢 BOTTOM BAR -->
         <div class="absolute bottom-0 left-0 w-full h-[75px] bg-white border-t border-gray-200 px-3 py-3 flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-30">
             <button id="detail-cart-btn" class="flex-1 bg-white border border-gray-300 text-gray-900 font-black text-sm rounded-[12px] active:scale-95 transition flex items-center justify-center gap-2 h-full">
                 <i class="fas fa-cart-plus"></i> Add to Cart
@@ -252,6 +252,7 @@
             </button>
         </div>
     </div>
+
 
 
     <!-- ✨ HYBRID CHECKOUT MODAL ✨ -->
@@ -1617,18 +1618,21 @@ function getVIPBadge(isVerified, plan) {
         document.addEventListener('DOMContentLoaded', updateCartBadge);
 
         function updateCartBadge() {
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
-            let badge = document.getElementById('cart-badge');
-            if(badge) {
-                if(cart.length > 0) {
-                    let totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-                    badge.innerText = totalItems;
-                    badge.classList.remove('hidden');
-                } else {
-                    badge.classList.add('hidden');
-                }
-            }
-        }
+    let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+    let mainBadge = document.getElementById('cart-badge');
+    let detailBadge = document.getElementById('detail-cart-badge'); // ✨ NAYA BADGE
+    
+    if(cart.length > 0) {
+        let totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+        
+        if(mainBadge) { mainBadge.innerText = totalItems; mainBadge.classList.remove('hidden'); }
+        if(detailBadge) { detailBadge.innerText = totalItems; detailBadge.classList.remove('hidden'); }
+    } else {
+        if(mainBadge) mainBadge.classList.add('hidden');
+        if(detailBadge) detailBadge.classList.add('hidden');
+    }
+}
+
 
         function addToCart(event, name, price, shopName, shopPhone) {
             event.stopPropagation(); 
@@ -3403,7 +3407,7 @@ function openProductDetails(safeName, mrp, price, safeShopName, shopPhone, image
 
     // 2. Load Similar Products
     loadSimilarProducts();
-
+document.getElementById('detail-scroll-area').scrollTop = 0;
     // 3. UI Slide-in
     page.classList.remove('hidden');
     setTimeout(() => {
@@ -3428,7 +3432,6 @@ async function loadSimilarProducts() {
     container.innerHTML = '<div class="w-full text-center py-6"><i class="fas fa-spinner fa-spin text-purple-500"></i> Loading...</div>';
     
     try {
-        // Fetch 6 random products
         const snap = await db.collectionGroup('products').limit(6).get();
         let html = '';
         
@@ -3438,8 +3441,9 @@ async function loadSimilarProducts() {
             const safeName = encodeURIComponent(p.name);
             const safeDesc = encodeURIComponent(p.description || "");
             
+            // ✨ NAYA LOGIC: closeProductDetails() हटा दिया, सीधा openProductDetails कॉल होगा ✨
             html += `
-            <div onclick="closeProductDetails(); setTimeout(()=> openProductDetails('${safeName}', '${p.mrp||0}', '${p.price}', 'Local Store', '', '${p.image||''}', '', false, '${safeDesc}'), 350);" class="w-36 shrink-0 snap-start bg-white border border-gray-100 rounded-[1rem] overflow-hidden cursor-pointer hover:shadow-md transition pb-2 shadow-sm">
+            <div onclick="openProductDetails('${safeName}', '${p.mrp||0}', '${p.price}', 'Local Store', '', '${p.image||''}', '', false, '${safeDesc}')" class="w-36 shrink-0 snap-start bg-white border border-gray-100 rounded-[1rem] overflow-hidden cursor-pointer hover:shadow-md transition pb-2 shadow-sm">
                 <div class="w-full h-32 bg-gray-50 flex items-center justify-center">
                     ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-gray-300 text-2xl"></i>`}
                 </div>
@@ -3458,7 +3462,6 @@ async function loadSimilarProducts() {
         container.innerHTML = '<p class="text-xs text-red-400 px-4 py-6">Failed to load suggestions.</p>';
     }
 }
-
 
     </script>
     <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
