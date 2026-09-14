@@ -8948,7 +8948,16 @@ async function initPremiumAnalytics() {
         setAnalyticsValue("metric-enquiries", formatNumber(waClicks)); 
         setAnalyticsValue("metric-orders", formatNumber(totalOrders));
         setAnalyticsValue("metric-revenue", formatCurrency(totalRevenue));
+        // 👇👇 YAHAN SE NAYA CODE PASTE KARNA HAI 👇👇
+        
+        // Update Customer Activity Section
+        let directions = globalShopData.directionClicks || 0;
+        if(document.getElementById('activity-calls')) document.getElementById('activity-calls').innerText = formatNumber(totalItemsSold); 
+        if(document.getElementById('activity-whatsapp')) document.getElementById('activity-whatsapp').innerText = formatNumber(waClicks);
+        if(document.getElementById('activity-directions')) document.getElementById('activity-directions').innerText = formatNumber(directions);
 
+        // 👆👆 YAHAN TAK NAYA CODE THA 👆👆
+        
         // 4. Store Conversion Rate (Views to Orders)
         let conversionPercentage = views > 0 ? ((totalOrders / views) * 100).toFixed(1) : 0;
         setAnalyticsValue("metric-conversion-rate", conversionPercentage + "%");
