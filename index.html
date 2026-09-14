@@ -3177,7 +3177,7 @@ function trackSearchImpression(shopIdToTrack) {
         }).catch(err => console.log(err));
     }
 }
-           // ✨ NAYA: DYNAMIC PLAN UI (WITH PREMIUM ANIMATIONS & GLOW EFFECTS) ✨
+              // ✨ NAYA: CLEAN APPLE iOS STYLE PLAN UI ✨
         function updatePlanUI(activePlan) {
             const btnStarter = document.getElementById('btn-starter');
             const btnPlus = document.getElementById('btn-plus');
@@ -3189,7 +3189,7 @@ function trackSearchImpression(shopIdToTrack) {
 
             if(!btnStarter || !btnPlus || !btnPro) return;
 
-            // 1. Sabko pehle Default (Upgrade) state mein set karo
+            // 1. Reset Buttons to Default
             btnStarter.innerHTML = 'Select Starter';
             btnStarter.className = 'w-full bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl border border-gray-200 mt-auto transition-colors active:scale-95';
             btnStarter.disabled = false;
@@ -3202,50 +3202,50 @@ function trackSearchImpression(shopIdToTrack) {
             btnPro.className = 'relative z-10 w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 text-black font-black py-4 rounded-xl mt-auto transition-colors active:scale-95 shadow-md';
             btnPro.disabled = false;
 
-            // 2. Default Badges
+            // 2. Reset Badges
             badgeStarter.innerHTML = '';
-            badgeStarter.className = 'hidden';
-            
             badgePlus.innerHTML = 'Most Popular';
-            badgePlus.className = 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-sm';
+            badgePlus.className = 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full shadow-sm';
             
             badgePro.innerHTML = 'Best For Business';
-            badgePro.className = 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-sm';
+            badgePro.className = 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full shadow-sm';
 
-            // 3. Active Plan ke hisaab se Glowing & Premium Styles
-            const activeBtnClass = 'w-full bg-slate-800 text-emerald-400 font-black py-4 rounded-xl cursor-not-allowed border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.2)] flex items-center justify-center gap-2';
-            const activePlusBtnClass = 'w-full bg-purple-50 text-purple-700 font-black py-3.5 rounded-xl cursor-not-allowed border border-purple-300 shadow-sm flex items-center justify-center gap-2';
+            // Common iOS Active Styles
+            const activeBtnClass = 'w-full bg-white/10 text-white font-bold py-4 rounded-xl cursor-not-allowed border border-white/20 mt-auto flex items-center justify-center gap-2';
+            const activePlusBtnClass = 'w-full bg-purple-100 text-purple-700 font-bold py-3.5 rounded-xl cursor-not-allowed border border-purple-200 mt-auto flex items-center justify-center gap-2';
             
-            const activeBadgeClass = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-black uppercase px-3.5 py-1 rounded-full shadow-sm flex items-center gap-1.5 animate-pulse';
-            const activePlusBadgeClass = 'bg-purple-100 text-purple-700 border border-purple-300 text-[10px] font-black uppercase px-3.5 py-1 rounded-full shadow-sm flex items-center gap-1.5';
+            const activeBadgeClass = 'bg-yellow-400/20 text-yellow-300 border border-yellow-400/30 text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full flex items-center gap-1.5 tracking-wider';
+            const activePlusBadgeClass = 'bg-purple-600 text-white text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full shadow-sm flex items-center gap-1.5';
 
             if (activePlan === 'starter') {
-                btnStarter.innerHTML = '<i class="fas fa-check-circle"></i> Currently Active';
-                btnStarter.className = 'w-full bg-gray-100 text-gray-500 font-bold py-3.5 rounded-xl cursor-not-allowed border mt-auto';
+                btnStarter.innerHTML = 'Current Plan';
+                btnStarter.className = 'w-full bg-gray-100 text-gray-400 font-bold py-3.5 rounded-xl cursor-not-allowed border mt-auto';
                 btnStarter.disabled = true;
-                badgeStarter.innerHTML = 'Active Plan';
-                badgeStarter.className = 'bg-gray-100 text-gray-600 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-gray-200';
+                badgeStarter.innerHTML = 'Active';
+                badgeStarter.className = 'bg-gray-100 text-gray-500 text-[10px] font-black uppercase px-3 py-1.5 rounded-full border border-gray-200';
             } 
             else if (activePlan === 'plus') {
-                btnPlus.innerHTML = '<i class="fas fa-check-circle"></i> Currently Active';
+                btnPlus.innerHTML = '<i class="fas fa-check text-purple-600"></i> Current Plan';
                 btnPlus.className = activePlusBtnClass;
                 btnPlus.disabled = true;
-                badgePlus.innerHTML = '<i class="fas fa-shield-alt text-purple-600"></i> Active Plan';
+                
+                badgePlus.innerHTML = 'Active Plan';
                 badgePlus.className = activePlusBadgeClass;
+                
                 btnStarter.innerHTML = 'Downgrade';
             } 
             else if (activePlan === 'pro') {
-                btnPro.innerHTML = '<i class="fas fa-crown text-yellow-400 animate-bounce"></i> PRO VIP ACTIVE';
-                btnPro.className = activeBtnClass + ' relative z-10 text-sm tracking-wider';
+                btnPro.innerHTML = '<i class="fas fa-crown text-yellow-400"></i> Current Plan';
+                btnPro.className = activeBtnClass;
                 btnPro.disabled = true;
                 
-                badgePro.innerHTML = '<i class="fas fa-bolt text-yellow-400"></i> Your Current Plan';
+                badgePro.innerHTML = '✨ Active Plan';
                 badgePro.className = activeBadgeClass;
 
-                // Pro active hone par card pe thoda sa aur heavy glowing border daal denge agar chahe toh
+                // Pro Card Border Glow (Clean iOS Look)
                 const proCard = btnPro.closest('.group');
                 if(proCard) {
-                    proCard.classList.add('ring-2', 'ring-yellow-400/50', 'shadow-[0_0_40px_rgba(234,179,8,0.15)]');
+                    proCard.classList.add('ring-2', 'ring-yellow-400/40', 'shadow-[0_10px_30px_rgba(234,179,8,0.1)]');
                 }
 
                 btnStarter.innerHTML = 'Downgrade';
