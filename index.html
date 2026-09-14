@@ -173,29 +173,27 @@
     </div>
 </div>
 
-      <!-- ✨ PRODUCT DETAILS FULL-SCREEN MODAL ✨ -->
-    <!-- z-[200] को हटाकर z-[75] कर दिया है, ताकि Order Modal इसके ऊपर खुले और h-[100dvh] से स्क्रॉल फिक्स हो गया है -->
-    <div id="product-details-page" class="fixed top-0 left-0 w-full h-[100dvh] bg-[#F2F2F7] z-[75] hidden flex-col overflow-hidden transition-transform duration-300 translate-x-full">
+     <!-- ✨ PRODUCT DETAILS FULL-SCREEN MODAL ✨ -->
+    <div id="product-details-page" class="fixed inset-0 bg-[#F2F2F7] z-[75] hidden flex-col transition-transform duration-300 translate-x-full">
         
-        <!-- 🟢 TOP HEADER -->
-        <div class="flex justify-between items-center px-4 py-3 bg-white/80 backdrop-blur-md sticky top-0 z-20 border-b border-gray-200 shrink-0">
-            <button onclick="closeProductDetails()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-800 active:scale-95 transition shrink-0">
+        <!-- 🟢 TOP HEADER (Fixed) -->
+        <div class="flex-none flex justify-between items-center px-4 py-3 bg-white/80 backdrop-blur-md border-b border-gray-200 z-20">
+            <button onclick="closeProductDetails()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-800 active:scale-95 transition">
                 <i class="fas fa-arrow-left"></i>
             </button>
             
-            <!-- ✨ NAYA: Header Text 'Pixigenie' ✨ -->
             <h2 class="font-black text-xl text-gray-900 tracking-tight text-center flex-1">Pixigenie</h2>
 
-            <div class="flex gap-3 shrink-0">
-                <!-- Cart बटन क्लिक करने पर पहले ये पेज बंद होगा, फिर Cart खुलेगा -->
-                <button class="w-10 h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center active:scale-95 transition relative" onclick="closeProductDetails(); setTimeout(toggleCartModal, 300);">
+            <div class="flex gap-3">
+                <button class="w-10 h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center active:scale-95 transition" onclick="closeProductDetails(); setTimeout(toggleCartModal, 300);">
                     <i class="fas fa-shopping-cart"></i>
                 </button>
             </div>
         </div>
 
-        <!-- 🟢 SCROLLABLE CONTENT (Fixed) -->
-        <div class="flex-1 overflow-y-auto bg-[#F2F2F7] pb-28 custom-scrollbar block">
+        <!-- 🟢 SCROLLABLE CONTENT (Fixed scrolling) -->
+        <!-- flex-1 और overflow-y-auto इसे बीच में आराम से स्क्रॉल होने देंगे -->
+        <div class="flex-1 overflow-y-auto bg-[#F2F2F7] custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
             
             <!-- Image -->
             <div class="bg-white w-full aspect-square flex items-center justify-center overflow-hidden border-b border-gray-100">
@@ -238,7 +236,8 @@
             </div>
 
             <!-- Similar Products -->
-            <div class="bg-white p-5 pb-8 shadow-sm">
+            <!-- pb-6 दिया है ताकि नीचे थोड़ा स्पेस रहे और एकदम सटा हुआ ना लगे -->
+            <div class="bg-white p-5 pb-6 shadow-sm">
                 <h3 class="text-sm font-black text-gray-900 mb-4 uppercase tracking-wider">Similar Products</h3>
                 <div id="similar-products-list" class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x">
                     <!-- JS से लोड होंगे -->
@@ -246,8 +245,9 @@
             </div>
         </div>
 
-        <!-- 🟢 STICKY BOTTOM BAR -->
-        <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-200 p-3 flex gap-3 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-5 sm:pb-3 shrink-0">
+        <!-- 🟢 BOTTOM BAR (Fixed) -->
+        <!-- इसे absolute से हटाकर flex-none कर दिया है, जिससे यह स्क्रीन के नीचे परमानेंट चिपका रहेगा -->
+        <div class="flex-none w-full bg-white border-t border-gray-200 p-3 pb-5 sm:pb-3 flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-30">
             <button id="detail-cart-btn" class="flex-1 bg-white border border-gray-300 text-gray-900 font-black text-sm py-3.5 rounded-[12px] active:scale-95 transition flex items-center justify-center gap-2">
                 <i class="fas fa-cart-plus"></i> Add to Cart
             </button>
@@ -256,6 +256,7 @@
             </button>
         </div>
     </div>
+
 
 
     <!-- ✨ HYBRID CHECKOUT MODAL ✨ -->
