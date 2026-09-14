@@ -9031,28 +9031,64 @@ async function initPremiumAnalytics() {
             topProdList.innerHTML = phtml;
         }
 
-        // --- ✨ DYNAMIC INSIGHTS LOGIC ✨ ---
+             // --- ✨ DYNAMIC INSIGHTS LOGIC ✨ ---
         const insightsList = document.getElementById('insights-list');
         if(insightsList) {
-            let convRate = views > 0 ? ((totalOrders / views) * 100).toFixed(1) : 0;
-            insightsList.innerHTML = `
-                <div class="rounded-2xl bg-blue-50 border border-blue-100 p-4 flex gap-3 mb-2 shadow-sm">
-                    <i class="fas fa-lightbulb text-blue-500 mt-0.5"></i>
+            let insightsHTML = '';
+
+            // 1. Cart Size / Average Items Insight
+            let avgItems = totalOrders > 0 ? (totalItemsSold / totalOrders).toFixed(1) : 0;
+            if (totalOrders > 0) {
+                insightsHTML += `
+                <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-4 flex gap-3 mb-3 shadow-sm">
+                    <i class="fas fa-shopping-basket text-emerald-500 mt-0.5 text-lg"></i>
                     <div>
-                        <p class="text-sm font-bold text-slate-700">Conversion Rate: ${convRate}%</p>
-                        <p class="text-xs text-slate-500 mt-1">For every 100 profile views, you get approx ${Math.round(convRate)} orders.</p>
+                        <p class="text-sm font-bold text-slate-700">Average Cart Size: ${avgItems} Items</p>
+                        <p class="text-xs text-slate-500 mt-1">Customers buy about ${Math.round(avgItems)} item(s) per order. Try creating "Combo Deals" to increase this!</p>
                     </div>
-                </div>
-                ${totalOrders === 0 ? `
+                </div>`;
+            }
+
+            // 2. WhatsApp Follow-up Alert (Agar chat hui par order nahi aaya)
+            if (waClicks > totalOrders) {
+                let lostLeads = waClicks - totalOrders;
+                insightsHTML += `
+                <div class="rounded-2xl bg-rose-50 border border-rose-100 p-4 flex gap-3 mb-3 shadow-sm">
+                    <i class="fab fa-whatsapp text-rose-500 mt-0.5 text-lg"></i>
+                    <div>
+                        <p class="text-sm font-bold text-slate-700">Follow up required!</p>
+                        <p class="text-xs text-slate-500 mt-1">You had ${waClicks} WhatsApp chats but only ${totalOrders} orders. Message those ${lostLeads} customers back with a special discount to close the deal.</p>
+                    </div>
+                </div>`;
+            }
+
+            // 3. New Store / No Orders Insight
+            if (totalOrders === 0) {
+                insightsHTML += `
                 <div class="rounded-2xl bg-amber-50 border border-amber-100 p-4 flex gap-3 shadow-sm">
-                    <i class="fas fa-bullhorn text-amber-500 mt-0.5"></i>
+                    <i class="fas fa-bullhorn text-amber-500 mt-0.5 text-lg"></i>
                     <div>
                         <p class="text-sm font-bold text-slate-700">Boost Your Sales</p>
-                        <p class="text-xs text-slate-500 mt-1">Share your store link on WhatsApp status to get your first order!</p>
+                        <p class="text-xs text-slate-500 mt-1">Share your store link on your WhatsApp status and Facebook groups to get your first order!</p>
                     </div>
-                </div>` : ''}
-            `;
+                </div>`;
+            }
+
+            // 4. Fallback (Agar sab theek hai toh)
+            if (insightsHTML === '') {
+                insightsHTML = `
+                <div class="rounded-2xl bg-blue-50 border border-blue-100 p-4 flex gap-3 shadow-sm">
+                    <i class="fas fa-rocket text-blue-500 mt-0.5 text-lg"></i>
+                    <div>
+                        <p class="text-sm font-bold text-slate-700">Store is looking healthy</p>
+                        <p class="text-xs text-slate-500 mt-1">Keep adding new products and sharing your store link to maintain growth.</p>
+                    </div>
+                </div>`;
+            }
+
+            insightsList.innerHTML = insightsHTML;
         }
+
         // 👆👆 YAHAN TAK THA WOH NAYA CODE 👆👆
         // 4. Store Conversion Rate (Views to Orders)
         let conversionPercentage = views > 0 ? ((totalOrders / views) * 100).toFixed(1) : 0;
