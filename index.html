@@ -3433,17 +3433,43 @@ async function loadSimilarProducts() {
     
     try {
         const snap = await db.collectionGroup('products').limit(6).get();
-        let html = '';
         
-        snap.forEach(doc => {
+        if (snap.empty) {
+            container.innerHTML = '<p class="text-xs text-gray-500 px-4 py-6">No similar items found.</p>';
+            return;
+        }
+
+        // ✨ NAYA LOGIC: Har product ki shop detail nikalna ✨
+        const itemPromises = snap.docs.map(async (doc) => {
             const p = doc.data();
-            if(!p.name) return;
+            if(!p.name) return null;
+            
+            let shopName = "Local Shop";
+            let shopPhone = "";
+            let shopId = "";
+            let isService = false;
+
+            // Parent shop ka data fetch karo
+            if (doc.ref.parent && doc.ref.parent.parent) {
+                try {
+                    const shopDoc = await doc.ref.parent.parent.get();
+                    if (shopDoc.exists) {
+                        const sData = shopDoc.data();
+                        shopName = sData.shopName || "Local Shop";
+                        shopPhone = sData.phone || "";
+                        shopId = shopDoc.id;
+                        isService = sData.businessType === 'Service Provider';
+                    }
+                } catch(e) {}
+            }
+
             const safeName = encodeURIComponent(p.name);
             const safeDesc = encodeURIComponent(p.description || "");
-            
-            // ✨ NAYA LOGIC: closeProductDetails() हटा दिया, सीधा openProductDetails कॉल होगा ✨
-            html += `
-            <div onclick="openProductDetails('${safeName}', '${p.mrp||0}', '${p.price}', 'Local Store', '', '${p.image||''}', '', false, '${safeDesc}')" class="w-36 shrink-0 snap-start bg-white border border-gray-100 rounded-[1rem] overflow-hidden cursor-pointer hover:shadow-md transition pb-2 shadow-sm">
+            const safeShopName = encodeURIComponent(shopName);
+
+            // Ab 'Local Store' ki jagah asli safeShopName, shopPhone, aur shopId pass ho raha hai
+            return `
+            <div onclick="openProductDetails('${safeName}', '${p.mrp||0}', '${p.price}', '${safeShopName}', '${shopPhone}', '${p.image||''}', '${shopId}', ${isService}, '${safeDesc}')" class="w-36 shrink-0 snap-start bg-white border border-gray-100 rounded-[1rem] overflow-hidden cursor-pointer hover:shadow-md transition pb-2 shadow-sm">
                 <div class="w-full h-32 bg-gray-50 flex items-center justify-center">
                     ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-gray-300 text-2xl"></i>`}
                 </div>
@@ -3456,9 +3482,13 @@ async function loadSimilarProducts() {
                 </div>
             </div>`;
         });
+
+        const cardsHtmlArray = await Promise.all(itemPromises);
+        const finalHtml = cardsHtmlArray.filter(card => card !== null).join('');
         
-        container.innerHTML = html || '<p class="text-xs text-gray-500 px-4 py-6">No similar items found.</p>';
+        container.innerHTML = finalHtml || '<p class="text-xs text-gray-500 px-4 py-6">No similar items found.</p>';
     } catch(e) {
+        console.log("Error loading similar products: ", e);
         container.innerHTML = '<p class="text-xs text-red-400 px-4 py-6">Failed to load suggestions.</p>';
     }
 }
