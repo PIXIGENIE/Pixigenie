@@ -8,7 +8,8 @@
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <!-- Leaflet Map CSS & JS -->
+    
+    <!-- Leaflet Map CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -17,14 +18,14 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <script>
-               const firebaseConfig = {
-          apiKey: "AIzaSyAdJsThwv9E7zp6Mff4XUCm6hVNQCYCLyo",
-          authDomain: "pixigenie-ee9f5.firebaseapp.com",
-          projectId: "pixigenie-ee9f5",
-          storageBucket: "pixigenie-ee9f5.firebasestorage.app",
-          messagingSenderId: "727128884439",
-          appId: "1:727128884439:web:8a521d0308347ddcccdc92",
-          measurementId: "G-QTBJS03LTF"
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdJsThwv9E7zp6Mff4XUCm6hVNQCYCLyo",
+            authDomain: "pixigenie-ee9f5.firebaseapp.com",
+            projectId: "pixigenie-ee9f5",
+            storageBucket: "pixigenie-ee9f5.firebasestorage.app",
+            messagingSenderId: "727128884439",
+            appId: "1:727128884439:web:8a521d0308347ddcccdc92",
+            measurementId: "G-QTBJS03LTF"
         };
 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
@@ -45,56 +46,42 @@
     <header class="bg-white/90 backdrop-blur-xl sticky top-0 z-50 px-4 py-3 border-b border-gray-100 flex items-center justify-between transition-all">
         <button onclick="if(window.history.length > 1) { window.history.back(); } else { window.close(); window.location.href='index.html'; }" class="w-9 h-9 flex items-center justify-center text-gray-900 bg-gray-50 rounded-full active:scale-95 transition"><i class="fas fa-arrow-left"></i></button>
 
-
-                      <!-- ✨ PREMIUM HEADER TITLE ✨ -->
         <div class="flex items-center justify-center">
             <h1 class="font-black text-gray-800 text-[12px] sm:text-[13px] tracking-[0.2em] uppercase flex items-center gap-2.5">
-                                                     <!-- Naya Modern Circular Gradient Icon -->
                 <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white shadow-[0_2px_5px_rgba(79,70,229,0.3)]">
-                    <!-- ✨ FIX: 'ml-[1.5px]' lagaya taaki bag icon ekdum perfectly Right side me khisak kar Center me aa jaye ✨ -->
                     <i class="fas fa-shopping-bag text-[11px] ml-[1.5px] mb-[1px]"></i>
                 </span>
-
-
-
                 Storefront
             </h1>
-            <!-- Ye hidden tag zaroori hai JS errors rokne ke liye -->
             <span id="header-shop-name" class="hidden"></span>
         </div>
 
-
         <button onclick="toggleCartModal()" class="relative w-9 h-9 flex items-center justify-center text-gray-900 bg-gray-50 rounded-full active:scale-95 transition">
             <i class="fas fa-shopping-bag"></i>
-            <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full hidden border border-white">0</span>
+            <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm">0</span>
         </button>
     </header>
 
     <main class="max-w-4xl mx-auto w-full bg-white min-h-screen flex flex-col">
 
-
-        
         <!-- ✨ PROFILE SECTION ✨ -->
         <section class="px-5 pt-6 pb-6">
             <div class="flex items-center gap-5">
-                            <!-- ✨ PROFILE PICTURE & PREMIUM BADGE ✨ -->
-            <div class="relative shrink-0 flex flex-col items-center">
-            <div id="profile-pic-ring" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 p-[3px] shadow-sm relative z-10 transition-all duration-500">
-
-                    <div class="w-full h-full bg-white rounded-full p-0.5">
-                        <label id="store-logo-wrapper" class="relative w-full h-full bg-gray-50 rounded-full flex items-center justify-center text-gray-300 text-3xl overflow-hidden">
-                            <i id="shop-avatar-icon" class="fas fa-store"></i>
-                            <img id="shop-avatar-img" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
-                            <div id="camera-hover-overlay" class="absolute inset-0 bg-black/40 hidden items-center justify-center z-20 transition-all">
-                                <i class="fas fa-camera text-white text-xl"></i>
-                            </div>
-                            <input type="file" id="logo-file-input" accept="image/*" class="hidden" onchange="uploadStoreLogo(event)" disabled>
-                        </label>
+                <div class="relative shrink-0 flex flex-col items-center">
+                    <div id="profile-pic-ring" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 p-[3px] shadow-sm relative z-10 transition-all duration-500">
+                        <div class="w-full h-full bg-white rounded-full p-0.5">
+                            <label id="store-logo-wrapper" class="relative w-full h-full bg-gray-50 rounded-full flex items-center justify-center text-gray-300 text-3xl overflow-hidden">
+                                <i id="shop-avatar-icon" class="fas fa-store"></i>
+                                <img id="shop-avatar-img" src="" class="absolute inset-0 w-full h-full object-cover hidden z-10">
+                                <div id="camera-hover-overlay" class="absolute inset-0 bg-black/40 hidden items-center justify-center z-20 transition-all">
+                                    <i class="fas fa-camera text-white text-xl"></i>
+                                </div>
+                                <input type="file" id="logo-file-input" accept="image/*" class="hidden" onchange="uploadStoreLogo(event)" disabled>
+                            </label>
+                        </div>
                     </div>
+                    <div id="premium-biz-badge" class="absolute -bottom-2.5 left-1/2 transform -translate-x-1/2 hidden z-30"></div>
                 </div>
-                <!-- ✨ PHOTO KE NEECHE CHIPKA HUA BADGE ✨ -->
-                <div id="premium-biz-badge" class="absolute -bottom-2.5 left-1/2 transform -translate-x-1/2 hidden z-30"></div>
-            </div>
 
                 <div class="flex-1 flex justify-around items-center text-center">
                     <div class="flex flex-col">
@@ -114,12 +101,8 @@
 
             <div class="mt-5">
                 <h2 id="profile-shop-name" class="font-black text-gray-900 text-[17px] tracking-tight flex items-center">Store Name</h2>
-
                 <p id="profile-owner-name" class="text-[13px] font-semibold text-gray-500">Proprietor Name</p>
-                
-                                     <span id="profile-category" class="inline-block mt-2 mb-2.5 px-2.5 py-1 bg-gray-50 text-gray-600 text-[10px] font-black uppercase tracking-wider rounded-lg border border-gray-100">Category</span>
-
-
+                <span id="profile-category" class="inline-block mt-2 mb-2.5 px-2.5 py-1 bg-gray-50 text-gray-600 text-[10px] font-black uppercase tracking-wider rounded-lg border border-gray-100">Category</span>
                 
                 <div class="text-[13px] text-gray-700 leading-relaxed font-medium">
                     <span id="desc-text"></span>
@@ -130,19 +113,16 @@
                     <i class="fas fa-location-dot mt-0.5 text-gray-400"></i>
                     <span>Loading location...</span>
                 </p>
-                 <a id="profile-map-link" href="#" target="_blank" onclick="trackEvent('directionClicks')" class="hidden mt-2.5 text-[11px] font-bold px-3 py-1.5 bg-green-50 text-green-600 rounded-lg inline-flex items-center gap-1.5 w-fit active:scale-95 transition border border-green-100 shadow-sm">
-    <i class="fas fa-map-marked-alt"></i> View on Google Maps
-</a>
+                <a id="profile-map-link" href="#" target="_blank" onclick="trackEvent('directionClicks')" class="hidden mt-2.5 text-[11px] font-bold px-3 py-1.5 bg-green-50 text-green-600 rounded-lg inline-flex items-center gap-1.5 w-fit active:scale-95 transition border border-green-100 shadow-sm">
+                    <i class="fas fa-map-marked-alt"></i> View on Google Maps
+                </a>
 
-                                <!-- ✨ NAYA PREMIUM DELIVERY BANNER ✨ -->
                 <div id="profile-delivery-banner" class="hidden"></div>
-
             </div>
 
             <div id="action-buttons-container" class="flex gap-2.5 mt-5 hidden">
                 <button id="btn-follow" onclick="toggleFollow()" class="flex-1 bg-gray-900 hover:bg-black text-white font-bold py-3 rounded-[14px] text-sm active:scale-95 transition shadow-md">Follow</button>
                 <button onclick="trackEvent('whatsappClicks'); openWhatsApp()" class="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200 font-bold py-3 rounded-[14px] text-sm active:scale-95 transition flex items-center justify-center gap-1.5"><i class="fab fa-whatsapp text-green-500 text-lg"></i> Message</button>
-
             </div>
         </section>
 
@@ -159,14 +139,15 @@
         </div>
 
         <!-- ✨ PRODUCT GRID ✨ -->
-       <section id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grid-borders w-full bg-gray-100">
-
+        <section id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grid-borders w-full bg-gray-100">
             <div class="col-span-full text-center py-12 grid-item">
-<i class="fas fa-circle-notch fa-spin text-2xl text-gray-400"></i><p class="text-xs text-gray-500 font-bold mt-2">Loading catalog...</p></div>
+                <i class="fas fa-circle-notch fa-spin text-2xl text-gray-400"></i><p class="text-xs text-gray-500 font-bold mt-2">Loading catalog...</p>
+            </div>
         </section>
-<button id="load-more-products-btn" onclick="loadMoreProducts()" class="w-full mt-6 max-w-sm mx-auto block bg-purple-50 text-purple-600 border border-purple-100 font-bold py-3.5 rounded-[16px] text-sm transition hidden active:scale-95">
-    Load More Products <i class="fas fa-arrow-down ml-1"></i>
-</button>
+        
+        <button id="load-more-products-btn" onclick="loadMoreProducts()" class="w-full mt-6 max-w-sm mx-auto block bg-purple-50 text-purple-600 border border-purple-100 font-bold py-3.5 rounded-[16px] text-sm transition hidden active:scale-95">
+            Load More Products <i class="fas fa-arrow-down ml-1"></i>
+        </button>
 
         <!-- Thick Divider -->
         <div class="w-full h-2 bg-[#F7F7F9]"></div>
@@ -182,12 +163,11 @@
             <div id="my-review-container" class="hidden mb-6 bg-purple-50/50 border border-purple-100/50 rounded-[20px] p-5 relative"></div>
             <div id="review-form-container" class="mb-8 hidden transition-all duration-300"></div>
             
- 
             <div id="reviews-list" class="space-y-4"><p class="text-center text-sm text-gray-400 py-4 font-semibold"><i class="fas fa-circle-notch fa-spin"></i> Loading reviews...</p></div>
             <button id="load-more-reviews-btn" onclick="loadReviews(true)" class="w-full mt-6 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold py-3.5 rounded-[16px] text-sm transition hidden active:scale-95">Load More</button>
         </div>
 
-        <!-- ✨ PREMIUM FOOTER ✨ -->
+        <!-- ✨ FOOTER ✨ -->
         <footer class="mt-12 pb-14 px-5 text-center bg-white">
             <div class="flex justify-center items-center gap-1.5 text-gray-400 mb-2 opacity-80"><i class="fas fa-magic text-[10px]"></i><span class="font-bold text-[12px] tracking-wide">Pixigenie Storefront</span></div>
             <p class="text-[11px] font-semibold text-gray-400 opacity-80">&copy; 2026 <span id="footer-shop-name">Store</span></p>
@@ -196,34 +176,95 @@
     </main>
 
     <!-- ============================================== -->
-    <!-- ✨ MODALS (CART, DIRECT ORDER & SUCCESS) ✨ -->
+    <!-- ✨ MODALS (CART, DETAILS, ORDER & MAP) ✨ -->
     <!-- ============================================== -->
-    <!-- ✨ EYE CATCHING FLASH OFFER MODAL (CUSTOMER) ✨ -->
+
+    <!-- ✨ PRODUCT DETAILS FULL-SCREEN MODAL ✨ -->
+    <div id="product-details-page" class="fixed inset-0 bg-[#F2F2F7] z-[75] hidden transition-transform duration-300 translate-x-full">
+        <!-- 🟢 TOP HEADER (Absolute Fixed) -->
+        <div class="absolute top-0 left-0 w-full h-[60px] flex justify-between items-center px-4 bg-white/90 backdrop-blur-md border-b border-gray-200 z-20">
+            <button onclick="closeProductDetails()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-800 active:scale-95 transition">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 class="font-black text-xl text-gray-900 tracking-tight text-center flex-1">Pixigenie</h2>
+            <button class="w-10 h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center active:scale-95 transition relative" onclick="closeProductDetails(); setTimeout(toggleCartModal, 300);">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="detail-cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm">0</span>
+            </button>
+        </div>
+
+        <!-- 🟢 SCROLLABLE CONTENT -->
+        <div id="detail-scroll-area" class="absolute top-[60px] bottom-[75px] left-0 w-full overflow-y-auto bg-[#F2F2F7] custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
+            <div class="bg-white w-full aspect-square flex items-center justify-center overflow-hidden border-b border-gray-100">
+                <img id="detail-img" src="" class="w-full h-full object-cover">
+            </div>
+
+            <div class="bg-white p-5 border-b border-gray-200 mb-2 shadow-sm">
+                <div class="flex items-center gap-2 mb-2">
+                    <span id="detail-discount-badge" class="bg-red-50 text-red-600 border border-red-200 text-[10px] font-black px-2 py-1 rounded-md tracking-wider hidden"><span id="detail-discount-val">0%</span> OFF</span>
+                </div>
+                <h1 id="detail-title" class="text-xl font-black text-gray-900 leading-tight">Product Name</h1>
+                <div class="mt-3 flex items-end gap-3">
+                    <span id="detail-price" class="text-3xl font-black text-gray-900">₹0</span>
+                    <div class="flex flex-col mb-1" id="detail-mrp-box">
+                        <span class="text-xs text-gray-400 font-bold uppercase">MRP</span>
+                        <span id="detail-mrp" class="text-sm text-gray-400 font-bold line-through">₹0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 flex items-center justify-between border-b border-gray-200 mb-2 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 overflow-hidden border border-gray-100 shrink-0">
+                        <img id="detail-store-logo" src="" class="w-full h-full object-cover hidden">
+                        <i id="detail-store-icon" class="fas fa-store"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">Sold By</p>
+                        <p id="detail-store-name" class="text-sm font-bold text-gray-900">Store Name</p>
+                    </div>
+                </div>
+                <button id="detail-store-btn" class="text-blue-600 font-bold text-xs bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 active:scale-95 transition">View Shop</button>
+            </div>
+
+            <div class="bg-white p-5 border-b border-gray-200 mb-2 shadow-sm">
+                <h3 class="text-sm font-black text-gray-900 mb-3 uppercase tracking-wider">Product Details</h3>
+                <p id="detail-desc" class="text-sm text-gray-600 font-medium leading-relaxed whitespace-pre-wrap"></p>
+            </div>
+
+            <div class="bg-white p-5 pb-6 shadow-sm">
+                <h3 class="text-sm font-black text-gray-900 mb-4 uppercase tracking-wider">More from this Shop</h3>
+                <div id="similar-products-list" class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x">
+                    <!-- JS से लोड होंगे -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 🟢 BOTTOM BAR -->
+        <div class="absolute bottom-0 left-0 w-full h-[75px] bg-white border-t border-gray-200 px-3 py-3 flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-30">
+            <button id="detail-cart-btn" class="flex-1 bg-white border border-gray-300 text-gray-900 font-black text-sm rounded-[12px] active:scale-95 transition flex items-center justify-center gap-2 h-full">
+                <i class="fas fa-cart-plus"></i> Add to Cart
+            </button>
+            <button id="detail-order-btn" class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-sm rounded-[12px] shadow-md active:scale-95 transition flex items-center justify-center gap-2 h-full">
+                Order Now <i class="fas fa-bolt text-yellow-300"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ✨ FLASH OFFER MODAL ✨ -->
     <div id="flash-offer-modal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-md z-[300] hidden flex items-center justify-center p-4 transition-all duration-500 opacity-0">
         <div class="bg-white rounded-[28px] shadow-[0_20px_60px_rgba(0,0,0,0.4)] max-w-sm w-full p-1 relative transform scale-90 transition-all duration-500 overflow-hidden group" id="flash-offer-content">
-            
-            <!-- Animated Gradient Border Effect -->
             <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-rose-500 opacity-20 animate-pulse"></div>
-            
             <div class="bg-white rounded-[26px] p-6 sm:p-8 relative z-10 text-center flex flex-col items-center">
-                <!-- Close Button -->
                 <button onclick="closeFlashOffer()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90 shadow-sm border border-gray-100">
                     <i class="fas fa-times"></i>
                 </button>
-
-                <!-- Icon -->
                 <div class="w-20 h-20 bg-gradient-to-tr from-pink-500 to-rose-500 text-white rounded-full flex items-center justify-center text-4xl mb-5 shadow-[0_10px_25px_rgba(225,29,72,0.4)] animate-bounce mt-2">
                     <i class="fas fa-gift"></i>
                 </div>
-                
-                <!-- Hook Message -->
                 <h3 class="text-2xl font-black text-gray-900 mb-2 leading-tight tracking-tight">Special Offer!</h3>
                 <p id="flash-msg-display" class="text-[15px] text-gray-600 font-bold mb-6 whitespace-pre-wrap leading-relaxed">Loading offer...</p>
-
-                <!-- Optional Linked Product Card (JS will fill this) -->
                 <div id="flash-product-display" class="w-full mb-6 hidden"></div>
-
-                <!-- CTA Button -->
                 <button onclick="closeFlashOffer()" class="w-full bg-gray-900 hover:bg-black text-white font-black text-[15px] py-4 rounded-2xl shadow-xl transition-all active:scale-95 tracking-wide">
                     Awesome, Let's Shop!
                 </button>
@@ -234,15 +275,12 @@
     <!-- ✨ CART MODAL ✨ -->
     <div id="cart-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[90] hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-all duration-300 opacity-0">
         <div class="bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-md h-auto max-h-[85vh] sm:max-h-[90vh] flex flex-col transform translate-y-full sm:scale-95 sm:translate-y-0 transition-all duration-300 relative" id="cart-modal-content">
-
             <div class="flex items-center justify-between p-5 sm:p-6 border-b border-gray-100 shrink-0">
                 <h3 class="font-black text-gray-900 text-xl flex items-center gap-2"><i class="fas fa-shopping-basket text-purple-600"></i> Your Cart</h3>
                 <button onclick="toggleCartModal()" class="text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90"><i class="fas fa-times"></i></button>
             </div>
-            
             <div id="cart-items-container" class="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-6 space-y-3"></div>
             
-            <!-- CART FOOTER -->
             <div class="p-5 sm:p-6 border-t border-gray-100 bg-gray-50 rounded-b-none sm:rounded-b-[2rem] shrink-0">
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-sm font-bold text-gray-500 uppercase tracking-wider">Total Amount</span>
@@ -262,23 +300,19 @@
 
                 <div>
                     <div class="flex justify-between items-center mb-1">
-    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Delivery Address</label>
-    
-    <div class="flex items-center gap-1.5">
-        <button type="button" onclick="openMapPicker('cart-address', 'cart-lat', 'cart-lng')" class="text-[10px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-purple-100 shadow-sm">
-            <i class="fas fa-map-marked-alt"></i> Map
-        </button>
-        <button type="button" onclick="fetchCustomerGPS('cart-address', 'cart-gps-btn-cart')" id="cart-gps-btn-cart" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-blue-100 shadow-sm">
-            <i class="fas fa-location-crosshairs"></i> Auto
-        </button>
-    </div>
-</div>
-
-                 <textarea id="cart-address" placeholder="House No, Street, City..." rows="2" class="w-full px-4 py-3 mb-3 rounded-xl border border-gray-200 focus:border-purple-500 outline-none bg-white text-sm font-semibold transition resize-none shadow-sm"></textarea>
-<!-- ✨ HIDDEN GPS FIELDS ✨ -->
-<input type="hidden" id="cart-lat">
-<input type="hidden" id="cart-lng">
-
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Delivery Address</label>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="openMapPicker('cart-address', 'cart-lat', 'cart-lng')" class="text-[10px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-purple-100 shadow-sm">
+                                <i class="fas fa-map-marked-alt"></i> Map
+                            </button>
+                            <button type="button" onclick="fetchCustomerGPS('cart-address', 'cart-gps-btn-cart')" id="cart-gps-btn-cart" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-blue-100 shadow-sm">
+                                <i class="fas fa-location-crosshairs"></i> Auto
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="cart-address" placeholder="House No, Street, City..." rows="2" class="w-full px-4 py-3 mb-3 rounded-xl border border-gray-200 focus:border-purple-500 outline-none bg-white text-sm font-semibold transition resize-none shadow-sm"></textarea>
+                    <input type="hidden" id="cart-lat">
+                    <input type="hidden" id="cart-lng">
                 </div>
                 
                 <div class="flex flex-col gap-2 mt-4">
@@ -286,15 +320,14 @@
                         Checkout Now <i class="fas fa-check-circle text-green-400"></i>
                     </button>
                     <button type="button" onclick="trackEvent('whatsappClicks'); checkoutCartWhatsApp()" class="w-full text-center text-[10px] font-bold text-green-500 hover:text-green-600 uppercase tracking-widest mt-4 flex items-center justify-center gap-1.5 transition active:scale-95">
-    <i class="fab fa-whatsapp text-[14px]"></i> Checkout via WhatsApp
-</button>
-
+                        <i class="fab fa-whatsapp text-[14px]"></i> Checkout via WhatsApp
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ✨ DIRECT ORDER MODAL (RESTORED) ✨ -->
+    <!-- ✨ ORDER MODAL ✨ -->
     <div id="order-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[80] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
         <div class="bg-white rounded-[2rem] shadow-2xl max-w-md w-full p-6 sm:p-8 text-left transform scale-95 transition-all duration-300 relative" id="order-modal-content">
             <button onclick="closeOrderModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90">
@@ -331,57 +364,69 @@
 
                 <div>
                     <div class="flex justify-between items-center mb-1">
-    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Delivery Address</label>
-    
-    <div class="flex items-center gap-1.5">
-        <button type="button" onclick="openMapPicker('order-address', 'order-lat', 'order-lng')" class="text-[10px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-purple-100 shadow-sm">
-            <i class="fas fa-map-marked-alt"></i> Map
-        </button>
-        <button type="button" onclick="fetchCustomerGPS('order-address', 'order-gps-btn')" id="order-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-blue-100 shadow-sm">
-            <i class="fas fa-location-crosshairs"></i> Auto
-        </button>
-    </div>
-</div>
-
-                   <textarea id="order-address" placeholder="House No, Street, Landmark..." required rows="2" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 outline-none bg-[#F7F7F9] focus:bg-white text-sm font-semibold transition resize-none"></textarea>
-<!-- ✨ HIDDEN GPS FIELDS ✨ -->
-<input type="hidden" id="order-lat">
-<input type="hidden" id="order-lng">
-
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest">Delivery Address</label>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="openMapPicker('order-address', 'order-lat', 'order-lng')" class="text-[10px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-purple-100 shadow-sm">
+                                <i class="fas fa-map-marked-alt"></i> Map
+                            </button>
+                            <button type="button" onclick="fetchCustomerGPS('order-address', 'order-gps-btn')" id="order-gps-btn" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md flex items-center gap-1 active:scale-95 transition border border-blue-100 shadow-sm">
+                                <i class="fas fa-location-crosshairs"></i> Auto
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="order-address" placeholder="House No, Street, Landmark..." required rows="2" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 outline-none bg-[#F7F7F9] focus:bg-white text-sm font-semibold transition resize-none"></textarea>
+                    <input type="hidden" id="order-lat">
+                    <input type="hidden" id="order-lng">
                 </div>
                 
-                <!-- DUAL BUTTONS RESTORED -->
                 <div class="flex flex-col gap-2 mt-4">
                     <button type="submit" id="main-order-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-xl shadow-[0_8px_20px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2 active:scale-95 transition-transform text-sm sm:text-base">
                         Place Order Now <i class="fas fa-check-circle text-green-400"></i>
                     </button>
                     <button type="button" onclick="trackEvent('whatsappClicks'); orderViaWhatsApp()" class="w-full bg-[#ECFDF5] text-[#16A34A] border border-[#BBF7D0] font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform text-sm hover:bg-[#DCFCE7]">
-    <i class="fab fa-whatsapp text-lg"></i> Order via WhatsApp
-</button>
-
+                        <i class="fab fa-whatsapp text-lg"></i> Order via WhatsApp
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- ✨ iOS STYLE SUCCESS MODAL ✨ -->
+    <!-- ✨ SUCCESS MODAL ✨ -->
     <div id="order-success-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[150] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
-                <div class="bg-white rounded-[24px] shadow-2xl max-w-xs w-full p-6 text-center transform scale-90 transition-all duration-300 relative" id="order-success-content">
-            
-            <!-- ✨ NAYA: Cross Button ✨ -->
+        <div class="bg-white rounded-[24px] shadow-2xl max-w-xs w-full p-6 text-center transform scale-90 transition-all duration-300 relative" id="order-success-content">
             <button onclick="closeOrderSuccessModal()" class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-full transition active:scale-90">
                 <i class="fas fa-times"></i>
             </button>
-
             <div class="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 shadow-sm border border-green-100 mt-2">
-
                 <i class="fas fa-check"></i>
             </div>
             <h3 class="text-xl font-black text-gray-900 mb-2">Request Sent!</h3>
-<p class="text-sm text-gray-500 font-medium mb-6">Your request has been sent to the seller. You can track it in the 'My Orders' section.</p>
-
+            <p class="text-sm text-gray-500 font-medium mb-6">Your request has been sent to the seller. You can track it in the 'My Orders' section.</p>
             <button onclick="closeSuccessAndGoToOrders()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold py-3.5 rounded-xl transition active:scale-95 text-sm">
                 Check My Orders
+            </button>
+        </div>
+    </div>
+
+    <!-- ✨ MAP PICKER MODAL ✨ -->
+    <div id="map-picker-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm z-[200] hidden flex flex-col transition-all duration-300 opacity-0">
+        <div class="bg-white flex items-center justify-between p-4 shadow-sm z-10 shrink-0 rounded-b-2xl">
+            <h3 class="font-black text-gray-900 text-lg flex items-center gap-2"><i class="fas fa-map-marker-alt text-purple-500"></i> Pin Location</h3>
+            <button onclick="closeMapPicker()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 active:scale-90 transition"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="relative flex-1 w-full bg-gray-100 overflow-hidden">
+            <div id="map-container" class="absolute inset-0 w-full h-full z-0"></div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[400] pointer-events-none pb-8 animate-bounce">
+                <i class="fas fa-map-marker-alt text-4xl text-red-500 drop-shadow-md"></i>
+            </div>
+            <button onclick="goToLiveLocation()" id="live-gps-btn" class="absolute bottom-6 right-4 z-[400] w-12 h-12 bg-white rounded-full shadow-[0_5px_15px_rgba(0,0,0,0.2)] flex items-center justify-center text-blue-600 hover:bg-gray-50 active:scale-95 transition border border-gray-100">
+                <i class="fas fa-crosshairs text-xl"></i>
+            </button>
+        </div>
+        <div class="bg-white p-5 shadow-[0_-10px_20px_rgba(0,0,0,0.1)] z-10 shrink-0 rounded-t-3xl">
+            <p id="map-address-preview" class="text-xs text-gray-600 font-semibold mb-3 line-clamp-2 leading-relaxed"><i class="fas fa-spinner fa-spin mr-1"></i> Finding your location...</p>
+            <button onclick="confirmMapLocation()" id="map-confirm-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-xl active:scale-95 transition shadow-lg flex items-center justify-center gap-2">
+                Confirm Location <i class="fas fa-check-circle text-green-400"></i>
             </button>
         </div>
     </div>
@@ -399,8 +444,8 @@
         let fullDesc = "";
         let isDescExpanded = false;
         let isFollowing = false;
-let lastProductDoc = null;
-let hasMoreProducts = true;
+        let lastProductDoc = null;
+        let hasMoreProducts = true;
 
         let userRating = 0;
         let currentUserReviewText = ""; 
@@ -418,18 +463,19 @@ let hasMoreProducts = true;
                 return;
             }
 
-                        try {
+            try {
                 const shopDoc = await db.collection('shops').doc(currentShopId).get();
-                let shopData; // Variable ko bahar declare kiya
+                let shopData; 
                 if (shopDoc.exists) {
-                    shopData = shopDoc.data(); // Data assign kiya
+                    shopData = shopDoc.data(); 
 
                     globalShopPhone = shopData.phone;
                     globalShopName = shopData.shopName;
                     globalBusinessType = shopData.businessType || '';
                     const safeOwnerName = shopData.ownerName || "Shop Owner";
 
-                    document.title = `${shopData.shopName} | Pixigenie`;                                                                     // ✨✨ PROFILE PIC PREMIUM VIP BADGE & RING LOGIC ✨✨
+                    document.title = `${shopData.shopName} | Pixigenie`;                                                                     
+                    
                     const bizType = shopData.businessType;
                     const profileBadgeEl = document.getElementById('premium-biz-badge');
                     const profileRingEl = document.getElementById('profile-pic-ring'); 
@@ -438,7 +484,6 @@ let hasMoreProducts = true;
                         let premiumStyle = 'bg-gradient-to-r from-purple-500 to-pink-500 shadow-[0_4px_10px_rgba(168,85,247,0.4)]'; 
                         let ringStyle = 'from-purple-500 to-pink-500'; 
                         
-                        // ✨ NAYA: Lamba naam chhota karne ka logic ✨
                         let displayType = bizType;
                         
                         if (bizType === 'Wholesaler') { 
@@ -450,10 +495,9 @@ let hasMoreProducts = true;
                         } else if (bizType === 'Service Provider') { 
                             premiumStyle = 'bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[0_4px_10px_rgba(16,185,129,0.4)]'; 
                             ringStyle = 'from-emerald-500 to-teal-500';
-                            displayType = 'SERVICES'; // Lamba naam hatakar chhota kar diya
+                            displayType = 'SERVICES';
                         }
 
-                        // 1. Badge ka HTML set karo
                         profileBadgeEl.innerHTML = `
                             <div class="${premiumStyle} text-white px-3 py-[3px] rounded-full uppercase text-[8px] sm:text-[9px] font-black tracking-[0.2em] border border-white/40 backdrop-blur-md whitespace-nowrap text-center">
                                 ${displayType}
@@ -461,32 +505,22 @@ let hasMoreProducts = true;
                         `;
                         profileBadgeEl.classList.remove('hidden');
 
-                        // 2. Ring ka color apne aap Badge jaisa kar do
                         if (profileRingEl) {
                             profileRingEl.className = `w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr ${ringStyle} p-[3px] shadow-sm relative z-10 transition-all duration-500`;
                         }
                     }
-                    // ✨✨ VIP BADGE LOGIC END ✨✨
-
-
 
                     document.getElementById('header-shop-name').innerText = shopData.shopName;
                     document.getElementById('profile-shop-name').innerText = shopData.shopName;
                     document.getElementById('profile-owner-name').innerText = safeOwnerName;
                     document.getElementById('profile-category').innerText = shopData.category || "General Store";
-                                        // ==========================================
-                    // ✨ FLASH OFFER CHECKER (ONLY ONCE LOGIC) ✨
-                    // ==========================================
+                    
                     if (shopData.activeFlashOffer) {
                         const offer = shopData.activeFlashOffer;
-                        // Check if this specific offer ID has been seen before
                         const hasSeen = localStorage.getItem(`pixigenie_seen_offer_${offer.offerId}`);
                         
                         if (!hasSeen) {
-                            // Show the message
                             document.getElementById('flash-msg-display').innerText = offer.message;
-                            
-                            // If a product is linked, fetch it and display it
                             const pDisplay = document.getElementById('flash-product-display');
                             if (offer.productId) {
                                 db.collection('shops').doc(currentShopId).collection('products').doc(offer.productId).get().then(pDoc => {
@@ -511,56 +545,37 @@ let hasMoreProducts = true;
                                 pDisplay.classList.add('hidden');
                             }
                             
-                            // Open Modal
                             setTimeout(() => {
                                 const m = document.getElementById('flash-offer-modal');
                                 const c = document.getElementById('flash-offer-content');
                                 m.classList.remove('hidden');
                                 setTimeout(() => { m.classList.remove('opacity-0'); c.classList.remove('scale-90'); }, 10);
                                 document.body.style.overflow = 'hidden';
-                            }, 1500); // 1.5 second delay so user sees store first, then BAM! offer pops up.
+                            }, 1500); 
                             
-                            // Save to local storage so it doesn't pop up again
                             localStorage.setItem(`pixigenie_seen_offer_${offer.offerId}`, 'true');
                         }
                     }
 
-                                                                // ✨ PREMIUM DELIVERY BANNER LOGIC (RESTORED ORIGINAL ICONS) ✨
                     const deliveryBanner = document.getElementById('profile-delivery-banner');
                     if (deliveryBanner) {
                         deliveryBanner.classList.remove('hidden');
-                        
                         const isService = shopData.businessType === 'Service Provider';
-                        
-                        // ✨ FIX: Wapas original FontAwesome Truck icon laga diya Retailer ke liye ✨
-                        // Aur Service wale ke liye 'fa-tools' (Cross Wrench & Screwdriver)
-                        const iconHtml = isService 
-                            ? `<i class="fas fa-tools text-[17px]"></i>` 
-                            : `<i class="fas fa-truck text-[17px]"></i>`;
-                            
+                        const iconHtml = isService ? `<i class="fas fa-tools text-[17px]"></i>` : `<i class="fas fa-truck text-[17px]"></i>`;
                         const activeTitle = isService ? 'Home Service' : 'Home Delivery';
                         const inactiveTitle = isService ? 'Service Status' : 'Delivery Status';
-                        const inactiveText = isService 
-                            ? 'Home service not started yet. Please visit our center.' 
-                            : 'Home delivery not started yet. Please pick up from store.';
+                        const inactiveText = isService ? 'Home service not started yet. Please visit our center.' : 'Home delivery not started yet. Please pick up from store.';
 
-                                            if (shopData.homeDelivery === true) {
+                        if (shopData.homeDelivery === true) {
                             let areaText = shopData.deliveryArea || "Available";
-                            
-                            // ✨ FIX: Service Provider ke liye "No Delivery" ko hata kar "Available" dikhao ✨
-                            if (isService && (areaText === "No Delivery" || areaText === "")) {
-                                areaText = "Available";
-                            }
+                            if (isService && (areaText === "No Delivery" || areaText === "")) { areaText = "Available"; }
                             
                             if (areaText === "State Level" && shopData.address) {
-
                                 const indianStates = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", "Jammu", "Kashmir", "Chandigarh"];
                                 let detectedState = "Your State";
                                 let normAddress = shopData.address.toLowerCase().replace(/\s+/g, '');
                                 for (let state of indianStates) {
-                                    if (normAddress.includes(state.toLowerCase().replace(/\s+/g, ''))) {
-                                        detectedState = state; break;
-                                    }
+                                    if (normAddress.includes(state.toLowerCase().replace(/\s+/g, ''))) { detectedState = state; break; }
                                 }
                                 areaText = `Within ${detectedState}`;
                             }
@@ -592,9 +607,7 @@ let hasMoreProducts = true;
                         }
                     }
 
-
-
- document.getElementById('footer-shop-name').innerText = shopData.shopName;
+                    document.getElementById('footer-shop-name').innerText = shopData.shopName;
                     document.getElementById('footer-owner-name').innerText = safeOwnerName;
                     
                     let addressText = shopData.address || "Address not provided";
@@ -603,16 +616,12 @@ let hasMoreProducts = true;
                     
                     if (shopData.googleMapLink && shopData.googleMapLink !== "") {
                         const mapBtn = document.getElementById('profile-map-link');
-                        if (mapBtn) {
-                            mapBtn.href = shopData.googleMapLink;
-                            mapBtn.classList.remove('hidden');
-                        }
+                        if (mapBtn) { mapBtn.href = shopData.googleMapLink; mapBtn.classList.remove('hidden'); }
                     }
 
                     fullDesc = (shopData.description && shopData.description.trim() !== "") ? shopData.description : "Store description not provided.";
                     renderDescription();
 
-                                       // ✨ NAYA: Load Store Logo ✨
                     if (shopData.storeLogo || shopData.profileImage) {
                         const logoUrl = shopData.storeLogo || shopData.profileImage;
                         const imgEl = document.getElementById('shop-avatar-img');
@@ -624,23 +633,18 @@ let hasMoreProducts = true;
                         }
                     }
 
-
-                                        const loggedInOwner = localStorage.getItem('pixigenie_active_shop');
-                    
+                    const loggedInOwner = localStorage.getItem('pixigenie_active_shop');
                     const logoWrapper = document.getElementById('store-logo-wrapper');
                     const cameraOverlay = document.getElementById('camera-hover-overlay');
                     const fileInput = document.getElementById('logo-file-input');
 
                     if (loggedInOwner === currentShopId) {
-                        // ✨ 1. Agar Owner khud dekh raha hai, to upload chalu karo ✨
                         if (logoWrapper) logoWrapper.classList.add('cursor-pointer', 'group');
                         if (cameraOverlay) cameraOverlay.classList.add('group-hover:flex');
                         if (fileInput) fileInput.disabled = false;
                     } else {
-                        // ✨ 2. Agar Customer dekh raha hai, to bas Follow/Message button dikhao ✨
                         document.getElementById('action-buttons-container').classList.remove('hidden');
                     }
-
                     
                     updateAverageRatingDisplay();
                     initReviewsSystem();
@@ -662,19 +666,16 @@ let hasMoreProducts = true;
                         }
                       } catch(e) {}
 
-                                // ✨✨ AUTO VERIFY BADGE LOGIC (CRITERIA + LIFETIME VIP) ✨✨
                     let totalOrders = 0;
                     let totalFollowers = 0;
                     if(document.getElementById('stat-orders')) totalOrders = parseInt(document.getElementById('stat-orders').innerText) || 0;
                     if(document.getElementById('stat-followers')) totalFollowers = parseInt(document.getElementById('stat-followers').innerText) || 0;
 
-                    // ✨ FIX: Ab plan 'plus' ya 'pro' hone par bhi isVIP true ho jayega ✨
                     const isVIP = shopData.isVerified || shopData.plan === 'plus' || shopData.plan === 'pro' || (totalOrders >= 50 && totalFollowers >= 100);
 
                     if (isVIP) {
                         let finalBadgeHtml = "";
 
-                        // 👇 PLUS PLAN: "Verified Plus" (Pink Badge)
                         if (shopData.plan === 'plus') {
                             finalBadgeHtml = `
                             <style>
@@ -701,7 +702,6 @@ let hasMoreProducts = true;
                                 </span>
                             </span>`;
                         } 
-                        // 👇 PRO PLAN: "Verified Pro" (Gold Badge)
                         else if (shopData.plan === 'pro') {
                             finalBadgeHtml = `
                             <style>
@@ -729,7 +729,6 @@ let hasMoreProducts = true;
                                 </span>
                             </span>`;
                         }
-                        // 👇 FREE / STARTER PLAN: "Verified Store" (Standard Blue Tick for 50+ orders)
                         else {
                             finalBadgeHtml = `
                             <span class="group relative inline-block ml-1.5 align-middle cursor-pointer outline-none" tabindex="0">
@@ -746,115 +745,216 @@ let hasMoreProducts = true;
                         document.getElementById('profile-shop-name').innerHTML = `${shopData.shopName} ${finalBadgeHtml}`;
                     }
 
-
-
-
-
-
                 } else {
                     document.getElementById('products-grid').innerHTML = `<p class="col-span-2 text-center py-10 text-red-500 font-bold">Store Not Found!</p>`;
                     return;
                 }
 
-                                                                     // ==========================================
-                    // ✨ NAYA: VISIBILITY LIMIT LOGIC (PLAN BASED) ✨
-                    // ==========================================
-                    let storeMaxLimit = 20; // Default Starter Plan
-                    if (shopData.plan === 'plus') storeMaxLimit = 100;
-                 if (shopData.plan === 'pro') storeMaxLimit = 500;
+                let storeMaxLimit = 20; 
+                if (shopData.plan === 'plus') storeMaxLimit = 100;
+                if (shopData.plan === 'pro') storeMaxLimit = 500;
+                
+                window.storeMaxLimit = storeMaxLimit;
+                window.currentLoadedCount = 0;
+
+                let fetchLimit = Math.min(12, storeMaxLimit);
+
+                const productsSnap = await db.collection('shops').doc(currentShopId).collection('products').orderBy('timestamp', 'desc').limit(fetchLimit).get();
+                const grid = document.getElementById('products-grid');
+                const loadMoreBtn = document.getElementById('load-more-products-btn');
+
+                if (productsSnap.empty) {
+                    grid.innerHTML = `<p class="col-span-full text-center py-10 text-gray-500 font-bold">No products available.</p>`;
+                    if(loadMoreBtn) loadMoreBtn.classList.add('hidden');
+                    return;
+                }
+
+                window.currentLoadedCount += productsSnap.docs.length;
+                lastProductDoc = productsSnap.docs[productsSnap.docs.length - 1];
+                
+                if (productsSnap.docs.length < fetchLimit || window.currentLoadedCount >= storeMaxLimit) {
+                    hasMoreProducts = false;
+                    if(loadMoreBtn) loadMoreBtn.classList.add('hidden');
+                } else {
+                    hasMoreProducts = true;
+                    if(loadMoreBtn) loadMoreBtn.classList.remove('hidden');
+                }
+
+                let html = '';
+                productsSnap.forEach(doc => {
+                    const product = doc.data();
+                    const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
+                    const unit = product.unit || 'pcs';
                     
-                    window.storeMaxLimit = storeMaxLimit;
-                    window.currentLoadedCount = 0;
+                    let isServiceItem = (globalBusinessType === 'Service Provider') || 
+                                        (product.name && product.name.toLowerCase().includes('service')) || 
+                                        (unit.toLowerCase() === 'hr');
+                    const buttonText = isServiceItem ? "Book Now" : "Order Now";
+                    
+                    let discountBadgeHtml = '';
+                    let priceDisplayHtml = `<p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>`;
 
-                    let fetchLimit = Math.min(12, storeMaxLimit); // Ek baar me max 12, ya jo limit bachi ho
-
-                    const productsSnap = await db.collection('shops').doc(currentShopId).collection('products').orderBy('timestamp', 'desc').limit(fetchLimit).get();
-                    const grid = document.getElementById('products-grid');
-                    const loadMoreBtn = document.getElementById('load-more-products-btn');
-
-                    if (productsSnap.empty) {
-                        grid.innerHTML = `<p class="col-span-full text-center py-10 text-gray-500 font-bold">No products available.</p>`;
-                        if(loadMoreBtn) loadMoreBtn.classList.add('hidden');
-                        return;
+                    if (product.mrp && product.mrp > product.price) {
+                        const discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
+                        discountBadgeHtml = `
+                            <div class="absolute top-2 right-2 bg-[#DC2626] text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm z-10 tracking-wider">
+                                ${discountPercent}% OFF
+                            </div>
+                        `;
+                        priceDisplayHtml = `
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <p class="font-black text-[#16A34A] text-base">₹${product.price}</p>
+                                <p class="text-[11px] text-gray-400 font-bold line-through mt-0.5">₹${product.mrp}</p>
+                            </div>
+                        `;
                     }
 
-                    window.currentLoadedCount += productsSnap.docs.length;
+                    const safeName = encodeURIComponent(product.name || '');
+                    const safeDesc = encodeURIComponent(product.description || '');
+                    const safeShopName = encodeURIComponent(globalShopName || 'Local Shop');
 
-                    // Pagination setup with Limit check
-                    lastProductDoc = productsSnap.docs[productsSnap.docs.length - 1];
-                    if (productsSnap.docs.length < fetchLimit || window.currentLoadedCount >= storeMaxLimit) {
-                        hasMoreProducts = false;
-                        if(loadMoreBtn) loadMoreBtn.classList.add('hidden');
-                    } else {
-                        hasMoreProducts = true;
-                        if(loadMoreBtn) loadMoreBtn.classList.remove('hidden');
-                    }
-
-
-let html = '';
-productsSnap.forEach(doc => {
-    const product = doc.data();
-    const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
-    const unit = product.unit || 'pcs';
-    
-    // ✨ NAYA: BUTTON TEXT LOGIC ✨
-    let isServiceItem = (globalBusinessType === 'Service Provider') || 
-                        (product.name && product.name.toLowerCase().includes('service')) || 
-                        (unit.toLowerCase() === 'hr');
-    const buttonText = isServiceItem ? "Book Now" : "Order Now";
-    
-    // ✨ NAYA: DISCOUNT CALCULATION LOGIC ✨
-    let discountBadgeHtml = '';
-    let priceDisplayHtml = `<p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>`;
-
-    if (product.mrp && product.mrp > product.price) {
-        const discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
-        discountBadgeHtml = `
-            <div class="absolute top-2 right-2 bg-[#DC2626] text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm z-10 tracking-wider">
-                ${discountPercent}% OFF
-            </div>
-        `;
-        priceDisplayHtml = `
-            <div class="flex items-center gap-1.5 mt-1">
-                <p class="font-black text-[#16A34A] text-base">₹${product.price}</p>
-                <p class="text-[11px] text-gray-400 font-bold line-through mt-0.5">₹${product.mrp}</p>
-            </div>
-        `;
-    }
-
-    html += `
-    <div class="grid-item p-4 flex flex-col active:bg-gray-50 transition relative">
-        <div class="w-full aspect-square bg-gray-50 rounded-[14px] mb-3 flex items-center justify-center overflow-hidden relative">
-            ${product.image ? `<img src="${product.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-3xl text-gray-200"></i>`}
-            
-            <!-- ✨ DISCOUNT BADGE ✨ -->
-            ${discountBadgeHtml}
-
-            <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-700 shadow-sm">${qtySize} ${unit}</div>
-        </div>
-        <div class="flex-1">
-            <h4 class="text-gray-900 font-semibold text-[13px] leading-tight line-clamp-2">${product.name}</h4>
-            
-            <!-- ✨ PRICE & MRP ✨ -->
-            ${priceDisplayHtml}
-            
-        </div>
-        <div class="flex flex-col gap-2 w-full mt-3">
-            <div class="flex gap-2 w-full">
-                <button onclick="addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
-                    <i class="fas fa-cart-plus text-sm"></i> Cart
-                </button>
-                <button onclick="openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
-                    ${buttonText}
-                </button>
-            </div>
-        </div>
-    </div>`;
-});
-grid.innerHTML = html;
+                    html += `
+                    <div onclick="openProductDetails('${safeName}', '${product.mrp||0}', '${product.price}', '${safeShopName}', '${globalShopPhone}', '${product.image||''}', currentShopId, ${isServiceItem}, '${safeDesc}')" class="grid-item p-4 flex flex-col active:bg-gray-50 transition relative cursor-pointer">
+                        <div class="w-full aspect-square bg-gray-50 rounded-[14px] mb-3 flex items-center justify-center overflow-hidden relative">
+                            ${product.image ? `<img src="${product.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-3xl text-gray-200"></i>`}
+                            ${discountBadgeHtml}
+                            <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-700 shadow-sm">${qtySize} ${unit}</div>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-gray-900 font-semibold text-[13px] leading-tight line-clamp-2">${product.name}</h4>
+                            ${priceDisplayHtml}
+                        </div>
+                        <div class="flex flex-col gap-2 w-full mt-3">
+                            <div class="flex gap-2 w-full">
+                                <button onclick="event.stopPropagation(); addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
+                                    <i class="fas fa-cart-plus text-sm"></i> Cart
+                                </button>
+                                <button onclick="event.stopPropagation(); openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
+                                    ${buttonText}
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                grid.innerHTML = html;
 
             } catch(e) { 
                 document.getElementById('products-grid').innerHTML = `<p class="col-span-2 text-center py-10 text-red-500 font-bold">Error loading store data.</p>`;
+            }
+        }
+
+        // ===============================================
+        // ✨ PRODUCT DETAILS PAGE LOGIC (STOREFRONT) ✨
+        // ===============================================
+
+        function openProductDetails(safeName, mrp, price, safeShopName, shopPhone, image, shopId, isService, safeDesc) {
+            const name = decodeURIComponent(safeName);
+            const shopName = decodeURIComponent(safeShopName);
+            const desc = decodeURIComponent(safeDesc);
+            const numMrp = parseInt(mrp) || 0;
+            const page = document.getElementById('product-details-page');
+            
+            document.getElementById('detail-img').src = image || 'https://via.placeholder.com/400?text=No+Image';
+            document.getElementById('detail-title').innerText = name;
+            document.getElementById('detail-price').innerText = `₹${price}`;
+            document.getElementById('detail-store-name').innerText = shopName || 'Local Shop';
+            
+            document.getElementById('detail-store-btn').onclick = () => window.location.href = `store.html?shop=${shopId}`;
+            
+            if (desc.trim() !== '') {
+                document.getElementById('detail-desc').innerText = desc;
+            } else {
+                document.getElementById('detail-desc').innerHTML = '<i>No description provided by the seller.</i>';
+            }
+
+            const badge = document.getElementById('detail-discount-badge');
+            const mrpBox = document.getElementById('detail-mrp-box');
+            if (numMrp > price) {
+                document.getElementById('detail-mrp').innerText = `₹${numMrp}`;
+                let discount = Math.round(((numMrp - price) / numMrp) * 100);
+                document.getElementById('detail-discount-val').innerText = discount + "%";
+                badge.classList.remove('hidden'); mrpBox.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden'); mrpBox.classList.add('hidden');
+            }
+
+            const logoImg = document.getElementById('detail-store-logo');
+            const logoIcon = document.getElementById('detail-store-icon');
+            logoImg.classList.add('hidden'); logoIcon.classList.remove('hidden');
+            if (shopId) {
+                db.collection('shops').doc(shopId).get().then(doc => {
+                    if (doc.exists && doc.data().storeLogo) {
+                        logoImg.src = doc.data().storeLogo;
+                        logoImg.classList.remove('hidden'); logoIcon.classList.add('hidden');
+                    }
+                }).catch(e => console.log("Logo fetch err:", e));
+            }
+
+            document.getElementById('detail-cart-btn').onclick = function(e) {
+                addToCart(e, name, price, shopName, shopPhone);
+                let orig = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check text-green-500"></i> Added';
+                setTimeout(() => this.innerHTML = orig, 1000);
+            };
+            
+            document.getElementById('detail-order-btn').innerHTML = isService ? `Book Now <i class="fas fa-bolt text-yellow-300"></i>` : `Order Now <i class="fas fa-bolt text-yellow-300"></i>`;
+            document.getElementById('detail-order-btn').onclick = () => {
+                openOrderModal(name, price, shopName, shopPhone);
+            };
+
+            loadStoreSimilarProducts(shopId, safeShopName, shopPhone, isService);
+
+            document.getElementById('detail-scroll-area').scrollTop = 0;
+            page.classList.remove('hidden');
+            setTimeout(() => { page.classList.remove('translate-x-full'); page.classList.add('translate-x-0'); }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProductDetails() {
+            const page = document.getElementById('product-details-page');
+            page.classList.remove('translate-x-0'); page.classList.add('translate-x-full');
+            setTimeout(() => { page.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300);
+        }
+
+        async function loadStoreSimilarProducts(shopId, safeShopName, shopPhone, isService) {
+            const container = document.getElementById('similar-products-list');
+            container.innerHTML = '<div class="w-full text-center py-6"><i class="fas fa-spinner fa-spin text-purple-500"></i> Loading...</div>';
+            
+            try {
+                const snap = await db.collection('shops').doc(shopId).collection('products').limit(6).get();
+                if (snap.empty) { container.innerHTML = '<p class="text-xs text-gray-500 px-4 py-6">No more items found.</p>'; return; }
+
+                let html = '';
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    if(!p.name) return;
+                    const safeName = encodeURIComponent(p.name);
+                    const safeDesc = encodeURIComponent(p.description || "");
+                    
+                    let discountHtml = '';
+                    if (p.mrp && p.mrp > p.price) {
+                        let discountPercent = Math.round(((p.mrp - p.price) / p.mrp) * 100);
+                        discountHtml = `<div class="absolute top-1.5 left-1.5 bg-red-50 text-red-600 border border-red-100 text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm">${discountPercent}% OFF</div>`;
+                    }
+
+                    html += `
+                    <div onclick="openProductDetails('${safeName}', '${p.mrp||0}', '${p.price}', '${safeShopName}', '${shopPhone}', '${p.image||''}', '${shopId}', ${isService}, '${safeDesc}')" class="w-36 shrink-0 snap-start bg-white border border-gray-100 rounded-[1rem] overflow-hidden cursor-pointer hover:shadow-md transition pb-2 shadow-sm">
+                        <div class="relative w-full h-32 bg-gray-50 flex items-center justify-center">
+                            ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-gray-300 text-2xl"></i>`}
+                            ${discountHtml}
+                        </div>
+                        <div class="p-2.5">
+                            <p class="text-[11px] font-bold text-gray-800 truncate">${p.name}</p>
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <span class="text-sm font-black text-gray-900">₹${p.price}</span>
+                                ${p.mrp && p.mrp > p.price ? `<span class="text-[9px] text-gray-400 line-through">₹${p.mrp}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            } catch(e) {
+                container.innerHTML = '<p class="text-xs text-red-400 px-4 py-6">Error loading products.</p>';
             }
         }
 
@@ -953,7 +1053,6 @@ grid.innerHTML = html;
             const myReviewContainer = document.getElementById('my-review-container');
             
             if (!customerName || !customerPhone) {
-                // ✨ जादुई लाइन: flex, items-center और mx-auto से ये एकदम सेंटर में आ जाएगा ✨
                 formContainer.innerHTML = `
                     <div class="flex flex-col items-center justify-center text-center py-8 bg-[#F7F7F9] rounded-[20px] border border-[#E5E7EB] mb-2 w-full">
                         <div class="w-12 h-12 bg-white text-[#9CA3AF] rounded-full flex items-center justify-center text-xl mb-3 shadow-sm border border-[#E5E7EB]">
@@ -1074,7 +1173,6 @@ grid.innerHTML = html;
         function toggleDescription() { isDescExpanded = !isDescExpanded; renderDescription(); }
         function openWhatsApp() { if (!globalShopPhone) return; window.open(`https://wa.me/91${globalShopPhone}?text=Hi! I am visiting your Pixigenie store.`, '_blank'); }
 
-
         // ==========================================
         // 🛒 CART RENDER & QUANTITY LOGIC
         // ==========================================
@@ -1129,21 +1227,24 @@ grid.innerHTML = html;
 
         function updateCartBadge() {
             let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
-            let badge = document.getElementById('cart-badge');
-            if(badge) {
-                if(cart.length > 0) {
-                    let totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-                    badge.innerText = totalItems; badge.classList.remove('hidden');
-                } else { badge.classList.add('hidden'); }
+            let mainBadge = document.getElementById('cart-badge');
+            let detailBadge = document.getElementById('detail-cart-badge'); 
+            
+            if(cart.length > 0) {
+                let totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+                if(mainBadge) { mainBadge.innerText = totalItems; mainBadge.classList.remove('hidden'); }
+                if(detailBadge) { detailBadge.innerText = totalItems; detailBadge.classList.remove('hidden'); }
+            } else {
+                if(mainBadge) mainBadge.classList.add('hidden');
+                if(detailBadge) detailBadge.classList.add('hidden');
             }
         }
-        // ✨ कस्टमर को लॉगिन पर भेजना और वापस आने का रास्ता सेव करना
+
         function goToCustomerLogin() {
             localStorage.setItem('pixigenie_return_url', window.location.href);
             window.location.href = 'index.html'; 
         }
 
-        // ✨ शॉपिंग से पहले लॉगिन चेक करने का फंक्शन
         function enforceCustomerLogin() {
             const isCustomerLoggedIn = localStorage.getItem('pixigenie_customer_phone'); 
             if (!isCustomerLoggedIn) {
@@ -1153,64 +1254,43 @@ grid.innerHTML = html;
             return true;
         }
 
-   function addToCart(event, name, price, shopName, shopPhone) {
-    event.stopPropagation(); 
-    
-    // ✨ YAHAN SE 'enforceCustomerLogin' WALI LINE HATA DI HAI ✨
-    
-    let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
-    const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
-    
-    if (existingItem) { 
-        existingItem.qty += 1; 
-    } else { 
-        cart.push({ name, price: parseInt(price), shopName, shopPhone, qty: 1 }); 
-    }
-    
-    localStorage.setItem('pixigenie_cart', JSON.stringify(cart));
-    updateCartBadge();
-    
-    // Button Animation
-    let btn = event.currentTarget;
-    let origHtml = btn.innerHTML;
-    btn.innerHTML = `<i class="fas fa-check"></i> Added`;
-    btn.classList.replace('bg-purple-50', 'bg-green-500'); 
-    btn.classList.replace('text-purple-600', 'text-white');
-    
-    setTimeout(() => { 
-        btn.innerHTML = origHtml; 
-        btn.classList.replace('bg-green-500', 'bg-purple-50'); 
-        btn.classList.replace('text-white', 'text-purple-600'); 
-    }, 1000);
-}
+        function addToCart(event, name, price, shopName, shopPhone) {
+            event.stopPropagation(); 
+            
+            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
+            
+            if (existingItem) { 
+                existingItem.qty += 1; 
+            } else { 
+                cart.push({ name, price: parseInt(price), shopName, shopPhone, qty: 1 }); 
+            }
+            
+            localStorage.setItem('pixigenie_cart', JSON.stringify(cart));
+            updateCartBadge();
+            
+            let btn = event.currentTarget;
+            let origHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-check text-green-500"></i> Added`;
+            setTimeout(() => { btn.innerHTML = origHtml; }, 1000);
+        }
 
-                function toggleCartModal() {
+        function toggleCartModal() {
             const modal = document.getElementById('cart-modal');
             const content = document.getElementById('cart-modal-content');
             
             if(modal.classList.contains('hidden')) {
                 renderCartItems();
                 
-                // ✨ SMART PRE-FILL LOGIC ✨
                 const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
                 let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
                 const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
 
-                // अगर ईमेल है, तो फोन का डब्बा खाली छोड़ो
-                if (savedPhone.includes('@')) {
-                    savedPhone = ''; 
-                }
+                if (savedPhone.includes('@')) savedPhone = ''; 
                 
-                // फॉर्म में डाटा भरो (अगर पहले से खाली है)
-                if(!document.getElementById('cart-cust-name').value) {
-                    document.getElementById('cart-cust-name').value = savedName;
-                }
-                if(!document.getElementById('cart-cust-phone').value) {
-                    document.getElementById('cart-cust-phone').value = savedPhone;
-                }
-                if(!document.getElementById('cart-address').value && savedAddress) {
-                    document.getElementById('cart-address').value = savedAddress;
-                }
+                if(!document.getElementById('cart-cust-name').value) document.getElementById('cart-cust-name').value = savedName;
+                if(!document.getElementById('cart-cust-phone').value) document.getElementById('cart-cust-phone').value = savedPhone;
+                if(!document.getElementById('cart-address').value && savedAddress) document.getElementById('cart-address').value = savedAddress;
 
                 modal.classList.remove('hidden');
                 setTimeout(() => {
@@ -1228,7 +1308,6 @@ grid.innerHTML = html;
             }
         }
 
-        // ✨ IN-APP CART ORDER (FIXED FOR MY ORDERS) ✨
         async function checkoutCartInApp() {
             let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
             if(cart.length === 0) { alert("Cart is empty!"); return; }
@@ -1240,7 +1319,6 @@ grid.innerHTML = html;
             if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
             if(!address) { alert("Please enter delivery address!"); return; }
 
-            // ✨ ASLI ACCOUNT ID YAHAN SE NIKALO ✨
             const accountId = localStorage.getItem('pixigenie_customer_phone');
 
             const btn = document.getElementById('cart-main-btn');
@@ -1261,16 +1339,14 @@ grid.innerHTML = html;
                     const phone = shopPhones[i];
                     const orderData = ordersByShop[phone];
                     
-                                        await db.collection('orders').add({
+                    await db.collection('orders').add({
                         customerId: accountId, 
                         customerName: custName,
                         customerPhone: custWhatsApp, 
                         customerAddress: address,
-                        // ✨ NAYA LOGIC: GPS Coordinates ✨
                         lat: document.getElementById('cart-lat').value || null,
                         lng: document.getElementById('cart-lng').value || null,
                         shopPhone: phone,
-
                         shopName: orderData.shopName,
                         items: orderData.items,
                         totalAmount: orderData.total,
@@ -1292,7 +1368,6 @@ grid.innerHTML = html;
             }
         }
 
-        // ✨ MANUAL WHATSAPP CART ORDER LOGIC ✨
         function checkoutCartWhatsApp() {
             let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
             if(cart.length === 0) { alert("Cart is empty!"); return; }
@@ -1324,70 +1399,60 @@ grid.innerHTML = html;
             }
         }
 
-        // ==========================================
-        // ✨ DIRECT (SINGLE ITEM) ORDER LOGIC RESTORED ✨
-        // ==========================================
         let currentOrder = null;
 
-            function openOrderModal(itemName, itemPrice, shopName, shopPhone) {
-    currentOrder = { itemName, itemPrice, shopName, shopPhone };
-    document.getElementById('order-item-name').innerText = itemName;
-    document.getElementById('order-item-price').innerText = `₹${itemPrice}`;
-    document.getElementById('order-shop-name').innerText = shopName || 'Local Store';
-    
-    // ✨ NAYA LOGIC: Modal ke andar ke buttons ko Service ke hisaab se update karna ✨
-    let isServiceModal = false;
-    if (typeof globalBusinessType !== 'undefined' && globalBusinessType === 'Service Provider') {
-        isServiceModal = true;
-    } else if (itemName.toLowerCase().includes('service')) {
-        isServiceModal = true;
-    }
+        function openOrderModal(itemName, itemPrice, shopName, shopPhone) {
+            currentOrder = { itemName, itemPrice, shopName, shopPhone };
+            document.getElementById('order-item-name').innerText = itemName;
+            document.getElementById('order-item-price').innerText = `₹${itemPrice}`;
+            document.getElementById('order-shop-name').innerText = shopName || 'Local Store';
+            
+            let isServiceModal = false;
+            if (typeof globalBusinessType !== 'undefined' && globalBusinessType === 'Service Provider') {
+                isServiceModal = true;
+            } else if (itemName.toLowerCase().includes('service')) {
+                isServiceModal = true;
+            }
 
-    const mainBtn = document.getElementById('main-order-btn');
-    const waBtn = document.querySelector('button[onclick="orderViaWhatsApp()"]');
+            const mainBtn = document.getElementById('main-order-btn');
+            const waBtn = document.querySelector('button[onclick="orderViaWhatsApp()"]');
 
-    if (mainBtn) {
-        mainBtn.innerHTML = isServiceModal 
-            ? `Book Now <i class="fas fa-check-circle text-green-400"></i>` 
-            : `Place Order Now <i class="fas fa-check-circle text-green-400"></i>`;
-    }
-    if (waBtn) {
-        waBtn.innerHTML = isServiceModal 
-            ? `<i class="fab fa-whatsapp text-lg"></i> Book via WhatsApp` 
-            : `<i class="fab fa-whatsapp text-lg"></i> Order via WhatsApp`;
-    }
-    
-    // ✨ SMART PRE-FILL LOGIC (Email filter + Saved Address) ✨
-    const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
-    let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
-    const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
+            if (mainBtn) {
+                mainBtn.innerHTML = isServiceModal 
+                    ? `Book Now <i class="fas fa-check-circle text-green-400"></i>` 
+                    : `Place Order Now <i class="fas fa-check-circle text-green-400"></i>`;
+            }
+            if (waBtn) {
+                waBtn.innerHTML = isServiceModal 
+                    ? `<i class="fab fa-whatsapp text-lg"></i> Book via WhatsApp` 
+                    : `<i class="fab fa-whatsapp text-lg"></i> Order via WhatsApp`;
+            }
+            
+            const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
+            let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
+            const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
 
-    // अगर फोन में '@' है (यानी ईमेल है), तो इसे खाली छोड़ दो
-    if (savedPhone.includes('@')) {
-        savedPhone = '';
-    }
+            if (savedPhone.includes('@')) savedPhone = '';
 
-    // फॉर्म में डाटा डाल दो
-    document.getElementById('order-cust-name').value = savedName;
-    document.getElementById('order-cust-phone').value = savedPhone;
-    document.getElementById('order-address').value = savedAddress;
-    
-    if (document.getElementById('order-shop-phone')) {
-        document.getElementById('order-shop-phone').value = shopPhone || '';
-    }
+            document.getElementById('order-cust-name').value = savedName;
+            document.getElementById('order-cust-phone').value = savedPhone;
+            document.getElementById('order-address').value = savedAddress;
+            
+            if (document.getElementById('order-shop-phone')) {
+                document.getElementById('order-shop-phone').value = shopPhone || '';
+            }
 
-    const modal = document.getElementById('order-modal');
-    const content = document.getElementById('order-modal-content');
-    modal.classList.remove('hidden');
-    
-    setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        content.classList.remove('scale-75');
-        content.classList.add('scale-100');
-    }, 10);
-    document.body.style.overflow = 'hidden'; 
-}
-
+            const modal = document.getElementById('order-modal');
+            const content = document.getElementById('order-modal-content');
+            modal.classList.remove('hidden');
+            
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-75');
+                content.classList.add('scale-100');
+            }, 10);
+            document.body.style.overflow = 'hidden'; 
+        }
 
         function closeOrderModal() {
             const modal = document.getElementById('order-modal');
@@ -1398,18 +1463,16 @@ grid.innerHTML = html;
             setTimeout(() => { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 500); 
         }
 
-         // ✨ IN-APP PLACE ORDER (FIXED FOR MY ORDERS) ✨
         async function submitOrder(e) {
             e.preventDefault();
             const qty = document.getElementById('order-qty').value;
             const custName = document.getElementById('order-cust-name').value.trim();
-            const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); // फॉर्म वाला नंबर
+            const custWhatsApp = document.getElementById('order-cust-phone').value.trim(); 
             const address = document.getElementById('order-address').value.trim();
             
             const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
             const phone = currentOrder.shopPhone || '9876543210';
             
-            // ✨ ASLI ACCOUNT ID YAHAN SE NIKALO ✨
             const accountId = localStorage.getItem('pixigenie_customer_phone');
 
             const btn = document.getElementById('main-order-btn');
@@ -1418,16 +1481,14 @@ grid.innerHTML = html;
             btn.disabled = true;
 
             try {
-                                await db.collection('orders').add({
+                await db.collection('orders').add({
                     customerId: accountId, 
                     customerName: custName,
                     customerPhone: custWhatsApp, 
                     customerAddress: address,
-                    // ✨ NAYA LOGIC: GPS Coordinates ✨
                     lat: document.getElementById('order-lat').value || null,
                     lng: document.getElementById('order-lng').value || null,
                     shopPhone: phone,
-
                     shopName: currentOrder.shopName || 'Local Store',
                     items: [{ name: currentOrder.itemName, qty: parseInt(qty), price: parseInt(currentOrder.itemPrice) }],
                     totalAmount: total,
@@ -1459,7 +1520,6 @@ grid.innerHTML = html;
             window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(waMessage)}`, '_blank');
         }
 
-        // ✨ SUCCESS MODAL HANDLERS ✨
         function showOrderSuccessModal() {
             const modal = document.getElementById('order-success-modal');
             const content = document.getElementById('order-success-content');
@@ -1469,7 +1529,6 @@ grid.innerHTML = html;
 
         function closeSuccessAndGoToOrders() { window.location.href = 'my-orders.html'; }
 
-        // ✨ Store Product Search Logic ✨
         function filterStoreProducts(query) {
             query = query.toLowerCase().trim();
             const container = document.getElementById('products-grid'); 
@@ -1483,7 +1542,6 @@ grid.innerHTML = html;
             }
         }
 
-        // ✨ AUTO FETCH GPS ADDRESS FUNCTION ✨
         function fetchCustomerGPS(inputId, btnId) {
             const btn = document.getElementById(btnId); const addrInput = document.getElementById(inputId);
             if (!navigator.geolocation) { alert("GPS is not supported by your browser."); return; }
@@ -1491,15 +1549,13 @@ grid.innerHTML = html;
 
             navigator.geolocation.getCurrentPosition(
                 async (pos) => {
-                                     const lat = pos.coords.latitude; const lng = pos.coords.longitude;
+                    const lat = pos.coords.latitude; const lng = pos.coords.longitude;
                     
-                    // ✨ NAYA LOGIC: Save GPS in Hidden Fields ✨
-                    let prefix = inputId.split('-')[0]; // Ye automatically 'order' ya 'cart' pakad lega
+                    let prefix = inputId.split('-')[0]; 
                     if(document.getElementById(prefix + '-lat')) document.getElementById(prefix + '-lat').value = lat;
                     if(document.getElementById(prefix + '-lng')) document.getElementById(prefix + '-lng').value = lng;
                     
                     try {
-
                         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
                         const data = await res.json();
                         if (data && data.display_name) {
@@ -1514,29 +1570,8 @@ grid.innerHTML = html;
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         }
-        // ✨ कस्टमर को लॉगिन पर भेजना और वापस आने का रास्ता सेव करना
-        function goToCustomerLogin() {
-            // मौजूदा दुकान का पूरा URL localStorage में सेव कर दो
-            localStorage.setItem('pixigenie_return_url', window.location.href);
-            // लॉगिन पेज पर भेज दो
-            window.location.href = 'index.html'; 
-        }
 
-        // ✨ शॉपिंग से पहले लॉगिन चेक करने का फंक्शन
-        function enforceCustomerLogin() {
-            // चेक करो कि कस्टमर का डेटा सेव है या नहीं (अपने हिसाब से key बदल लेना अगर अलग हो)
-            const isCustomerLoggedIn = localStorage.getItem('pixigenie_customer_phone') || localStorage.getItem('customer_data'); 
-            
-            if (!isCustomerLoggedIn) {
-                // अगर लॉगिन नहीं है, तो सीधा लॉगिन पेज पर फेंको
-                goToCustomerLogin();
-                return false;
-            }
-            return true;
-        }
-        // ✨ NAYA: Store Logo Upload & Save Function ✨
         async function uploadStoreLogo(event) {
-            // सिक्यूरिटी: सिर्फ दुकान का मालिक ही फोटो बदल सकता है
             const loggedInOwner = localStorage.getItem('pixigenie_active_shop');
             if (loggedInOwner !== currentShopId) {
                 alert("⚠️ Only the store owner can change this logo!");
@@ -1557,7 +1592,6 @@ grid.innerHTML = html;
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = async function() {
-                    // फोटो को 200px में Compress करना
                     const canvas = document.createElement('canvas');
                     let size = 200; 
                     let w = img.width, h = img.height;
@@ -1569,13 +1603,11 @@ grid.innerHTML = html;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                     const base64Image = canvas.toDataURL('image/jpeg', 0.8);
 
-                    // तुरंत स्क्रीन पर दिखाओ
                     imgEl.src = base64Image;
                     imgEl.classList.remove('hidden');
                     iconEl.style.display = 'none';
 
                     try {
-                        // Firebase में storeLogo के नाम से सेव करो
                         await db.collection('shops').doc(currentShopId).update({ storeLogo: base64Image });
                         alert("Store Logo Updated Successfully! 🎉");
                     } catch (err) {
@@ -1589,7 +1621,7 @@ grid.innerHTML = html;
             };
             reader.readAsDataURL(file);
         }
-        // ✨ NAYA: Success Modal ko wahin close karne ka function ✨
+
         function closeOrderSuccessModal() {
             const modal = document.getElementById('order-success-modal');
             const content = document.getElementById('order-success-content');
@@ -1600,13 +1632,10 @@ grid.innerHTML = html;
             
             setTimeout(() => { 
                 modal.classList.add('hidden'); 
-                document.body.style.overflow = 'auto'; // Background scrolling wapas chalu
+                document.body.style.overflow = 'auto'; 
             }, 300);
         }
 
-              // ==========================================
-        // 🗺️ PREMIUM MAP PICKER (Google Maps UI + Live Fetch)
-        // ==========================================
         let mapInstance = null;
         let currentTargetAddressId = '';
         let currentTargetLatId = '';
@@ -1626,7 +1655,6 @@ grid.innerHTML = html;
             const preview = document.getElementById('map-address-preview');
             preview.innerHTML = `<i class="fas fa-circle-notch fa-spin text-purple-500 mr-1"></i> Getting your live location...`;
 
-            // Agar pehle se coordinate save hai, to usko use karo
             const existingLat = document.getElementById(latId) ? parseFloat(document.getElementById(latId).value) : null;
             const existingLng = document.getElementById(lngId) ? parseFloat(document.getElementById(lngId).value) : null;
 
@@ -1635,7 +1663,6 @@ grid.innerHTML = html;
                 selectedLng = existingLng;
                 initOrUpdateMap();
             } else {
-                // ✨ NAYA LOGIC: Agar naya address hai toh Map khulte hi Live Location fetch karo
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (pos) => {
@@ -1643,7 +1670,7 @@ grid.innerHTML = html;
                             selectedLng = pos.coords.longitude;
                             initOrUpdateMap();
                         },
-                        (err) => { initOrUpdateMap(); }, // Agar GPS band hai, toh default location khul jayegi
+                        (err) => { initOrUpdateMap(); }, 
                         { enableHighAccuracy: true, timeout: 5000 }
                     );
                 } else {
@@ -1654,10 +1681,8 @@ grid.innerHTML = html;
 
         function initOrUpdateMap() {
             if (!mapInstance) {
-                // Zoom level 18 kar diya (Galiyan ekdum clear dikhengi)
                 mapInstance = L.map('map-container', { zoomControl: false }).setView([selectedLat, selectedLng], 18);
                 
-                // ✨ NAYA: GOOGLE MAPS TILE (Premium Look) ✨
                 L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { 
                     maxZoom: 20,
                     attribution: '© Google Maps'
@@ -1690,7 +1715,6 @@ grid.innerHTML = html;
             setTimeout(() => { mapInstance.invalidateSize(); mapInstance.fire('moveend'); }, 300);
         }
 
-        // ✨ NAYA: Map ke andar wala GPS crosshair button ✨
         function goToLiveLocation() {
             const btn = document.getElementById('live-gps-btn');
             btn.innerHTML = `<i class="fas fa-circle-notch fa-spin text-xl"></i>`;
@@ -1701,7 +1725,7 @@ grid.innerHTML = html;
                         selectedLng = pos.coords.longitude;
                         if(mapInstance) {
                             mapInstance.setView([selectedLat, selectedLng], 18);
-                            mapInstance.fire('moveend'); // Force address fetch
+                            mapInstance.fire('moveend'); 
                         }
                         btn.innerHTML = `<i class="fas fa-crosshairs text-xl"></i>`;
                     },
@@ -1736,97 +1760,97 @@ grid.innerHTML = html;
             
             closeMapPicker();
         }
-async function loadMoreProducts() {
-    if (!hasMoreProducts || !currentShopId) return;
-    const btn = document.getElementById('load-more-products-btn');
-    btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Loading...`;
-    
-    try {
-        const snap = await db.collection('shops').doc(currentShopId).collection('products')
-                             .orderBy('timestamp', 'desc')
-                             .startAfter(lastProductDoc)
-                             .limit(12).get();
-                             
-        if (snap.empty) {
-            hasMoreProducts = false;
-            btn.classList.add('hidden');
-            return;
-        }
-        
-        lastProductDoc = snap.docs[snap.docs.length - 1];
-        if (snap.docs.length < 12) {
-            hasMoreProducts = false;
-            btn.classList.add('hidden');
-        } else {
-            btn.innerHTML = `Load More Products <i class="fas fa-arrow-down ml-1"></i>`;
-        }
-        
+
+        async function loadMoreProducts() {
+            if (!hasMoreProducts || !currentShopId) return;
+            const btn = document.getElementById('load-more-products-btn');
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Loading...`;
+            
+            try {
+                const snap = await db.collection('shops').doc(currentShopId).collection('products')
+                                     .orderBy('timestamp', 'desc')
+                                     .startAfter(lastProductDoc)
+                                     .limit(12).get();
+                                     
+                if (snap.empty) {
+                    hasMoreProducts = false;
+                    btn.classList.add('hidden');
+                    return;
+                }
+                
+                lastProductDoc = snap.docs[snap.docs.length - 1];
+                if (snap.docs.length < 12) {
+                    hasMoreProducts = false;
+                    btn.classList.add('hidden');
+                } else {
+                    btn.innerHTML = `Load More Products <i class="fas fa-arrow-down ml-1"></i>`;
+                }
+                
                 let html = '';
-        snap.forEach(doc => {
-            const product = doc.data();
-            const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
-            const unit = product.unit || 'pcs';
-            // ✨ NAYA: BUTTON TEXT LOGIC ✨
-            let isServiceItem = (globalBusinessType === 'Service Provider') || 
-                                (product.name && product.name.toLowerCase().includes('service')) || 
-                                (unit.toLowerCase() === 'hr');
-            const buttonText = isServiceItem ? "Book Now" : "Order Now";
-            // ✨ NAYA: DISCOUNT CALCULATION LOGIC ✨
-            let discountBadgeHtml = '';
-            let priceDisplayHtml = `<p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>`;
+                snap.forEach(doc => {
+                    const product = doc.data();
+                    const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
+                    const unit = product.unit || 'pcs';
+                    
+                    let isServiceItem = (globalBusinessType === 'Service Provider') || 
+                                        (product.name && product.name.toLowerCase().includes('service')) || 
+                                        (unit.toLowerCase() === 'hr');
+                    const buttonText = isServiceItem ? "Book Now" : "Order Now";
+                    
+                    let discountBadgeHtml = '';
+                    let priceDisplayHtml = `<p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>`;
 
-            if (product.mrp && product.mrp > product.price) {
-                const discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
-                discountBadgeHtml = `
-                    <div class="absolute top-2 right-2 bg-[#DC2626] text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm z-10 tracking-wider">
-                        ${discountPercent}% OFF
-                    </div>
-                `;
-                priceDisplayHtml = `
-                    <div class="flex items-center gap-1.5 mt-1">
-                        <p class="font-black text-[#16A34A] text-base">₹${product.price}</p>
-                        <p class="text-[11px] text-gray-400 font-bold line-through mt-0.5">₹${product.mrp}</p>
-                    </div>
-                `;
+                    if (product.mrp && product.mrp > product.price) {
+                        const discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
+                        discountBadgeHtml = `
+                            <div class="absolute top-2 right-2 bg-[#DC2626] text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm z-10 tracking-wider">
+                                ${discountPercent}% OFF
+                            </div>
+                        `;
+                        priceDisplayHtml = `
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <p class="font-black text-[#16A34A] text-base">₹${product.price}</p>
+                                <p class="text-[11px] text-gray-400 font-bold line-through mt-0.5">₹${product.mrp}</p>
+                            </div>
+                        `;
+                    }
+
+                    const safeName = encodeURIComponent(product.name || '');
+                    const safeDesc = encodeURIComponent(product.description || '');
+                    const safeShopName = encodeURIComponent(globalShopName || 'Local Shop');
+
+                    html += `
+                    <div onclick="openProductDetails('${safeName}', '${product.mrp||0}', '${product.price}', '${safeShopName}', '${globalShopPhone}', '${product.image||''}', currentShopId, ${isServiceItem}, '${safeDesc}')" class="grid-item p-4 flex flex-col active:bg-gray-50 transition relative cursor-pointer">
+                        <div class="w-full aspect-square bg-gray-50 rounded-[14px] mb-3 flex items-center justify-center overflow-hidden relative">
+                            ${product.image ? `<img src="${product.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-3xl text-gray-200"></i>`}
+                            ${discountBadgeHtml}
+                            <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-700 shadow-sm">${qtySize} ${unit}</div>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-gray-900 font-semibold text-[13px] leading-tight line-clamp-2">${product.name}</h4>
+                            ${priceDisplayHtml}
+                        </div>
+                        <div class="flex flex-col gap-2 w-full mt-3">
+                            <div class="flex gap-2 w-full">
+                                <button onclick="event.stopPropagation(); addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
+                                    <i class="fas fa-cart-plus text-sm"></i> Cart
+                                </button>
+                                <button onclick="event.stopPropagation(); openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
+                                    ${buttonText}
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                
+                document.getElementById('products-grid').insertAdjacentHTML('beforeend', html);
+
+            } catch (e) {
+                console.error("Error loading more products:", e);
+                btn.innerHTML = `Load More Products <i class="fas fa-arrow-down ml-1"></i>`;
             }
+        }
 
-            html += `
-            <div class="grid-item p-4 flex flex-col active:bg-gray-50 transition relative">
-                <div class="w-full aspect-square bg-gray-50 rounded-[14px] mb-3 flex items-center justify-center overflow-hidden relative">
-                    ${product.image ? `<img src="${product.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-3xl text-gray-200"></i>`}
-                    
-                    <!-- ✨ DISCOUNT BADGE ✨ -->
-                    ${discountBadgeHtml}
-
-                    <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-700 shadow-sm">${qtySize} ${unit}</div>
-                </div>
-                <div class="flex-1">
-                    <h4 class="text-gray-900 font-semibold text-[13px] leading-tight line-clamp-2">${product.name}</h4>
-                    
-                    <!-- ✨ PRICE & MRP ✨ -->
-                    ${priceDisplayHtml}
-                    
-                </div>
-                <div class="flex flex-col gap-2 w-full mt-3">
-                    <div class="flex gap-2 w-full">
-                        <button onclick="addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
-                            <i class="fas fa-cart-plus text-sm"></i> Cart
-                        </button>
-                        <button onclick="openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
-                             ${buttonText}
-                        </button>
-                    </div>
-                </div>
-            </div>`;
-        });
-        
-        document.getElementById('products-grid').insertAdjacentHTML('beforeend', html);
-
-    } catch (e) {
-        console.error("Error loading more products:", e);
-        btn.innerHTML = `Load More Products <i class="fas fa-arrow-down ml-1"></i>`;
-    }
-}
         function closeFlashOffer() {
             const m = document.getElementById('flash-offer-modal');
             const c = document.getElementById('flash-offer-content');
@@ -1834,11 +1858,6 @@ async function loadMoreProducts() {
             setTimeout(() => { m.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 500);
         }
 
-        // ==========================================
-        // ✨ ANALYTICS EVENT TRACKING SYSTEM ✨
-        // ==========================================
-        
-        // 1. TRACK PROFILE VIEWS (Dukaan khulte hi 1 view count hoga)
         setTimeout(() => {
             if (typeof currentShopId !== 'undefined' && currentShopId) {
                 db.collection('shops').doc(currentShopId).update({
@@ -1847,7 +1866,6 @@ async function loadMoreProducts() {
             }
         }, 2500);
 
-        // 2. TRACK BUTTON CLICKS (Message, Map, Orders)
         function trackEvent(eventType) {
             if (typeof currentShopId !== 'undefined' && currentShopId) {
                 let updateData = {};
@@ -1858,37 +1876,5 @@ async function loadMoreProducts() {
         }
 
     </script>
-         <!-- ✨ LIVE MAP PICKER MODAL (PREMIUM GOOGLE STYLE) ✨ -->
-    <div id="map-picker-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-sm z-[200] hidden flex flex-col transition-all duration-300 opacity-0">
-        <!-- Header -->
-        <div class="bg-white flex items-center justify-between p-4 shadow-sm z-10 shrink-0 rounded-b-2xl">
-            <h3 class="font-black text-gray-900 text-lg flex items-center gap-2"><i class="fas fa-map-marker-alt text-purple-500"></i> Pin Location</h3>
-            <button onclick="closeMapPicker()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 active:scale-90 transition"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <!-- Map Area -->
-        <div class="relative flex-1 w-full bg-gray-100 overflow-hidden">
-            <div id="map-container" class="absolute inset-0 w-full h-full z-0"></div>
-            
-            <!-- Center Target Pin -->
-            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[400] pointer-events-none pb-8 animate-bounce">
-                <i class="fas fa-map-marker-alt text-4xl text-red-500 drop-shadow-md"></i>
-            </div>
-            
-            <!-- ✨ NAYA: Live GPS Button (Map ke upar) ✨ -->
-            <button onclick="goToLiveLocation()" id="live-gps-btn" class="absolute bottom-6 right-4 z-[400] w-12 h-12 bg-white rounded-full shadow-[0_5px_15px_rgba(0,0,0,0.2)] flex items-center justify-center text-blue-600 hover:bg-gray-50 active:scale-95 transition border border-gray-100">
-                <i class="fas fa-crosshairs text-xl"></i>
-            </button>
-        </div>
-        
-        <!-- Footer -->
-        <div class="bg-white p-5 shadow-[0_-10px_20px_rgba(0,0,0,0.1)] z-10 shrink-0 rounded-t-3xl">
-            <p id="map-address-preview" class="text-xs text-gray-600 font-semibold mb-3 line-clamp-2 leading-relaxed"><i class="fas fa-spinner fa-spin mr-1"></i> Finding your location...</p>
-            <button onclick="confirmMapLocation()" id="map-confirm-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-xl active:scale-95 transition shadow-lg flex items-center justify-center gap-2">
-                Confirm Location <i class="fas fa-check-circle text-green-400"></i>
-            </button>
-        </div>
-    </div>
-
 </body>
 </html>
