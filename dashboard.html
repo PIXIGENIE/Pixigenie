@@ -813,8 +813,8 @@
                 </div>
 
                 <span id="views-change"
-                      class="text-[10px] font-bold text-slate-400">
-                    —
+                      class="text-[9px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
+                    All Time
                 </span>
 
             </div>
@@ -847,7 +847,9 @@
                 <div class="w-10 h-10 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center">
                     <i class="fas fa-search"></i>
                 </div>
-                <span id="visits-change" class="text-[10px] font-bold text-slate-400">—</span>
+                <span id="visits-change" class="text-[9px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
+                    All Time
+                </span>
             </div>
             <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500">Search Impressions</p>
             <h3 id="metric-visits" class="text-2xl sm:text-3xl font-black text-slate-900 mt-1 break-words">0</h3>
@@ -871,8 +873,8 @@
                 </div>
 
                 <span id="enquiries-change"
-                      class="text-[10px] font-bold text-slate-400">
-                    —
+                      class="text-[9px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
+                    All Time
                 </span>
 
             </div>
@@ -915,8 +917,8 @@
                 </div>
 
                 <span id="orders-change"
-                      class="text-[10px] font-bold text-slate-400">
-                    —
+                      class="text-[9px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+                    Selected Period
                 </span>
 
             </div>
@@ -1035,7 +1037,7 @@
                     <p class="text-3xl font-black text-slate-900" id="metric-conversion-rate">0%</p>
                     <p class="text-xs text-slate-400 mt-1">Profile views to orders ratio</p>
                 </div>
-                <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded-md">Smart Metric</span>
+                <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">All Time</span>
             </div>
         </div>
 
@@ -1124,69 +1126,40 @@
     </div>
 
 
-    <!-- ================= CUSTOMER ACTIVITY ================= -->
-
-    <div class="bg-white border border-slate-200
-                rounded-[26px] p-5 sm:p-6 shadow-sm mb-7">
-
-        <div class="mb-5">
-
-            <h3 class="text-lg font-black text-slate-900">
-                Customer Activity
-            </h3>
-
-            <p class="text-xs text-slate-400 mt-1">
-                Understand how customers interact with your store.
-            </p>
-
-        </div>
-
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
 
-
-                        <!-- ITEMS SOLD (Replaced Phone Calls) -->
-            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
-                <i class="fas fa-box-open text-blue-500 mb-3"></i>
+            <!-- ITEMS SOLD (Date Filtered) -->
+            <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <i class="fas fa-box-open text-emerald-500 text-lg"></i>
+                    <span class="text-[9px] font-bold bg-emerald-200/60 text-emerald-700 px-1.5 py-0.5 rounded">Period</span>
+                </div>
                 <p class="text-xs font-bold text-slate-600">Total Items Sold</p>
                 <h4 id="activity-calls" class="text-2xl font-black text-slate-900 mt-1">0</h4>
             </div>
 
-
-
-            <div class="rounded-2xl bg-slate-50
-                        border border-slate-100 p-4">
-
-                <i class="fab fa-whatsapp text-emerald-500 mb-3"></i>
-
-                <p class="text-xs font-bold text-slate-600">
-                    WhatsApp Enquiries
-                </p>
-
-                <h4 id="activity-whatsapp"
-                    class="text-2xl font-black text-slate-900 mt-1">
-                    0
-                </h4>
-
+            <!-- WHATSAPP ENQUIRIES (All Time) -->
+            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <i class="fab fa-whatsapp text-emerald-500 text-lg"></i>
+                    <span class="text-[9px] font-bold bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded">All Time</span>
+                </div>
+                <p class="text-xs font-bold text-slate-600">WhatsApp Enquiries</p>
+                <h4 id="activity-whatsapp" class="text-2xl font-black text-slate-900 mt-1">0</h4>
             </div>
 
-
-            <div class="rounded-2xl bg-slate-50
-                        border border-slate-100 p-4">
-
-                <i class="fas fa-map-marker-alt text-rose-500 mb-3"></i>
-
-                <p class="text-xs font-bold text-slate-600">
-                    Direction Requests
-                </p>
-
-                <h4 id="activity-directions"
-                    class="text-2xl font-black text-slate-900 mt-1">
-                    0
-                </h4>
-
+            <!-- DIRECTIONS (All Time) -->
+            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <i class="fas fa-map-marker-alt text-rose-500 text-lg"></i>
+                    <span class="text-[9px] font-bold bg-slate-200 text-slate-500 px-1.5 py-0.5 rounded">All Time</span>
+                </div>
+                <p class="text-xs font-bold text-slate-600">Direction Requests</p>
+                <h4 id="activity-directions" class="text-2xl font-black text-slate-900 mt-1">0</h4>
             </div>
 
         </div>
+
 
     </div>
 
@@ -9088,6 +9061,48 @@ async function initPremiumAnalytics() {
         }
 
         updateGrowthChart("orders");
+                // --- ✨ NAYA: FREEMIUM HOOK LOGIC (LOCK PREMIUM CARDS) ✨ ---
+        const applyPremiumLock = (elementId, title, desc) => {
+            const innerEl = document.getElementById(elementId);
+            if (!innerEl) return;
+            const card = innerEl.closest('.bg-white'); // ये अपने आप पूरे कार्ड को पकड़ लेगा
+            if (!card) return;
+            
+            card.classList.add('relative', 'overflow-hidden');
+            
+            // अगर पहले से लॉक है तो उसे हटाओ (ताकि डबल न लगे)
+            const oldLock = card.querySelector('.dynamic-premium-lock');
+            if (oldLock) oldLock.remove();
+
+            // प्लान चेक करो 
+            const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
+            const isPremium = plan === 'plus' || plan === 'pro';
+
+            // अगर फ्री (basic) है, तो Blur Lock लगा दो
+            if (!isPremium) {
+                const lock = document.createElement('div');
+                lock.className = 'dynamic-premium-lock absolute inset-0 bg-white/70 backdrop-blur-md z-20 flex flex-col items-center justify-center p-6 text-center transition-all duration-300';
+                lock.innerHTML = `
+                    <div class="w-14 h-14 bg-gradient-to-tr from-yellow-400 to-amber-500 rounded-[16px] flex items-center justify-center text-white shadow-lg mb-3 border border-yellow-200">
+                        <i class="fas fa-crown text-2xl"></i>
+                    </div>
+                    <h4 class="font-black text-slate-900 text-lg mb-1">${title}</h4>
+                    <p class="text-[11px] text-slate-600 mb-4 font-bold max-w-[200px] leading-relaxed">${desc}</p>
+                    <button onclick="window.location.href='index.html?shop=' + currentShopId + '#merchant-upgrade-plans'" class="bg-slate-900 hover:bg-black text-white text-xs font-bold px-6 py-3 rounded-[12px] transition active:scale-95 shadow-md flex items-center gap-2">
+                        <i class="fas fa-lock-open"></i> Unlock Feature
+                    </button>
+                `;
+                card.appendChild(lock);
+            }
+        };
+
+        // इन 4 एडवांस्ड फीचर्स पर लॉक लगाओ (Basic Users के लिए)
+        applyPremiumLock('growthChart', 'Growth Analytics', 'See your daily order trends and revenue graphs.');
+        applyPremiumLock('metric-repeat-cust', 'Smart Store Health', 'Track loyal customers, rush hours & average bill size.');
+        applyPremiumLock('top-products-list', 'Product Performance', 'Discover which products are driving the most sales.');
+        applyPremiumLock('insights-list', 'Performance Insights', 'Get AI-powered tips for cart sizes and follow-ups.');
+        // --- ✨ FREEMIUM HOOK END ✨ ---
+
         updateAnalyticsTimestamp();
 
     } catch (error) {
