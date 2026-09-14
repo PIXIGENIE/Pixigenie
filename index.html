@@ -3444,87 +3444,157 @@ function trackSearchImpression(shopIdToTrack) {
             document.body.style.overflow = 'hidden';
         }
 
-function closeProductDetails() {
-    const page = document.getElementById('product-details-page');
-    page.classList.remove('translate-x-0');
-    page.classList.add('translate-x-full');
-    setTimeout(() => {
-        page.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }, 300);
-}
-
-async function loadSimilarProducts() {
-    const container = document.getElementById('similar-products-list');
-    container.innerHTML = '<div class="w-full text-center py-6"><i class="fas fa-spinner fa-spin text-purple-500"></i> Loading...</div>';
-    
-    try {
-        const snap = await db.collectionGroup('products').limit(6).get();
-        
-        if (snap.empty) {
-            container.innerHTML = '<p class="text-xs text-gray-500 px-4 py-6">No similar items found.</p>';
-            return;
+        function closeProductDetails() {
+            const page = document.getElementById('product-details-page');
+            page.classList.remove('translate-x-0');
+            page.classList.add('translate-x-full');
+            setTimeout(() => {
+                page.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
 
-        const itemPromises = snap.docs.map(async (doc) => {
-            const p = doc.data();
-            if(!p.name) return null;
+        // ==========================================
+        // ✨ MODAL DESCRIPTION & SIMILAR PRODUCTS LOGIC ✨
+        // ==========================================
+        let currentModalDesc = "";
+        let isModalDescExpanded = false;
+
+        function renderModalDescription() {
+            const descEl = document.getElementById('detail-desc');
+            const toggleBtn = document.getElementById('detail-desc-toggle-btn');
             
-            let shopName = "Local Shop";
-            let shopPhone = "";
-            let shopId = "";
-            let isService = false;
+            if (currentModalDesc === '') {
+                descEl.innerHTML = '<i>No description provided by the seller.</i>';
+                toggleBtn.classList.add('hidden');
+                return;
+            }
 
-            if (doc.ref.parent && doc.ref.parent.parent) {
-                try {
-                    const shopDoc = await doc.ref.parent.parent.get();
-                    if (shopDoc.exists) {
-                        const sData = shopDoc.data();
-                        shopName = sData.shopName || "Local Shop";
-                        shopPhone = sData.phone || "";
-                        shopId = shopDoc.id;
-                        isService = sData.businessType === 'Service Provider';
+            if (currentModalDesc.length > 80 && !isModalDescExpanded) { 
+                descEl.innerText = currentModalDesc.substring(0, 80) + "..."; 
+                toggleBtn.innerText = "more"; 
+                toggleBtn.classList.remove('hidden'); 
+            } else if (isModalDescExpanded) { 
+                descEl.innerText = currentModalDesc; 
+                toggleBtn.innerText = "less"; 
+                toggleBtn.classList.remove('hidden'); 
+            } else { 
+                descEl.innerText = currentModalDesc; 
+                toggleBtn.classList.add('hidden'); 
+            }
+        }
+
+        function toggleModalDescription() { 
+            isModalDescExpanded = !isModalDescExpanded; 
+            renderModalDescription(); 
+        }
+
+        // --- SIMILAR PRODUCTS PAGINATION (10-10 LOAD) ---
+        let modalSimilarLastDoc = null;
+        let modalSimilarHasMore = true;
+        let modalCurrentShopIdForSimilar = "";
+        let modalCurrentShopNameForSimilar = "";
+        let modalCurrentShopPhoneForSimilar = "";
+        let modalCurrentIsService = false;
+
+        async function loadStoreSimilarProducts(shopId, safeShopName, shopPhone, isService) {
+            modalSimilarLastDoc = null;
+            modalSimilarHasMore = true;
+            modalCurrentShopIdForSimilar = shopId;
+            modalCurrentShopNameForSimilar = safeShopName;
+            modalCurrentShopPhoneForSimilar = shopPhone;
+            modalCurrentIsService = isService;
+
+            const container = document.getElementById('similar-products-list');
+            const btn = document.getElementById('modal-load-more-btn');
+            
+            container.innerHTML = '<div class="w-full text-center py-6"><i class="fas fa-spinner fa-spin text-purple-500"></i> Loading...</div>';
+            if (btn) btn.classList.add('hidden');
+
+            await fetchAndRenderModalProducts(true);
+        }
+
+        async function loadMoreModalProducts() {
+            if (!modalSimilarHasMore) return;
+            const btn = document.getElementById('modal-load-more-btn');
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Loading...`;
+            await fetchAndRenderModalProducts(false);
+        }
+
+        async function fetchAndRenderModalProducts(isFirstLoad) {
+            const container = document.getElementById('similar-products-list');
+            const btn = document.getElementById('modal-load-more-btn');
+            
+            try {
+                let query = db.collection('shops').doc(modalCurrentShopIdForSimilar).collection('products').orderBy('timestamp', 'desc').limit(10);
+                
+                if (!isFirstLoad && modalSimilarLastDoc) {
+                    query = query.startAfter(modalSimilarLastDoc);
+                }
+
+                const snap = await query.get();
+                
+                if (snap.empty) {
+                    modalSimilarHasMore = false;
+                    if (btn) btn.classList.add('hidden');
+                    if (isFirstLoad) container.innerHTML = '<p class="text-xs text-gray-500 px-4 py-6">No items found.</p>';
+                    return;
+                }
+
+                modalSimilarLastDoc = snap.docs[snap.docs.length - 1];
+                
+                if (snap.docs.length < 10) {
+                    modalSimilarHasMore = false;
+                    if (btn) btn.classList.add('hidden');
+                } else {
+                    modalSimilarHasMore = true;
+                    if (btn) {
+                        btn.classList.remove('hidden');
+                        btn.innerHTML = `Load More <i class="fas fa-arrow-right"></i>`;
                     }
-                } catch(e) {}
+                }
+
+                let html = '';
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    if(!p.name) return;
+                    const safeName = encodeURIComponent(p.name);
+                    const safeDesc = encodeURIComponent(p.description || "");
+                    
+                    let discountHtml = '';
+                    if (p.mrp && p.mrp > p.price) {
+                        let discountPercent = Math.round(((p.mrp - p.price) / p.mrp) * 100);
+                        discountHtml = `<div class="absolute top-1.5 left-1.5 bg-red-50 text-red-600 border border-red-100 text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm">${discountPercent}% OFF</div>`;
+                    }
+
+                    html += `
+                    <div onclick="openProductDetails('${safeName}', '${p.mrp||0}', '${p.price}', '${modalCurrentShopNameForSimilar}', '${modalCurrentShopPhoneForSimilar}', '${p.image||''}', '${modalCurrentShopIdForSimilar}', ${modalCurrentIsService}, '${safeDesc}')" class="w-36 shrink-0 snap-start bg-white border border-gray-100 rounded-[1rem] overflow-hidden cursor-pointer hover:shadow-md transition pb-2 shadow-sm">
+                        <div class="relative w-full h-32 bg-gray-50 flex items-center justify-center">
+                            ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-gray-300 text-2xl"></i>`}
+                            ${discountHtml}
+                        </div>
+                        <div class="p-2.5">
+                            <p class="text-[11px] font-bold text-gray-800 truncate">${p.name}</p>
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <span class="text-sm font-black text-gray-900">₹${p.price}</span>
+                                ${p.mrp && p.mrp > p.price ? `<span class="text-[9px] text-gray-400 line-through">₹${p.mrp}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                
+                if (isFirstLoad) {
+                    container.innerHTML = html;
+                } else {
+                    container.insertAdjacentHTML('beforeend', html);
+                }
+            } catch(e) {
+                console.error(e);
+                if (isFirstLoad) container.innerHTML = '<p class="text-xs text-red-400 px-4 py-6">Error loading products.</p>';
+                if (btn) btn.innerHTML = `Load More <i class="fas fa-arrow-right"></i>`;
             }
+        }
 
-            const safeName = encodeURIComponent(p.name);
-            const safeDesc = encodeURIComponent(p.description || "");
-            const safeShopName = encodeURIComponent(shopName);
-
-            // ✨ NAYA LOGIC: Discount Percentage Calculate karna ✨
-            let discountHtml = '';
-            if (p.mrp && p.mrp > p.price) {
-                let discountPercent = Math.round(((p.mrp - p.price) / p.mrp) * 100);
-                discountHtml = `<div class="absolute top-1.5 left-1.5 bg-red-50 text-red-600 border border-red-100 text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm">${discountPercent}% OFF</div>`;
-            }
-
-            return `
-            <div onclick="openProductDetails('${safeName}', '${p.mrp||0}', '${p.price}', '${safeShopName}', '${shopPhone}', '${p.image||''}', '${shopId}', ${isService}, '${safeDesc}')" class="w-36 shrink-0 snap-start bg-white border border-gray-100 rounded-[1rem] overflow-hidden cursor-pointer hover:shadow-md transition pb-2 shadow-sm">
-                <!-- Image Wrapper is now relative to hold the absolute discount tag -->
-                <div class="relative w-full h-32 bg-gray-50 flex items-center justify-center">
-                    ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-gray-300 text-2xl"></i>`}
-                    ${discountHtml}
-                </div>
-                <div class="p-2.5">
-                    <p class="text-[11px] font-bold text-gray-800 truncate">${p.name}</p>
-                    <div class="flex items-center gap-1.5 mt-1">
-                        <span class="text-sm font-black text-gray-900">₹${p.price}</span>
-                        ${p.mrp && p.mrp > p.price ? `<span class="text-[9px] text-gray-400 line-through">₹${p.mrp}</span>` : ''}
-                    </div>
-                </div>
-            </div>`;
-        });
-
-        const cardsHtmlArray = await Promise.all(itemPromises);
-        const finalHtml = cardsHtmlArray.filter(card => card !== null).join('');
-        
-        container.innerHTML = finalHtml || '<p class="text-xs text-gray-500 px-4 py-6">No similar items found.</p>';
-    } catch(e) {
-        console.log("Error loading similar products: ", e);
-        container.innerHTML = '<p class="text-xs text-red-400 px-4 py-6">Failed to load suggestions.</p>';
-    }
-}
 
     </script>
     <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
