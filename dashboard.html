@@ -1190,47 +1190,42 @@
 
     </div>
 
-
-     <!-- ================= SMART STORE HEALTH ================= -->
+    <!-- ================= SMART STORE HEALTH ================= -->
     <div class="bg-white border border-slate-200 rounded-[26px] p-5 sm:p-6 shadow-sm mb-7">
         <div class="mb-5 flex justify-between items-center">
             <div>
                 <h3 class="text-lg font-black text-slate-900">Smart Store Health</h3>
                 <p class="text-xs text-slate-400 mt-1">AI-powered insights about your customers.</p>
             </div>
-            <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center animate-pulse">
+            <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center animate-pulse shrink-0">
                 <i class="fas fa-sparkles"></i>
             </div>
         </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <!-- Repeat Customers -->
-            <div class="rounded-2xl bg-rose-50 border border-rose-100 p-4 flex gap-3 items-center">
-                <div class="w-10 h-10 bg-white rounded-xl text-rose-500 flex items-center justify-center shadow-sm shrink-0"><i class="fas fa-heart text-lg"></i></div>
-                <div>
-                    <p class="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Loyal Customers</p>
-                    <h4 id="metric-repeat-cust" class="text-xl font-black text-slate-900 mt-0.5">0%</h4>
-                </div>
+            <div class="rounded-2xl bg-rose-50 border border-rose-100 p-4 flex flex-col items-center text-center">
+                <div class="w-10 h-10 bg-white rounded-full text-rose-500 flex items-center justify-center shadow-sm mb-2"><i class="fas fa-heart text-lg"></i></div>
+                <p class="text-[10px] font-bold text-rose-500 uppercase tracking-wider mb-1">Loyal Cust.</p>
+                <h4 id="metric-repeat-cust" class="text-2xl font-black text-slate-900">0%</h4>
             </div>
             
             <!-- Peak Hours -->
-            <div class="rounded-2xl bg-blue-50 border border-blue-100 p-4 flex gap-3 items-center">
-                <div class="w-10 h-10 bg-white rounded-xl text-blue-500 flex items-center justify-center shadow-sm shrink-0"><i class="fas fa-clock text-lg"></i></div>
-                <div>
-                    <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Rush Hours</p>
-                    <h4 id="metric-peak-hours" class="text-sm font-black text-slate-900 mt-1 whitespace-nowrap">calculating...</h4>
-                </div>
+            <div class="rounded-2xl bg-blue-50 border border-blue-100 p-4 flex flex-col items-center text-center">
+                <div class="w-10 h-10 bg-white rounded-full text-blue-500 flex items-center justify-center shadow-sm mb-2"><i class="fas fa-clock text-lg"></i></div>
+                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">Rush Hours</p>
+                <h4 id="metric-peak-hours" class="text-sm font-black text-slate-900 mt-1">...</h4>
             </div>
             
             <!-- Average Bill -->
-            <div class="rounded-2xl bg-amber-50 border border-amber-100 p-4 flex gap-3 items-center">
-                <div class="w-10 h-10 bg-white rounded-xl text-amber-500 flex items-center justify-center shadow-sm shrink-0"><i class="fas fa-receipt text-lg"></i></div>
-                <div>
-                    <p class="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Avg. Bill Size</p>
-                    <h4 id="metric-avg-bill" class="text-xl font-black text-slate-900 mt-0.5">₹0</h4>
-                </div>
+            <div class="rounded-2xl bg-amber-50 border border-amber-100 p-4 flex flex-col items-center text-center">
+                <div class="w-10 h-10 bg-white rounded-full text-amber-500 flex items-center justify-center shadow-sm mb-2"><i class="fas fa-receipt text-lg"></i></div>
+                <p class="text-[10px] font-bold text-amber-500 uppercase tracking-wider mb-1">Avg. Bill Size</p>
+                <h4 id="metric-avg-bill" class="text-2xl font-black text-slate-900">₹0</h4>
             </div>
         </div>
+    </div>
+
     </div>
 
 
@@ -8904,13 +8899,12 @@ function getAnalyticsDateRange() {
 
 
 /* =====================================================
-   3. INITIALIZE ANALYTICS (100% REAL DATA)
+   3. INITIALIZE ANALYTICS (100% REAL DATA + DATE FILTER)
 ===================================================== */
 async function initPremiumAnalytics() {
     if (!globalShopData || !globalShopData.phone) return;
 
     try {
-        // 1. Fetch Real Orders, Revenue & Items Sold
         const range = getAnalyticsDateRange();
         const snapshot = await db.collection("orders").where("shopPhone", "==", globalShopData.phone).get();
 
@@ -8918,6 +8912,7 @@ async function initPremiumAnalytics() {
         let totalRevenue = 0;
         let totalItemsSold = 0;
         const allOrders = [];
+        const filteredOrders = []; // ✨ NAYA: Sirf selected dates ke orders
 
         snapshot.forEach(doc => {
             const order = { id: doc.id, ...doc.data() };
@@ -8926,9 +8921,11 @@ async function initPremiumAnalytics() {
             
             allOrders.push({ ...order, _analyticsDate: orderDate });
             
+            // DATE FILTER CHECK
             if (orderDate >= range.startDate && orderDate <= range.endDate) {
                 totalOrders++;
                 totalRevenue += getOrderAmount(order);
+                filteredOrders.push(order); // Sirf date range wale add honge
                 
                 if (order.items) {
                     order.items.forEach(item => {
@@ -8940,41 +8937,34 @@ async function initPremiumAnalytics() {
 
         analyticsState.orders = allOrders;
 
-        // 2. Fetch REAL Events from Firebase Tracker
+        // Fetch REAL Events (Views are All-Time to save Firebase Reads)
         let views = globalShopData.profileViews || 0;
         let impressions = globalShopData.searchImpressions || 0;
         let waClicks = globalShopData.whatsappClicks || 0;
-        let directions = globalShopData.directionClicks || 0;
 
-        // 3. Update UI Cards
+        // Update UI Basic Cards
         setAnalyticsValue("metric-views", formatNumber(views));
         setAnalyticsValue("metric-visits", formatNumber(impressions)); 
         setAnalyticsValue("metric-enquiries", formatNumber(waClicks)); 
         setAnalyticsValue("metric-orders", formatNumber(totalOrders));
         setAnalyticsValue("metric-revenue", formatCurrency(totalRevenue));
-        setAnalyticsValue("metric-impressions", formatNumber(impressions));
 
-        // Customer Activity Section Updates
-        if(document.getElementById('activity-calls')) document.getElementById('activity-calls').innerText = formatNumber(totalItemsSold); 
-        if(document.getElementById('activity-whatsapp')) document.getElementById('activity-whatsapp').innerText = formatNumber(waClicks);
-        if(document.getElementById('activity-directions')) document.getElementById('activity-directions').innerText = formatNumber(directions);
+        // 4. Store Conversion Rate (Views to Orders)
+        let conversionPercentage = views > 0 ? ((totalOrders / views) * 100).toFixed(1) : 0;
+        setAnalyticsValue("metric-conversion-rate", conversionPercentage + "%");
 
-             // --- ✨ SMART STORE HEALTH LOGIC ✨ ---
-        
-        // 1. Average Bill Size
+        // --- ✨ SMART STORE HEALTH LOGIC (FILTERED) ✨ ---
         let avgBill = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(0) : 0;
         setAnalyticsValue("metric-avg-bill", formatCurrency(avgBill));
 
-        // 2. Loyal Customers (Repeat Rate) & 3. Peak Rush Hours
         let phoneCounts = {};
         let hourCounts = {};
 
-        allOrders.forEach(order => {
-            // Counting Phones for Loyalty
+        // ✨ Yahan ab 'allOrders' ki jagah 'filteredOrders' use hoga
+        filteredOrders.forEach(order => {
             if (order.customerPhone && order.customerPhone !== 'N/A') {
                 phoneCounts[order.customerPhone] = (phoneCounts[order.customerPhone] || 0) + 1;
             }
-            // Counting Hours for Rush Time
             let orderD = getOrderDate(order);
             if (orderD) {
                 let hr = orderD.getHours();
@@ -8982,13 +8972,11 @@ async function initPremiumAnalytics() {
             }
         });
 
-        // Loyal Customers % Calculation
         let repeatCust = Object.values(phoneCounts).filter(v => v > 1).length;
         let totalUnique = Object.keys(phoneCounts).length;
         let repeatRate = totalUnique > 0 ? ((repeatCust / totalUnique) * 100).toFixed(0) : 0;
         setAnalyticsValue("metric-repeat-cust", repeatRate + "%");
 
-        // Peak Hour Calculation (AM/PM)
         let peakText = "Not enough data";
         if (Object.keys(hourCounts).length > 0) {
             let peakHour = Object.keys(hourCounts).reduce((a, b) => hourCounts[a] > hourCounts[b] ? a : b);
@@ -9001,12 +8989,9 @@ async function initPremiumAnalytics() {
         }
         setAnalyticsValue("metric-peak-hours", peakText);
 
-
-        // 👇👇 YAHAN DALNA THA WOH NAYA CODE 👇👇
-
-        // --- ✨ DYNAMIC PRODUCT PERFORMANCE LOGIC ✨ ---
+        // --- ✨ DYNAMIC PRODUCT PERFORMANCE LOGIC (FILTERED) ✨ ---
         let productSalesCount = {};
-        allOrders.forEach(order => {
+        filteredOrders.forEach(order => {
             if(order.items) {
                 order.items.forEach(item => {
                     productSalesCount[item.name] = (productSalesCount[item.name] || 0) + (parseInt(item.qty) || 0);
@@ -9015,28 +9000,35 @@ async function initPremiumAnalytics() {
         });
 
         const topProdList = document.getElementById('top-products-list');
-        if (Object.keys(productSalesCount).length > 0 && topProdList) {
-            let sortedProds = Object.entries(productSalesCount).sort((a,b) => b[1] - a[1]).slice(0, 3);
-            let phtml = '';
-            sortedProds.forEach((p, i) => {
-                phtml += `
-                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4 flex items-center justify-between shadow-sm mb-2">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-[10px] bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs">${i+1}</div>
-                        <span class="font-bold text-slate-700 text-sm truncate max-w-[150px]">${p[0]}</span>
-                    </div>
-                    <span class="text-xs font-black text-emerald-600 bg-emerald-100 px-2 py-1 rounded-md border border-emerald-200">${p[1]} Sold</span>
+        if (topProdList) {
+            if (Object.keys(productSalesCount).length > 0) {
+                let sortedProds = Object.entries(productSalesCount).sort((a,b) => b[1] - a[1]).slice(0, 3);
+                let phtml = '';
+                sortedProds.forEach((p, i) => {
+                    phtml += `
+                    <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4 flex items-center justify-between shadow-sm mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-[10px] bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs">${i+1}</div>
+                            <span class="font-bold text-slate-700 text-sm truncate max-w-[150px]">${p[0]}</span>
+                        </div>
+                        <span class="text-xs font-black text-emerald-600 bg-emerald-100 px-2 py-1 rounded-md border border-emerald-200">${p[1]} Sold</span>
+                    </div>`;
+                });
+                topProdList.innerHTML = phtml;
+            } else {
+                topProdList.innerHTML = `
+                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-5 text-center">
+                    <i class="fas fa-box-open text-slate-300 text-2xl mb-3"></i>
+                    <p class="text-sm font-bold text-slate-600">No products sold in this period</p>
                 </div>`;
-            });
-            topProdList.innerHTML = phtml;
+            }
         }
 
-             // --- ✨ DYNAMIC INSIGHTS LOGIC ✨ ---
+        // --- ✨ DYNAMIC INSIGHTS LOGIC ✨ ---
         const insightsList = document.getElementById('insights-list');
         if(insightsList) {
             let insightsHTML = '';
 
-            // 1. Cart Size / Average Items Insight
             let avgItems = totalOrders > 0 ? (totalItemsSold / totalOrders).toFixed(1) : 0;
             if (totalOrders > 0) {
                 insightsHTML += `
@@ -9049,7 +9041,6 @@ async function initPremiumAnalytics() {
                 </div>`;
             }
 
-            // 2. WhatsApp Follow-up Alert (Agar chat hui par order nahi aaya)
             if (waClicks > totalOrders) {
                 let lostLeads = waClicks - totalOrders;
                 insightsHTML += `
@@ -9062,7 +9053,6 @@ async function initPremiumAnalytics() {
                 </div>`;
             }
 
-            // 3. New Store / No Orders Insight
             if (totalOrders === 0) {
                 insightsHTML += `
                 <div class="rounded-2xl bg-amber-50 border border-amber-100 p-4 flex gap-3 shadow-sm">
@@ -9074,7 +9064,6 @@ async function initPremiumAnalytics() {
                 </div>`;
             }
 
-            // 4. Fallback (Agar sab theek hai toh)
             if (insightsHTML === '') {
                 insightsHTML = `
                 <div class="rounded-2xl bg-blue-50 border border-blue-100 p-4 flex gap-3 shadow-sm">
@@ -9089,13 +9078,6 @@ async function initPremiumAnalytics() {
             insightsList.innerHTML = insightsHTML;
         }
 
-        // 👆👆 YAHAN TAK THA WOH NAYA CODE 👆👆
-        // 4. Store Conversion Rate (Views to Orders)
-        let conversionPercentage = views > 0 ? ((totalOrders / views) * 100).toFixed(1) : 0;
-        setAnalyticsValue("metric-conversion-rate", conversionPercentage + "%");
-        
-
-        // 4. Update Charts
         updateGrowthChart("orders");
         updateAnalyticsTimestamp();
 
@@ -9103,7 +9085,6 @@ async function initPremiumAnalytics() {
         console.error("Store analytics error:", error);
     }
 }
-
 
 
 /* =====================================================
