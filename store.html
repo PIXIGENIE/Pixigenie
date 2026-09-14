@@ -226,18 +226,27 @@
                 </div>
                 <button id="detail-store-btn" class="text-blue-600 font-bold text-xs bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 active:scale-95 transition">View Shop</button>
             </div>
-
+            <!-- Description Area (Updated with More button) -->
             <div class="bg-white p-5 border-b border-gray-200 mb-2 shadow-sm">
                 <h3 class="text-sm font-black text-gray-900 mb-3 uppercase tracking-wider">Product Details</h3>
-                <p id="detail-desc" class="text-sm text-gray-600 font-medium leading-relaxed whitespace-pre-wrap"></p>
+                <div class="text-[13px] text-gray-600 font-medium leading-relaxed whitespace-pre-wrap">
+                    <span id="detail-desc"></span>
+                    <button id="detail-desc-toggle-btn" onclick="toggleModalDescription()" class="text-blue-600 font-bold ml-1 hidden active:opacity-70 transition">more</button>
+                </div>
             </div>
 
+            <!-- Similar Products Area (Updated with Load More button) -->
             <div class="bg-white p-5 pb-6 shadow-sm">
                 <h3 class="text-sm font-black text-gray-900 mb-4 uppercase tracking-wider">More from this Shop</h3>
                 <div id="similar-products-list" class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x">
                     <!-- JS से लोड होंगे -->
                 </div>
+                <!-- ✨ NAYA: Similar Products ke liye Load More Button ✨ -->
+                <button id="modal-load-more-btn" onclick="loadMoreModalProducts()" class="w-full mt-2 bg-purple-50 text-purple-600 border border-purple-100 font-bold py-2.5 rounded-[12px] text-xs transition hidden active:scale-95 flex items-center justify-center gap-1.5">
+                    Load More <i class="fas fa-arrow-right"></i>
+                </button>
             </div>
+
         </div>
 
         <!-- 🟢 BOTTOM BAR -->
@@ -861,11 +870,10 @@
             
             document.getElementById('detail-store-btn').onclick = () => window.location.href = `store.html?shop=${shopId}`;
             
-            if (desc.trim() !== '') {
-                document.getElementById('detail-desc').innerText = desc;
-            } else {
-                document.getElementById('detail-desc').innerHTML = '<i>No description provided by the seller.</i>';
-            }
+                      // ✨ NAYA: Description Text Set Karna ✨
+            currentModalDesc = desc;
+            isModalDescExpanded = false;
+            renderModalDescription();
 
             const badge = document.getElementById('detail-discount-badge');
             const mrpBox = document.getElementById('detail-mrp-box');
@@ -945,13 +953,107 @@
             setTimeout(() => { page.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300);
         }
 
+             // ==========================================
+        // ✨ MODAL DESCRIPTION & SIMILAR PRODUCTS LOGIC ✨
+        // ==========================================
+        
+        let currentModalDesc = "";
+        let isModalDescExpanded = false;
+
+        function renderModalDescription() {
+            const descEl = document.getElementById('detail-desc');
+            const toggleBtn = document.getElementById('detail-desc-toggle-btn');
+            
+            if (currentModalDesc.trim() === '') {
+                descEl.innerHTML = '<i>No description provided by the seller.</i>';
+                toggleBtn.classList.add('hidden');
+                return;
+            }
+
+            if (currentModalDesc.length > 80 && !isModalDescExpanded) { 
+                descEl.innerText = currentModalDesc.substring(0, 80) + "..."; 
+                toggleBtn.innerText = "more"; 
+                toggleBtn.classList.remove('hidden'); 
+            } else if (isModalDescExpanded) { 
+                descEl.innerText = currentModalDesc; 
+                toggleBtn.innerText = "less"; 
+                toggleBtn.classList.remove('hidden'); 
+            } else { 
+                descEl.innerText = currentModalDesc; 
+                toggleBtn.classList.add('hidden'); 
+            }
+        }
+
+        function toggleModalDescription() { 
+            isModalDescExpanded = !isModalDescExpanded; 
+            renderModalDescription(); 
+        }
+
+        // --- SIMILAR PRODUCTS PAGINATION (10-10 LOAD) ---
+        let modalSimilarLastDoc = null;
+        let modalSimilarHasMore = true;
+        let modalCurrentShopIdForSimilar = "";
+        let modalCurrentShopNameForSimilar = "";
+        let modalCurrentShopPhoneForSimilar = "";
+        let modalCurrentIsService = false;
+
         async function loadStoreSimilarProducts(shopId, safeShopName, shopPhone, isService) {
+            modalSimilarLastDoc = null;
+            modalSimilarHasMore = true;
+            modalCurrentShopIdForSimilar = shopId;
+            modalCurrentShopNameForSimilar = safeShopName;
+            modalCurrentShopPhoneForSimilar = shopPhone;
+            modalCurrentIsService = isService;
+
             const container = document.getElementById('similar-products-list');
+            const btn = document.getElementById('modal-load-more-btn');
+            
             container.innerHTML = '<div class="w-full text-center py-6"><i class="fas fa-spinner fa-spin text-purple-500"></i> Loading...</div>';
+            if (btn) btn.classList.add('hidden');
+
+            await fetchAndRenderModalProducts(true);
+        }
+
+        async function loadMoreModalProducts() {
+            if (!modalSimilarHasMore) return;
+            const btn = document.getElementById('modal-load-more-btn');
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Loading...`;
+            await fetchAndRenderModalProducts(false);
+        }
+
+        async function fetchAndRenderModalProducts(isFirstLoad) {
+            const container = document.getElementById('similar-products-list');
+            const btn = document.getElementById('modal-load-more-btn');
             
             try {
-                const snap = await db.collection('shops').doc(shopId).collection('products').limit(6).get();
-                if (snap.empty) { container.innerHTML = '<p class="text-xs text-gray-500 px-4 py-6">No more items found.</p>'; return; }
+                // Pehli baar mein 10 load honge
+                let query = db.collection('shops').doc(modalCurrentShopIdForSimilar).collection('products').orderBy('timestamp', 'desc').limit(10);
+                
+                if (!isFirstLoad && modalSimilarLastDoc) {
+                    query = query.startAfter(modalSimilarLastDoc);
+                }
+
+                const snap = await query.get();
+                
+                if (snap.empty) {
+                    modalSimilarHasMore = false;
+                    if (btn) btn.classList.add('hidden');
+                    if (isFirstLoad) container.innerHTML = '<p class="text-xs text-gray-500 px-4 py-6">No items found.</p>';
+                    return;
+                }
+
+                modalSimilarLastDoc = snap.docs[snap.docs.length - 1];
+                
+                if (snap.docs.length < 10) {
+                    modalSimilarHasMore = false;
+                    if (btn) btn.classList.add('hidden');
+                } else {
+                    modalSimilarHasMore = true;
+                    if (btn) {
+                        btn.classList.remove('hidden');
+                        btn.innerHTML = `Load More <i class="fas fa-arrow-right"></i>`;
+                    }
+                }
 
                 let html = '';
                 snap.forEach(doc => {
@@ -967,7 +1069,7 @@
                     }
 
                     html += `
-                    <div onclick="openProductDetails('${safeName}', '${p.mrp||0}', '${p.price}', '${safeShopName}', '${shopPhone}', '${p.image||''}', '${shopId}', ${isService}, '${safeDesc}')" class="w-36 shrink-0 snap-start bg-white border border-gray-100 rounded-[1rem] overflow-hidden cursor-pointer hover:shadow-md transition pb-2 shadow-sm">
+                    <div onclick="openProductDetails('${safeName}', '${p.mrp||0}', '${p.price}', '${modalCurrentShopNameForSimilar}', '${modalCurrentShopPhoneForSimilar}', '${p.image||''}', '${modalCurrentShopIdForSimilar}', ${modalCurrentIsService}, '${safeDesc}')" class="w-36 shrink-0 snap-start bg-white border border-gray-100 rounded-[1rem] overflow-hidden cursor-pointer hover:shadow-md transition pb-2 shadow-sm">
                         <div class="relative w-full h-32 bg-gray-50 flex items-center justify-center">
                             ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-gray-300 text-2xl"></i>`}
                             ${discountHtml}
@@ -981,11 +1083,19 @@
                         </div>
                     </div>`;
                 });
-                container.innerHTML = html;
+                
+                if (isFirstLoad) {
+                    container.innerHTML = html;
+                } else {
+                    container.insertAdjacentHTML('beforeend', html);
+                }
             } catch(e) {
-                container.innerHTML = '<p class="text-xs text-red-400 px-4 py-6">Error loading products.</p>';
+                console.error(e);
+                if (isFirstLoad) container.innerHTML = '<p class="text-xs text-red-400 px-4 py-6">Error loading products.</p>';
+                if (btn) btn.innerHTML = `Load More <i class="fas fa-arrow-right"></i>`;
             }
         }
+
 
         // ==========================================
         // 🚀 TOGGLE FOLLOW BUTTON LOGIC
