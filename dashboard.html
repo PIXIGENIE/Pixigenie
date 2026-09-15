@@ -2782,7 +2782,7 @@ async function processMultipleImages(fileInput) {
         }
 
 
-              async function addProduct(e) {
+                  async function addProduct(e) {
             e.preventDefault(); 
             
             // ==========================================
@@ -2797,7 +2797,6 @@ async function processMultipleImages(fileInput) {
 
             // Agar store me products limit ke barabar ya zyada ho gaye hain toh rok do
             if (storeProducts.length >= maxLimit) {
-                // Customer ko upgrade karne ka popup dikhao
                 iosConfirm(
                     "Limit Reached! 🚫", 
                     `Your current plan allows a maximum of ${maxLimit} items. Please upgrade your plan to add more.`,
@@ -2805,11 +2804,10 @@ async function processMultipleImages(fileInput) {
                     "text-purple-600"
                 ).then((confirmed) => {
                     if(confirmed) {
-                        // Seedha upgrade page par bhej do
                         window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
                     }
                 });
-                return; // Function yahin rok do, product add nahi hoga
+                return; 
             }
             // ==========================================
 
@@ -2820,36 +2818,47 @@ async function processMultipleImages(fileInput) {
             const unit = document.getElementById('prod-unit').value;
             const desc = document.getElementById('prod-desc').value.trim();
 
-            // Selling Price kabhi MRP se zyada nahi ho sakti
+            // Selling Price kabhi MRP से ज्यादा नहीं हो सकती
             if (p > mrpVal) {
                 showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
                 return;
             }
 
-            const btn = e.target.querySelector('button'); const orig = btn.innerHTML; 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+            const btn = e.target.querySelector('button'); 
+            const orig = btn.innerHTML; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; 
+            btn.disabled = true;
 
-            const imagesArray = await processMultipleImages(document.getElementById('prod-image'));
-const primaryImage = imagesArray.length > 0 ? imagesArray[0] : "";
+            try {
+                const imagesArray = await processMultipleImages(document.getElementById('prod-image'));
+                const primaryImage = imagesArray.length > 0 ? imagesArray[0] : "";
 
-let pd = { 
-    name: n, 
-    mrp: mrpVal, 
-    price: p, 
-    qtySize: qtySize, 
-    unit: unit, 
-    description: desc, 
-    image: primaryImage,        // Pehli image by default har jagah dikhegi
-    images: imagesArray,        // Saari images ka array store hoga
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    searchRank: currentRank 
-};
+                let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
+
+                let pd = { 
+                    name: n, 
+                    mrp: mrpVal, 
+                    price: p, 
+                    qtySize: qtySize, 
+                    unit: unit, 
+                    description: desc, 
+                    image: primaryImage,        // Pehli image by default har jagah dikhegi
+                    images: imagesArray,        // Saari images ka array store hoga
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    searchRank: currentRank 
+                };
 
                 const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
-                pd.id = doc.id; storeProducts.unshift(pd); e.target.reset(); renderAdminProducts(); 
-            } catch(err) { alert(err.message); } 
-            
-            btn.innerHTML = orig; btn.disabled = false;
+                pd.id = doc.id; 
+                storeProducts.unshift(pd); 
+                e.target.reset(); 
+                renderAdminProducts(); 
+            } catch(err) { 
+                alert("Error adding product: " + err.message); 
+            } finally {
+                btn.innerHTML = orig; 
+                btn.disabled = false;
+            }
         }
 
 
