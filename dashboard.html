@@ -612,8 +612,7 @@
                                         </div>
                                         <div class="flex gap-2 flex-1">
                                             <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex items-center px-2 overflow-hidden h-11">
-                                                <input type="file" id="prod-image" accept="image/*" multiple class="w-full text-[10px] text-[#6B7280] file:mr-2 file:py-1.5 file:px-3 file:rounded-[8px] file:border-0 file:text-[10px] file:font-bold file:bg-[#F3E8FF] file:text-[#A855F7] hover:file:bg-[#E9D5FF] cursor-pointer outline-none">
-
+                                                <input type="file" id="prod-image" accept="image/*" class="w-full text-[10px] text-[#6B7280] file:mr-2 file:py-1.5 file:px-3 file:rounded-[8px] file:border-0 file:text-[10px] file:font-bold file:bg-[#F3E8FF] file:text-[#A855F7] hover:file:bg-[#E9D5FF] cursor-pointer outline-none">
                                             </div>
                                             <button type="submit" class="bg-[#111827] text-white font-bold px-5 h-11 rounded-[12px] active:scale-95 transition flex justify-center items-center gap-1.5 shrink-0 text-[13px] shadow-md">Add <i class="fas fa-plus text-[10px]"></i></button>
                                         </div>
@@ -627,10 +626,7 @@
                                         </p>
                                     </div>
                                 </form>
-    
-    <!-- ✨ Image Preview Container ✨ -->
-    <div id="product-images-preview-container" class="flex gap-2 overflow-x-auto py-2 custom-scrollbar hidden mb-2"></div>
-    
+
                                                                 <div class="flex justify-between items-center border-b border-[#E5E7EB] pb-2 mb-4">
                                     <h4 class="text-[11px] text-[#6B7280] uppercase tracking-wider font-bold">Your Products</h4>
                                     <span id="inventory-count" class="text-xs font-bold text-[#D97706] bg-[#FEF3C7] px-2 py-0.5 rounded-full">0</span>
@@ -2714,35 +2710,29 @@
             }
         }
 
-      // ✨ NAYA: Multiple images process aur compress karne ke liye ✨
-async function processMultipleImages(fileInput) {
-    if (!fileInput.files || fileInput.files.length === 0) return [];
-    
-    const files = Array.from(fileInput.files);
-    const compressedImages = [];
-
-    for (const file of files) {
-        const base64 = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width, height = img.height;
-                    // Max width 600px taaki database heavy na ho
-                    if (width > 600) { height *= 600 / width; width = 600; }
-                    canvas.width = width; canvas.height = height;
-                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+        // ==========================================
+        // 7. PRODUCTS LOGIC
+        // ==========================================
+        async function processImage(fileInput) {
+            if (!fileInput.files || fileInput.files.length === 0) return "";
+            const file = fileInput.files[0];
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width, height = img.height;
+                        if (width > 600) { height *= 600 / width; width = 600; }
+                        canvas.width = width; canvas.height = height;
+                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                    };
+                    img.src = e.target.result;
                 };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-        compressedImages.push(base64);
-    }
-    return compressedImages;
-}
+                reader.readAsDataURL(file);
+            });
+        }
 
           function renderAdminProducts() {
             const list = document.getElementById('admin-products-list'); const cnt = document.getElementById('inventory-count'); if(!list) return; cnt.innerText = storeProducts.length;
@@ -2785,115 +2775,77 @@ async function processMultipleImages(fileInput) {
         }
 
 
-                   let currentProductImageArray = [];
-
-        // ✨ 1. Jab user image select kare tab preview dikhane ke liye ✨
-        document.addEventListener('change', async function(e) {
-            if(e.target.id === 'prod-image' || e.target.id === 'edit-prod-image') {
-                const btn = e.target.closest('form').querySelector('button[type="submit"]');
-                if (btn) btn.disabled = true; 
-                
-                const newImgs = await processMultipleImages(e.target);
-                currentProductImageArray = currentProductImageArray.concat(newImgs);
-                renderDashboardImagePreviews();
-                
-                if (btn) btn.disabled = false;
-            }
-        });
-
-        // ✨ 2. Preview dikhane aur Cross (X) lagane ka function ✨
-        function renderDashboardImagePreviews() {
-            const container = document.getElementById('product-images-preview-container');
-            if(!container) return;
-            
-            if(currentProductImageArray.length > 0) {
-                container.classList.remove('hidden');
-                container.innerHTML = currentProductImageArray.map((imgSrc, index) => `
-                    <div class="relative w-16 h-16 rounded-xl overflow-hidden border border-gray-200 shrink-0 shadow-sm group">
-                        <img src="${imgSrc}" class="w-full h-full object-cover">
-                        <button type="button" onclick="removeDashboardImage(${index})" class="absolute top-1 right-1 w-5 h-5 bg-black/60 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-[10px] transition active:scale-90">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                `).join('');
-            } else {
-                container.classList.add('hidden');
-                container.innerHTML = '';
-            }
-        }
-
-        // ✨ 3. Cross (X) dabane par image hatane ka function ✨
-        function removeDashboardImage(index) {
-            currentProductImageArray.splice(index, 1);
-            renderDashboardImagePreviews();
-        }
-
-        // ✨ 4. Add Product Function (Updated for Multiple Images) ✨
-        async function addProduct(e) {
+              async function addProduct(e) {
             e.preventDefault(); 
             
+            // ==========================================
+            // ✨ NAYA: PLAN KE HISAAB SE PRODUCT LIMIT CHECK ✨
+            // ==========================================
             const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
-            let maxLimit = 20; 
+            const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
+            
+            let maxLimit = 20; // Default Starter Plan
             if (plan === 'plus') maxLimit = 100;
-            if (plan === 'pro') maxLimit = 500; 
+            if (plan === 'pro') maxLimit = 500; // VIP/Admin
 
+            // Agar store me products limit ke barabar ya zyada ho gaye hain toh rok do
             if (storeProducts.length >= maxLimit) {
-                iosConfirm("Limit Reached! 🚫", `Your current plan allows a maximum of ${maxLimit} items. Please upgrade.`, "Upgrade Plan", "text-purple-600").then((confirmed) => {
-                    if(confirmed) window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
+                // Customer ko upgrade karne ka popup dikhao
+                iosConfirm(
+                    "Limit Reached! 🚫", 
+                    `Your current plan allows a maximum of ${maxLimit} items. Please upgrade your plan to add more.`,
+                    "Upgrade Plan",
+                    "text-purple-600"
+                ).then((confirmed) => {
+                    if(confirmed) {
+                        // Seedha upgrade page par bhej do
+                        window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
+                    }
                 });
-                return; 
+                return; // Function yahin rok do, product add nahi hoga
             }
+            // ==========================================
 
             const n = document.getElementById('prod-name').value.trim(); 
-            const mrpVal = parseInt(document.getElementById('prod-mrp').value); 
+            const mrpVal = parseInt(document.getElementById('prod-mrp').value); // MRP
             const p = parseInt(document.getElementById('prod-price').value);
             const qtySize = parseFloat(document.getElementById('prod-qty').value) || 1;
             const unit = document.getElementById('prod-unit').value;
             const desc = document.getElementById('prod-desc').value.trim();
 
+            // Selling Price kabhi MRP se zyada nahi ho sakti
             if (p > mrpVal) {
                 showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
                 return;
             }
 
-            const btn = e.target.querySelector('button'); 
-            const orig = btn.innerHTML; 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; 
-            btn.disabled = true;
+            const btn = e.target.querySelector('button'); const orig = btn.innerHTML; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
 
-            try {
-                const primaryImage = currentProductImageArray.length > 0 ? currentProductImageArray[0] : "";
-                let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
+            const imgBase64 = await processImage(document.getElementById('prod-image'));
 
-                let pd = { 
-                    name: n, 
-                    mrp: mrpVal, 
-                    price: p, 
-                    qtySize: qtySize, 
-                    unit: unit, 
-                    description: desc, 
-                    image: primaryImage,        
-                    images: currentProductImageArray, // Naya array yahan save hoga      
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    searchRank: currentRank 
-                };
+            try { 
+             // 🔥 NAYA: Dukaandar ki jo rank hai, wahi rank uske product ko bhi mil jayegi
+let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
+
+let pd = { 
+    name: n, 
+    mrp: mrpVal, 
+    price: p, 
+    qtySize: qtySize, 
+    unit: unit, 
+    description: desc, 
+    image: imgBase64, 
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    searchRank: currentRank // 🔥 PRODUCT KO BHI RANK MIL GAYI
+};
+
 
                 const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
-                pd.id = doc.id; 
-                storeProducts.unshift(pd); 
-                
-                // Sab kuch save hone ke baad form aur images clear kar do
-                e.target.reset(); 
-                currentProductImageArray = [];
-                renderDashboardImagePreviews();
-                renderAdminProducts(); 
-
-            } catch(err) { 
-                alert("Error adding product: " + err.message); 
-            } finally {
-                btn.innerHTML = orig; 
-                btn.disabled = false;
-            }
+                pd.id = doc.id; storeProducts.unshift(pd); e.target.reset(); renderAdminProducts(); 
+            } catch(err) { alert(err.message); } 
+            
+            btn.innerHTML = orig; btn.disabled = false;
         }
 
 
