@@ -627,7 +627,10 @@
                                         </p>
                                     </div>
                                 </form>
-
+    
+    <!-- ✨ Image Preview Container ✨ -->
+    <div id="product-images-preview-container" class="flex gap-2 overflow-x-auto py-2 custom-scrollbar hidden mb-2"></div>
+    
                                                                 <div class="flex justify-between items-center border-b border-[#E5E7EB] pb-2 mb-4">
                                     <h4 class="text-[11px] text-[#6B7280] uppercase tracking-wider font-bold">Your Products</h4>
                                     <span id="inventory-count" class="text-xs font-bold text-[#D97706] bg-[#FEF3C7] px-2 py-0.5 rounded-full">0</span>
@@ -2782,43 +2785,72 @@ async function processMultipleImages(fileInput) {
         }
 
 
-                  async function addProduct(e) {
+                   let currentProductImageArray = [];
+
+        // ✨ 1. Jab user image select kare tab preview dikhane ke liye ✨
+        document.addEventListener('change', async function(e) {
+            if(e.target.id === 'prod-image' || e.target.id === 'edit-prod-image') {
+                const btn = e.target.closest('form').querySelector('button[type="submit"]');
+                if (btn) btn.disabled = true; 
+                
+                const newImgs = await processMultipleImages(e.target);
+                currentProductImageArray = currentProductImageArray.concat(newImgs);
+                renderDashboardImagePreviews();
+                
+                if (btn) btn.disabled = false;
+            }
+        });
+
+        // ✨ 2. Preview dikhane aur Cross (X) lagane ka function ✨
+        function renderDashboardImagePreviews() {
+            const container = document.getElementById('product-images-preview-container');
+            if(!container) return;
+            
+            if(currentProductImageArray.length > 0) {
+                container.classList.remove('hidden');
+                container.innerHTML = currentProductImageArray.map((imgSrc, index) => `
+                    <div class="relative w-16 h-16 rounded-xl overflow-hidden border border-gray-200 shrink-0 shadow-sm group">
+                        <img src="${imgSrc}" class="w-full h-full object-cover">
+                        <button type="button" onclick="removeDashboardImage(${index})" class="absolute top-1 right-1 w-5 h-5 bg-black/60 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-[10px] transition active:scale-90">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+            }
+        }
+
+        // ✨ 3. Cross (X) dabane par image hatane ka function ✨
+        function removeDashboardImage(index) {
+            currentProductImageArray.splice(index, 1);
+            renderDashboardImagePreviews();
+        }
+
+        // ✨ 4. Add Product Function (Updated for Multiple Images) ✨
+        async function addProduct(e) {
             e.preventDefault(); 
             
-            // ==========================================
-            // ✨ NAYA: PLAN KE HISAAB SE PRODUCT LIMIT CHECK ✨
-            // ==========================================
             const plan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
-            const email = (typeof globalShopData !== 'undefined' && globalShopData.email) ? globalShopData.email : '';
-            
-            let maxLimit = 20; // Default Starter Plan
+            let maxLimit = 20; 
             if (plan === 'plus') maxLimit = 100;
-            if (plan === 'pro') maxLimit = 500; // VIP/Admin
+            if (plan === 'pro') maxLimit = 500; 
 
-            // Agar store me products limit ke barabar ya zyada ho gaye hain toh rok do
             if (storeProducts.length >= maxLimit) {
-                iosConfirm(
-                    "Limit Reached! 🚫", 
-                    `Your current plan allows a maximum of ${maxLimit} items. Please upgrade your plan to add more.`,
-                    "Upgrade Plan",
-                    "text-purple-600"
-                ).then((confirmed) => {
-                    if(confirmed) {
-                        window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
-                    }
+                iosConfirm("Limit Reached! 🚫", `Your current plan allows a maximum of ${maxLimit} items. Please upgrade.`, "Upgrade Plan", "text-purple-600").then((confirmed) => {
+                    if(confirmed) window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
                 });
                 return; 
             }
-            // ==========================================
 
             const n = document.getElementById('prod-name').value.trim(); 
-            const mrpVal = parseInt(document.getElementById('prod-mrp').value); // MRP
+            const mrpVal = parseInt(document.getElementById('prod-mrp').value); 
             const p = parseInt(document.getElementById('prod-price').value);
             const qtySize = parseFloat(document.getElementById('prod-qty').value) || 1;
             const unit = document.getElementById('prod-unit').value;
             const desc = document.getElementById('prod-desc').value.trim();
 
-            // Selling Price kabhi MRP से ज्यादा नहीं हो सकती
             if (p > mrpVal) {
                 showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
                 return;
@@ -2830,9 +2862,7 @@ async function processMultipleImages(fileInput) {
             btn.disabled = true;
 
             try {
-                const imagesArray = await processMultipleImages(document.getElementById('prod-image'));
-                const primaryImage = imagesArray.length > 0 ? imagesArray[0] : "";
-
+                const primaryImage = currentProductImageArray.length > 0 ? currentProductImageArray[0] : "";
                 let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
 
                 let pd = { 
@@ -2842,8 +2872,8 @@ async function processMultipleImages(fileInput) {
                     qtySize: qtySize, 
                     unit: unit, 
                     description: desc, 
-                    image: primaryImage,        // Pehli image by default har jagah dikhegi
-                    images: imagesArray,        // Saari images ka array store hoga
+                    image: primaryImage,        
+                    images: currentProductImageArray, // Naya array yahan save hoga      
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     searchRank: currentRank 
                 };
@@ -2851,8 +2881,13 @@ async function processMultipleImages(fileInput) {
                 const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
                 pd.id = doc.id; 
                 storeProducts.unshift(pd); 
+                
+                // Sab kuch save hone ke baad form aur images clear kar do
                 e.target.reset(); 
+                currentProductImageArray = [];
+                renderDashboardImagePreviews();
                 renderAdminProducts(); 
+
             } catch(err) { 
                 alert("Error adding product: " + err.message); 
             } finally {
