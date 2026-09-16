@@ -194,9 +194,13 @@
         <!-- 🟢 SCROLLABLE CONTENT (Added ID: detail-scroll-area) -->
         <div id="detail-scroll-area" class="absolute top-[60px] bottom-[75px] left-0 w-full overflow-y-auto bg-[#F2F2F7] custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
             
-            <!-- Image -->
-            <div class="bg-white w-full aspect-square flex items-center justify-center overflow-hidden border-b border-gray-100">
+                     <!-- Image -->
+            <div class="bg-white w-full aspect-square flex items-center justify-center overflow-hidden border-b border-gray-100 relative">
                 <img id="detail-img" src="" class="w-full h-full object-cover">
+                <!-- ✨ NAYA: Rating Badge (Flipkart Style) ✨ -->
+                <div id="product-rating-badge" class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm border border-gray-200 px-2 py-1 rounded-md text-[12px] font-bold shadow-sm items-center gap-1.5 hidden">
+                    <!-- JS Data Aayega -->
+                </div>
             </div>
 
                      <!-- Price & Title Section -->
@@ -243,11 +247,32 @@
                 <div id="similar-products-list" class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x">
                     <!-- JS से लोड होंगे -->
                 </div>
-                <button id="modal-load-more-btn" onclick="loadMoreModalProducts()" class="w-full mt-2 bg-purple-50 text-purple-600 border border-purple-100 font-bold py-2.5 rounded-[12px] text-xs transition hidden active:scale-95 flex items-center justify-center gap-1.5">
+                                <button id="modal-load-more-btn" onclick="loadMoreModalProducts()" class="w-full mt-2 bg-purple-50 text-purple-600 border border-purple-100 font-bold py-2.5 rounded-[12px] text-xs transition hidden active:scale-95 flex items-center justify-center gap-1.5">
                     Load More <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
+
+            <!-- ✨ FLIPKART STYLE RATINGS & REVIEWS ✨ -->
+            <div class="bg-white p-5 pb-8 border-t-8 border-gray-100">
+                <div class="flex justify-between items-center mb-5">
+                    <h2 class="text-[16px] font-black text-gray-900 tracking-wide">Ratings & Reviews</h2>
+                </div>
+                
+                <!-- Overall Rating Header -->
+                <div class="flex items-center gap-4 mb-5" id="overall-rating-container">
+                    <p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>
+                </div>
+
+                <!-- Review Cards (Horizontal Scroll) -->
+                <div id="product-reviews-list" class="flex overflow-x-auto gap-3 pb-4 snap-x custom-scrollbar">
+                    <!-- JS se yahan reviews aayenge -->
+                </div>
+            </div>
+
         </div>
+
+        <!-- 🟢 BOTTOM BAR -->
+
 
 
         <!-- 🟢 BOTTOM BAR -->
@@ -3364,6 +3389,7 @@ function trackSearchImpression(shopIdToTrack) {
 
                 function openProductDetails(safeName, mrp, price, safeShopName, shopPhone, image, shopId, isService, safeDesc) {
             const name = decodeURIComponent(safeName);
+            fetchProductReviews(name, shopPhone);
             const shopName = decodeURIComponent(safeShopName);
             const desc = decodeURIComponent(safeDesc);
             const numMrp = parseInt(mrp) || 0;
@@ -3627,6 +3653,92 @@ function trackSearchImpression(shopIdToTrack) {
             }
         }
 
+        // ===============================================
+        // ✨ FETCH PRODUCT REVIEWS (FLIPKART STYLE) ✨
+        // ===============================================
+        async function fetchProductReviews(productName, shopPhone) {
+            // UI reset kar do taki purane product ka review na dikhe
+            document.getElementById('product-rating-badge').classList.add('hidden');
+            document.getElementById('product-rating-badge').classList.remove('flex');
+            document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>`;
+            document.getElementById('product-reviews-list').innerHTML = '';
+
+            try {
+                // Dukaan ke orders uthao
+                const snapshot = await db.collection('orders')
+                    .where('shopPhone', '==', shopPhone)
+                    .where('status', '==', 'delivered')
+                    .get(); 
+                
+                let totalRating = 0;
+                let reviewCount = 0;
+                let reviewsHtml = '';
+
+                snapshot.forEach(doc => {
+                    const order = doc.data();
+                    if (order.review) {
+                        const hasProduct = order.items && order.items.some(item => item.name === productName);
+                        if (hasProduct) {
+                            reviewCount++;
+                            totalRating += order.review.rating;
+
+                            // Flipkart logic: >=4 Green, 3 Yellow, <3 Red
+                            let badgeColor = order.review.rating >= 4 ? "bg-green-600" : (order.review.rating === 3 ? "bg-yellow-500" : "bg-red-500");
+                            let reviewTitle = order.review.rating >= 4 ? 'Highly Recommended' : (order.review.rating === 3 ? 'Good' : 'Average');
+
+                            reviewsHtml += `
+                            <div class="min-w-[260px] max-w-[260px] border border-gray-200 rounded-lg p-3.5 snap-center shrink-0 bg-white shadow-sm flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="${badgeColor} text-white text-[11px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">${order.review.rating} <i class="fas fa-star text-[8px]"></i></span>
+                                        <span class="text-[12px] font-bold text-gray-800">${reviewTitle}</span>
+                                    </div>
+                                    <p class="text-[12px] text-gray-600 line-clamp-3 mb-3 leading-relaxed">${order.review.text || 'Good product.'}</p>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-gray-100">
+                                    <span class="flex items-center gap-1 text-gray-500 font-semibold"><i class="fas fa-check-circle text-gray-300"></i> ${order.customerName || 'Verified Buyer'}</span>
+                                    <span><i class="far fa-thumbs-up"></i> 0</span>
+                                </div>
+                            </div>`;
+                        }
+                    }
+                });
+
+                if (reviewCount > 0) {
+                    let avgRating = (totalRating / reviewCount).toFixed(1);
+                    let avgBadgeColor = avgRating >= 4 ? "bg-green-600" : (avgRating >= 3 ? "bg-yellow-500" : "bg-red-500");
+                    let avgTextColor = avgRating >= 4 ? "text-green-600" : (avgRating >= 3 ? "text-yellow-500" : "text-red-500");
+                    
+                    // 1. Image ke upar Flipkart wala badge update karo
+                    const badge = document.getElementById('product-rating-badge');
+                    if(badge) {
+                        badge.innerHTML = `<span class="bg-green-600 text-white px-1.5 py-0.5 rounded-[4px] flex items-center gap-0.5">${avgRating} <i class="fas fa-star text-[8px]"></i></span> <span class="text-gray-400 font-medium ml-0.5">${reviewCount}</span>`;
+                        badge.classList.remove('hidden');
+                        badge.classList.add('flex');
+                    }
+
+                    // 2. Niche Review Section ka header update karo
+                    document.getElementById('overall-rating-container').innerHTML = `
+                        <div class="text-3xl font-black text-gray-900 flex items-center gap-2">
+                            ${avgRating} <i class="fas fa-star text-2xl ${avgTextColor}"></i>
+                        </div>
+                        <div class="text-[12px] text-gray-500 font-medium flex flex-col">
+                            <span>${reviewCount} Ratings & Reviews</span>
+                            <span class="flex items-center gap-1 mt-0.5"><i class="fas fa-check-circle text-gray-400 text-[10px]"></i> Verified Buyers</span>
+                        </div>
+                    `;
+
+                    // 3. Scrollable Cards dal do
+                    document.getElementById('product-reviews-list').innerHTML = reviewsHtml;
+                } else {
+                    document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium">No reviews yet for this product.</p>`;
+                }
+
+            } catch(e) {
+                console.log("Review fetch error: ", e);
+                document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-red-500 font-medium">Could not load reviews.</p>`;
+            }
+        }
 
     </script>
     <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
