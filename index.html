@@ -3658,8 +3658,8 @@ function trackSearchImpression(shopIdToTrack) {
         }
 
 
-                  // ===============================================
-        // ✨ FETCH PRODUCT REVIEWS (WITH LIKES FIX) ✨
+                      // ===============================================
+        // ✨ FETCH PRODUCT REVIEWS (WITH LIKES STATE FIX) ✨
         // ===============================================
         async function fetchProductReviews(productName, shopPhone) {
             const badge = document.getElementById('product-rating-badge');
@@ -3678,11 +3678,14 @@ function trackSearchImpression(shopIdToTrack) {
                 let reviewCount = 0;
                 let reviewsHtml = '';
                 
-                let seenCustomers = new Set(); // Duplicate rokne ke liye
+                let seenCustomers = new Set(); 
+                
+                // 💾 Memory se check karo ki kon kon se review user like kar chuka hai
+                let likedReviews = JSON.parse(localStorage.getItem('pixigenie_liked_reviews')) || [];
 
                 snapshot.forEach(doc => {
                     const order = doc.data();
-                    const orderId = doc.id; // ✨ NAYA: Order ka ID nikal liya
+                    const orderId = doc.id;
 
                     if (order.review) {
                         const hasProduct = order.items && order.items.some(item => item.name === productName);
@@ -3696,8 +3699,12 @@ function trackSearchImpression(shopIdToTrack) {
                             let badgeColor = order.review.rating >= 4 ? "bg-green-600" : (order.review.rating === 3 ? "bg-yellow-500" : "bg-red-500");
                             let reviewTitle = order.review.rating >= 4 ? 'Highly Recommended' : (order.review.rating === 3 ? 'Good' : 'Average');
                             
-                            // ✨ NAYA: Database se likes fetch karo, default 0
                             let likesCount = order.review.likes || 0;
+                            
+                            // ✨ UI STATE RESTORE: Check karo agar ye wala orderId liked list me hai
+                            let isLiked = likedReviews.includes(orderId);
+                            let likeIconClass = isLiked ? 'fas text-blue-600' : 'far text-gray-400';
+                            let likeDataStatus = isLiked ? 'true' : 'false';
 
                             reviewsHtml += `
                             <div class="min-w-[260px] max-w-[260px] border border-gray-200 rounded-lg p-3.5 snap-center shrink-0 bg-white shadow-sm flex flex-col justify-between">
@@ -3711,9 +3718,9 @@ function trackSearchImpression(shopIdToTrack) {
                                 <div class="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-gray-100">
                                     <span class="flex items-center gap-1 text-gray-500 font-semibold"><i class="fas fa-check-circle text-gray-300"></i> ${order.customerName || 'Verified Buyer'}</span>
                                     
-                                    <!-- ✨ NAYA: Fully Functional Like Button ✨ -->
-                                    <button onclick="likeReview('${orderId}', this)" data-liked="false" class="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 font-semibold active:scale-95 transition">
-                                        <i class="far fa-thumbs-up text-gray-400 transition-colors"></i> <span class="like-count text-[11px]">${likesCount}</span>
+                                    <!-- ✨ Data Like Status Yahan Set Ho Raha Hai ✨ -->
+                                    <button onclick="likeReview('${orderId}', this)" data-liked="${likeDataStatus}" class="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 font-semibold active:scale-95 transition">
+                                        <i class="${likeIconClass} transition-colors"></i> <span class="like-count text-[11px]">${likesCount}</span>
                                     </button>
                                 </div>
                             </div>`;
@@ -3792,13 +3799,16 @@ function trackSearchImpression(shopIdToTrack) {
                 } catch(e){}
             });
         }
-        // ===============================================
-        // ✨ REVIEW LIKE/UNLIKE LOGIC ✨
+               // ===============================================
+        // ✨ REVIEW LIKE/UNLIKE LOGIC (PERSISTENT FIX) ✨
         // ===============================================
         async function likeReview(orderId, btnElement) {
             const icon = btnElement.querySelector('i');
             const countSpan = btnElement.querySelector('.like-count');
             let currentCount = parseInt(countSpan.innerText) || 0;
+            
+            // 💾 Phone ki memory (LocalStorage) se nikalo ki pehle se kya liked hai
+            let likedReviews = JSON.parse(localStorage.getItem('pixigenie_liked_reviews')) || [];
             
             if (btnElement.dataset.liked === 'true') {
                 // 👎 UNLIKE KARNA
@@ -3808,7 +3818,11 @@ function trackSearchImpression(shopIdToTrack) {
                 currentCount = Math.max(0, currentCount - 1);
                 countSpan.innerText = currentCount;
                 
-                // Firebase Database me -1 karna
+                // Memory se hatao aur save karo
+                likedReviews = likedReviews.filter(id => id !== orderId);
+                localStorage.setItem('pixigenie_liked_reviews', JSON.stringify(likedReviews));
+                
+                // Database me -1 karo
                 db.collection('orders').doc(orderId).update({
                     'review.likes': firebase.firestore.FieldValue.increment(-1)
                 }).catch(e => console.log(e));
@@ -3820,7 +3834,13 @@ function trackSearchImpression(shopIdToTrack) {
                 currentCount += 1;
                 countSpan.innerText = currentCount;
                 
-                // Firebase Database me +1 karna
+                // Memory me save karo
+                if (!likedReviews.includes(orderId)) {
+                    likedReviews.push(orderId);
+                }
+                localStorage.setItem('pixigenie_liked_reviews', JSON.stringify(likedReviews));
+                
+                // Database me +1 karo
                 db.collection('orders').doc(orderId).update({
                     'review.likes': firebase.firestore.FieldValue.increment(1)
                 }).catch(e => console.log(e));
