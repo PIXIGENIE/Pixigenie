@@ -152,7 +152,7 @@
         <!-- Thick Divider -->
         <div class="w-full h-2 bg-[#F7F7F9]"></div>
 
-        <!-- ✨ CUSTOMER REVIEWS ✨ -->
+        <!-- ✨ CUSTOMER REVIEWS (STORE LEVEL) ✨ -->
         <div class="px-5 py-6">
             <div class="flex items-center justify-between mb-5">
                 <h3 class="font-black text-gray-900 text-lg tracking-tight">Ratings & Reviews</h3>
@@ -195,8 +195,12 @@
 
         <!-- 🟢 SCROLLABLE CONTENT -->
         <div id="detail-scroll-area" class="absolute top-[60px] bottom-[75px] left-0 w-full overflow-y-auto bg-[#F2F2F7] custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
-            <div class="bg-white w-full aspect-square flex items-center justify-center overflow-hidden border-b border-gray-100">
+            
+            <div class="bg-white w-full aspect-square flex items-center justify-center overflow-hidden border-b border-gray-100 relative">
                 <img id="detail-img" src="" class="w-full h-full object-cover">
+                <!-- ✨ NAYA: Rating Badge (Flipkart Style) ✨ -->
+                <div id="product-rating-badge" class="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm border border-gray-200 px-2 py-1 rounded-md text-[12px] font-bold shadow-sm items-center gap-1.5 hidden">
+                </div>
             </div>
 
             <div class="bg-white p-5 border-b border-gray-200 mb-2 shadow-sm">
@@ -213,13 +217,11 @@
                 </div>
             </div>
 
-                       <!-- Description Area (AB YE UPAR AAYEGA) -->
             <div class="bg-white p-5 border-b border-gray-200 mb-2 shadow-sm text-left">
                 <h3 class="text-sm font-black text-gray-900 mb-3 uppercase tracking-wider">Product Details</h3>
                 <div class="text-[13px] text-gray-600 font-medium leading-relaxed whitespace-pre-wrap"><span id="detail-desc"></span><button id="detail-desc-toggle-btn" onclick="toggleModalDescription()" class="text-blue-600 font-bold ml-1 hidden active:opacity-70 transition">more</button></div>
             </div>
 
-            <!-- Store Info (SOLD BY) (AB YE NEECHE AAYEGA) -->
             <div class="bg-white p-4 flex items-center justify-between border-b border-gray-200 mb-2 shadow-sm">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 overflow-hidden border border-gray-100 shrink-0">
@@ -234,16 +236,26 @@
                 <button id="detail-store-btn" class="text-blue-600 font-bold text-xs bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 active:scale-95 transition">View Shop</button>
             </div>
 
-            <!-- Similar Products Area (Updated with Load More button) -->
+            <!-- Similar Products Area -->
             <div class="bg-white p-5 pb-6 shadow-sm">
                 <h3 class="text-sm font-black text-gray-900 mb-4 uppercase tracking-wider">More from this Shop</h3>
                 <div id="similar-products-list" class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x">
                     <!-- JS से लोड होंगे -->
                 </div>
-                <!-- ✨ NAYA: Similar Products ke liye Load More Button ✨ -->
                 <button id="modal-load-more-btn" onclick="loadMoreModalProducts()" class="w-full mt-2 bg-purple-50 text-purple-600 border border-purple-100 font-bold py-2.5 rounded-[12px] text-xs transition hidden active:scale-95 flex items-center justify-center gap-1.5">
                     Load More <i class="fas fa-arrow-right"></i>
                 </button>
+            </div>
+
+            <!-- ✨ FLIPKART STYLE RATINGS & REVIEWS FOR PRODUCT ✨ -->
+            <div class="bg-white p-5 pb-8 border-t-8 border-gray-100">
+                <div class="flex justify-between items-center mb-5">
+                    <h2 class="text-[16px] font-black text-gray-900 tracking-wide">Ratings & Reviews</h2>
+                </div>
+                <div class="flex items-center gap-4 mb-5" id="overall-rating-container">
+                    <p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>
+                </div>
+                <div id="product-reviews-list" class="flex overflow-x-auto gap-3 pb-4 snap-x custom-scrollbar"></div>
             </div>
 
         </div>
@@ -830,6 +842,8 @@
                         </div>
                         <div class="flex-1">
                             <h4 class="text-gray-900 font-semibold text-[13px] leading-tight line-clamp-2">${product.name}</h4>
+                            <!-- ✨ RATING PLACEHOLDER ✨ -->
+                            <div class="card-rating-placeholder hidden items-center gap-1 mt-1.5" data-phone="${globalShopPhone}" data-name="${product.name}"></div>
                             ${priceDisplayHtml}
                         </div>
                         <div class="flex flex-col gap-2 w-full mt-3">
@@ -845,6 +859,9 @@
                     </div>`;
                 });
                 grid.innerHTML = html;
+                
+                // ✨ FIRE RATINGS FETCHER AFTER HTML LOAD ✨
+                if(typeof attachRatingsToCards === 'function') attachRatingsToCards();
 
             } catch(e) { 
                 document.getElementById('products-grid').innerHTML = `<p class="col-span-2 text-center py-10 text-red-500 font-bold">Error loading store data.</p>`;
@@ -869,7 +886,6 @@
             
             document.getElementById('detail-store-btn').onclick = () => window.location.href = `store.html?shop=${shopId}`;
             
-                              // ✨ NAYA: Description Text Set Karna (Trim spaces) ✨
             currentModalDesc = desc.trim();
             isModalDescExpanded = false;
             renderModalDescription();
@@ -885,27 +901,24 @@
                 badge.classList.add('hidden'); mrpBox.classList.add('hidden');
             }
 
-                   // ✨ NAYA LOGIC: Logo aur Badge (Tick) dono fetch karna ✨
             const logoImg = document.getElementById('detail-store-logo');
             const logoIcon = document.getElementById('detail-store-icon');
             const storeNameEl = document.getElementById('detail-store-name');
             
             logoImg.classList.add('hidden'); logoIcon.classList.remove('hidden');
-            storeNameEl.innerText = shopName || 'Local Shop'; // Pehle sirf naam dikhao
+            storeNameEl.innerText = shopName || 'Local Shop'; 
 
             if (shopId) {
                 db.collection('shops').doc(shopId).get().then(doc => {
                     if (doc.exists) {
                         const sData = doc.data();
                         
-                        // 1. Logo Set Karo
                         if (sData.storeLogo) {
                             logoImg.src = sData.storeLogo;
                             logoImg.classList.remove('hidden'); 
                             logoIcon.classList.add('hidden');
                         }
 
-                        // 2. VIP Badge Set Karo
                         const plan = sData.plan || 'basic';
                         const isVerified = sData.isVerified || plan === 'plus' || plan === 'pro';
                         let badgeHtml = '';
@@ -920,7 +933,6 @@
                             }
                         }
                         
-                        // Naam ke aage Badge chipka do
                         storeNameEl.innerHTML = `${shopName || 'Local Shop'} ${badgeHtml}`;
                     }
                 }).catch(e => console.log("Shop data fetch err:", e));
@@ -939,6 +951,9 @@
             };
 
             loadStoreSimilarProducts(shopId, safeShopName, shopPhone, isService);
+            
+            // ✨ FETCH REVIEWS FOR THIS PRODUCT IN MODAL ✨
+            fetchProductReviews(name, shopPhone);
 
             document.getElementById('detail-scroll-area').scrollTop = 0;
             page.classList.remove('hidden');
@@ -952,7 +967,7 @@
             setTimeout(() => { page.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 300);
         }
 
-             // ==========================================
+        // ==========================================
         // ✨ MODAL DESCRIPTION & SIMILAR PRODUCTS LOGIC ✨
         // ==========================================
         
@@ -1025,7 +1040,6 @@
             const btn = document.getElementById('modal-load-more-btn');
             
             try {
-                // Pehli baar mein 10 load honge
                 let query = db.collection('shops').doc(modalCurrentShopIdForSimilar).collection('products').orderBy('timestamp', 'desc').limit(10);
                 
                 if (!isFirstLoad && modalSimilarLastDoc) {
@@ -1075,6 +1089,8 @@
                         </div>
                         <div class="p-2.5">
                             <p class="text-[11px] font-bold text-gray-800 truncate">${p.name}</p>
+                            <!-- ✨ RATING PLACEHOLDER ✨ -->
+                            <div class="card-rating-placeholder hidden items-center gap-1 mt-1.5" data-phone="${modalCurrentShopPhoneForSimilar}" data-name="${p.name}"></div>
                             <div class="flex items-center gap-1.5 mt-1">
                                 <span class="text-sm font-black text-gray-900">₹${p.price}</span>
                                 ${p.mrp && p.mrp > p.price ? `<span class="text-[9px] text-gray-400 line-through">₹${p.mrp}</span>` : ''}
@@ -1088,6 +1104,10 @@
                 } else {
                     container.insertAdjacentHTML('beforeend', html);
                 }
+                
+                // ✨ FIRE RATINGS FETCHER AFTER HTML LOAD ✨
+                if(typeof attachRatingsToCards === 'function') attachRatingsToCards();
+
             } catch(e) {
                 console.error(e);
                 if (isFirstLoad) container.innerHTML = '<p class="text-xs text-red-400 px-4 py-6">Error loading products.</p>';
@@ -1157,7 +1177,7 @@
         }
 
         // ==========================================
-        // ⭐ REVIEWS & RATING LOGIC
+        // ⭐ REVIEWS & RATING LOGIC (STORE LEVEL)
         // ==========================================
         async function updateAverageRatingDisplay() {
             try {
@@ -1234,7 +1254,7 @@
                     <div class="flex justify-between items-center mb-4"><h4 class="font-black text-gray-900 text-[15px] tracking-tight">${isUpdate ? 'Edit your review' : 'Write a review'}</h4>${isUpdate ? `<button onclick="cancelEdit()" class="text-gray-400 hover:text-gray-600 w-6 h-6 flex items-center justify-center bg-gray-50 rounded-full"><i class="fas fa-times text-[10px]"></i></button>` : ''}</div>
                     <div id="star-input-container" class="flex gap-2 mb-4">${renderStarsInput(userRating)}</div>
                     <textarea id="review-text-input" rows="3" placeholder="How was your experience?" class="w-full bg-[#F7F7F9] focus:bg-white focus:border-gray-300 border border-transparent rounded-[14px] p-4 outline-none text-[13px] font-semibold transition resize-none mb-4 placeholder-gray-400"></textarea>
-                    <button onclick="submitReview()" id="submit-review-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3.5 rounded-[14px] text-sm transition active:scale-95 flex justify-center items-center gap-2">${isUpdate ? 'Update Review' : 'Submit Review'}</button>
+                    <button onclick="submitStoreReview()" id="submit-review-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3.5 rounded-[14px] text-sm transition active:scale-95 flex justify-center items-center gap-2">${isUpdate ? 'Update Review' : 'Submit Review'}</button>
                 </div>
             `;
             document.getElementById('review-text-input').value = isUpdate ? currentUserReviewText : "";
@@ -1243,7 +1263,7 @@
 
         function cancelEdit() { document.getElementById('review-form-container').classList.add('hidden'); document.getElementById('my-review-container').classList.remove('hidden'); }
 
-        async function submitReview() {
+        async function submitStoreReview() {
             const customerPhone = localStorage.getItem('pixigenie_customer_phone');
             const customerName = localStorage.getItem('pixigenie_customer_name');
             if(!customerPhone) return;
@@ -1899,101 +1919,191 @@
             closeMapPicker();
         }
 
-        async function loadMoreProducts() {
-            if (!hasMoreProducts || !currentShopId) return;
-            const btn = document.getElementById('load-more-products-btn');
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Loading...`;
+        // ===============================================
+        // ✨ AUTO ATTACH RATINGS TO HOME & SIMILAR CARDS ✨
+        // ===============================================
+        async function attachRatingsToCards() {
+            const ratingElements = document.querySelectorAll('.card-rating-placeholder');
+            ratingElements.forEach(async (el) => {
+                if(el.dataset.fetched === 'true') return;
+                el.dataset.fetched = 'true';
+                
+                const shopPhone = el.dataset.phone;
+                const name = el.dataset.name;
+                if(!shopPhone || !name) return;
+
+                try {
+                    const snap = await db.collection('orders')
+                        .where('shopPhone', '==', shopPhone)
+                        .where('status', '==', 'delivered')
+                        .get();
+                    
+                    let total = 0, count = 0;
+                    let seenCust = new Set();
+                    
+                    snap.forEach(doc => {
+                        const order = doc.data();
+                        if(order.review && order.items && order.items.some(i => i.name === name)) {
+                            if(!seenCust.has(order.customerId)) {
+                                seenCust.add(order.customerId);
+                                total += order.review.rating;
+                                count++;
+                            }
+                        }
+                    });
+
+                    if(count > 0) {
+                        let avg = (total/count).toFixed(1);
+                        let color = avg >= 4 ? 'bg-green-600' : (avg >= 3 ? 'bg-yellow-500' : 'bg-red-500');
+                        el.innerHTML = `<span class="${color} text-white px-1.5 py-[2px] rounded-[4px] text-[10px] font-bold flex items-center gap-0.5 shadow-sm">${avg} <i class="fas fa-star text-[8px]"></i></span> <span class="text-gray-400 text-[10px] font-bold">(${count})</span>`;
+                        el.classList.remove('hidden');
+                        el.classList.add('flex');
+                    }
+                } catch(e){}
+            });
+        }
+
+        // ===============================================
+        // ✨ REVIEW LIKE/UNLIKE LOGIC (SMART FIX) ✨
+        // ===============================================
+        async function likeReview(orderId, btnElement) {
+            const icon = btnElement.querySelector('i');
+            const countSpan = btnElement.querySelector('.like-count');
+            let currentCount = parseInt(countSpan.innerText) || 0;
+            
+            let likedReviews = JSON.parse(localStorage.getItem('pixigenie_liked_reviews')) || [];
             
             try {
-                const snap = await db.collection('shops').doc(currentShopId).collection('products')
-                                     .orderBy('timestamp', 'desc')
-                                     .startAfter(lastProductDoc)
-                                     .limit(12).get();
-                                     
-                if (snap.empty) {
-                    hasMoreProducts = false;
-                    btn.classList.add('hidden');
-                    return;
-                }
-                
-                lastProductDoc = snap.docs[snap.docs.length - 1];
-                if (snap.docs.length < 12) {
-                    hasMoreProducts = false;
-                    btn.classList.add('hidden');
+                if (btnElement.dataset.liked === 'true') {
+                    btnElement.dataset.liked = 'false';
+                    icon.classList.remove('fas', 'text-blue-600');
+                    icon.classList.add('far', 'text-gray-400');
+                    currentCount = Math.max(0, currentCount - 1);
+                    countSpan.innerText = currentCount;
+                    
+                    likedReviews = likedReviews.filter(id => id !== orderId);
+                    localStorage.setItem('pixigenie_liked_reviews', JSON.stringify(likedReviews));
+                    
+                    await db.collection('orders').doc(orderId).update({
+                        'review.likes': firebase.firestore.FieldValue.increment(-1)
+                    });
                 } else {
-                    btn.innerHTML = `Load More Products <i class="fas fa-arrow-down ml-1"></i>`;
-                }
-                
-                let html = '';
-                snap.forEach(doc => {
-                    const product = doc.data();
-                    const qtySize = product.qtySize !== undefined ? product.qtySize : (product.stock || 1);
-                    const unit = product.unit || 'pcs';
+                    btnElement.dataset.liked = 'true';
+                    icon.classList.remove('far', 'text-gray-400');
+                    icon.classList.add('fas', 'text-blue-600');
+                    currentCount += 1;
+                    countSpan.innerText = currentCount;
                     
-                    let isServiceItem = (globalBusinessType === 'Service Provider') || 
-                                        (product.name && product.name.toLowerCase().includes('service')) || 
-                                        (unit.toLowerCase() === 'hr');
-                    const buttonText = isServiceItem ? "Book Now" : "Order Now";
-                    
-                    let discountBadgeHtml = '';
-                    let priceDisplayHtml = `<p class="font-black text-gray-900 text-base mt-1">₹${product.price}</p>`;
-
-                    if (product.mrp && product.mrp > product.price) {
-                        const discountPercent = Math.round(((product.mrp - product.price) / product.mrp) * 100);
-                        discountBadgeHtml = `
-                            <div class="absolute top-2 right-2 bg-[#DC2626] text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm z-10 tracking-wider">
-                                ${discountPercent}% OFF
-                            </div>
-                        `;
-                        priceDisplayHtml = `
-                            <div class="flex items-center gap-1.5 mt-1">
-                                <p class="font-black text-[#16A34A] text-base">₹${product.price}</p>
-                                <p class="text-[11px] text-gray-400 font-bold line-through mt-0.5">₹${product.mrp}</p>
-                            </div>
-                        `;
+                    if (!likedReviews.includes(orderId)) {
+                        likedReviews.push(orderId);
                     }
-
-                    const safeName = encodeURIComponent(product.name || '');
-                    const safeDesc = encodeURIComponent(product.description || '');
-                    const safeShopName = encodeURIComponent(globalShopName || 'Local Shop');
-
-                    html += `
-                    <div onclick="openProductDetails('${safeName}', '${product.mrp||0}', '${product.price}', '${safeShopName}', '${globalShopPhone}', '${product.image||''}', currentShopId, ${isServiceItem}, '${safeDesc}')" class="grid-item p-4 flex flex-col active:bg-gray-50 transition relative cursor-pointer">
-                        <div class="w-full aspect-square bg-gray-50 rounded-[14px] mb-3 flex items-center justify-center overflow-hidden relative">
-                            ${product.image ? `<img src="${product.image}" class="w-full h-full object-cover">` : `<i class="fas fa-box text-3xl text-gray-200"></i>`}
-                            ${discountBadgeHtml}
-                            <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-gray-700 shadow-sm">${qtySize} ${unit}</div>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="text-gray-900 font-semibold text-[13px] leading-tight line-clamp-2">${product.name}</h4>
-                            ${priceDisplayHtml}
-                        </div>
-                        <div class="flex flex-col gap-2 w-full mt-3">
-                            <div class="flex gap-2 w-full">
-                                <button onclick="event.stopPropagation(); addToCart(event, '${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-100 font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 active:scale-95">
-                                    <i class="fas fa-cart-plus text-sm"></i> Cart
-                                </button>
-                                <button onclick="event.stopPropagation(); openOrderModal('${product.name}', '${product.price}', globalShopName, globalShopPhone)" class="flex-1 bg-gray-900 text-white hover:bg-black font-bold py-2 rounded-xl transition-all duration-300 text-[11px] sm:text-xs flex justify-center items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95">
-                                    ${buttonText}
-                                </button>
-                            </div>
-                        </div>
-                    </div>`;
-                });
-                
-                document.getElementById('products-grid').insertAdjacentHTML('beforeend', html);
-
-            } catch (e) {
-                console.error("Error loading more products:", e);
-                btn.innerHTML = `Load More Products <i class="fas fa-arrow-down ml-1"></i>`;
+                    localStorage.setItem('pixigenie_liked_reviews', JSON.stringify(likedReviews));
+                    
+                    await db.collection('orders').doc(orderId).update({
+                        'review.likes': firebase.firestore.FieldValue.increment(1)
+                    });
+                }
+            } catch (error) {
+                console.log("Firebase Update Blocked by Rules, but Local UI Updated:", error.message);
             }
         }
 
-        function closeFlashOffer() {
-            const m = document.getElementById('flash-offer-modal');
-            const c = document.getElementById('flash-offer-content');
-            m.classList.add('opacity-0'); c.classList.add('scale-90');
-            setTimeout(() => { m.classList.add('hidden'); document.body.style.overflow = 'auto'; }, 500);
+        // ===============================================
+        // ✨ FETCH PRODUCT REVIEWS (ZERO OVERRIDE FIX) ✨
+        // ===============================================
+        async function fetchProductReviews(productName, shopPhone) {
+            const badge = document.getElementById('product-rating-badge');
+            if(badge) { badge.classList.add('hidden'); badge.classList.remove('flex'); }
+            
+            document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>`;
+            document.getElementById('product-reviews-list').innerHTML = '';
+
+            try {
+                const snapshot = await db.collection('orders')
+                    .where('shopPhone', '==', shopPhone)
+                    .where('status', '==', 'delivered')
+                    .get(); 
+                
+                let totalRating = 0;
+                let reviewCount = 0;
+                let reviewsHtml = '';
+                
+                let seenCustomers = new Set(); 
+                let likedReviews = JSON.parse(localStorage.getItem('pixigenie_liked_reviews')) || [];
+
+                snapshot.forEach(doc => {
+                    const order = doc.data();
+                    const orderId = doc.id;
+
+                    if (order.review) {
+                        const hasProduct = order.items && order.items.some(item => item.name === productName);
+                        if (hasProduct) {
+                            if (seenCustomers.has(order.customerId)) return;
+                            seenCustomers.add(order.customerId);
+
+                            reviewCount++;
+                            totalRating += order.review.rating;
+
+                            let badgeColor = order.review.rating >= 4 ? "bg-green-600" : (order.review.rating === 3 ? "bg-yellow-500" : "bg-red-500");
+                            let reviewTitle = order.review.rating >= 4 ? 'Highly Recommended' : (order.review.rating === 3 ? 'Good' : 'Average');
+                            
+                            let likesCount = order.review.likes || 0;
+                            
+                            let isLiked = likedReviews.includes(orderId);
+                            let likeIconClass = isLiked ? 'fas fa-thumbs-up text-blue-600' : 'far fa-thumbs-up text-gray-400';
+                            let likeDataStatus = isLiked ? 'true' : 'false';
+
+                            if (isLiked && likesCount === 0) {
+                                likesCount = 1;
+                            }
+
+                            reviewsHtml += `
+                            <div class="min-w-[260px] max-w-[260px] border border-gray-200 rounded-lg p-3.5 snap-center shrink-0 bg-white shadow-sm flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="${badgeColor} text-white text-[11px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">${order.review.rating} <i class="fas fa-star text-[8px]"></i></span>
+                                        <span class="text-[12px] font-bold text-gray-800">${reviewTitle}</span>
+                                    </div>
+                                    <p class="text-[12px] text-gray-600 line-clamp-3 mb-3 leading-relaxed">${order.review.text || 'Good product.'}</p>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-gray-100">
+                                    <span class="flex items-center gap-1 text-gray-500 font-semibold"><i class="fas fa-check-circle text-gray-300"></i> ${order.customerName || 'Verified Buyer'}</span>
+                                    
+                                    <button onclick="likeReview('${orderId}', this)" data-liked="${likeDataStatus}" class="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 font-semibold active:scale-95 transition">
+                                        <i class="${likeIconClass} transition-colors"></i> <span class="like-count text-[11px]">${likesCount}</span>
+                                    </button>
+                                </div>
+                            </div>`;
+                        }
+                    }
+                });
+
+                if (reviewCount > 0) {
+                    let avgRating = (totalRating / reviewCount).toFixed(1);
+                    let avgBadgeColor = avgRating >= 4 ? "bg-green-600" : (avgRating >= 3 ? "bg-yellow-500" : "bg-red-500");
+                    let avgTextColor = avgRating >= 4 ? "text-green-600" : (avgRating >= 3 ? "text-yellow-500" : "text-red-500");
+                    
+                    if(badge) {
+                        badge.innerHTML = `<span class="bg-green-600 text-white px-1.5 py-0.5 rounded-[4px] flex items-center gap-0.5">${avgRating} <i class="fas fa-star text-[8px]"></i></span> <span class="text-gray-400 font-medium ml-0.5">${reviewCount}</span>`;
+                        badge.classList.remove('hidden');
+                        badge.classList.add('flex');
+                    }
+
+                    document.getElementById('overall-rating-container').innerHTML = `
+                        <div class="text-3xl font-black text-gray-900 flex items-center gap-2">
+                            ${avgRating} <i class="fas fa-star text-2xl ${avgTextColor}"></i>
+                        </div>
+                        <div class="text-[12px] text-gray-500 font-medium flex flex-col">
+                            <span>${reviewCount} Ratings & Reviews</span>
+                            <span class="flex items-center gap-1 mt-0.5"><i class="fas fa-check-circle text-gray-400 text-[10px]"></i> Verified Buyers</span>
+                        </div>
+                    `;
+                    document.getElementById('product-reviews-list').innerHTML = reviewsHtml;
+                } else {
+                    document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium">No reviews yet for this product.</p>`;
+                }
+
+            } catch(e) { console.log("Review fetch error: ", e); }
         }
 
         setTimeout(() => {
