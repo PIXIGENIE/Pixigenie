@@ -3658,8 +3658,8 @@ function trackSearchImpression(shopIdToTrack) {
         }
 
 
-                      // ===============================================
-        // ✨ FETCH PRODUCT REVIEWS (WITH LIKES STATE FIX) ✨
+                    // ===============================================
+        // ✨ FETCH PRODUCT REVIEWS (LIKE ICON FIX) ✨
         // ===============================================
         async function fetchProductReviews(productName, shopPhone) {
             const badge = document.getElementById('product-rating-badge');
@@ -3701,9 +3701,9 @@ function trackSearchImpression(shopIdToTrack) {
                             
                             let likesCount = order.review.likes || 0;
                             
-                            // ✨ UI STATE RESTORE: Check karo agar ye wala orderId liked list me hai
+                            // ✨ UI STATE RESTORE: YAHAN ICON KA NAAM FIX KIYA HAI ✨
                             let isLiked = likedReviews.includes(orderId);
-                            let likeIconClass = isLiked ? 'fas text-blue-600' : 'far text-gray-400';
+                            let likeIconClass = isLiked ? 'fas fa-thumbs-up text-blue-600' : 'far fa-thumbs-up text-gray-400';
                             let likeDataStatus = isLiked ? 'true' : 'false';
 
                             reviewsHtml += `
@@ -3718,7 +3718,6 @@ function trackSearchImpression(shopIdToTrack) {
                                 <div class="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-gray-100">
                                     <span class="flex items-center gap-1 text-gray-500 font-semibold"><i class="fas fa-check-circle text-gray-300"></i> ${order.customerName || 'Verified Buyer'}</span>
                                     
-                                    <!-- ✨ Data Like Status Yahan Set Ho Raha Hai ✨ -->
                                     <button onclick="likeReview('${orderId}', this)" data-liked="${likeDataStatus}" class="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 font-semibold active:scale-95 transition">
                                         <i class="${likeIconClass} transition-colors"></i> <span class="like-count text-[11px]">${likesCount}</span>
                                     </button>
@@ -3755,6 +3754,7 @@ function trackSearchImpression(shopIdToTrack) {
 
             } catch(e) { console.log("Review fetch error: ", e); }
         }
+
 
         // ===============================================
         // ✨ AUTO ATTACH RATINGS TO HOME & SIMILAR CARDS ✨
