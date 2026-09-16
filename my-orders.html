@@ -56,24 +56,21 @@
         }
         .animate-slide-up { animation: slideUp 0.6s var(--ios-spring) forwards; }
 
-        /* ✨ Apple Style Animated Checkmark CSS ✨ */
-        .success-circle { 
-            stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 4; stroke-miterlimit: 10; 
-            stroke: #000; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; 
+        /* ✨ PERFECT iOS HUD ANIMATIONS ✨ */
+        @keyframes iosHudIn {
+            0% { opacity: 0; transform: scale(0.85); }
+            100% { opacity: 1; transform: scale(1); }
         }
-        .success-check { 
-            transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; 
-            stroke: #000; stroke-width: 4; fill: none; animation: stroke 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.5s forwards; 
+        @keyframes iosHudOut {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.9); }
         }
-        @keyframes stroke { 100% { stroke-dashoffset: 0; } }
-        
-        @keyframes popFade {
-            0% { opacity: 0; transform: scale(0.9); }
-            10% { opacity: 1; transform: scale(1); }
-            90% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(0.95); }
+        .ios-hud-enter {
+            animation: iosHudIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
         }
-        .animate-apple-success { animation: popFade 2.5s var(--ios-spring) forwards; }
+        .ios-hud-exit {
+            animation: iosHudOut 0.3s ease-out forwards;
+        }
     </style>
 </head>
 <body class="font-sans text-[#111827] pb-10">
@@ -168,7 +165,7 @@
 
                     let itemsHtml = order.items ? order.items.map(i => `<span class="font-semibold text-gray-900">${i.qty}x</span> ${i.name}`).join(', ') : "Items not found";
 
-                    // ✨ NAYA: Edit Review & Download Bill Action Buttons
+                    // ✨ EDITABLE REVIEW & BILL BUTTONS
                     let actionBtnHtml = "";
                     if(order.status === 'pending') {
                         actionBtnHtml = `<button onclick="cancelOrder('${order.id}', this)" class="bg-gray-100 hover:bg-gray-200 text-red-500 font-semibold text-[13px] px-4 py-2 rounded-full transition-all active:scale-95 shrink-0">Cancel</button>`;
@@ -258,7 +255,7 @@
         }
     </script>
 
-     <!-- ✨ TERA 100% ORIGINAL HIDDEN PREMIUM BILL CONTAINER YAHAN HAI (KUCH DELETE NAHI KIYA) ✨ -->
+     <!-- ✨ PREMIUM BILL CONTAINER ✨ -->
     <div id="receipt-container" style="width: 800px !important; height: 1131px !important; min-width: 800px !important; display: block !important;" class="fixed -left-[9999px] top-0 bg-white text-[#1d1d1f] font-sans overflow-hidden shadow-2xl pb-0 z-[-50]">
         <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap'); .font-inter { font-family: 'Inter', sans-serif; }</style>
         
@@ -427,7 +424,7 @@
                 document.getElementById('receipt-items').innerHTML = itemsHtml;
                 document.getElementById('receipt-total').innerText = `₹${tA.toFixed(2)}`;
 
-                // 4. Generate Photo (Wait thoda zyada taaki Logo aaram se load ho jaye)
+                // 4. Generate Photo
                 setTimeout(() => {
                     const c = document.getElementById('receipt-container');
                     html2canvas(c, { scale: 2, backgroundColor: "#ffffff", useCORS: true, windowWidth: 800, width: 800, windowHeight: 1131, height: 1131, logging: false }).then(cv => {
@@ -446,7 +443,7 @@
         }
     </script>
 
-    <!-- ✨ EDITABLE REVIEW MODAL (iOS Style) ✨ -->
+    <!-- ✨ EDITABLE REVIEW MODAL ✨ -->
     <div id="review-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeReviewModal()"></div>
         <div class="ios-card w-full max-w-sm p-6 relative z-10 animate-slide-up bg-white">
@@ -470,14 +467,15 @@
         </div>
     </div>
 
-    <!-- ✨ APPLE PAY STYLE ANIMATED SUCCESS GREETING ✨ -->
-    <div id="success-greeting" class="fixed inset-0 z-[200] hidden items-center justify-center pointer-events-none">
-        <div class="bg-white/80 backdrop-blur-2xl border border-white/50 rounded-[32px] w-[220px] h-[220px] flex flex-col items-center justify-center shadow-[0_10px_40px_rgba(0,0,0,0.1)]" id="success-card">
-            <svg class="w-20 h-20 mb-3" viewBox="0 0 52 52">
-                <circle class="success-circle" cx="26" cy="26" r="25" fill="none"/>
-                <path class="success-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+    <!-- ✨ 100% PERFECT iOS STYLE SUCCESS HUD (Dark Blur Box) ✨ -->
+    <div id="ios-success-hud" class="fixed inset-0 z-[200] hidden items-center justify-center pointer-events-none">
+        <!-- iOS Style Dark Glass Box (150x150) -->
+        <div id="ios-success-card" class="bg-black/75 backdrop-blur-xl rounded-[24px] w-[150px] h-[150px] flex flex-col items-center justify-center shadow-lg opacity-0">
+            <!-- Thin iOS Style SVG Checkmark -->
+            <svg class="w-[50px] h-[50px] text-white mb-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7"></path>
             </svg>
-            <h3 class="font-semibold text-black text-xl tracking-tight">Done</h3>
+            <h3 class="font-medium text-white text-[16px] tracking-wide">Done</h3>
         </div>
     </div>
 
@@ -497,11 +495,11 @@
             if (order.review) {
                 currentRating = order.review.rating || 0;
                 document.getElementById('review-text').value = order.review.text || "";
-                document.getElementById('submit-review-btn').innerText = "Update Review";
+                document.getElementById('submit-review-btn').innerText = "Update";
             } else {
                 currentRating = 0;
                 document.getElementById('review-text').value = "";
-                document.getElementById('submit-review-btn').innerText = "Post Review";
+                document.getElementById('submit-review-btn').innerText = "Post";
             }
 
             updateStarUI(currentRating);
@@ -564,10 +562,10 @@
                 btn.innerHTML = origHtml;
                 btn.disabled = false;
 
-                // ✨ Show Apple Style Success Greeting
-                showSuccessGreeting();
+                // ✨ Show Perfect iOS HUD
+                showIosSuccessHud();
 
-                // Refresh orders so the UI updates to show the "Edit" button for this review
+                // Refresh orders
                 fetchMyOrders(localStorage.getItem('pixigenie_customer_phone'));
             } catch (error) {
                 alert("Could not post review: " + error.message);
@@ -576,22 +574,30 @@
             }
         }
 
-        function showSuccessGreeting() {
-            const greeting = document.getElementById('success-greeting');
-            const card = document.getElementById('success-card');
+        function showIosSuccessHud() {
+            const hud = document.getElementById('ios-success-hud');
+            const card = document.getElementById('ios-success-card');
             
-            greeting.classList.remove('hidden');
-            greeting.classList.add('flex');
+            // Show container
+            hud.classList.remove('hidden');
+            hud.classList.add('flex');
             
-            // Apply pop animation class
-            card.classList.add('animate-apple-success');
+            // Trigger Enter Animation
+            card.classList.remove('ios-hud-exit');
+            card.classList.add('ios-hud-enter');
             
-            // Auto hide pop-up after animation (2.5 seconds)
+            // Wait 1.5 seconds, then trigger Exit Animation
             setTimeout(() => {
-                greeting.classList.add('hidden');
-                greeting.classList.remove('flex');
-                card.classList.remove('animate-apple-success'); // reset animation
-            }, 2500);
+                card.classList.remove('ios-hud-enter');
+                card.classList.add('ios-hud-exit');
+                
+                // Hide container after exit animation finishes
+                setTimeout(() => {
+                    hud.classList.add('hidden');
+                    hud.classList.remove('flex');
+                }, 300); // 300ms matches exit animation duration
+                
+            }, 1500); // How long the HUD stays visible
         }
     </script>
 </body>
