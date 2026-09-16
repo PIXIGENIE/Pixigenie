@@ -1525,9 +1525,7 @@ async function fetchGlobalItems(itemType) {
 
    // ✨ NAYA: isService parameter end me add kiya hai ✨
 function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopId = "", isVerified = false, plan = "", isService = false, desc = "") {
-    
     const verifiedTick = typeof getVIPBadge === 'function' ? getVIPBadge(isVerified, plan) : '';
-
     let discountBadgeHtml = '';
     let priceDisplayHtml = `<div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-sm font-black text-gray-900 shadow-sm border border-white/50">₹${price}</div>`;
 
@@ -1536,18 +1534,15 @@ function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopI
         discountBadgeHtml = `
             <div class="absolute top-3 left-3 bg-[#DC2626] text-white text-[11px] font-black px-2 py-1 rounded-lg shadow-md z-10 tracking-wider">
                 ${discountPercent}% OFF
-            </div>
-        `;
+            </div>`;
         priceDisplayHtml = `
             <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-sm font-black text-gray-900 shadow-sm border border-white/50 flex items-center gap-1.5">
                 <span>₹${price}</span>
                 <span class="text-[10px] text-gray-400 line-through">₹${mrp}</span>
-            </div>
-        `;
+            </div>`;
     }
 
     const buttonText = isService ? "Book Now" : "Order Now";
-    // Data attributes pass kar rahe hain jisse details page me data extract kar sakein
     const safeDesc = encodeURIComponent(desc);
     const safeName = encodeURIComponent(name);
     const safeShopName = encodeURIComponent(shopName);
@@ -1562,6 +1557,8 @@ function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopI
         <div class="min-w-0 flex-1 mb-5">
             <h4 class="text-gray-900 font-bold text-lg leading-tight truncate group-hover:text-purple-600 transition-colors">${name}</h4>
             <p class="text-gray-500 text-xs mt-2 flex items-center gap-1.5 truncate"><i class="fas fa-store text-gray-400"></i> ${shopName || 'Local Shop'} ${verifiedTick}</p>
+            <!-- ✨ NAYA: RATING PLACEHOLDER FOR HOME SCREEN ✨ -->
+            <div class="card-rating-placeholder hidden items-center gap-1 mt-1.5" data-phone="${shopPhone}" data-name="${name}"></div>
         </div>
         
         <div class="mt-auto flex flex-col gap-2 w-full">
@@ -3578,7 +3575,6 @@ function trackSearchImpression(shopIdToTrack) {
             btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Loading...`;
             await fetchAndRenderModalProducts(false);
         }
-
         async function fetchAndRenderModalProducts(isFirstLoad) {
             const container = document.getElementById('similar-products-list');
             const btn = document.getElementById('modal-load-more-btn');
@@ -3633,7 +3629,9 @@ function trackSearchImpression(shopIdToTrack) {
                         </div>
                         <div class="p-2.5">
                             <p class="text-[11px] font-bold text-gray-800 truncate">${p.name}</p>
-                            <div class="flex items-center gap-1.5 mt-1">
+                            <!-- ✨ NAYA: RATING PLACEHOLDER FOR SIMILAR PRODUCTS ✨ -->
+                            <div class="card-rating-placeholder hidden items-center gap-1 mt-1" data-phone="${modalCurrentShopPhoneForSimilar}" data-name="${p.name}"></div>
+                            <div class="flex items-center gap-1.5 mt-1.5">
                                 <span class="text-sm font-black text-gray-900">₹${p.price}</span>
                                 ${p.mrp && p.mrp > p.price ? `<span class="text-[9px] text-gray-400 line-through">₹${p.mrp}</span>` : ''}
                             </div>
@@ -3646,6 +3644,10 @@ function trackSearchImpression(shopIdToTrack) {
                 } else {
                     container.insertAdjacentHTML('beforeend', html);
                 }
+                
+                // ✨ FIRE RATINGS FETCHER AFTER HTML LOAD ✨
+                attachRatingsToCards();
+
             } catch(e) {
                 console.error(e);
                 if (isFirstLoad) container.innerHTML = '<p class="text-xs text-red-400 px-4 py-6">Error loading products.</p>';
@@ -3653,18 +3655,18 @@ function trackSearchImpression(shopIdToTrack) {
             }
         }
 
-        // ===============================================
-        // ✨ FETCH PRODUCT REVIEWS (FLIPKART STYLE) ✨
+
+             // ===============================================
+        // ✨ FETCH PRODUCT REVIEWS (DUPLICATE FIX) ✨
         // ===============================================
         async function fetchProductReviews(productName, shopPhone) {
-            // UI reset kar do taki purane product ka review na dikhe
-            document.getElementById('product-rating-badge').classList.add('hidden');
-            document.getElementById('product-rating-badge').classList.remove('flex');
+            const badge = document.getElementById('product-rating-badge');
+            if(badge) { badge.classList.add('hidden'); badge.classList.remove('flex'); }
+            
             document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>`;
             document.getElementById('product-reviews-list').innerHTML = '';
 
             try {
-                // Dukaan ke orders uthao
                 const snapshot = await db.collection('orders')
                     .where('shopPhone', '==', shopPhone)
                     .where('status', '==', 'delivered')
@@ -3673,16 +3675,22 @@ function trackSearchImpression(shopIdToTrack) {
                 let totalRating = 0;
                 let reviewCount = 0;
                 let reviewsHtml = '';
+                
+                // ✨ DEDUPLICATION LOGIC: Ek user ka sirf 1 review allow karega
+                let seenCustomers = new Set();
 
                 snapshot.forEach(doc => {
                     const order = doc.data();
                     if (order.review) {
                         const hasProduct = order.items && order.items.some(item => item.name === productName);
                         if (hasProduct) {
+                            // Agar same customer pehle review de chuka hai, toh doosra ignore karo
+                            if (seenCustomers.has(order.customerId)) return;
+                            seenCustomers.add(order.customerId);
+
                             reviewCount++;
                             totalRating += order.review.rating;
 
-                            // Flipkart logic: >=4 Green, 3 Yellow, <3 Red
                             let badgeColor = order.review.rating >= 4 ? "bg-green-600" : (order.review.rating === 3 ? "bg-yellow-500" : "bg-red-500");
                             let reviewTitle = order.review.rating >= 4 ? 'Highly Recommended' : (order.review.rating === 3 ? 'Good' : 'Average');
 
@@ -3709,15 +3717,12 @@ function trackSearchImpression(shopIdToTrack) {
                     let avgBadgeColor = avgRating >= 4 ? "bg-green-600" : (avgRating >= 3 ? "bg-yellow-500" : "bg-red-500");
                     let avgTextColor = avgRating >= 4 ? "text-green-600" : (avgRating >= 3 ? "text-yellow-500" : "text-red-500");
                     
-                    // 1. Image ke upar Flipkart wala badge update karo
-                    const badge = document.getElementById('product-rating-badge');
                     if(badge) {
                         badge.innerHTML = `<span class="bg-green-600 text-white px-1.5 py-0.5 rounded-[4px] flex items-center gap-0.5">${avgRating} <i class="fas fa-star text-[8px]"></i></span> <span class="text-gray-400 font-medium ml-0.5">${reviewCount}</span>`;
                         badge.classList.remove('hidden');
                         badge.classList.add('flex');
                     }
 
-                    // 2. Niche Review Section ka header update karo
                     document.getElementById('overall-rating-container').innerHTML = `
                         <div class="text-3xl font-black text-gray-900 flex items-center gap-2">
                             ${avgRating} <i class="fas fa-star text-2xl ${avgTextColor}"></i>
@@ -3727,18 +3732,57 @@ function trackSearchImpression(shopIdToTrack) {
                             <span class="flex items-center gap-1 mt-0.5"><i class="fas fa-check-circle text-gray-400 text-[10px]"></i> Verified Buyers</span>
                         </div>
                     `;
-
-                    // 3. Scrollable Cards dal do
                     document.getElementById('product-reviews-list').innerHTML = reviewsHtml;
                 } else {
                     document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium">No reviews yet for this product.</p>`;
                 }
 
-            } catch(e) {
-                console.log("Review fetch error: ", e);
-                document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-red-500 font-medium">Could not load reviews.</p>`;
-            }
+            } catch(e) { console.log("Review fetch error: ", e); }
         }
+        // ===============================================
+        // ✨ AUTO ATTACH RATINGS TO HOME & SIMILAR CARDS ✨
+        // ===============================================
+        async function attachRatingsToCards() {
+            const ratingElements = document.querySelectorAll('.card-rating-placeholder');
+            ratingElements.forEach(async (el) => {
+                if(el.dataset.fetched === 'true') return;
+                el.dataset.fetched = 'true';
+                
+                const shopPhone = el.dataset.phone;
+                const name = el.dataset.name;
+                if(!shopPhone || !name) return;
+
+                try {
+                    const snap = await db.collection('orders')
+                        .where('shopPhone', '==', shopPhone)
+                        .where('status', '==', 'delivered')
+                        .get();
+                    
+                    let total = 0, count = 0;
+                    let seenCust = new Set();
+                    
+                    snap.forEach(doc => {
+                        const order = doc.data();
+                        if(order.review && order.items && order.items.some(i => i.name === name)) {
+                            if(!seenCust.has(order.customerId)) {
+                                seenCust.add(order.customerId);
+                                total += order.review.rating;
+                                count++;
+                            }
+                        }
+                    });
+
+                    if(count > 0) {
+                        let avg = (total/count).toFixed(1);
+                        let color = avg >= 4 ? 'bg-green-600' : (avg >= 3 ? 'bg-yellow-500' : 'bg-red-500');
+                        el.innerHTML = `<span class="${color} text-white px-1.5 py-[2px] rounded-[4px] text-[10px] font-bold flex items-center gap-0.5 shadow-sm">${avg} <i class="fas fa-star text-[8px]"></i></span> <span class="text-gray-400 text-[10px] font-bold">(${count})</span>`;
+                        el.classList.remove('hidden');
+                        el.classList.add('flex');
+                    }
+                } catch(e){}
+            });
+        }
+
 
     </script>
     <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
