@@ -149,12 +149,25 @@
 
                     let itemsHtml = order.items ? order.items.map(i => `<span class="font-semibold text-gray-900">${i.qty}x</span> ${i.name}`).join(', ') : "Items not found";
 
-                    // ✨ NAYA: iOS Style Secondary Button for Cancellation OR Bill Download
+                    // ✨ NAYA: iOS Style Secondary Button for Cancellation, Bill OR Review
                     let actionBtnHtml = "";
                     if(order.status === 'pending') {
                         actionBtnHtml = `<button onclick="cancelOrder('${order.id}', this)" class="bg-gray-100 hover:bg-gray-200 text-red-500 font-semibold text-[13px] px-4 py-2 rounded-full transition-all active:scale-95 shrink-0">Cancel</button>`;
                     } else if(order.status === 'delivered') {
-                        actionBtnHtml = `<button onclick="downloadCustomerBill('${order.id}', event)" class="bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-[12px] px-4 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1.5 shadow-sm border border-blue-100"><i class="fas fa-file-invoice"></i> Download Bill</button>`;
+                        // Bill Download Button (Chota kiya taaki Review button ke sath fit ho sake)
+                        let billBtn = `<button onclick="downloadCustomerBill('${order.id}', event)" class="bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1.5 shadow-sm border border-blue-100"><i class="fas fa-file-invoice"></i> Bill</button>`;
+                        
+                        let reviewBtn = "";
+                        if (order.review) {
+                            // Agar review pehle se diya hai, toh rating dikhao
+                            reviewBtn = `<div class="bg-yellow-50 text-yellow-600 font-bold text-[12px] px-3 py-2 rounded-full shrink-0 flex items-center gap-1 shadow-sm border border-yellow-100"><i class="fas fa-star"></i> ${order.review.rating}</div>`;
+                        } else {
+                            // Review dene ka button
+                            let shopNameEscaped = (order.shopName || 'Store').replace(/'/g, "\\'");
+                            reviewBtn = `<button onclick="openReviewModal('${order.id}', '${shopNameEscaped}')" class="bg-gray-50 text-gray-700 hover:bg-gray-100 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1.5 shadow-sm border border-gray-200"><i class="fas fa-star text-gray-400"></i> Review</button>`;
+                        }
+                        
+                        actionBtnHtml = `<div class="flex items-center gap-2">${reviewBtn}${billBtn}</div>`;
                     }
 
                     html += `
@@ -417,5 +430,108 @@
         }
     </script>
 
+    <!-- ✨ iOS Style Review Modal ✨ -->
+    <div id="review-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeReviewModal()"></div>
+        <div class="ios-card w-full max-w-sm p-6 relative z-10 animate-slide-up bg-white">
+            <h3 class="text-center font-bold text-gray-900 text-lg mb-1" id="review-shop-name">Store Name</h3>
+            <p class="text-center text-gray-500 text-[13px] mb-5">How was the product & delivery?</p>
+
+            <!-- Interactive Stars -->
+            <div class="flex justify-center gap-2 mb-6" id="star-container">
+                <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(1)"></i>
+                <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(2)"></i>
+                <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(3)"></i>
+                <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(4)"></i>
+                <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(5)"></i>
+            </div>
+
+            <!-- Review Text -->
+            <textarea id="review-text" rows="3" placeholder="Write a review (optional)..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-[14px] text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4 resize-none transition-all"></textarea>
+
+            <!-- Actions -->
+            <div class="flex gap-3">
+                <button onclick="closeReviewModal()" class="flex-1 bg-gray-100 text-gray-700 font-semibold py-3 rounded-xl text-[15px] active:scale-95 transition-transform">Cancel</button>
+                <button onclick="submitReview()" id="submit-review-btn" class="flex-1 bg-blue-500 text-white font-semibold py-3 rounded-xl text-[15px] active:scale-95 transition-transform disabled:opacity-50">Post</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✨ Review System Logic ✨ -->
+    <script>
+        let currentReviewOrderId = null;
+        let currentRating = 0;
+
+        function openReviewModal(orderId, shopName) {
+            currentReviewOrderId = orderId;
+            currentRating = 0;
+            document.getElementById('review-shop-name').innerText = shopName;
+            document.getElementById('review-text').value = "";
+            updateStarUI(0);
+            
+            const modal = document.getElementById('review-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeReviewModal() {
+            const modal = document.getElementById('review-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+
+        function setRating(rating) {
+            currentRating = rating;
+            updateStarUI(rating);
+        }
+
+        function updateStarUI(rating) {
+            const stars = document.getElementById('star-container').children;
+            for (let i = 0; i < stars.length; i++) {
+                if (i < rating) {
+                    stars[i].classList.remove('text-gray-200');
+                    stars[i].classList.add('text-yellow-400');
+                } else {
+                    stars[i].classList.remove('text-yellow-400');
+                    stars[i].classList.add('text-gray-200');
+                }
+            }
+        }
+
+        async function submitReview() {
+            if (currentRating === 0) {
+                alert("Please select a star rating first!");
+                return;
+            }
+
+            const btn = document.getElementById('submit-review-btn');
+            const origHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+            btn.disabled = true;
+
+            const reviewText = document.getElementById('review-text').value.trim();
+
+            try {
+                // Update Order Document in Firebase
+                await db.collection('orders').doc(currentReviewOrderId).update({
+                    review: {
+                        rating: currentRating,
+                        text: reviewText,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }
+                });
+
+                closeReviewModal();
+                // Refresh order list to show the new stars
+                fetchMyOrders(localStorage.getItem('pixigenie_customer_phone'));
+            } catch (error) {
+                alert("Could not post review: " + error.message + "\n(Check Firebase Security Rules if permission is denied)");
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
+            }
+        }
+    </script>
 </body>
 </html>
