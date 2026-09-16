@@ -55,6 +55,12 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
         .animate-slide-up { animation: slideUp 0.6s var(--ios-spring) forwards; }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.85) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-pop-in { animation: popIn 0.5s var(--ios-spring) forwards; }
     </style>
 </head>
 <body class="font-sans text-[#111827] pb-10">
@@ -124,7 +130,7 @@
                 // Sort by Latest First
                 ordersList.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
                 
-                // ✨ NAYA: Taki function me details mil sake
+                // ✨ Taki function me details mil sake (Review and Bill ke liye)
                 window.customerOrders = ordersList;
 
                 let html = '';
@@ -149,22 +155,20 @@
 
                     let itemsHtml = order.items ? order.items.map(i => `<span class="font-semibold text-gray-900">${i.qty}x</span> ${i.name}`).join(', ') : "Items not found";
 
-                    // ✨ NAYA: iOS Style Secondary Button for Cancellation, Bill OR Review
+                    // ✨ NAYA: Editable Review & Bill Action Buttons
                     let actionBtnHtml = "";
                     if(order.status === 'pending') {
                         actionBtnHtml = `<button onclick="cancelOrder('${order.id}', this)" class="bg-gray-100 hover:bg-gray-200 text-red-500 font-semibold text-[13px] px-4 py-2 rounded-full transition-all active:scale-95 shrink-0">Cancel</button>`;
                     } else if(order.status === 'delivered') {
-                        // Bill Download Button (Chota kiya taaki Review button ke sath fit ho sake)
                         let billBtn = `<button onclick="downloadCustomerBill('${order.id}', event)" class="bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1.5 shadow-sm border border-blue-100"><i class="fas fa-file-invoice"></i> Bill</button>`;
                         
                         let reviewBtn = "";
                         if (order.review) {
-                            // Agar review pehle se diya hai, toh rating dikhao
-                            reviewBtn = `<div class="bg-yellow-50 text-yellow-600 font-bold text-[12px] px-3 py-2 rounded-full shrink-0 flex items-center gap-1 shadow-sm border border-yellow-100"><i class="fas fa-star"></i> ${order.review.rating}</div>`;
+                            // Agar review pehle se diya hai, toh Edit button dikhao
+                            reviewBtn = `<button onclick="openReviewModal('${order.id}')" class="bg-yellow-50 hover:bg-yellow-100 text-yellow-600 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1 shadow-sm border border-yellow-200 cursor-pointer"><i class="fas fa-star"></i> ${order.review.rating} <span class="text-[10px] text-yellow-500 ml-1 border-l border-yellow-200 pl-1.5 opacity-90">Edit</span></button>`;
                         } else {
-                            // Review dene ka button
-                            let shopNameEscaped = (order.shopName || 'Store').replace(/'/g, "\\'");
-                            reviewBtn = `<button onclick="openReviewModal('${order.id}', '${shopNameEscaped}')" class="bg-gray-50 text-gray-700 hover:bg-gray-100 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1.5 shadow-sm border border-gray-200"><i class="fas fa-star text-gray-400"></i> Review</button>`;
+                            // Review dene ka naya button
+                            reviewBtn = `<button onclick="openReviewModal('${order.id}')" class="bg-gray-50 text-gray-700 hover:bg-gray-100 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1.5 shadow-sm border border-gray-200"><i class="fas fa-star text-gray-400"></i> Review</button>`;
                         }
                         
                         actionBtnHtml = `<div class="flex items-center gap-2">${reviewBtn}${billBtn}</div>`;
@@ -430,14 +434,13 @@
         }
     </script>
 
-    <!-- ✨ iOS Style Review Modal ✨ -->
+    <!-- ✨ EDITABLE REVIEW MODAL ✨ -->
     <div id="review-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeReviewModal()"></div>
         <div class="ios-card w-full max-w-sm p-6 relative z-10 animate-slide-up bg-white">
             <h3 class="text-center font-bold text-gray-900 text-lg mb-1" id="review-shop-name">Store Name</h3>
             <p class="text-center text-gray-500 text-[13px] mb-5">How was the product & delivery?</p>
 
-            <!-- Interactive Stars -->
             <div class="flex justify-center gap-2 mb-6" id="star-container">
                 <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(1)"></i>
                 <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(2)"></i>
@@ -446,14 +449,27 @@
                 <i class="fas fa-star text-3xl text-gray-200 cursor-pointer transition-colors" onclick="setRating(5)"></i>
             </div>
 
-            <!-- Review Text -->
-            <textarea id="review-text" rows="3" placeholder="Write a review (optional)..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-[14px] text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4 resize-none transition-all"></textarea>
+            <textarea id="review-text" rows="3" placeholder="Write your experience (optional)..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-[14px] text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4 resize-none transition-all"></textarea>
 
-            <!-- Actions -->
             <div class="flex gap-3">
                 <button onclick="closeReviewModal()" class="flex-1 bg-gray-100 text-gray-700 font-semibold py-3 rounded-xl text-[15px] active:scale-95 transition-transform">Cancel</button>
-                <button onclick="submitReview()" id="submit-review-btn" class="flex-1 bg-blue-500 text-white font-semibold py-3 rounded-xl text-[15px] active:scale-95 transition-transform disabled:opacity-50">Post</button>
+                <button onclick="submitReview()" id="submit-review-btn" class="flex-1 bg-blue-500 text-white font-semibold py-3 rounded-xl text-[15px] active:scale-95 transition-transform disabled:opacity-50">Post Review</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ✨ SHANDAAR SUCCESS GREETING ✨ -->
+    <div id="success-greeting" class="fixed inset-0 z-[200] hidden items-center justify-center p-4">
+        <!-- Glassy Background -->
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+        <!-- Success Card -->
+        <div class="bg-white/95 backdrop-blur-xl border border-white rounded-[28px] w-full max-w-[280px] p-8 relative z-10 flex flex-col items-center text-center shadow-[0_20px_40px_rgba(0,0,0,0.12)] animate-pop-in">
+            <!-- Icon with glow effect -->
+            <div class="w-20 h-20 bg-gradient-to-tr from-green-400 to-emerald-400 rounded-full flex items-center justify-center mb-5 shadow-[0_10px_25px_rgba(52,211,118,0.4)]">
+                <i class="fas fa-check text-4xl text-white"></i>
+            </div>
+            <h3 class="font-black text-gray-900 text-2xl tracking-tight mb-1">Awesome!</h3>
+            <p class="text-gray-500 text-[14px] leading-relaxed font-medium">Your feedback has been posted successfully.</p>
         </div>
     </div>
 
@@ -462,12 +478,25 @@
         let currentReviewOrderId = null;
         let currentRating = 0;
 
-        function openReviewModal(orderId, shopName) {
+        function openReviewModal(orderId) {
+            const order = window.customerOrders.find(o => o.id === orderId);
+            if (!order) return;
+
             currentReviewOrderId = orderId;
-            currentRating = 0;
-            document.getElementById('review-shop-name').innerText = shopName;
-            document.getElementById('review-text').value = "";
-            updateStarUI(0);
+            document.getElementById('review-shop-name').innerText = order.shopName || 'Store';
+            
+            // Check if review already exists and populate
+            if (order.review) {
+                currentRating = order.review.rating || 0;
+                document.getElementById('review-text').value = order.review.text || "";
+                document.getElementById('submit-review-btn').innerText = "Update Review";
+            } else {
+                currentRating = 0;
+                document.getElementById('review-text').value = "";
+                document.getElementById('submit-review-btn').innerText = "Post Review";
+            }
+
+            updateStarUI(currentRating);
             
             const modal = document.getElementById('review-modal');
             modal.classList.remove('hidden');
@@ -519,18 +548,36 @@
                     review: {
                         rating: currentRating,
                         text: reviewText,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     }
                 });
 
                 closeReviewModal();
-                // Refresh order list to show the new stars
+                btn.innerHTML = origHtml;
+                btn.disabled = false;
+
+                // ✨ Show Shandaar Greeting
+                showSuccessGreeting();
+
+                // Refresh orders to reflect updated review
                 fetchMyOrders(localStorage.getItem('pixigenie_customer_phone'));
             } catch (error) {
-                alert("Could not post review: " + error.message + "\n(Check Firebase Security Rules if permission is denied)");
+                alert("Could not post review: " + error.message);
                 btn.innerHTML = origHtml;
                 btn.disabled = false;
             }
+        }
+
+        function showSuccessGreeting() {
+            const greeting = document.getElementById('success-greeting');
+            greeting.classList.remove('hidden');
+            greeting.classList.add('flex');
+            
+            // Auto hide pop-up after 2.5 seconds
+            setTimeout(() => {
+                greeting.classList.add('hidden');
+                greeting.classList.remove('flex');
+            }, 2500);
         }
     </script>
 </body>
