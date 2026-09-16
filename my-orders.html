@@ -56,11 +56,24 @@
         }
         .animate-slide-up { animation: slideUp 0.6s var(--ios-spring) forwards; }
 
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.85) translateY(10px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+        /* ✨ Apple Style Animated Checkmark CSS ✨ */
+        .success-circle { 
+            stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 4; stroke-miterlimit: 10; 
+            stroke: #000; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; 
         }
-        .animate-pop-in { animation: popIn 0.5s var(--ios-spring) forwards; }
+        .success-check { 
+            transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; 
+            stroke: #000; stroke-width: 4; fill: none; animation: stroke 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.5s forwards; 
+        }
+        @keyframes stroke { 100% { stroke-dashoffset: 0; } }
+        
+        @keyframes popFade {
+            0% { opacity: 0; transform: scale(0.9); }
+            10% { opacity: 1; transform: scale(1); }
+            90% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.95); }
+        }
+        .animate-apple-success { animation: popFade 2.5s var(--ios-spring) forwards; }
     </style>
 </head>
 <body class="font-sans text-[#111827] pb-10">
@@ -130,7 +143,7 @@
                 // Sort by Latest First
                 ordersList.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
                 
-                // ✨ Taki function me details mil sake (Review and Bill ke liye)
+                // ✨ Taki function me details mil sake
                 window.customerOrders = ordersList;
 
                 let html = '';
@@ -155,19 +168,20 @@
 
                     let itemsHtml = order.items ? order.items.map(i => `<span class="font-semibold text-gray-900">${i.qty}x</span> ${i.name}`).join(', ') : "Items not found";
 
-                    // ✨ NAYA: Editable Review & Bill Action Buttons
+                    // ✨ NAYA: Edit Review & Download Bill Action Buttons
                     let actionBtnHtml = "";
                     if(order.status === 'pending') {
                         actionBtnHtml = `<button onclick="cancelOrder('${order.id}', this)" class="bg-gray-100 hover:bg-gray-200 text-red-500 font-semibold text-[13px] px-4 py-2 rounded-full transition-all active:scale-95 shrink-0">Cancel</button>`;
                     } else if(order.status === 'delivered') {
+                        // Bill Download Button
                         let billBtn = `<button onclick="downloadCustomerBill('${order.id}', event)" class="bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1.5 shadow-sm border border-blue-100"><i class="fas fa-file-invoice"></i> Bill</button>`;
                         
                         let reviewBtn = "";
                         if (order.review) {
-                            // Agar review pehle se diya hai, toh Edit button dikhao
+                            // Agar review hai -> "Edit" mode me button dikhao
                             reviewBtn = `<button onclick="openReviewModal('${order.id}')" class="bg-yellow-50 hover:bg-yellow-100 text-yellow-600 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1 shadow-sm border border-yellow-200 cursor-pointer"><i class="fas fa-star"></i> ${order.review.rating} <span class="text-[10px] text-yellow-500 ml-1 border-l border-yellow-200 pl-1.5 opacity-90">Edit</span></button>`;
                         } else {
-                            // Review dene ka naya button
+                            // First time Review
                             reviewBtn = `<button onclick="openReviewModal('${order.id}')" class="bg-gray-50 text-gray-700 hover:bg-gray-100 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1.5 shadow-sm border border-gray-200"><i class="fas fa-star text-gray-400"></i> Review</button>`;
                         }
                         
@@ -230,13 +244,11 @@
                 btnElement.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i>`;
                 btnElement.disabled = true;
                 
-                // Firebase Status Update
                 await db.collection('orders').doc(orderId).update({
                     status: 'cancelled',
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                // Refresh list
                 fetchMyOrders(localStorage.getItem('pixigenie_customer_phone'));
             } catch (error) {
                 alert("Could not cancel order: " + error.message);
@@ -246,7 +258,7 @@
         }
     </script>
 
-     <!-- ✨ HIDDEN PREMIUM BILL CONTAINER FOR CUSTOMERS ✨ -->
+     <!-- ✨ TERA 100% ORIGINAL HIDDEN PREMIUM BILL CONTAINER YAHAN HAI (KUCH DELETE NAHI KIYA) ✨ -->
     <div id="receipt-container" style="width: 800px !important; height: 1131px !important; min-width: 800px !important; display: block !important;" class="fixed -left-[9999px] top-0 bg-white text-[#1d1d1f] font-sans overflow-hidden shadow-2xl pb-0 z-[-50]">
         <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap'); .font-inter { font-family: 'Inter', sans-serif; }</style>
         
@@ -434,7 +446,7 @@
         }
     </script>
 
-    <!-- ✨ EDITABLE REVIEW MODAL ✨ -->
+    <!-- ✨ EDITABLE REVIEW MODAL (iOS Style) ✨ -->
     <div id="review-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeReviewModal()"></div>
         <div class="ios-card w-full max-w-sm p-6 relative z-10 animate-slide-up bg-white">
@@ -458,18 +470,14 @@
         </div>
     </div>
 
-    <!-- ✨ SHANDAAR SUCCESS GREETING ✨ -->
-    <div id="success-greeting" class="fixed inset-0 z-[200] hidden items-center justify-center p-4">
-        <!-- Glassy Background -->
-        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
-        <!-- Success Card -->
-        <div class="bg-white/95 backdrop-blur-xl border border-white rounded-[28px] w-full max-w-[280px] p-8 relative z-10 flex flex-col items-center text-center shadow-[0_20px_40px_rgba(0,0,0,0.12)] animate-pop-in">
-            <!-- Icon with glow effect -->
-            <div class="w-20 h-20 bg-gradient-to-tr from-green-400 to-emerald-400 rounded-full flex items-center justify-center mb-5 shadow-[0_10px_25px_rgba(52,211,118,0.4)]">
-                <i class="fas fa-check text-4xl text-white"></i>
-            </div>
-            <h3 class="font-black text-gray-900 text-2xl tracking-tight mb-1">Awesome!</h3>
-            <p class="text-gray-500 text-[14px] leading-relaxed font-medium">Your feedback has been posted successfully.</p>
+    <!-- ✨ APPLE PAY STYLE ANIMATED SUCCESS GREETING ✨ -->
+    <div id="success-greeting" class="fixed inset-0 z-[200] hidden items-center justify-center pointer-events-none">
+        <div class="bg-white/80 backdrop-blur-2xl border border-white/50 rounded-[32px] w-[220px] h-[220px] flex flex-col items-center justify-center shadow-[0_10px_40px_rgba(0,0,0,0.1)]" id="success-card">
+            <svg class="w-20 h-20 mb-3" viewBox="0 0 52 52">
+                <circle class="success-circle" cx="26" cy="26" r="25" fill="none"/>
+                <path class="success-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
+            <h3 class="font-semibold text-black text-xl tracking-tight">Done</h3>
         </div>
     </div>
 
@@ -485,7 +493,7 @@
             currentReviewOrderId = orderId;
             document.getElementById('review-shop-name').innerText = order.shopName || 'Store';
             
-            // Check if review already exists and populate
+            // Check if review already exists (EDIT MODE)
             if (order.review) {
                 currentRating = order.review.rating || 0;
                 document.getElementById('review-text').value = order.review.text || "";
@@ -556,10 +564,10 @@
                 btn.innerHTML = origHtml;
                 btn.disabled = false;
 
-                // ✨ Show Shandaar Greeting
+                // ✨ Show Apple Style Success Greeting
                 showSuccessGreeting();
 
-                // Refresh orders to reflect updated review
+                // Refresh orders so the UI updates to show the "Edit" button for this review
                 fetchMyOrders(localStorage.getItem('pixigenie_customer_phone'));
             } catch (error) {
                 alert("Could not post review: " + error.message);
@@ -570,13 +578,19 @@
 
         function showSuccessGreeting() {
             const greeting = document.getElementById('success-greeting');
+            const card = document.getElementById('success-card');
+            
             greeting.classList.remove('hidden');
             greeting.classList.add('flex');
             
-            // Auto hide pop-up after 2.5 seconds
+            // Apply pop animation class
+            card.classList.add('animate-apple-success');
+            
+            // Auto hide pop-up after animation (2.5 seconds)
             setTimeout(() => {
                 greeting.classList.add('hidden');
                 greeting.classList.remove('flex');
+                card.classList.remove('animate-apple-success'); // reset animation
             }, 2500);
         }
     </script>
