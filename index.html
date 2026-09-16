@@ -1450,6 +1450,7 @@ trackSearchImpression(shopId);
                 grid.innerHTML = cardsHtmlArray.join('');
                 
                 if(typeof initScrollAnimations === 'function') initScrollAnimations();
+                if(typeof attachRatingsToCards === 'function') attachRatingsToCards();
             } catch (error) { 
                 console.error("Fetch All Error: ", error); // Console me error check karne ke liye
                 grid.innerHTML = `<div class="col-span-full text-center py-16"><i class="fas fa-box-open text-4xl text-gray-200 mb-3"></i><p class="text-gray-500 font-medium">No products found around you.</p></div>`;
@@ -1517,6 +1518,7 @@ async function fetchGlobalItems(itemType) {
         }
         
         if(typeof initScrollAnimations === 'function') initScrollAnimations();
+        if(typeof attachRatingsToCards === 'function') attachRatingsToCards();
     } catch (error) { 
         console.error(error);
         grid.innerHTML = `<div class="col-span-full text-center py-10"><p class="text-red-500 font-medium">Failed to load ${itemType}s.</p></div>`;
@@ -3656,8 +3658,8 @@ function trackSearchImpression(shopIdToTrack) {
         }
 
 
-             // ===============================================
-        // ✨ FETCH PRODUCT REVIEWS (DUPLICATE FIX) ✨
+                  // ===============================================
+        // ✨ FETCH PRODUCT REVIEWS (WITH LIKES FIX) ✨
         // ===============================================
         async function fetchProductReviews(productName, shopPhone) {
             const badge = document.getElementById('product-rating-badge');
@@ -3676,15 +3678,15 @@ function trackSearchImpression(shopIdToTrack) {
                 let reviewCount = 0;
                 let reviewsHtml = '';
                 
-                // ✨ DEDUPLICATION LOGIC: Ek user ka sirf 1 review allow karega
-                let seenCustomers = new Set();
+                let seenCustomers = new Set(); // Duplicate rokne ke liye
 
                 snapshot.forEach(doc => {
                     const order = doc.data();
+                    const orderId = doc.id; // ✨ NAYA: Order ka ID nikal liya
+
                     if (order.review) {
                         const hasProduct = order.items && order.items.some(item => item.name === productName);
                         if (hasProduct) {
-                            // Agar same customer pehle review de chuka hai, toh doosra ignore karo
                             if (seenCustomers.has(order.customerId)) return;
                             seenCustomers.add(order.customerId);
 
@@ -3693,6 +3695,9 @@ function trackSearchImpression(shopIdToTrack) {
 
                             let badgeColor = order.review.rating >= 4 ? "bg-green-600" : (order.review.rating === 3 ? "bg-yellow-500" : "bg-red-500");
                             let reviewTitle = order.review.rating >= 4 ? 'Highly Recommended' : (order.review.rating === 3 ? 'Good' : 'Average');
+                            
+                            // ✨ NAYA: Database se likes fetch karo, default 0
+                            let likesCount = order.review.likes || 0;
 
                             reviewsHtml += `
                             <div class="min-w-[260px] max-w-[260px] border border-gray-200 rounded-lg p-3.5 snap-center shrink-0 bg-white shadow-sm flex flex-col justify-between">
@@ -3705,7 +3710,11 @@ function trackSearchImpression(shopIdToTrack) {
                                 </div>
                                 <div class="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-gray-100">
                                     <span class="flex items-center gap-1 text-gray-500 font-semibold"><i class="fas fa-check-circle text-gray-300"></i> ${order.customerName || 'Verified Buyer'}</span>
-                                    <span><i class="far fa-thumbs-up"></i> 0</span>
+                                    
+                                    <!-- ✨ NAYA: Fully Functional Like Button ✨ -->
+                                    <button onclick="likeReview('${orderId}', this)" data-liked="false" class="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 font-semibold active:scale-95 transition">
+                                        <i class="far fa-thumbs-up text-gray-400 transition-colors"></i> <span class="like-count text-[11px]">${likesCount}</span>
+                                    </button>
                                 </div>
                             </div>`;
                         }
@@ -3739,6 +3748,7 @@ function trackSearchImpression(shopIdToTrack) {
 
             } catch(e) { console.log("Review fetch error: ", e); }
         }
+
         // ===============================================
         // ✨ AUTO ATTACH RATINGS TO HOME & SIMILAR CARDS ✨
         // ===============================================
@@ -3781,6 +3791,40 @@ function trackSearchImpression(shopIdToTrack) {
                     }
                 } catch(e){}
             });
+        }
+        // ===============================================
+        // ✨ REVIEW LIKE/UNLIKE LOGIC ✨
+        // ===============================================
+        async function likeReview(orderId, btnElement) {
+            const icon = btnElement.querySelector('i');
+            const countSpan = btnElement.querySelector('.like-count');
+            let currentCount = parseInt(countSpan.innerText) || 0;
+            
+            if (btnElement.dataset.liked === 'true') {
+                // 👎 UNLIKE KARNA
+                btnElement.dataset.liked = 'false';
+                icon.classList.remove('fas', 'text-blue-600');
+                icon.classList.add('far', 'text-gray-400');
+                currentCount = Math.max(0, currentCount - 1);
+                countSpan.innerText = currentCount;
+                
+                // Firebase Database me -1 karna
+                db.collection('orders').doc(orderId).update({
+                    'review.likes': firebase.firestore.FieldValue.increment(-1)
+                }).catch(e => console.log(e));
+            } else {
+                // 👍 LIKE KARNA
+                btnElement.dataset.liked = 'true';
+                icon.classList.remove('far', 'text-gray-400');
+                icon.classList.add('fas', 'text-blue-600');
+                currentCount += 1;
+                countSpan.innerText = currentCount;
+                
+                // Firebase Database me +1 karna
+                db.collection('orders').doc(orderId).update({
+                    'review.likes': firebase.firestore.FieldValue.increment(1)
+                }).catch(e => console.log(e));
+            }
         }
 
 
