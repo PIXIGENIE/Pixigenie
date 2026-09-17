@@ -9744,20 +9744,27 @@ function trackEvent(eventType) {
             </div>
         </div>
     </div>
-    <script>
-        // ✨ DASHBOARD SECURITY LOCK (BACK BUTTON FIX) ✨
-        // Agar user back button se aata hai aur uske paas dukaan nahi hai, toh index par bhejo
+       <script>
+        // ==========================================
+        // ✨ STRICT SECURITY LOCK FOR DASHBOARD ✨
+        // ==========================================
+        
+        // Agar active shop ki ID nahi hai, ya user customer hai, toh dashboard bilkul mat kholne do
+        const activeShopId = localStorage.getItem('pixigenie_active_shop');
+        const customerPhone = localStorage.getItem('pixigenie_customer_phone');
+
+        if (!activeShopId || (customerPhone && customerPhone.includes('@') && !activeShopId)) {
+            window.location.replace('index.html');
+        }
+
+        // Back button ya cache se aane par bhi turant phek do
         window.addEventListener('pageshow', function(event) {
             if (!localStorage.getItem('pixigenie_active_shop')) {
                 window.location.replace('index.html');
             }
         });
-        
-        // Page direct load hone par bhi check karo
-        if (!localStorage.getItem('pixigenie_active_shop')) {
-            window.location.replace('index.html');
-        }
     </script>
+
 
 
 </body>
