@@ -4041,6 +4041,30 @@ function trackSearchImpression(shopIdToTrack) {
         </div>
     </div>
        
+   <script>
+        // =======================================================
+        // ✨ SMART BACK BUTTON INTERCEPTOR (For Home Page) ✨
+        // =======================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check karo ki user logged in hai ya nahi
+            const isUserLoggedIn = localStorage.getItem('pixigenie_active_shop') || localStorage.getItem('pixigenie_customer_phone');
+            
+            if (isUserLoggedIn) {
+                // 1. Browser ki history me ek 'dummy' lock push kar do
+                history.pushState({ page: 'home' }, "Home", "");
 
+                // 2. Jab koi phone ka 'Back' button dabayega toh ye function chalega
+                window.addEventListener('popstate', function(event) {
+                    // Turant ek aur dummy lock push karo taaki wo app se bahar na nikle
+                    history.pushState({ page: 'home' }, "Home", "");
+                    
+                    // Tera mast sa iOS Logout Modal dikha do!
+                    if (typeof showLogoutModal === 'function') {
+                        showLogoutModal();
+                    }
+                });
+            }
+        });
+    </script> 
 </body>
 </html>
