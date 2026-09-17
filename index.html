@@ -4058,37 +4058,27 @@ function trackSearchImpression(shopIdToTrack) {
         </div>
     </div>
        
-        <script>
+          <script>
         // =======================================================
-        // ✨ BULLETPROOF BACK-TO-LOGOUT & CLEAN HISTORY LOGIC ✨
+        // ✨ NATURAL HOME PAGE BACK-TO-LOGOUT LOGIC ✨
         // =======================================================
         document.addEventListener('DOMContentLoaded', () => {
             const isUserLoggedIn = localStorage.getItem('pixigenie_active_shop') || localStorage.getItem('pixigenie_customer_phone');
             
             if (isUserLoggedIn) {
-                // 🚀 Sabse pehle purani gandi history ko replace kar do taaki dashboard ka rasta band ho jaye
                 history.replaceState({ page: 'home' }, document.title, window.location.href);
                 history.pushState({ page: 'guard' }, document.title, window.location.href);
 
-                // Jab user back dabaye
                 window.addEventListener('popstate', function(event) {
-                    // Agar galti se koi dashboard par jaane ki koshish kare, toh turant rok lo
-                    if (!localStorage.getItem('pixigenie_active_shop') && !localStorage.getItem('pixigenie_customer_phone')) {
-                        window.location.replace('index.html');
-                        return;
-                    }
-
-                    // iOS Logout Modal dikhao
                     if (typeof showLogoutModal === 'function') {
                         showLogoutModal();
                     }
-                    
-                    // Guard state wapas set karo taaki cancel dabane par app band na ho
                     history.pushState({ page: 'guard' }, document.title, window.location.href);
                 });
             }
         });
     </script>
+
 
 
    
