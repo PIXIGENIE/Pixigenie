@@ -96,6 +96,18 @@
 </head>
 <body class="font-sans text-gray-800 overflow-x-hidden flex flex-col min-h-screen">
 
+    <!-- ✨ NAYA: DUKAANDAR & CUSTOMER MIX-UP FIX ✨ -->
+    <script>
+        const activeShop = localStorage.getItem('pixigenie_active_shop');
+        const custName = localStorage.getItem('pixigenie_customer_name');
+        
+        // Agar local storage me purani shop ID padi hai par current user customer hai, toh shop ID uda do
+        if (!activeShop && custName) {
+            localStorage.removeItem('pixigenie_active_shop');
+        }
+    </script>
+
+
     <!-- Header -->
     <header class="bg-white/80 backdrop-blur-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] border-b border-white py-3 px-4 sm:px-6 fixed w-full top-0 z-50 flex justify-between items-center transition-all duration-300">
         <div class="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform duration-300" onclick="window.scrollTo(0,0)">
@@ -2759,40 +2771,40 @@ function getVIPBadge(isVerified, plan) {
             }, 10);
         }
 
-        function closeLogoutModal() {
-            const modal = document.getElementById('ios-logout-modal');
-            const card = document.getElementById('ios-logout-card');
-            
-            modal.classList.add('opacity-0');
-            card.classList.add('scale-95');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300); // 300ms baad hide karega jab animation khatam ho jaye
-        }
-
-                  function confirmLogoutAction() {
-            // ✨ Likes aur Cart ka data bacha lo
+            function confirmLogoutAction() {
+            // 1. Sirf wahi data bachao jo customer ka personal hai (jaise cart aur likes)
             let savedLikes = localStorage.getItem('pixigenie_liked_reviews');
             let savedCart = localStorage.getItem('pixigenie_cart');
             
-            localStorage.clear();
-            sessionStorage.clear();
-            
-            // ✨ Data Wapas set kar do
+            // 2. Storage ka kachra saaf karo
+            localStorage.removeItem('pixigenie_active_shop');
+            localStorage.removeItem('pixigenie_owner_name');
+            localStorage.removeItem('pixigenie_customer_name');
+            localStorage.removeItem('pixigenie_customer_phone');
+            localStorage.removeItem('pixigenie_profile_img');
+            localStorage.removeItem('pixigenie_saved_name');
+            localStorage.removeItem('pixigenie_saved_phone');
+            localStorage.removeItem('pixigenie_saved_address');
+            localStorage.removeItem('pixigenie_saved_lat');
+            localStorage.removeItem('pixigenie_saved_lng');
+
+            // 3. Bachaya hua data wapas daalo
             if(savedLikes) localStorage.setItem('pixigenie_liked_reviews', savedLikes);
             if(savedCart) localStorage.setItem('pixigenie_cart', savedCart);
             
-            // 🔥 NAYA: Firebase se bhi proper logout karo taaki purani ID yaad na rakhe
-            if (typeof auth !== 'undefined') {
+            sessionStorage.clear();
+            
+            // 4. Firebase Auth SignOut aur Hard Redirect (No Cache Issue!)
+            if (typeof auth !== 'undefined' && auth.currentUser) {
                 auth.signOut().then(() => {
-                    window.location.href = 'index.html'; 
+                    window.location.replace('index.html'); 
+                }).catch(() => {
+                    window.location.replace('index.html');
                 });
             } else {
-                window.location.href = 'index.html'; 
+                window.location.replace('index.html'); 
             }
         }
-
 
         // ✨ NAYA: Success Modal ko wahin close karne ka function ✨
         function closeOrderSuccessModal() {
