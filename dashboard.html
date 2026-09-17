@@ -9775,6 +9775,51 @@ function trackEvent(eventType) {
                 window.location.replace('index.html');
             }
         });
+   
+                // ==========================================
+        // 📄 SINGLE BILL CSV DOWNLOAD FUNCTION
+        // ==========================================
+        function downloadBillCSV(id) {
+            // 1. Bill dhoondho
+            const b = adminBills.find(x => x.id === id);
+            if (!b) {
+                alert("Bill not found!");
+                return;
+            }
+
+            // 2. CSV Headers aur Row data banao
+            let csvContent = "Order ID,Date,Customer Name,Phone,Address,Items Ordered,Discount,Delivery,Grand Total,Payment Mode,Payment Status,Delivery Status\n";
+            
+            let orderId = (b.id || "").substring(0, 8).toUpperCase();
+            let date = b.date || "";
+            let name = (b.customerName || "N/A").replace(/,/g, " ");
+            let phone = b.customerPhone || "N/A";
+            let address = (b.address || "").replace(/,/g, " ").replace(/[\n\r]+/g, " ");
+            let items = (b.items ? b.items.map(i => `${i.qty}x ${i.name} (₹${i.price})`).join(' | ') : "-").replace(/,/g, " ");
+            let discount = b.discount || 0;
+            let delivery = b.delivery || 0;
+            let total = b.grandTotal || 0;
+            let payMode = b.payMode || "-";
+            let payStatus = (b.payStatus || "UNPAID").replace(/,/g, " ");
+            let delStatus = (b.deliveryStatus || "PROCESSING").replace(/,/g, " ");
+
+            csvContent += `${orderId},${date},${name},${phone},${address},${items},${discount},${delivery},${total},${payMode},${payStatus},${delStatus}\n`;
+
+            // 3. Blob create karke file download trigger karo
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            
+            const safeName = String(b.customerName || "Customer").replace(/[^a-zA-Z0-9]/g, '_');
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Invoice_${safeName}_${orderId}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
     </script>
 
 
