@@ -4058,7 +4058,98 @@ function trackSearchImpression(shopIdToTrack) {
         </div>
     </div>
        
-          
+              <script>
+        // =======================================================
+        // ✨ UNIVERSAL STEP-BY-STEP BACK BUTTON MANAGER ✨
+        // =======================================================
+        
+        // 1. Jab bhi koi modal khule, yeh function history me state add karega
+        function pushModalState(modalName) {
+            history.pushState({ modal: modalName }, document.title, window.location.href);
+        }
+
+        // 2. Browser ka back button handle karne ke liye main listener
+        window.addEventListener('popstate', function(event) {
+            // Check karo ki koi modal khula hai kya, agar khula hai toh ek-ek karke band karo
+            
+            const productModal = document.getElementById('product-details-page');
+            const cartModal = document.getElementById('cart-modal');
+            const orderModal = document.getElementById('order-modal');
+            const profileModal = document.getElementById('ios-profile-modal');
+            const authModal = document.getElementById('auth-modal');
+            const mapModal = document.getElementById('map-picker-modal');
+
+            // Agar Product Details khula hai, toh pehle use band karo
+            if (productModal && !productModal.classList.contains('hidden') && !productModal.classList.contains('translate-x-full')) {
+                closeProductDetails();
+                return;
+            }
+            
+            // Agar Cart khula hai, toh use band karo
+            if (cartModal && !cartModal.classList.contains('hidden') && !cartModal.classList.contains('opacity-0')) {
+                toggleCartModal();
+                return;
+            }
+
+            // Agar Order Modal khula hai, toh use band karo
+            if (orderModal && !orderModal.classList.contains('hidden') && !orderModal.classList.contains('opacity-0')) {
+                closeOrderModal();
+                return;
+            }
+
+            // Agar Profile Modal khula hai, toh use band karo
+            if (profileModal && !profileModal.classList.contains('hidden') && !profileModal.classList.contains('opacity-0')) {
+                toggleProfileModal();
+                return;
+            }
+
+            // Agar Auth/Login Modal khula hai, toh use band karo
+            if (authModal && !authModal.classList.contains('hidden') && !authModal.classList.contains('opacity-0')) {
+                closeAuthModal();
+                return;
+            }
+
+            // Agar Map Picker khula hai, toh use band karo
+            if (mapModal && !mapModal.classList.contains('hidden') && !mapModal.classList.contains('opacity-0')) {
+                closeMapPicker();
+                return;
+            }
+        });
+
+        // 3. Modals ke khulne par history state push karne ke liye automatic triggers
+        document.addEventListener('DOMContentLoaded', () => {
+            // Product Details observer/listener
+            const prodPage = document.getElementById('product-details-page');
+            if (prodPage) {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.attributeName === 'class') {
+                            if (!prodPage.classList.contains('hidden') && !prodPage.classList.contains('translate-x-full')) {
+                                history.pushState({ modal: 'product' }, document.title, window.location.href);
+                            }
+                        }
+                    });
+                });
+                observer.observe(prodPage, { attributes: true });
+            }
+
+            // Cart Modal observer
+            const cartModal = document.getElementById('cart-modal');
+            if (cartModal) {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.attributeName === 'class') {
+                            if (!cartModal.classList.contains('hidden') && !cartModal.classList.contains('opacity-0')) {
+                                history.pushState({ modal: 'cart' }, document.title, window.location.href);
+                            }
+                        }
+                    });
+                });
+                observer.observe(cartModal, { attributes: true });
+            }
+        });
+    </script>
+
    
 </body>
 </html>
