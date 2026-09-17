@@ -1595,7 +1595,7 @@
             return true;
         }
 
-                    function addToCart(event, name, price, shopName, shopPhone) {
+                      function addToCart(event, name, price, shopName, shopPhone) {
             event.stopPropagation(); 
             let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
             const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
@@ -1612,24 +1612,27 @@
             // Agar yeh Full-Screen modal ka bada button hai, toh isse bypass karo
             if (btn.id === 'detail-cart-btn') return;
 
-            // 🚀 DOUBLE CLICK BUG FIX: Agar animation chal rahi hai toh dobara mat chalao
+            // 🚀 DOUBLE CLICK BUG FIX
             if (btn.dataset.adding === "true") return;
             btn.dataset.adding = "true";
 
-            // Original HTML ko hardcode kar diya taaki kabhi na atke
             let origHtml = `<i class="fas fa-cart-plus text-sm"></i> Cart`;
 
             btn.innerHTML = `<i class="fas fa-check text-lg"></i> Added`;
-            btn.classList.add('bg-purple-600', 'text-white', 'shadow-md');
-            btn.classList.remove('bg-purple-50', 'text-purple-600');
+            
+            // ✨ NAYA FIX: Mobile hover color ko temporarily hata do taaki white text perfectly dikhe
+            btn.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
+            btn.classList.remove('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
 
             setTimeout(() => {
                 btn.innerHTML = origHtml;
-                btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md');
-                btn.classList.add('bg-purple-50', 'text-purple-600');
-                btn.dataset.adding = "false"; // Animation khatam, lock khol do
+                // Animation khatam hone par wapas normal kar do
+                btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
+                btn.classList.add('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
+                btn.dataset.adding = "false"; // Lock khol do
             }, 1200);
         }
+
 
 
         function toggleCartModal() {
