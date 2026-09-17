@@ -610,26 +610,48 @@
 
 
                                         </div>
-                                                     <div class="flex flex-col gap-2 flex-1">
-                                            <div class="flex flex-col gap-1 w-full text-xs font-bold text-gray-500 mb-1">
-                                                <p>Upload Product Images (Max 3)</p>
-                                                <p class="text-[9px] font-medium text-gray-400">First image will be the primary display image.</p>
-                                            </div>
+                                                                                             <!-- ✨ NAYA: 3 Image Premium Uploader (ADD PRODUCT) ✨ -->
+                                        <div class="flex flex-col gap-2 flex-1 mt-2">
+                                            <label class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Upload Images (Max 3)</label>
                                             <div class="flex gap-2 w-full">
-                                                <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex items-center px-1 overflow-hidden h-11 shadow-sm">
-                                                    <input type="file" id="prod-image" accept="image/*" class="w-full text-[10px] text-[#6B7280] file:hidden cursor-pointer outline-none">
-                                                    <span class="text-[10px] font-bold text-[#A855F7] ml-2 pointer-events-none">Img 1</span>
+                                                <!-- BOX 1 (Main Image) -->
+                                                <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[16px] h-20 flex flex-col items-center justify-center overflow-hidden shadow-sm relative">
+                                                    <input type="file" id="prod-image" accept="image/*" class="hidden" onchange="previewImg(this, 'add-prev-1', 'add-def-1', 'add-show-1')">
+                                                    <div id="add-def-1" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-gray-50 transition" onclick="document.getElementById('prod-image').click()">
+                                                        <i class="fas fa-plus text-gray-400 mb-1.5 text-lg"></i>
+                                                        <span class="text-[9px] font-bold text-[#A855F7] tracking-wider uppercase">Main Img</span>
+                                                    </div>
+                                                    <div id="add-show-1" class="hidden absolute inset-0 w-full h-full">
+                                                        <img id="add-prev-1" src="" class="w-full h-full object-cover">
+                                                        <button type="button" onclick="clearImg('prod-image', 'add-prev-1', 'add-def-1', 'add-show-1')" class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 text-red-500 rounded-full flex items-center justify-center text-[10px] shadow-md z-10 active:scale-90 border border-red-100 backdrop-blur-sm"><i class="fas fa-times"></i></button>
+                                                    </div>
                                                 </div>
-                                                <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex items-center px-1 overflow-hidden h-11 shadow-sm">
-                                                    <input type="file" id="prod-image2" accept="image/*" class="w-full text-[10px] text-[#6B7280] file:hidden cursor-pointer outline-none">
-                                                    <span class="text-[10px] font-bold text-gray-500 ml-2 pointer-events-none">Img 2</span>
+                                                <!-- BOX 2 -->
+                                                <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[16px] h-20 flex flex-col items-center justify-center overflow-hidden shadow-sm relative">
+                                                    <input type="file" id="prod-image2" accept="image/*" class="hidden" onchange="previewImg(this, 'add-prev-2', 'add-def-2', 'add-show-2')">
+                                                    <div id="add-def-2" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-gray-50 transition" onclick="document.getElementById('prod-image2').click()">
+                                                        <i class="fas fa-plus text-gray-300 mb-1.5 text-lg"></i>
+                                                        <span class="text-[9px] font-bold text-gray-400 tracking-wider uppercase">Img 2</span>
+                                                    </div>
+                                                    <div id="add-show-2" class="hidden absolute inset-0 w-full h-full">
+                                                        <img id="add-prev-2" src="" class="w-full h-full object-cover">
+                                                        <button type="button" onclick="clearImg('prod-image2', 'add-prev-2', 'add-def-2', 'add-show-2')" class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 text-red-500 rounded-full flex items-center justify-center text-[10px] shadow-md z-10 active:scale-90 border border-red-100 backdrop-blur-sm"><i class="fas fa-times"></i></button>
+                                                    </div>
                                                 </div>
-                                                <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex items-center px-1 overflow-hidden h-11 shadow-sm">
-                                                    <input type="file" id="prod-image3" accept="image/*" class="w-full text-[10px] text-[#6B7280] file:hidden cursor-pointer outline-none">
-                                                    <span class="text-[10px] font-bold text-gray-500 ml-2 pointer-events-none">Img 3</span>
+                                                <!-- BOX 3 -->
+                                                <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[16px] h-20 flex flex-col items-center justify-center overflow-hidden shadow-sm relative">
+                                                    <input type="file" id="prod-image3" accept="image/*" class="hidden" onchange="previewImg(this, 'add-prev-3', 'add-def-3', 'add-show-3')">
+                                                    <div id="add-def-3" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-gray-50 transition" onclick="document.getElementById('prod-image3').click()">
+                                                        <i class="fas fa-plus text-gray-300 mb-1.5 text-lg"></i>
+                                                        <span class="text-[9px] font-bold text-gray-400 tracking-wider uppercase">Img 3</span>
+                                                    </div>
+                                                    <div id="add-show-3" class="hidden absolute inset-0 w-full h-full">
+                                                        <img id="add-prev-3" src="" class="w-full h-full object-cover">
+                                                        <button type="button" onclick="clearImg('prod-image3', 'add-prev-3', 'add-def-3', 'add-show-3')" class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 text-red-500 rounded-full flex items-center justify-center text-[10px] shadow-md z-10 active:scale-90 border border-red-100 backdrop-blur-sm"><i class="fas fa-times"></i></button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <button type="submit" class="w-full bg-[#111827] text-white font-bold px-5 h-11 rounded-[12px] mt-1 active:scale-95 transition flex justify-center items-center gap-1.5 shrink-0 text-[13px] shadow-md">Add Product <i class="fas fa-plus text-[10px]"></i></button>
+                                            <button type="submit" class="w-full bg-[#111827] text-white font-bold px-5 h-12 rounded-[14px] mt-1 active:scale-95 transition flex justify-center items-center gap-2 shrink-0 text-[14px] shadow-lg hover:shadow-xl">Add Product <i class="fas fa-plus text-[12px]"></i></button>
                                         </div>
 
                                     </div>
@@ -2806,7 +2828,7 @@
         }
 
 
-              async function addProduct(e) {
+                    async function addProduct(e) {
             e.preventDefault(); 
             
             // ==========================================
@@ -2853,12 +2875,13 @@
             const btn = e.target.querySelector('button'); const orig = btn.innerHTML; 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
 
-                    // ✨ NAYA: Teeno Images Process Karo ✨
+            // ✨ NAYA: TEENO IMAGES PROCESS KARO ✨
             const imgBase64_1 = await processImage(document.getElementById('prod-image'));
             const imgBase64_2 = await processImage(document.getElementById('prod-image2'));
             const imgBase64_3 = await processImage(document.getElementById('prod-image3'));
 
             try { 
+                // 🔥 NAYA: Dukaandar ki jo rank hai, wahi rank uske product ko bhi mil jayegi
                 let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
 
                 let pd = { 
@@ -2868,41 +2891,54 @@
                     qtySize: qtySize, 
                     unit: unit, 
                     description: desc, 
-                    image: imgBase64_1,     // Primary
+                    image: imgBase64_1,     // Primary Img
                     image2: imgBase64_2,    // Optional 2
                     image3: imgBase64_3,    // Optional 3
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    searchRank: currentRank 
+                    searchRank: currentRank // 🔥 PRODUCT KO BHI RANK MIL GAYI
                 };
 
-
-
                 const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
-                pd.id = doc.id; storeProducts.unshift(pd); e.target.reset(); renderAdminProducts(); 
+                pd.id = doc.id; storeProducts.unshift(pd); 
+                e.target.reset(); 
+                
+                // Form reset hone ke baad Image Preview bhi hata do (Agar JS helper lagaya hai toh)
+                if(typeof clearImg === 'function') {
+                    clearImg('prod-image', 'add-prev-1', 'add-def-1', 'add-show-1');
+                    clearImg('prod-image2', 'add-prev-2', 'add-def-2', 'add-show-2');
+                    clearImg('prod-image3', 'add-prev-3', 'add-def-3', 'add-show-3');
+                }
+                
+                renderAdminProducts(); 
             } catch(err) { alert(err.message); } 
             
             btn.innerHTML = orig; btn.disabled = false;
         }
 
-
-            function openEditProductModal(id) {
+                  function openEditProductModal(id) {
             const p = storeProducts.find(x=>x.id===id); if(!p) return; 
             
             document.getElementById('edit-prod-name').value = p.name; 
-            document.getElementById('edit-prod-mrp').value = p.mrp || p.price; // ✨ NAYA: MRP yahan load hoga
+            document.getElementById('edit-prod-mrp').value = p.mrp || p.price; 
             document.getElementById('edit-prod-price').value = p.price; 
-
             document.getElementById('edit-prod-qty').value = p.qtySize !== undefined ? p.qtySize : (p.stock !== undefined ? p.stock : 1);
-                        // ✨ Update iOS hidden input & button ✨
+            document.getElementById('edit-prod-desc').value = p.description || '';
+
             const unitVal = p.unit || 'pcs';
             document.getElementById('edit-prod-unit').value = unitVal;
             const unitLabels = { 'pcs':'pcs', 'kg':'kg', 'g':'g', 'liter':'liter', 'ml':'ml', 'packet':'pkt', 'box':'box', 'hr':'per hr', 'visit':'per visit', 'service':'per service', 'fixed':'fixed fee' };
             const editBtn = document.getElementById('edit-prod-unit-display');
             if(editBtn) editBtn.innerHTML = (unitLabels[unitVal] || unitVal) + ' <i class="fas fa-chevron-down text-[12px] text-gray-400"></i>';
 
-           document.getElementById('edit-prod-desc').value = p.description || '';
-
- document.getElementById('edit-prod-image').value = ''; 
+            // ✨ Pre-fill Existing Images in Preview Boxes ✨
+            if(p.image) { document.getElementById('edit-prev-1').src = p.image; document.getElementById('edit-def-1').classList.add('hidden'); document.getElementById('edit-show-1').classList.remove('hidden'); }
+            else { clearImg('edit-prod-image', 'edit-prev-1', 'edit-def-1', 'edit-show-1'); }
+            
+            if(p.image2) { document.getElementById('edit-prev-2').src = p.image2; document.getElementById('edit-def-2').classList.add('hidden'); document.getElementById('edit-show-2').classList.remove('hidden'); }
+            else { clearImg('edit-prod-image2', 'edit-prev-2', 'edit-def-2', 'edit-show-2'); }
+            
+            if(p.image3) { document.getElementById('edit-prev-3').src = p.image3; document.getElementById('edit-def-3').classList.add('hidden'); document.getElementById('edit-show-3').classList.remove('hidden'); }
+            else { clearImg('edit-prod-image3', 'edit-prev-3', 'edit-def-3', 'edit-show-3'); }
             
             document.getElementById('edit-product-form').dataset.id = id;
             const md = document.getElementById('edit-product-modal'); md.classList.remove('hidden'); setTimeout(()=>md.classList.add('opacity-100'),10);
@@ -2910,57 +2946,62 @@
 
         function closeEditProductModal() { const md = document.getElementById('edit-product-modal'); md.classList.remove('opacity-100'); setTimeout(()=>md.classList.add('hidden'),300); }
 
-                async function handleEditProduct(e) {
+                  async function handleEditProduct(e) {
             e.preventDefault(); 
             const n = document.getElementById('edit-prod-name').value.trim(); 
             const updatedDesc = document.getElementById('edit-prod-desc').value.trim();
-            const mrpVal = parseInt(document.getElementById('edit-prod-mrp').value); // ✨ NAYA: MRP
+            const mrpVal = parseInt(document.getElementById('edit-prod-mrp').value);
             const p = parseInt(document.getElementById('edit-prod-price').value); 
             const qtySize = parseFloat(document.getElementById('edit-prod-qty').value) || 1;
             const unit = document.getElementById('edit-prod-unit').value;
             const id = e.target.dataset.id;
 
-            // ✨ NAYA CHECK: Selling Price kabhi MRP se zyada nahi ho sakti
-            if (p > mrpVal) {
-                showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
-                return;
-            }
+            if (p > mrpVal) return showIOSAlert("Invalid Price", "Selling Price cannot be greater than MRP!");
             
-            const btn = e.target.querySelector('button'); const orig = btn.innerText; 
+            const btn = e.target.querySelector('button[type="submit"]'); const orig = btn.innerText; 
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Updating...`; btn.disabled = true;
 
-                     let updateData = { name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: updatedDesc };
+            let updateData = { name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: updatedDesc };
             
-            // ✨ NAYA: Teeno Images Update Logic ✨
+            // ✨ Image Cross/Delete Logic Handle karna ✨
+            const isImg1Visible = !document.getElementById('edit-show-1').classList.contains('hidden');
+            const isImg2Visible = !document.getElementById('edit-show-2').classList.contains('hidden');
+            const isImg3Visible = !document.getElementById('edit-show-3').classList.contains('hidden');
+
             const newImg1 = await processImage(document.getElementById('edit-prod-image'));
             const newImg2 = await processImage(document.getElementById('edit-prod-image2'));
             const newImg3 = await processImage(document.getElementById('edit-prod-image3'));
-            
+
             if (newImg1 !== "") updateData.image = newImg1;
+            else if (!isImg1Visible) updateData.image = firebase.firestore.FieldValue.delete();
+
             if (newImg2 !== "") updateData.image2 = newImg2;
+            else if (!isImg2Visible) updateData.image2 = firebase.firestore.FieldValue.delete();
+
             if (newImg3 !== "") updateData.image3 = newImg3;
+            else if (!isImg3Visible) updateData.image3 = firebase.firestore.FieldValue.delete();
 
             try { 
                 await db.collection('shops').doc(currentShopId).collection('products').doc(id).update(updateData); 
                 let idx = storeProducts.findIndex(x=>x.id===id); 
                 if(idx!==-1) {
-                    storeProducts[idx].name = n; 
-                    storeProducts[idx].mrp = mrpVal; 
-                    storeProducts[idx].price = p; 
-                    storeProducts[idx].qtySize = qtySize; 
-                    storeProducts[idx].unit = unit;
-                    storeProducts[idx].description = updatedDesc; 
-                    if(newImg1 !== "") storeProducts[idx].image = newImg1;
-                    if(newImg2 !== "") storeProducts[idx].image2 = newImg2;
-                    if(newImg3 !== "") storeProducts[idx].image3 = newImg3;
-                } 
+                    storeProducts[idx].name = n; storeProducts[idx].mrp = mrpVal; storeProducts[idx].price = p; 
+                    storeProducts[idx].qtySize = qtySize; storeProducts[idx].unit = unit; storeProducts[idx].description = updatedDesc; 
+                    
+                    if (newImg1 !== "") storeProducts[idx].image = newImg1;
+                    else if (!isImg1Visible) storeProducts[idx].image = "";
 
+                    if (newImg2 !== "") storeProducts[idx].image2 = newImg2;
+                    else if (!isImg2Visible) storeProducts[idx].image2 = "";
+
+                    if (newImg3 !== "") storeProducts[idx].image3 = newImg3;
+                    else if (!isImg3Visible) storeProducts[idx].image3 = "";
+                } 
                 renderAdminProducts(); closeEditProductModal(); 
             } catch(e) { alert(e.message); } 
             
             btn.innerText = orig; btn.disabled = false;
         }
-
 
         async function deleteProduct(id) { if(!confirm("Delete product?")) return; try { await db.collection('shops').doc(currentShopId).collection('products').doc(id).delete(); storeProducts = storeProducts.filter(x=>x.id!==id); renderAdminProducts(); } catch(e){} }
 
@@ -9558,6 +9599,26 @@ function trackEvent(eventType) {
           .catch(err => console.log("Event track error:", err));
     }
 }
+        // ✨ NAYA: IMAGE PREVIEW & CLEAR HELPERS ✨
+        function previewImg(input, imgId, defId, showId) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(imgId).src = e.target.result;
+                    document.getElementById(defId).classList.add('hidden');
+                    document.getElementById(showId).classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearImg(inputId, imgId, defId, showId) {
+            document.getElementById(inputId).value = "";
+            document.getElementById(imgId).src = "";
+            document.getElementById(showId).classList.add('hidden');
+            document.getElementById(defId).classList.remove('hidden');
+        }
 
     </script>
     <!-- ✨ iOS STYLE PREMIUM SHARE MODAL (WITH QR CODE) ✨ -->
