@@ -9656,6 +9656,21 @@ function trackEvent(eventType) {
             document.getElementById(showId).classList.add('hidden');
             document.getElementById(defId).classList.remove('hidden');
         }
+        // ==========================================
+        // ✨ STRICT SECURITY LOCK FOR DASHBOARD ✨
+        // ==========================================
+        
+        // 1. Agar koi bina dukaan (Customer) ke direct Dashboard kholta hai
+        if (!localStorage.getItem('pixigenie_active_shop')) {
+            window.location.replace('index.html');
+        }
+
+        // 2. Agar koi Back Button daba kar cache se wapas Dashboard par aata hai
+        window.addEventListener('pageshow', function(event) {
+            if (!localStorage.getItem('pixigenie_active_shop')) {
+                window.location.replace('index.html');
+            }
+        });
 
     </script>
     <!-- ✨ iOS STYLE PREMIUM SHARE MODAL (WITH QR CODE) ✨ -->
