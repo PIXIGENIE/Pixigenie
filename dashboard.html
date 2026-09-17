@@ -1418,24 +1418,43 @@
                                         <textarea id="edit-prod-desc" placeholder="Product Description (Optional)" rows="2" class="w-full bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] rounded-[12px] px-4 py-3 text-sm font-semibold outline-none focus:border-[#A855F7] transition resize-none"></textarea>
                                     </div>
 
-                                        <label class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Update Images (Optional)</label>
+                                                            <label class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Update Images (Max 3)</label>
                     <div class="flex gap-2 w-full mb-2">
-                        <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex flex-col items-center justify-center overflow-hidden h-16 shadow-sm relative cursor-pointer hover:bg-gray-50">
-                            <input type="file" id="edit-prod-image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
-                            <i class="fas fa-camera text-gray-400 mb-1"></i>
-                            <span class="text-[9px] font-bold text-[#A855F7] pointer-events-none">Main Img</span>
+                        <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[16px] h-20 flex flex-col items-center justify-center overflow-hidden shadow-sm relative">
+                            <input type="file" id="edit-prod-image" accept="image/*" class="hidden" onchange="previewImg(this, 'edit-prev-1', 'edit-def-1', 'edit-show-1')">
+                            <div id="edit-def-1" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-gray-50 transition" onclick="document.getElementById('edit-prod-image').click()">
+                                <i class="fas fa-plus text-gray-400 mb-1.5 text-lg"></i>
+                                <span class="text-[9px] font-bold text-[#A855F7] tracking-wider uppercase">Main Img</span>
+                            </div>
+                            <div id="edit-show-1" class="hidden absolute inset-0 w-full h-full">
+                                <img id="edit-prev-1" src="" class="w-full h-full object-cover">
+                                <button type="button" onclick="clearImg('edit-prod-image', 'edit-prev-1', 'edit-def-1', 'edit-show-1')" class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 text-red-500 rounded-full flex items-center justify-center text-[10px] shadow-md z-10 active:scale-90 border border-red-100 backdrop-blur-sm"><i class="fas fa-times"></i></button>
+                            </div>
                         </div>
-                        <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex flex-col items-center justify-center overflow-hidden h-16 shadow-sm relative cursor-pointer hover:bg-gray-50">
-                            <input type="file" id="edit-prod-image2" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
-                            <i class="fas fa-camera text-gray-300 mb-1"></i>
-                            <span class="text-[9px] font-bold text-gray-500 pointer-events-none">Img 2</span>
+                        <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[16px] h-20 flex flex-col items-center justify-center overflow-hidden shadow-sm relative">
+                            <input type="file" id="edit-prod-image2" accept="image/*" class="hidden" onchange="previewImg(this, 'edit-prev-2', 'edit-def-2', 'edit-show-2')">
+                            <div id="edit-def-2" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-gray-50 transition" onclick="document.getElementById('edit-prod-image2').click()">
+                                <i class="fas fa-plus text-gray-300 mb-1.5 text-lg"></i>
+                                <span class="text-[9px] font-bold text-gray-400 tracking-wider uppercase">Img 2</span>
+                            </div>
+                            <div id="edit-show-2" class="hidden absolute inset-0 w-full h-full">
+                                <img id="edit-prev-2" src="" class="w-full h-full object-cover">
+                                <button type="button" onclick="clearImg('edit-prod-image2', 'edit-prev-2', 'edit-def-2', 'edit-show-2')" class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 text-red-500 rounded-full flex items-center justify-center text-[10px] shadow-md z-10 active:scale-90 border border-red-100 backdrop-blur-sm"><i class="fas fa-times"></i></button>
+                            </div>
                         </div>
-                        <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex flex-col items-center justify-center overflow-hidden h-16 shadow-sm relative cursor-pointer hover:bg-gray-50">
-                            <input type="file" id="edit-prod-image3" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
-                            <i class="fas fa-camera text-gray-300 mb-1"></i>
-                            <span class="text-[9px] font-bold text-gray-500 pointer-events-none">Img 3</span>
+                        <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[16px] h-20 flex flex-col items-center justify-center overflow-hidden shadow-sm relative">
+                            <input type="file" id="edit-prod-image3" accept="image/*" class="hidden" onchange="previewImg(this, 'edit-prev-3', 'edit-def-3', 'edit-show-3')">
+                            <div id="edit-def-3" class="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-gray-50 transition" onclick="document.getElementById('edit-prod-image3').click()">
+                                <i class="fas fa-plus text-gray-300 mb-1.5 text-lg"></i>
+                                <span class="text-[9px] font-bold text-gray-400 tracking-wider uppercase">Img 3</span>
+                            </div>
+                            <div id="edit-show-3" class="hidden absolute inset-0 w-full h-full">
+                                <img id="edit-prev-3" src="" class="w-full h-full object-cover">
+                                <button type="button" onclick="clearImg('edit-prod-image3', 'edit-prev-3', 'edit-def-3', 'edit-show-3')" class="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 text-red-500 rounded-full flex items-center justify-center text-[10px] shadow-md z-10 active:scale-90 border border-red-100 backdrop-blur-sm"><i class="fas fa-times"></i></button>
+                            </div>
                         </div>
                     </div>
+
 
                 </div>
                 <button type="submit" class="w-full bg-[#111827] text-white font-bold h-[52px] rounded-[16px] mt-2 active:scale-95 transition shadow-md">Update Product</button>
@@ -2875,13 +2894,12 @@
             const btn = e.target.querySelector('button'); const orig = btn.innerHTML; 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
 
-            // ✨ NAYA: TEENO IMAGES PROCESS KARO ✨
+                    // ✨ NAYA: Teeno Images Process Karo ✨
             const imgBase64_1 = await processImage(document.getElementById('prod-image'));
             const imgBase64_2 = await processImage(document.getElementById('prod-image2'));
             const imgBase64_3 = await processImage(document.getElementById('prod-image3'));
 
             try { 
-                // 🔥 NAYA: Dukaandar ki jo rank hai, wahi rank uske product ko bhi mil jayegi
                 let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
 
                 let pd = { 
@@ -2892,17 +2910,17 @@
                     unit: unit, 
                     description: desc, 
                     image: imgBase64_1,     // Primary Img
-                    image2: imgBase64_2,    // Optional 2
-                    image3: imgBase64_3,    // Optional 3
+                    image2: imgBase64_2,    // Img 2
+                    image3: imgBase64_3,    // Img 3
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    searchRank: currentRank // 🔥 PRODUCT KO BHI RANK MIL GAYI
+                    searchRank: currentRank
                 };
 
                 const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
                 pd.id = doc.id; storeProducts.unshift(pd); 
                 e.target.reset(); 
                 
-                // Form reset hone ke baad Image Preview bhi hata do (Agar JS helper lagaya hai toh)
+                // Form reset hone ke baad Image Preview bhi hata do
                 if(typeof clearImg === 'function') {
                     clearImg('prod-image', 'add-prev-1', 'add-def-1', 'add-show-1');
                     clearImg('prod-image2', 'add-prev-2', 'add-def-2', 'add-show-2');
@@ -2915,7 +2933,8 @@
             btn.innerHTML = orig; btn.disabled = false;
         }
 
-                  function openEditProductModal(id) {
+
+                      function openEditProductModal(id) {
             const p = storeProducts.find(x=>x.id===id); if(!p) return; 
             
             document.getElementById('edit-prod-name').value = p.name; 
@@ -2946,7 +2965,7 @@
 
         function closeEditProductModal() { const md = document.getElementById('edit-product-modal'); md.classList.remove('opacity-100'); setTimeout(()=>md.classList.add('hidden'),300); }
 
-                  async function handleEditProduct(e) {
+        async function handleEditProduct(e) {
             e.preventDefault(); 
             const n = document.getElementById('edit-prod-name').value.trim(); 
             const updatedDesc = document.getElementById('edit-prod-desc').value.trim();
@@ -2972,6 +2991,8 @@
             const newImg2 = await processImage(document.getElementById('edit-prod-image2'));
             const newImg3 = await processImage(document.getElementById('edit-prod-image3'));
 
+            // Agar naya photo upload kiya toh update karo
+            // Warna agar user ne cross daba diya tha, to firebase se delete kar do
             if (newImg1 !== "") updateData.image = newImg1;
             else if (!isImg1Visible) updateData.image = firebase.firestore.FieldValue.delete();
 
