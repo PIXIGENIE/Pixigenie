@@ -813,6 +813,10 @@ function loginWithGoogle(event) {
 async function selectRole(role) {
     if (role === 'customer') {
         try {
+            // 🔥 NAYA FIX: Agar pehle koi dukaandar ki ID thi, toh use turant mitao!
+            localStorage.removeItem('pixigenie_active_shop');
+            localStorage.removeItem('pixigenie_owner_name');
+
             await db.collection('customers').doc(authTemp.email).set({
                 name: authTemp.name,
                 email: authTemp.email,
@@ -835,6 +839,7 @@ async function selectRole(role) {
         showStep('auth-step-shop');
     }
 }
+
 
 // ✨ 3. CREATE SHOP LOGIC ✨
 async function handleShopSubmit(e) {
