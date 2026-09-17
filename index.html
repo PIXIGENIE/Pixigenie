@@ -4058,30 +4058,39 @@ function trackSearchImpression(shopIdToTrack) {
         </div>
     </div>
        
-   <script>
+        <script>
         // =======================================================
-        // ✨ SMART BACK BUTTON INTERCEPTOR (For Home Page) ✨
+        // ✨ BULLETPROOF BACK-TO-LOGOUT & CLEAN HISTORY LOGIC ✨
         // =======================================================
         document.addEventListener('DOMContentLoaded', () => {
-            // Check karo ki user logged in hai ya nahi
             const isUserLoggedIn = localStorage.getItem('pixigenie_active_shop') || localStorage.getItem('pixigenie_customer_phone');
             
             if (isUserLoggedIn) {
-                // 1. Browser ki history me ek 'dummy' lock push kar do
-                history.pushState({ page: 'home' }, "Home", "");
+                // 🚀 Sabse pehle purani gandi history ko replace kar do taaki dashboard ka rasta band ho jaye
+                history.replaceState({ page: 'home' }, document.title, window.location.href);
+                history.pushState({ page: 'guard' }, document.title, window.location.href);
 
-                // 2. Jab koi phone ka 'Back' button dabayega toh ye function chalega
+                // Jab user back dabaye
                 window.addEventListener('popstate', function(event) {
-                    // Turant ek aur dummy lock push karo taaki wo app se bahar na nikle
-                    history.pushState({ page: 'home' }, "Home", "");
-                    
-                    // Tera mast sa iOS Logout Modal dikha do!
+                    // Agar galti se koi dashboard par jaane ki koshish kare, toh turant rok lo
+                    if (!localStorage.getItem('pixigenie_active_shop') && !localStorage.getItem('pixigenie_customer_phone')) {
+                        window.location.replace('index.html');
+                        return;
+                    }
+
+                    // iOS Logout Modal dikhao
                     if (typeof showLogoutModal === 'function') {
                         showLogoutModal();
                     }
+                    
+                    // Guard state wapas set karo taaki cancel dabane par app band na ho
+                    history.pushState({ page: 'guard' }, document.title, window.location.href);
                 });
             }
         });
-    </script> 
+    </script>
+
+
+   
 </body>
 </html>
