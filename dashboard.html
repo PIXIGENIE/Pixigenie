@@ -8266,11 +8266,10 @@ td.mono {
             }
         }
 
-        // ==========================================
+               // ==========================================
         // 📊 EXCEL / CSV DATA EXPORT FUNCTION
         // ==========================================
         function downloadExcelData() {
-            // 1. Get Selected Month
             let mPick = document.getElementById('insight-month-picker');
             let y = new Date().getFullYear();
             let m = new Date().getMonth();
@@ -8281,51 +8280,41 @@ td.mono {
             }
             const displayMonth = new Date(y, m).toLocaleString('default', { month: 'long' });
 
-            // 2. Prepare CSV Headers
             let csvContent = "Order ID,Date,Customer Name,Phone,Items Ordered,Total Amount (Rs),Payment Mode,Payment Status,Delivery Status\n";
             let hasData = false;
 
-            // 3. Loop through orders and format for Excel
             adminBills.forEach(b => {
                 let bD;
                 if (b.timestamp && typeof b.timestamp.toDate === 'function') bD = b.timestamp.toDate();
                 else if (b.timestamp && b.timestamp.seconds) bD = new Date(b.timestamp.seconds * 1000);
                 else { let pa = b.date.split('/'); if (pa.length === 3) bD = new Date(pa[2], pa[1] - 1, pa[0]); else bD = new Date(b.date); }
 
-                // Match with selected month
                 if (bD && !isNaN(bD) && bD.getMonth() === m && bD.getFullYear() === y) {
                     hasData = true;
-                    
-                    // Format text to avoid breaking Excel columns (replacing commas with spaces)
                     let id = (b.id || "").substring(0,8).toUpperCase();
                     let date = b.date || "";
                     let name = (b.customerName || "N/A").replace(/,/g, " "); 
                     let phone = b.customerPhone || "N/A";
-                    
-                    // Combine items into a single string
                     let items = (b.items ? b.items.map(i => `${i.qty}x ${i.name}`).join(' | ') : "-").replace(/,/g, " ");
-                    
                     let total = b.grandTotal || 0;
                     let payMode = b.payMode || "-";
                     let payStatus = (b.payStatus || "UNPAID").replace(/,/g, " ");
                     let delStatus = (b.deliveryStatus || "PROCESSING").replace(/,/g, " ");
 
-                    // Append row to CSV
                     csvContent += `${id},${date},${name},${phone},${items},${total},${payMode},${payStatus},${delStatus}\n`;
                 }
             });
 
-            // 4. Check if data exists
             if (!hasData) {
                 alert("No orders found for " + displayMonth + " " + y + " to export!");
                 return;
             }
 
-            // 5. Trigger Excel (CSV) Download
             const storeName = typeof globalShopData !== 'undefined' && globalShopData?.shopName ? globalShopData.shopName.replace(/[^a-zA-Z0-9]/g, '') : 'Store';
             const fileName = `${storeName}_Data_${displayMonth}_${y}.csv`;
             
-             // \uFEFF ensures MS Excel reads rupees (₹) and Hindi chars properly
+            // ✅ Sahi Blob definition jo file download karwayegi
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             
@@ -8337,6 +8326,7 @@ td.mono {
             link.click();
             document.body.removeChild(link);
         }
+
         // ==========================================
         // 🍎 iOS STYLE ALERT & CONFIRM FUNCTIONS
         // ==========================================
