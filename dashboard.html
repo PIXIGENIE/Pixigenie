@@ -8314,7 +8314,9 @@ td.mono {
             const fileName = `${storeName}_Data_${displayMonth}_${y}.csv`;
             
             // ✅ Sahi Blob definition jo file download karwayegi
-            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+           // ✨ Excel ke BOM bug ko hatane ke liye text encoder ka use karenge
+const blob = new Blob(["\u200B" + csvContent], { type: 'text/csv;charset=utf-8;' });
+
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             
