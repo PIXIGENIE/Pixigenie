@@ -8176,13 +8176,22 @@ td.mono {
             }, 300); // 300ms baad hide karega jab animation khatam ho jaye
         }
 
-        function confirmLogoutAction() {
-            // Yahan tera actual logout logic aayega (localStorage clear karna aur redirect karna)
+                function confirmLogoutAction() {
+            // ✨ Likes ka data bacha lo
+            let savedLikes = localStorage.getItem('pixigenie_liked_reviews');
+            
+            // Purana clear logic
             localStorage.clear();
             sessionStorage.clear();
+            
+            // ✨ Wapas set kar do
+            if(savedLikes) {
+                localStorage.setItem('pixigenie_liked_reviews', savedLikes);
+            }
+            
             window.location.href = 'index.html'; 
         }
-        // ==========================================
+// ==========================================
         // 📥 iOS DOWNLOAD CONTROLLERS
         // ==========================================
         let activeDownloadFunction = null;
