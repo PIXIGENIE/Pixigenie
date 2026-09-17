@@ -610,12 +610,28 @@
 
 
                                         </div>
-                                        <div class="flex gap-2 flex-1">
-                                            <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex items-center px-2 overflow-hidden h-11">
-                                                <input type="file" id="prod-image" accept="image/*" class="w-full text-[10px] text-[#6B7280] file:mr-2 file:py-1.5 file:px-3 file:rounded-[8px] file:border-0 file:text-[10px] file:font-bold file:bg-[#F3E8FF] file:text-[#A855F7] hover:file:bg-[#E9D5FF] cursor-pointer outline-none">
+                                                     <div class="flex flex-col gap-2 flex-1">
+                                            <div class="flex flex-col gap-1 w-full text-xs font-bold text-gray-500 mb-1">
+                                                <p>Upload Product Images (Max 3)</p>
+                                                <p class="text-[9px] font-medium text-gray-400">First image will be the primary display image.</p>
                                             </div>
-                                            <button type="submit" class="bg-[#111827] text-white font-bold px-5 h-11 rounded-[12px] active:scale-95 transition flex justify-center items-center gap-1.5 shrink-0 text-[13px] shadow-md">Add <i class="fas fa-plus text-[10px]"></i></button>
+                                            <div class="flex gap-2 w-full">
+                                                <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex items-center px-1 overflow-hidden h-11 shadow-sm">
+                                                    <input type="file" id="prod-image" accept="image/*" class="w-full text-[10px] text-[#6B7280] file:hidden cursor-pointer outline-none">
+                                                    <span class="text-[10px] font-bold text-[#A855F7] ml-2 pointer-events-none">Img 1</span>
+                                                </div>
+                                                <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex items-center px-1 overflow-hidden h-11 shadow-sm">
+                                                    <input type="file" id="prod-image2" accept="image/*" class="w-full text-[10px] text-[#6B7280] file:hidden cursor-pointer outline-none">
+                                                    <span class="text-[10px] font-bold text-gray-500 ml-2 pointer-events-none">Img 2</span>
+                                                </div>
+                                                <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex items-center px-1 overflow-hidden h-11 shadow-sm">
+                                                    <input type="file" id="prod-image3" accept="image/*" class="w-full text-[10px] text-[#6B7280] file:hidden cursor-pointer outline-none">
+                                                    <span class="text-[10px] font-bold text-gray-500 ml-2 pointer-events-none">Img 3</span>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="w-full bg-[#111827] text-white font-bold px-5 h-11 rounded-[12px] mt-1 active:scale-95 transition flex justify-center items-center gap-1.5 shrink-0 text-[13px] shadow-md">Add Product <i class="fas fa-plus text-[10px]"></i></button>
                                         </div>
+
                                     </div>
                                     
                                     <!-- ✨ NEW: WhatsApp Upload Tip (PERFECTLY PLACED) ✨ -->
@@ -1380,10 +1396,25 @@
                                         <textarea id="edit-prod-desc" placeholder="Product Description (Optional)" rows="2" class="w-full bg-[#F7F7F9] focus:bg-white border border-[#E5E7EB] rounded-[12px] px-4 py-3 text-sm font-semibold outline-none focus:border-[#A855F7] transition resize-none"></textarea>
                                     </div>
 
-                    <label class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Update Image (Optional)</label>
-                    <div class="h-11 bg-white border border-[#E5E7EB] rounded-[12px] flex items-center px-2 overflow-hidden">
-                        <input type="file" id="edit-prod-image" accept="image/*" class="w-full text-[10px] text-[#6B7280] file:mr-2 file:py-1.5 file:px-3 file:rounded-[8px] file:border-0 file:text-[10px] file:font-bold file:bg-[#F3E8FF] file:text-[#A855F7] hover:file:bg-[#E9D5FF] cursor-pointer outline-none">
+                                        <label class="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-1 block">Update Images (Optional)</label>
+                    <div class="flex gap-2 w-full mb-2">
+                        <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex flex-col items-center justify-center overflow-hidden h-16 shadow-sm relative cursor-pointer hover:bg-gray-50">
+                            <input type="file" id="edit-prod-image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                            <i class="fas fa-camera text-gray-400 mb-1"></i>
+                            <span class="text-[9px] font-bold text-[#A855F7] pointer-events-none">Main Img</span>
+                        </div>
+                        <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex flex-col items-center justify-center overflow-hidden h-16 shadow-sm relative cursor-pointer hover:bg-gray-50">
+                            <input type="file" id="edit-prod-image2" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                            <i class="fas fa-camera text-gray-300 mb-1"></i>
+                            <span class="text-[9px] font-bold text-gray-500 pointer-events-none">Img 2</span>
+                        </div>
+                        <div class="flex-1 bg-white border border-[#E5E7EB] rounded-[12px] flex flex-col items-center justify-center overflow-hidden h-16 shadow-sm relative cursor-pointer hover:bg-gray-50">
+                            <input type="file" id="edit-prod-image3" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                            <i class="fas fa-camera text-gray-300 mb-1"></i>
+                            <span class="text-[9px] font-bold text-gray-500 pointer-events-none">Img 3</span>
+                        </div>
                     </div>
+
                 </div>
                 <button type="submit" class="w-full bg-[#111827] text-white font-bold h-[52px] rounded-[16px] mt-2 active:scale-95 transition shadow-md">Update Product</button>
             </form>
@@ -2822,23 +2853,28 @@
             const btn = e.target.querySelector('button'); const orig = btn.innerHTML; 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
 
-            const imgBase64 = await processImage(document.getElementById('prod-image'));
+                    // ✨ NAYA: Teeno Images Process Karo ✨
+            const imgBase64_1 = await processImage(document.getElementById('prod-image'));
+            const imgBase64_2 = await processImage(document.getElementById('prod-image2'));
+            const imgBase64_3 = await processImage(document.getElementById('prod-image3'));
 
             try { 
-             // 🔥 NAYA: Dukaandar ki jo rank hai, wahi rank uske product ko bhi mil jayegi
-let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
+                let currentRank = (typeof globalShopData !== 'undefined' && globalShopData.searchRank) ? globalShopData.searchRank : 0;
 
-let pd = { 
-    name: n, 
-    mrp: mrpVal, 
-    price: p, 
-    qtySize: qtySize, 
-    unit: unit, 
-    description: desc, 
-    image: imgBase64, 
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    searchRank: currentRank // 🔥 PRODUCT KO BHI RANK MIL GAYI
-};
+                let pd = { 
+                    name: n, 
+                    mrp: mrpVal, 
+                    price: p, 
+                    qtySize: qtySize, 
+                    unit: unit, 
+                    description: desc, 
+                    image: imgBase64_1,     // Primary
+                    image2: imgBase64_2,    // Optional 2
+                    image3: imgBase64_3,    // Optional 3
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    searchRank: currentRank 
+                };
+
 
 
                 const doc = await db.collection('shops').doc(currentShopId).collection('products').add(pd); 
@@ -2893,24 +2929,32 @@ let pd = {
             const btn = e.target.querySelector('button'); const orig = btn.innerText; 
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Updating...`; btn.disabled = true;
 
-            // ✨ NAYA: updateData me mrp aur description dono daal diye
-            let updateData = { name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: updatedDesc };
+                     let updateData = { name: n, mrp: mrpVal, price: p, qtySize: qtySize, unit: unit, description: updatedDesc };
             
-            const newImg = await processImage(document.getElementById('edit-prod-image'));
-            if (newImg !== "") updateData.image = newImg;
+            // ✨ NAYA: Teeno Images Update Logic ✨
+            const newImg1 = await processImage(document.getElementById('edit-prod-image'));
+            const newImg2 = await processImage(document.getElementById('edit-prod-image2'));
+            const newImg3 = await processImage(document.getElementById('edit-prod-image3'));
+            
+            if (newImg1 !== "") updateData.image = newImg1;
+            if (newImg2 !== "") updateData.image2 = newImg2;
+            if (newImg3 !== "") updateData.image3 = newImg3;
 
             try { 
                 await db.collection('shops').doc(currentShopId).collection('products').doc(id).update(updateData); 
                 let idx = storeProducts.findIndex(x=>x.id===id); 
                 if(idx!==-1) {
                     storeProducts[idx].name = n; 
-                    storeProducts[idx].mrp = mrpVal; // ✨ NAYA
+                    storeProducts[idx].mrp = mrpVal; 
                     storeProducts[idx].price = p; 
                     storeProducts[idx].qtySize = qtySize; 
                     storeProducts[idx].unit = unit;
-                    storeProducts[idx].description = updatedDesc; // ✨ NAYA
-                    if(newImg !== "") storeProducts[idx].image = newImg;
+                    storeProducts[idx].description = updatedDesc; 
+                    if(newImg1 !== "") storeProducts[idx].image = newImg1;
+                    if(newImg2 !== "") storeProducts[idx].image2 = newImg2;
+                    if(newImg3 !== "") storeProducts[idx].image3 = newImg3;
                 } 
+
                 renderAdminProducts(); closeEditProductModal(); 
             } catch(e) { alert(e.message); } 
             
