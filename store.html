@@ -564,19 +564,20 @@
                                 db.collection('shops').doc(currentShopId).collection('products').doc(offer.productId).get().then(pDoc => {
                                     if(pDoc.exists) {
                                         const p = pDoc.data();
-                                        pDisplay.innerHTML = `
+                                                                                                                        pDisplay.innerHTML = `
                                             <div class="bg-gray-50 border border-gray-200 rounded-[16px] p-3 flex items-center gap-3 text-left shadow-sm">
                                                 ${p.image ? `<img src="${p.image}" class="w-14 h-14 rounded-[10px] object-cover border border-gray-200 shrink-0">` : `<div class="w-14 h-14 rounded-[10px] bg-white border border-gray-200 flex items-center justify-center text-gray-400 shrink-0"><i class="fas fa-box text-xl"></i></div>`}
                                                 <div class="min-w-0 flex-1">
                                                     <h4 class="font-bold text-gray-900 text-xs truncate">${p.name}</h4>
                                                     <p class="font-black text-green-600 text-sm mt-0.5">₹${p.price} ${p.mrp ? `<span class="text-gray-400 text-[9px] line-through ml-1">₹${p.mrp}</span>` : ''}</p>
                                                 </div>
-                                                <button onclick="addToCart(event, '${p.name}', '${p.price}', globalShopName, globalShopPhone); closeFlashOffer();" class="w-10 h-10 bg-purple-100 text-purple-600 rounded-[10px] flex items-center justify-center hover:bg-purple-600 hover:text-white transition active:scale-90 shrink-0">
+                                                <button onclick="addToCart(event, '${p.name}', '${p.price}', globalShopName, globalShopPhone); closeFlashOffer();" class="h-10 px-3 min-w-[40px] bg-purple-100 text-purple-600 rounded-[10px] flex items-center justify-center hover:bg-purple-600 hover:text-white transition-all duration-300 active:scale-90 shrink-0 whitespace-nowrap">
                                                     <i class="fas fa-cart-plus"></i>
                                                 </button>
                                             </div>
                                         `;
-                                        pDisplay.classList.remove('hidden');
+
+ pDisplay.classList.remove('hidden');
                                     }
                                 });
                             } else {
@@ -2285,6 +2286,21 @@
                 updateData[eventType] = firebase.firestore.FieldValue.increment(1);
                 db.collection('shops').doc(currentShopId).update(updateData)
                   .catch(err => console.log("Event track error:", err));
+            }
+        }
+        // ===============================================
+        // ✨ FLASH OFFER MODAL CLOSE LOGIC ✨
+        // ===============================================
+        function closeFlashOffer() {
+            const m = document.getElementById('flash-offer-modal');
+            const c = document.getElementById('flash-offer-content');
+            if(m && c) {
+                m.classList.add('opacity-0'); 
+                c.classList.add('scale-90');
+                setTimeout(() => { 
+                    m.classList.add('hidden'); 
+                    document.body.style.overflow = 'auto'; 
+                }, 500);
             }
         }
 
