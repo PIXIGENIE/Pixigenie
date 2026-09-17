@@ -1101,15 +1101,27 @@
                 }).catch(e => console.log("Shop data fetch err:", e));
             }
 
-            const cartBtn = document.getElementById('detail-cart-btn');
-            if(cartBtn) {
-                cartBtn.onclick = function(e) {
-                    addToCart(e, name, price, shopName, shopPhone);
-                    let orig = this.innerHTML;
-                    this.innerHTML = '<i class="fas fa-check text-green-500"></i> Added';
-                    setTimeout(() => this.innerHTML = orig, 1000);
-                };
-            }
+            const cartBtn =             document.getElementById('detail-cart-btn').onclick = function(e) {
+                // Pehle cart mein item add karo
+                addToCart(e, name, price, shopName, shopPhone);
+                
+                // ✨ MAST ANIMATION LOGIC ✨
+                let btn = this;
+                let origHtml = `<i class="fas fa-cart-plus"></i> Add to Cart`; // Asli text fix kar diya
+                
+                // Button ko Purple aur "Added" banao
+                btn.innerHTML = '<i class="fas fa-check"></i> Added';
+                btn.classList.remove('text-gray-900', 'border-gray-300', 'bg-white');
+                btn.classList.add('text-purple-600', 'border-purple-400', 'bg-purple-50');
+
+                // 1.2 second baad button ko wapas normal (Add to Cart) kar do
+                setTimeout(() => {
+                    btn.innerHTML = origHtml;
+                    btn.classList.remove('text-purple-600', 'border-purple-400', 'bg-purple-50');
+                    btn.classList.add('text-gray-900', 'border-gray-300', 'bg-white');
+                }, 1200);
+            };
+
             
             const orderBtn = document.getElementById('detail-order-btn');
             if(orderBtn) {
@@ -1578,25 +1590,33 @@
             return true;
         }
 
-        function addToCart(event, name, price, shopName, shopPhone) {
+                function addToCart(event, name, price, shopName, shopPhone) {
             event.stopPropagation(); 
-            
             let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
             const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
-            
-            if (existingItem) { 
+            if (existingItem) {
                 existingItem.qty += 1; 
-            } else { 
-                cart.push({ name, price: parseInt(price), shopName, shopPhone, qty: 1 }); 
+            } else {
+                cart.push({ name, price: parseInt(price), shopName, shopPhone, qty: 1 });
             }
-            
             localStorage.setItem('pixigenie_cart', JSON.stringify(cart));
             updateCartBadge();
             
             let btn = event.currentTarget;
+
+            // ✨ NAYA FIX: Agar yeh Full-Screen modal ka bada button hai, toh yahan wali animation mat chalao
+            if (btn.id === 'detail-cart-btn') return;
+
+            // Normal chhote cards ke liye animation
             let origHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-check text-green-500"></i> Added`;
-            setTimeout(() => { btn.innerHTML = origHtml; }, 1000);
+            btn.innerHTML = `<i class="fas fa-check text-lg"></i> Added`;
+            btn.classList.add('bg-purple-600', 'text-white', 'shadow-md');
+            btn.classList.remove('bg-purple-50', 'text-purple-600');
+            setTimeout(() => {
+                btn.innerHTML = origHtml;
+                btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md');
+                btn.classList.add('bg-purple-50', 'text-purple-600');
+            }, 1000);
         }
 
         function toggleCartModal() {
