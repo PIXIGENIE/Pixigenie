@@ -2258,20 +2258,21 @@
                     let grandTot = Number(oData.totalAmount) || 0;
 
                     let newBill = { 
-                        date: dateStr, 
-                        customerName: oData.customerName || "Customer", 
-                        customerPhone: oData.customerPhone || "N/A", 
-                        address: oData.customerAddress || "",
-                        items: oData.items || [], 
-                        discount: 0, 
-                        delivery: 0, 
-                        grandTotal: grandTot, 
-                        payStatus: 'Paid', 
-                        payMode: 'App Order', 
-                        deliveryStatus: 'Delivered', 
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        appOrderId: orderId
-                    };
+    date: dateStr, 
+    customerName: oData.customerName || "Customer", 
+    customerPhone: oData.customerPhone || "N/A", 
+    address: oData.customerAddress || "",
+    items: oData.items || [], 
+    discount: 0, 
+    delivery: 0, 
+    grandTotal: grandTot, 
+    payStatus: 'Unpaid',     // ✨ Ab ye Unpaid aayega
+    payMode: 'None',         // ✨ Jab tak dukaandar khud change na kare
+    deliveryStatus: 'Delivered', 
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    appOrderId: orderId
+};
+
 
                     const addedBill = await db.collection('shops').doc(currentShopId).collection('bills').add(newBill);
                     billIdToSave = addedBill.id;
@@ -8324,7 +8325,7 @@ td.mono {
             const storeName = typeof globalShopData !== 'undefined' && globalShopData?.shopName ? globalShopData.shopName.replace(/[^a-zA-Z0-9]/g, '') : 'Store';
             const fileName = `${storeName}_Data_${displayMonth}_${y}.csv`;
             
-            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' }); // \uFEFF ensures MS Excel reads rupees (₹) and Hindi chars properly
+             // \uFEFF ensures MS Excel reads rupees (₹) and Hindi chars properly
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             
