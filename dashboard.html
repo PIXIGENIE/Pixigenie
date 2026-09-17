@@ -9744,6 +9744,21 @@ function trackEvent(eventType) {
             </div>
         </div>
     </div>
+    <script>
+        // ✨ DASHBOARD SECURITY LOCK (BACK BUTTON FIX) ✨
+        // Agar user back button se aata hai aur uske paas dukaan nahi hai, toh index par bhejo
+        window.addEventListener('pageshow', function(event) {
+            if (!localStorage.getItem('pixigenie_active_shop')) {
+                window.location.replace('index.html');
+            }
+        });
+        
+        // Page direct load hone par bhi check karo
+        if (!localStorage.getItem('pixigenie_active_shop')) {
+            window.location.replace('index.html');
+        }
+    </script>
+
 
 </body>
 </html>
