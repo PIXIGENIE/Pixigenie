@@ -4058,29 +4058,7 @@ function trackSearchImpression(shopIdToTrack) {
         </div>
     </div>
        
-          <script>
-        // =======================================================
-        // ✨ NATURAL HOME PAGE BACK-TO-LOGOUT LOGIC ✨
-        // =======================================================
-        document.addEventListener('DOMContentLoaded', () => {
-            const isUserLoggedIn = localStorage.getItem('pixigenie_active_shop') || localStorage.getItem('pixigenie_customer_phone');
-            
-            if (isUserLoggedIn) {
-                history.replaceState({ page: 'home' }, document.title, window.location.href);
-                history.pushState({ page: 'guard' }, document.title, window.location.href);
-
-                window.addEventListener('popstate', function(event) {
-                    if (typeof showLogoutModal === 'function') {
-                        showLogoutModal();
-                    }
-                    history.pushState({ page: 'guard' }, document.title, window.location.href);
-                });
-            }
-        });
-    </script>
-
-
-
+          
    
 </body>
 </html>
