@@ -1595,7 +1595,7 @@
             return true;
         }
 
-                      function addToCart(event, name, price, shopName, shopPhone) {
+                              function addToCart(event, name, price, shopName, shopPhone) {
             event.stopPropagation(); 
             let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
             const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
