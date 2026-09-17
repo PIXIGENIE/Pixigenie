@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+        <script>
+        // 🚨 CRITICAL GATEKEEPER: Agar active shop ki ID nahi hai, toh dashboard kabhi mat kholne do!
+        if (!localStorage.getItem('pixigenie_active_shop')) {
+            window.location.replace('index.html');
+        }
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Merchant Dashboard | Pixigenie</title>
@@ -8175,28 +8182,41 @@ td.mono {
                 modal.classList.add('hidden');
             }, 300); // 300ms baad hide karega jab animation khatam ho jaye
         }
-
-                 function confirmLogoutAction() {
-            // ✨ Likes aur Cart ka data bacha lo
+        function confirmLogoutAction() {
+            // 1. Sirf wahi data bachao jo customer ka personal hai (jaise cart aur likes)
             let savedLikes = localStorage.getItem('pixigenie_liked_reviews');
             let savedCart = localStorage.getItem('pixigenie_cart');
             
-            localStorage.clear();
-            sessionStorage.clear();
-            
-            // ✨ Data Wapas set kar do
+            // 2. Storage ka kachra saaf karo
+            localStorage.removeItem('pixigenie_active_shop');
+            localStorage.removeItem('pixigenie_owner_name');
+            localStorage.removeItem('pixigenie_customer_name');
+            localStorage.removeItem('pixigenie_customer_phone');
+            localStorage.removeItem('pixigenie_profile_img');
+            localStorage.removeItem('pixigenie_saved_name');
+            localStorage.removeItem('pixigenie_saved_phone');
+            localStorage.removeItem('pixigenie_saved_address');
+            localStorage.removeItem('pixigenie_saved_lat');
+            localStorage.removeItem('pixigenie_saved_lng');
+
+            // 3. Bachaya hua data wapas daalo
             if(savedLikes) localStorage.setItem('pixigenie_liked_reviews', savedLikes);
             if(savedCart) localStorage.setItem('pixigenie_cart', savedCart);
             
-            // 🔥 NAYA: Firebase se bhi proper logout karo taaki purani ID yaad na rakhe
-            if (typeof auth !== 'undefined') {
+            sessionStorage.clear();
+            
+            // 4. Firebase Auth SignOut aur Hard Redirect (No Cache Issue!)
+            if (typeof auth !== 'undefined' && auth.currentUser) {
                 auth.signOut().then(() => {
-                    window.location.href = 'index.html'; 
+                    window.location.replace('index.html'); 
+                }).catch(() => {
+                    window.location.replace('index.html');
                 });
             } else {
-                window.location.href = 'index.html'; 
+                window.location.replace('index.html'); 
             }
         }
+
 
 // ==========================================
         // 📥 iOS DOWNLOAD CONTROLLERS
