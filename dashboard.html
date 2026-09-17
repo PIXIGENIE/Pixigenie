@@ -9819,9 +9819,109 @@ function trackEvent(eventType) {
             link.click();
             document.body.removeChild(link);
         }
+                // =======================================================
+        // ✨ NEW SHOPKEEPER WELCOME OFFER LOGIC (DASHBOARD) ✨
+        // =======================================================
+        
+        function showWelcomeOfferModal() {
+            const modal = document.getElementById('welcome-offer-modal');
+            const content = document.getElementById('welcome-offer-content');
+            if(!modal || !content) return;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-90');
+                content.classList.add('scale-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeWelcomeOffer() {
+            const modal = document.getElementById('welcome-offer-modal');
+            const content = document.getElementById('welcome-offer-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-90');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        function explorePlansFromWelcome() {
+            closeWelcomeOffer();
+            setTimeout(() => {
+                window.location.href = `index.html?shop=${currentShopId}#merchant-upgrade-plans`;
+            }, 350); 
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const activeShopId = localStorage.getItem('pixigenie_active_shop');
+            if (activeShopId) {
+                const hasSeenOffer = localStorage.getItem('pixigenie_welcome_shown_' + activeShopId);
+                if (!hasSeenOffer) {
+                    setTimeout(() => {
+                        showWelcomeOfferModal();
+                        localStorage.setItem('pixigenie_welcome_shown_' + activeShopId, 'true');
+                    }, 1500); 
+                }
+            }
+        });
+
 
     </script>
 
+    <!-- ✨ EYE-CATCHING NEW SHOPKEEPER WELCOME MODAL ✨ -->
+    <div id="welcome-offer-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4 transition-all duration-500 opacity-0">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm" onclick="closeWelcomeOffer()"></div>
+        
+        <!-- Modal Card -->
+        <div class="bg-white rounded-[32px] shadow-2xl max-w-sm w-full p-1 relative transform scale-90 transition-all duration-500 overflow-hidden group" id="welcome-offer-content">
+            <!-- Animated Glowing Background Border Effect -->
+            <div class="absolute inset-0 bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 opacity-20 animate-pulse"></div>
+            
+            <div class="bg-white rounded-[30px] p-8 relative z-10 text-center flex flex-col items-center">
+                <button onclick="closeWelcomeOffer()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center transition active:scale-90 shadow-sm border border-gray-100">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <!-- Bouncing Gift Icon -->
+                <div class="w-20 h-20 bg-gradient-to-tr from-green-400 to-emerald-600 text-white rounded-full flex items-center justify-center text-4xl mb-5 shadow-[0_10px_25px_rgba(16,185,129,0.4)] animate-bounce mt-2">
+                    <i class="fas fa-gift"></i>
+                </div>
+                
+                <h3 class="text-2xl font-black text-gray-900 mb-2 leading-tight tracking-tight">Welcome Aboard! 🎉</h3>
+                <p class="text-[14px] text-gray-500 font-medium mb-5 leading-relaxed">Your digital storefront is ready. As a welcome gift, we've unlocked the <strong class="text-gray-800">Starter Plan</strong> just for you!</p>
+                
+                <!-- Pricing Highlight Box -->
+                <div class="bg-gray-50 rounded-[20px] p-5 w-full mb-6 border border-gray-100 relative overflow-hidden shadow-inner">
+                    <div class="absolute top-0 right-0 bg-green-500 text-white text-[9px] font-black px-2.5 py-1 rounded-bl-xl uppercase tracking-widest shadow-sm">100% OFF</div>
+                    
+                    <div class="flex justify-center items-center gap-2 mb-1 mt-1">
+                        <span class="text-sm text-gray-400 font-bold line-through">₹99</span>
+                        <span class="text-4xl font-black text-green-600">₹0</span>
+                        <span class="text-xs text-gray-500 font-bold mt-2">/month</span>
+                    </div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Free Basic Features Included</p>
+                </div>
+                
+                <!-- Primary Action -->
+                <button onclick="closeWelcomeOffer()" class="w-full bg-gray-900 hover:bg-black text-white font-black text-[15px] py-4 rounded-2xl shadow-xl transition-all active:scale-95 tracking-wide mb-4">
+                    Awesome, Let's Start!
+                </button>
+                
+                <!-- Secondary Action (Upsell Link) -->
+                <button onclick="explorePlansFromWelcome()" class="text-[13px] font-black text-blue-600 hover:text-blue-700 transition active:scale-95 flex items-center gap-1.5 mx-auto px-4 py-2 rounded-full hover:bg-blue-50">
+                    Discover More Plans <i class="fas fa-arrow-right text-[11px] mt-0.5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
 
 </body>
