@@ -2051,12 +2051,22 @@ function getVIPBadge(isVerified, plan) {
             window.location.href = 'my-orders.html';
         }
 
-        function logoutUser() {
+                function logoutUser() {
             if(confirm("Are you sure you want to logout?")) {
+                // ✨ Likes aur Cart ka data bacha lo
+                let savedLikes = localStorage.getItem('pixigenie_liked_reviews');
+                let savedCart = localStorage.getItem('pixigenie_cart');
+                
                 localStorage.clear();
+                
+                // ✨ Data Wapas set kar do
+                if(savedLikes) localStorage.setItem('pixigenie_liked_reviews', savedLikes);
+                if(savedCart) localStorage.setItem('pixigenie_cart', savedCart);
+                
                 window.location.reload();
             }
         }
+
            // ✨ AUTO FETCH GPS ADDRESS FUNCTION ✨
         function fetchCustomerGPS(inputId, btnId) {
             const btn = document.getElementById(btnId);
