@@ -8312,10 +8312,9 @@ td.mono {
 
             const storeName = typeof globalShopData !== 'undefined' && globalShopData?.shopName ? globalShopData.shopName.replace(/[^a-zA-Z0-9]/g, '') : 'Store';
             const fileName = `${storeName}_Data_${displayMonth}_${y}.csv`;
-            
-            // ✅ Sahi Blob definition jo file download karwayegi
-           // ✨ Excel ke BOM bug ko hatane ke liye text encoder ka use karenge
-const blob = new Blob(["\u200B" + csvContent], { type: 'text/csv;charset=utf-8;' });
+ // ✨ Bilkul clean plain text blob taaki koi ajeeb symbol na aaye
+const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
 
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
