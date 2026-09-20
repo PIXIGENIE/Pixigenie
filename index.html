@@ -1176,6 +1176,25 @@ async function handleShopSubmit(e) {
 
                            } else if (customerName) {
                 // 🔹 CUSTOMER
+                // ✨ NAYA FIX: Page load hote hi background me Firebase se address nikal lo ✨
+                const custPhoneOrEmail = localStorage.getItem('pixigenie_customer_phone');
+                if (custPhoneOrEmail && !localStorage.getItem('pixigenie_saved_address')) {
+                    db.collection('customers').doc(custPhoneOrEmail).get().then(doc => {
+                        if (doc.exists && doc.data().savedAddress) {
+                            const d = doc.data();
+                            localStorage.setItem('pixigenie_saved_name', d.savedName || '');
+                            localStorage.setItem('pixigenie_saved_phone', d.savedPhone || '');
+                            localStorage.setItem('pixigenie_saved_landmark', d.savedLandmark || '');
+                            localStorage.setItem('pixigenie_saved_address', d.savedAddress || '');
+                            if (d.savedLat && d.savedLng) {
+                                localStorage.setItem('pixigenie_saved_lat', d.savedLat);
+                                localStorage.setItem('pixigenie_saved_lng', d.savedLng);
+                            }
+                        }
+                    }).catch(e => console.log("Background fetch error:", e));
+                }
+                // ✨ FIX END ✨
+
 
                 // ✨ NAYA CODE: Customer se Pricing chhupa lo
                 const pricingSec = document.getElementById('merchant-upgrade-plans');
@@ -4200,4 +4219,4 @@ function trackSearchImpression(shopIdToTrack) {
 
    
 </body>
-</html>
+</html> 
