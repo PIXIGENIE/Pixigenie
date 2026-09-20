@@ -1174,9 +1174,8 @@ async function handleShopSubmit(e) {
                 fetchLiveShops();
                 return true;
 
-                           } else if (customerName) {
+                                  } else if (customerName) {
                 // 🔹 CUSTOMER
-                // ✨ NAYA FIX: Page load hote hi background me Firebase se address nikal lo ✨
                 const custPhoneOrEmail = localStorage.getItem('pixigenie_customer_phone');
                 if (custPhoneOrEmail && !localStorage.getItem('pixigenie_saved_address')) {
                     db.collection('customers').doc(custPhoneOrEmail).get().then(doc => {
@@ -1193,17 +1192,13 @@ async function handleShopSubmit(e) {
                         }
                     }).catch(e => console.log("Background fetch error:", e));
                 }
-                // ✨ FIX END ✨
 
-
-                // ✨ NAYA CODE: Customer se Pricing chhupa lo
                 const pricingSec = document.getElementById('merchant-upgrade-plans');
                 if(pricingSec) pricingSec.classList.add('hidden');
 
                 const initials = getInitials(customerName);
-                const savedImg = localStorage.getItem('pixigenie_profile_img'); // ✨ Fetch saved image
+                const savedImg = localStorage.getItem('pixigenie_profile_img'); 
 
-                
                 authContainer.innerHTML = `
                     <button onclick="toggleProfileModal()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide relative overflow-hidden">
                         <span id="nav-initials" style="${savedImg ? 'display:none;' : ''}">${initials}</span>
@@ -1211,7 +1206,6 @@ async function handleShopSubmit(e) {
                     </button>
                     <div id="profile-dropdown-menu" class="hidden absolute right-0 top-12 mt-2 w-56 sm:w-64 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
                         <div class="p-5 bg-gray-50/50 border-b border-gray-100">
-
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Customer Profile</p>
                             <h4 class="font-black text-gray-900 text-lg leading-tight truncate">${customerName}</h4>
                             ${customerPhone ? `<p class="text-xs text-gray-500 mt-1.5 font-medium flex items-center gap-1.5"><i class="fas fa-phone-alt text-gray-400"></i> +91 ${customerPhone}</p>` : ''}
@@ -1222,99 +1216,177 @@ async function handleShopSubmit(e) {
                     </div>
                 `;
 
+                // ✨ ULTRA-PREMIUM iOS E-COMMERCE HERO SECTION ✨
                 heroContent.innerHTML = `
-                    <div class="opacity-0 fade-in-up inline-flex items-center gap-2 glass-card text-gray-800 rounded-full px-5 py-2 text-[11px] sm:text-xs font-bold tracking-widest mb-8 z-10 hover:scale-105 transition-transform duration-300">
-                        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span> DIGITAL MALL
-                    </div>
-                    
-                    <div class="relative w-full flex flex-col items-center justify-center z-10">
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] z-0 pointer-events-none flex items-center justify-center">
-                            <div class="w-full h-full bg-gradient-to-tr from-purple-300 via-fuchsia-200 to-pink-300 rounded-full filter blur-[90px] sm:blur-[120px] opacity-40 animate-pulse"></div>
+                    <div class="w-full max-w-2xl mx-auto flex flex-col relative z-10 px-2 sm:px-4 pb-8">
+                        <div class="flex justify-between items-center w-full mb-6 opacity-0 fade-in-up">
+                            <div class="flex items-center gap-3 cursor-pointer active:scale-95 transition-transform bg-white/80 backdrop-blur-2xl px-5 py-3 rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white" onclick="findNearbyShops(this)">
+                                <div class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center shadow-md shrink-0">
+                                    <i class="fas fa-map-marker-alt text-[15px]"></i>
+                                </div>
+                                <div class="text-left flex-1 min-w-0 pr-2">
+                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1.5">Delivering to</p>
+                                    <p class="text-[15px] font-black text-gray-900 leading-none flex items-center gap-1.5 truncate">Current Location <i class="fas fa-chevron-down text-[11px] text-gray-400 ml-0.5"></i></p>
+                                </div>
+                            </div>
                         </div>
-
-                        <h1 class="relative z-10 opacity-0 fade-in-up delay-100 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter mb-2 sm:mb-4 hover:scale-[1.02] transition-transform duration-300">Everything You Need.</h1>
-                        <h2 class="relative z-10 opacity-0 fade-in-up delay-200 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 mb-6 sm:mb-8 pb-2 hover:scale-[1.02] transition-transform duration-300">Right Around You.</h2>
-                    </div>
-
-                    <p class="relative z-10 opacity-0 fade-in-up delay-300 text-gray-500 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed font-medium px-4">Discover trusted local stores, explore their products, and order effortlessly — all from one simple place.</p>
-                    
-                    <div class="relative z-10 opacity-0 fade-in-up delay-300 w-full px-4 sm:px-0 max-w-xs mx-auto">
-                        <button onclick="document.getElementById('marketplace').scrollIntoView()" class="w-full bg-gray-900 text-white font-bold py-4 sm:py-5 rounded-2xl hover:bg-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3 text-sm sm:text-base">
-                            Start Shopping
-                        </button>
-                    </div>
-
-                    <div class="relative z-10 opacity-0 fade-in-up delay-300 mt-12 sm:mt-16 flex flex-wrap justify-center gap-4 sm:gap-6 text-[11px] sm:text-xs font-bold text-gray-600 tracking-wide px-4">
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-purple-600 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline>
-                            </svg>
-                            Verified Stores
+                        <div class="relative w-full mb-8 opacity-0 fade-in-up delay-100 z-[60]">
+                            <div class="relative shadow-[0_12px_40px_rgba(0,0,0,0.08)] rounded-[28px] bg-white border border-gray-100 focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-50 transition-all overflow-hidden flex items-center h-[68px] px-2">
+                                <div class="w-12 h-12 flex items-center justify-center text-gray-400 shrink-0 ml-1">
+                                    <i class="fas fa-search text-xl"></i>
+                                </div>
+                                <input type="text" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value);" placeholder="Search groceries, services, stores..." autocomplete="off" class="w-full bg-transparent px-2 outline-none text-[16px] font-bold text-gray-900 placeholder-gray-400">
+                                <div class="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-[20px] text-gray-600 shrink-0 mr-1 cursor-pointer hover:bg-gray-100 active:scale-95 transition-all">
+                                    <i class="fas fa-microphone text-lg"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-pink-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                            </svg>
-                            Fast Delivery
+                        <div class="w-full mb-8 opacity-0 fade-in-up delay-200">
+                            <div class="flex justify-between items-end mb-4 px-2">
+                                <h3 class="text-[19px] font-black text-gray-900 tracking-tight leading-none">Explore Categories</h3>
+                            </div>
+                            <div class="grid grid-cols-4 gap-3 sm:gap-5">
+                                <button onclick="switchMarketTab('products'); document.getElementById('marketplace').scrollIntoView();" class="flex flex-col items-center gap-2.5 group active:scale-95 transition-transform">
+                                    <div class="w-full aspect-square rounded-[24px] bg-[#FCE7F3] flex items-center justify-center shadow-sm border border-[#FBCFE8] group-hover:shadow-md transition-shadow relative overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-8 h-8 bg-white/60 rounded-full blur-md -mr-4 -mt-4"></div>
+                                        <i class="fas fa-box-open text-2xl sm:text-3xl text-[#DB2777]"></i>
+                                    </div>
+                                    <span class="text-[12px] font-bold text-gray-700 tracking-wide">Products</span>
+                                </button>
+                                <button onclick="switchMarketTab('services'); document.getElementById('marketplace').scrollIntoView();" class="flex flex-col items-center gap-2.5 group active:scale-95 transition-transform">
+                                    <div class="w-full aspect-square rounded-[24px] bg-[#E0E7FF] flex items-center justify-center shadow-sm border border-[#BFDBFE] group-hover:shadow-md transition-shadow relative overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-8 h-8 bg-white/60 rounded-full blur-md -mr-4 -mt-4"></div>
+                                        <i class="fas fa-tools text-2xl sm:text-3xl text-[#4F46E5]"></i>
+                                    </div>
+                                    <span class="text-[12px] font-bold text-gray-700 tracking-wide">Services</span>
+                                </button>
+                                <button onclick="switchMarketTab('shops'); document.getElementById('marketplace').scrollIntoView();" class="flex flex-col items-center gap-2.5 group active:scale-95 transition-transform">
+                                    <div class="w-full aspect-square rounded-[24px] bg-[#DCFCE7] flex items-center justify-center shadow-sm border border-[#BBF7D0] group-hover:shadow-md transition-shadow relative overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-8 h-8 bg-white/60 rounded-full blur-md -mr-4 -mt-4"></div>
+                                        <i class="fas fa-store text-2xl sm:text-3xl text-[#16A34A]"></i>
+                                    </div>
+                                    <span class="text-[12px] font-bold text-gray-700 tracking-wide">Stores</span>
+                                </button>
+                                <button onclick="alert('Exciting offers loading soon!')" class="flex flex-col items-center gap-2.5 group active:scale-95 transition-transform">
+                                    <div class="w-full aspect-square rounded-[24px] bg-[#FEF3C7] flex items-center justify-center shadow-sm border border-[#FDE68A] group-hover:shadow-md transition-shadow relative overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-8 h-8 bg-white/60 rounded-full blur-md -mr-4 -mt-4"></div>
+                                        <i class="fas fa-bolt text-2xl sm:text-3xl text-[#D97706]"></i>
+                                    </div>
+                                    <span class="text-[12px] font-bold text-gray-700 tracking-wide">Offers</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-green-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            Direct Chat
+                        <div class="w-full opacity-0 fade-in-up delay-300 cursor-pointer active:scale-[0.97] transition-transform" onclick="document.getElementById('marketplace').scrollIntoView();">
+                            <div class="relative w-full rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(17,24,39,0.15)] bg-[#111827] flex items-center min-h-[170px] p-7 border border-gray-800">
+                                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-gradient-to-tl from-blue-500 via-purple-500 to-pink-500 rounded-full blur-[70px] opacity-40"></div>
+                                <div class="relative z-10 w-2/3 text-left">
+                                    <div class="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full tracking-widest mb-3 shadow-sm">
+                                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]"></span> Delivery Live
+                                    </div>
+                                    <h3 class="text-[28px] sm:text-[34px] font-black text-white leading-[1.1] tracking-tight">Superfast <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Local Deals.</span></h3>
+                                </div>
+                                <div class="absolute -right-2 -bottom-2 opacity-90 drop-shadow-2xl">
+                                    <i class="fas fa-shopping-basket text-[110px] text-white/10 transform -rotate-12"></i>
+                                    <i class="fas fa-bolt text-[60px] text-yellow-400 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_0_20px_rgba(250,204,21,0.6)]"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    ${customerWhyChooseUsSection}
                 `;
 
                 document.getElementById('section-title').innerText = "Trending Products";
-document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
-
-searchInput.placeholder = "Search products, services, or shops...";
+                document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
+                searchInput.placeholder = "Search products, services, or shops...";
                 fetchGlobalProducts(); 
                 return true;
 
-                   } else {
-                
+            } else {
                 // 🔹 NOT LOGGED IN DEFAULT
-
-                // ✨ NAYA CODE: Guest se bhi Pricing chhupa lo
                 const pricingSec = document.getElementById('merchant-upgrade-plans');
                 if(pricingSec) pricingSec.classList.add('hidden');
 
                 authContainer.innerHTML = `
                     <button onclick="openAuthModal()" class="w-9 h-9 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-full flex items-center justify-center transition border border-gray-200 shadow-sm active:scale-95">
-
                         <i class="fas fa-user text-sm"></i>
                     </button>
                 `;
                 
+                // ✨ ULTRA-PREMIUM iOS E-COMMERCE HERO SECTION ✨
                 heroContent.innerHTML = `
-                    <div class="opacity-0 fade-in-up inline-flex items-center gap-2 glass-card text-gray-800 rounded-full px-5 py-2 text-[11px] sm:text-xs font-bold tracking-widest mb-8 z-10 hover:scale-105 hover:shadow-md transition-all duration-300 cursor-default">
-                        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span> DIGITAL MALL
-                    </div>
-
-                    <div class="relative w-full flex flex-col items-center justify-center z-10">
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] z-0 pointer-events-none flex items-center justify-center">
-                            <div class="w-full h-full bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 rounded-full filter blur-[90px] sm:blur-[120px] opacity-40 animate-pulse"></div>
+                    <div class="w-full max-w-2xl mx-auto flex flex-col relative z-10 px-2 sm:px-4 pb-8">
+                        <div class="flex justify-between items-center w-full mb-6 opacity-0 fade-in-up">
+                            <div class="flex items-center gap-3 cursor-pointer active:scale-95 transition-transform bg-white/80 backdrop-blur-2xl px-5 py-3 rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white" onclick="findNearbyShops(this)">
+                                <div class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center shadow-md shrink-0">
+                                    <i class="fas fa-map-marker-alt text-[15px]"></i>
+                                </div>
+                                <div class="text-left flex-1 min-w-0 pr-2">
+                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1.5">Delivering to</p>
+                                    <p class="text-[15px] font-black text-gray-900 leading-none flex items-center gap-1.5 truncate">Current Location <i class="fas fa-chevron-down text-[11px] text-gray-400 ml-0.5"></i></p>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <!-- 🎯 NEW TITLE -->
-                        <h1 class="relative z-10 opacity-0 fade-in-up delay-100 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter mb-2 sm:mb-4 hover:scale-[1.02] transition-transform duration-300">Everything You Need.</h1>
-                        <h2 class="relative z-10 opacity-0 fade-in-up delay-200 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 mb-6 sm:mb-8 pb-2 hover:scale-[1.02] transition-transform duration-300">Right Around You.</h2>
+                        <div class="relative w-full mb-8 opacity-0 fade-in-up delay-100 z-[60]">
+                            <div class="relative shadow-[0_12px_40px_rgba(0,0,0,0.08)] rounded-[28px] bg-white border border-gray-100 focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-50 transition-all overflow-hidden flex items-center h-[68px] px-2">
+                                <div class="w-12 h-12 flex items-center justify-center text-gray-400 shrink-0 ml-1">
+                                    <i class="fas fa-search text-xl"></i>
+                                </div>
+                                <input type="text" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value);" placeholder="Search groceries, services, stores..." autocomplete="off" class="w-full bg-transparent px-2 outline-none text-[16px] font-bold text-gray-900 placeholder-gray-400">
+                                <div class="w-12 h-12 flex items-center justify-center bg-gray-50 rounded-[20px] text-gray-600 shrink-0 mr-1 cursor-pointer hover:bg-gray-100 active:scale-95 transition-all">
+                                    <i class="fas fa-microphone text-lg"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full mb-8 opacity-0 fade-in-up delay-200">
+                            <div class="flex justify-between items-end mb-4 px-2">
+                                <h3 class="text-[19px] font-black text-gray-900 tracking-tight leading-none">Explore Categories</h3>
+                            </div>
+                            <div class="grid grid-cols-4 gap-3 sm:gap-5">
+                                <button onclick="switchMarketTab('products'); document.getElementById('marketplace').scrollIntoView();" class="flex flex-col items-center gap-2.5 group active:scale-95 transition-transform">
+                                    <div class="w-full aspect-square rounded-[24px] bg-[#FCE7F3] flex items-center justify-center shadow-sm border border-[#FBCFE8] group-hover:shadow-md transition-shadow relative overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-8 h-8 bg-white/60 rounded-full blur-md -mr-4 -mt-4"></div>
+                                        <i class="fas fa-box-open text-2xl sm:text-3xl text-[#DB2777]"></i>
+                                    </div>
+                                    <span class="text-[12px] font-bold text-gray-700 tracking-wide">Products</span>
+                                </button>
+                                <button onclick="switchMarketTab('services'); document.getElementById('marketplace').scrollIntoView();" class="flex flex-col items-center gap-2.5 group active:scale-95 transition-transform">
+                                    <div class="w-full aspect-square rounded-[24px] bg-[#E0E7FF] flex items-center justify-center shadow-sm border border-[#BFDBFE] group-hover:shadow-md transition-shadow relative overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-8 h-8 bg-white/60 rounded-full blur-md -mr-4 -mt-4"></div>
+                                        <i class="fas fa-tools text-2xl sm:text-3xl text-[#4F46E5]"></i>
+                                    </div>
+                                    <span class="text-[12px] font-bold text-gray-700 tracking-wide">Services</span>
+                                </button>
+                                <button onclick="switchMarketTab('shops'); document.getElementById('marketplace').scrollIntoView();" class="flex flex-col items-center gap-2.5 group active:scale-95 transition-transform">
+                                    <div class="w-full aspect-square rounded-[24px] bg-[#DCFCE7] flex items-center justify-center shadow-sm border border-[#BBF7D0] group-hover:shadow-md transition-shadow relative overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-8 h-8 bg-white/60 rounded-full blur-md -mr-4 -mt-4"></div>
+                                        <i class="fas fa-store text-2xl sm:text-3xl text-[#16A34A]"></i>
+                                    </div>
+                                    <span class="text-[12px] font-bold text-gray-700 tracking-wide">Stores</span>
+                                </button>
+                                <button onclick="alert('Exciting offers loading soon!')" class="flex flex-col items-center gap-2.5 group active:scale-95 transition-transform">
+                                    <div class="w-full aspect-square rounded-[24px] bg-[#FEF3C7] flex items-center justify-center shadow-sm border border-[#FDE68A] group-hover:shadow-md transition-shadow relative overflow-hidden">
+                                        <div class="absolute top-0 right-0 w-8 h-8 bg-white/60 rounded-full blur-md -mr-4 -mt-4"></div>
+                                        <i class="fas fa-bolt text-2xl sm:text-3xl text-[#D97706]"></i>
+                                    </div>
+                                    <span class="text-[12px] font-bold text-gray-700 tracking-wide">Offers</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="w-full opacity-0 fade-in-up delay-300 cursor-pointer active:scale-[0.97] transition-transform" onclick="document.getElementById('marketplace').scrollIntoView();">
+                            <div class="relative w-full rounded-[32px] overflow-hidden shadow-[0_20px_50px_rgba(17,24,39,0.15)] bg-[#111827] flex items-center min-h-[170px] p-7 border border-gray-800">
+                                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-gradient-to-tl from-blue-500 via-purple-500 to-pink-500 rounded-full blur-[70px] opacity-40"></div>
+                                <div class="relative z-10 w-2/3 text-left">
+                                    <div class="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase px-3.5 py-1.5 rounded-full tracking-widest mb-3 shadow-sm">
+                                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]"></span> Delivery Live
+                                    </div>
+                                    <h3 class="text-[28px] sm:text-[34px] font-black text-white leading-[1.1] tracking-tight">Superfast <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Local Deals.</span></h3>
+                                </div>
+                                <div class="absolute -right-2 -bottom-2 opacity-90 drop-shadow-2xl">
+                                    <i class="fas fa-shopping-basket text-[110px] text-white/10 transform -rotate-12"></i>
+                                    <i class="fas fa-bolt text-[60px] text-yellow-400 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drop-shadow-[0_0_20px_rgba(250,204,21,0.6)]"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <!-- 🎯 NEW DESCRIPTION -->
-                    <p class="relative z-10 opacity-0 fade-in-up delay-300 text-gray-500 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed font-medium px-4">Discover trusted local stores, explore their products, and order effortlessly — all from one simple place.</p>
-                    
-                    <div class="relative z-10 opacity-0 fade-in-up delay-300 w-full px-4 sm:px-0 max-w-xs mx-auto">
-                        <button onclick="openAuthModal()" class="w-full bg-gray-900 text-white font-bold py-4 sm:py-5 rounded-2xl hover:bg-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3 text-sm sm:text-base">
-                            Start Shopping
-                        </button>
-                    </div>
-                    
-                    ${customerWhyChooseUsSection}
                 `;
                 return false;
             }
