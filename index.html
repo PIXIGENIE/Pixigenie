@@ -2856,6 +2856,20 @@ function getVIPBadge(isVerified, plan) {
                 window.location.replace('index.html'); 
             }
         }
+// Cancel button dabane par modal band karne ka function
+function closeLogoutModal() {
+    const modal = document.getElementById('ios-logout-modal');
+    const card = document.getElementById('ios-logout-card');
+    
+    // Animation wapas reverse karne ke liye
+    modal.classList.add('opacity-0');
+    card.classList.add('scale-95');
+    
+    // 300ms baad modal ko hide kar do
+    setTimeout(() => { 
+        modal.classList.add('hidden'); 
+    }, 300); 
+}
 
         // ✨ NAYA: Success Modal ko wahin close karne ka function ✨
         function closeOrderSuccessModal() {
