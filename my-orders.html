@@ -161,7 +161,8 @@
                     // ✨ EDITABLE REVIEW & BILL BUTTONS
                     let actionBtnHtml = "";
                     if(order.status === 'pending') {
-                        actionBtnHtml = `<button onclick="cancelOrder('${order.id}', this)" class="bg-gray-100 hover:bg-gray-200 text-red-500 font-semibold text-[13px] px-4 py-2 rounded-full transition-all active:scale-95 shrink-0">Cancel</button>`;
+                        actionBtnHtml = `<button onclick="openCancelModal('${order.id}', this)" class="bg-gray-100 hover:bg-gray-200 text-red-500 font-semibold text-[13px] px-4 py-2 rounded-full transition-all active:scale-95 shrink-0">Cancel</button>`;
+
                     } else if(order.status === 'delivered') {
                         // Bill Download Button
                         let billBtn = `<button onclick="downloadCustomerBill('${order.id}', event)" class="bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-[12px] px-3 py-2 rounded-full transition-all active:scale-95 shrink-0 flex items-center gap-1.5 shadow-sm border border-blue-100"><i class="fas fa-file-invoice"></i> Bill</button>`;
@@ -226,8 +227,44 @@
             }
         }
 
-        async function cancelOrder(orderId, btnElement) {
-            if (!confirm("Are you sure you want to cancel this order?")) return;
+             let pendingCancelOrderId = null;
+        let pendingCancelBtnElement = null;
+
+        // Modal kholne ka function
+        function openCancelModal(orderId, btnElement) {
+            pendingCancelOrderId = orderId;
+            pendingCancelBtnElement = btnElement;
+            const modal = document.getElementById('ios-cancel-modal');
+            const card = document.getElementById('ios-cancel-card');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 10);
+        }
+
+        // Modal band karne ka function
+        function closeCancelModal() {
+            const modal = document.getElementById('ios-cancel-modal');
+            const card = document.getElementById('ios-cancel-card');
+            
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            
+            setTimeout(() => { 
+                modal.classList.add('hidden'); 
+            }, 300);
+        }
+
+        // Asli Cancel ka action (Jab user "Yes" dabaye)
+        async function confirmCancelAction() {
+            closeCancelModal(); // Pehle modal band karo
+            
+            if (!pendingCancelOrderId || !pendingCancelBtnElement) return;
+
+            const orderId = pendingCancelOrderId;
+            const btnElement = pendingCancelBtnElement;
 
             try {
                 const origHtml = btnElement.innerHTML;
@@ -239,6 +276,7 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
+                // Status refresh karne ke liye
                 fetchMyOrders(localStorage.getItem('pixigenie_customer_phone'));
             } catch (error) {
                 alert("Could not cancel order: " + error.message);
@@ -246,6 +284,7 @@
                 btnElement.disabled = false;
             }
         }
+
                 // ==========================================
         // ✨ AUTO REVIEW PROMPT LOGIC ✨
         // ==========================================
@@ -527,6 +566,20 @@
             </button>
         </div>
     </div>
+        <!-- ✨ iOS STYLE CANCEL CONFIRMATION MODAL ✨ -->
+    <div id="ios-cancel-modal" class="fixed inset-0 z-[300] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div id="ios-cancel-card" class="bg-white/90 backdrop-blur-xl w-[270px] rounded-[14px] shadow-2xl transform scale-95 transition-transform duration-300 text-center overflow-hidden flex flex-col">
+            <div class="p-4 pt-5 pb-4">
+                <h3 class="text-[17px] font-semibold text-black leading-tight mb-1">Cancel Order</h3>
+                <p class="text-[13px] text-black/70 leading-snug">Are you sure you want to cancel this order? This action cannot be undone.</p>
+            </div>
+            <div class="flex border-t border-black/10">
+                <button onclick="closeCancelModal()" class="flex-1 py-3 text-[17px] text-[#007AFF] font-normal border-r border-black/10 hover:bg-black/5 active:bg-black/10 transition-colors">No</button>
+                <button onclick="confirmCancelAction()" class="flex-1 py-3 text-[17px] text-[#FF3B30] font-semibold hover:bg-black/5 active:bg-black/10 transition-colors">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ✨ AUTO REVIEW PROMPT MODAL ✨ -->
     <div id="auto-review-prompt" class="fixed inset-0 z-[250] hidden items-end sm:items-center justify-center p-4">
         <!-- Backdrop -->
