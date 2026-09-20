@@ -2152,20 +2152,20 @@
             renderAdminBills(); 
             renderInsights(); 
         }
-        // ==========================================
-        // ✨ PREMIUM iOS STYLE LIVE ORDERS ✨
+           // ==========================================
+        // ✨ ULTRA-PREMIUM iOS STYLE LIVE ORDERS ✨
         // ==========================================
         function renderLiveOrders(orders) {
             const list = document.getElementById('merchant-orders-list');
             if(!list) return;
             if(orders.length === 0) {
-                list.innerHTML = `<div class="text-center py-12 bg-white rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)]"><i class="fas fa-box-open text-5xl text-gray-200 mb-4"></i><p class="text-gray-500 text-[15px] font-medium">No live orders yet.</p></div>`;
+                list.innerHTML = `<div class="text-center py-12 bg-white rounded-[24px] border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]"><i class="fas fa-inbox text-5xl text-gray-200 mb-4"></i><p class="text-gray-500 text-[15px] font-medium">No live orders right now.</p></div>`;
                 return;
             }
 
             let html = '';
             orders.forEach((o, index) => {
-                let delay = index * 0.05; // Cascading animation delay
+                let delay = index * 0.05; // Smooth entry animation
 
                 let d = "Just now";
                 if(o.createdAt && o.createdAt.toDate) {
@@ -2173,99 +2173,101 @@
                     d = dt.toLocaleDateString('en-IN', {day:'2-digit', month:'short'}) + " at " + dt.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
                 }
 
-                // ✨ Clean iOS Style Items List
+                // ✨ Enhanced Items List (Clean Apple Style)
                 let itemsHtml = o.items ? o.items.map(i => `
-                    <div class="flex justify-between items-center text-[13px] mb-1.5 last:mb-0">
-                        <span class="font-medium text-gray-700 truncate pr-2"><strong class="text-gray-900 font-bold">${i.qty}x</strong> ${i.name}</span>
-                        <span class="text-gray-900 font-black shrink-0">₹${i.price * i.qty}</span>
+                    <div class="flex justify-between items-start text-[13px] mb-2.5 last:mb-0">
+                        <span class="font-medium text-gray-700 pr-4 leading-snug"><strong class="text-black">${i.qty}x</strong> ${i.name}</span>
+                        <span class="text-gray-900 font-bold shrink-0">₹${i.price * i.qty}</span>
                     </div>
                 `).join('') : '<p class="text-[13px] text-gray-500">Items not found</p>';
 
-                // ✨ Premium Badges & Icons
-                let sBg = "bg-orange-50 text-orange-600 border-orange-100";
-                let statusIcon = "fa-clock";
-                
+                // ✨ Ultra-clean Status Badges with Dots
+                let sBg, statusText, statusDot;
                 if (o.status === 'pending') {
-                    sBg = "bg-blue-50 text-blue-600 border-blue-100"; 
-                    statusIcon = "fa-hourglass-half";
+                    sBg = "bg-blue-50 text-blue-600"; statusText = "New Order"; statusDot = "bg-blue-500";
                 } else if (o.status === 'accepted') {
-                    sBg = "bg-purple-50 text-purple-600 border-purple-100"; 
-                    statusIcon = "fa-box";
+                    sBg = "bg-purple-50 text-purple-600"; statusText = "Preparing"; statusDot = "bg-purple-500";
                 } else if (o.status === 'delivered') {
-                    sBg = "bg-green-50 text-green-600 border-green-100"; 
-                    statusIcon = "fa-check-circle";
+                    sBg = "bg-green-50 text-green-600"; statusText = "Delivered"; statusDot = "bg-green-500";
                 } else if (o.status === 'cancelled') {
-                    sBg = "bg-red-50 text-red-600 border-red-100"; 
-                    statusIcon = "fa-times-circle";
+                    sBg = "bg-red-50 text-red-600"; statusText = "Cancelled"; statusDot = "bg-red-500";
                 }
 
-                // ✨ Modern iOS Action Buttons
+                // ✨ Refined Action Buttons
                 let btns = '';
                 if(o.status === 'pending') {
                     btns = `
-                        <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-gray-50 text-red-500 border border-gray-200 hover:bg-gray-100 font-bold h-12 rounded-[14px] text-[13px] transition active:scale-95 shrink-0">Cancel</button>
-                        <button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-[2] bg-gray-900 text-white font-bold h-12 rounded-[14px] text-[13px] hover:bg-black transition active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.15)] shrink-0">Accept Order</button>
+                        <button onclick="updateLiveOrderStatus('${o.id}', 'cancelled', '${o.customerPhone}', '${o.customerName}')" class="w-12 h-12 bg-red-50 text-red-500 rounded-[16px] flex items-center justify-center text-lg active:scale-95 transition shrink-0"><i class="fas fa-times"></i></button>
+                        <button onclick="updateLiveOrderStatus('${o.id}', 'accepted', '${o.customerPhone}', '${o.customerName}')" class="flex-1 bg-[#111827] text-white font-bold h-12 rounded-[16px] text-[14px] hover:bg-black active:scale-95 transition shadow-[0_4px_14px_rgba(0,0,0,0.15)] flex items-center justify-center gap-2">Accept Order</button>
                     `;
                 } else if(o.status === 'accepted') {
-                    btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold h-12 rounded-[14px] text-[14px] transition active:scale-95 shadow-[0_4px_14px_rgba(34,197,94,0.3)]"><i class="fas fa-check-circle mr-1.5"></i> Mark Delivered</button>`;
+                    btns = `<button onclick="updateLiveOrderStatus('${o.id}', 'delivered', '${o.customerPhone}', '${o.customerName}')" class="w-full bg-[#16A34A] text-white font-bold h-12 rounded-[16px] text-[14px] active:scale-95 transition shadow-[0_4px_14px_rgba(22,163,74,0.3)] flex items-center justify-center gap-2"><i class="fas fa-check-circle"></i> Mark Delivered</button>`;
                 } else if(o.status === 'delivered') {
                     btns = `
-                        <button disabled class="flex-[1.5] bg-gray-50 text-green-600 font-bold h-12 rounded-[14px] text-[13px] border border-gray-200 cursor-not-allowed opacity-70">
-                            <i class="fas fa-check-circle mr-1"></i> Delivered
-                        </button>
-                        <button onclick="downloadBillImage('${o.billId || o.id}')" class="flex-1 bg-white text-blue-600 border border-blue-200 hover:bg-blue-50 font-bold h-12 rounded-[14px] text-[13px] transition active:scale-95 shadow-sm">
-                            <i class="fas fa-file-invoice mr-1"></i> Bill
-                        </button>`;
+                        <button disabled class="flex-[1.5] bg-gray-50 text-[#16A34A] font-bold h-12 rounded-[16px] text-[13px] border border-gray-200 opacity-60">Delivered</button>
+                        <button onclick="downloadBillImage('${o.billId || o.id}')" class="flex-1 bg-blue-50 text-blue-600 font-bold h-12 rounded-[16px] text-[13px] active:scale-95 transition flex items-center justify-center gap-1.5"><i class="fas fa-download"></i> Bill</button>`;
                 } else {
-                    btns = `<div class="w-full text-center py-3.5 bg-gray-50 rounded-[14px] border border-gray-200 text-gray-500 text-[11px] font-black uppercase tracking-widest">Order ${o.status}</div>`;
+                    btns = `<div class="w-full text-center py-3.5 bg-gray-50 rounded-[16px] text-gray-500 text-[12px] font-bold uppercase tracking-widest">Order ${o.status}</div>`;
                 }
 
                 let ini = (o.customerName || 'C').charAt(0).toUpperCase();
-                let mapUrl = (o.lat && o.lng) ? `https://www.google.com/maps/dir/?api=1&destination=$${o.lat},${o.lng}` : `https://www.google.com/maps/dir/?api=1&destination=$${encodeURIComponent(o.customerAddress || '')}`;
+                let mapUrl = (o.lat && o.lng) ? `https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lng}` : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(o.customerAddress || '')}`;
 
                 html += `
-                <div class="bg-white rounded-[24px] p-5 mb-4 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 relative overflow-hidden animate-slide-up shrink-0" style="animation-delay: ${delay}s">
-
-
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center border border-gray-200 shrink-0 text-gray-700 font-black text-lg shadow-sm">
+                <div class="bg-white rounded-[24px] mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-200/60 overflow-hidden shrink-0 flex flex-col animate-slide-up" style="animation-delay: ${delay}s">
+                    
+                    <!-- iOS Style Header -->
+                    <div class="p-4 sm:p-5 border-b border-gray-100 flex justify-between items-start bg-white">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-11 h-11 bg-gray-100 rounded-full flex items-center justify-center text-gray-800 font-black text-lg shrink-0 border border-gray-200/50">
                                 ${ini}
                             </div>
-                            <div>
-                                <h4 class="font-black text-gray-900 text-[17px] tracking-tight leading-none mb-1.5 truncate max-w-[150px] sm:max-w-[200px]">${o.customerName || 'Customer'}</h4>
-                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">#${o.id.substring(0,8).toUpperCase()} • ${d}</p>
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-gray-900 text-[16px] tracking-tight leading-none mb-1 truncate">${o.customerName || 'Customer'}</h4>
+                                <p class="text-[11px] text-gray-500 font-medium">#${o.id.substring(0,8).toUpperCase()} • ${d}</p>
                             </div>
                         </div>
-                        <span class="${sBg} px-2.5 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 shrink-0 border shadow-sm">
-                            <i class="fas ${statusIcon} text-[10px]"></i> ${o.status}
+                        <!-- Modern Minimal Badge -->
+                        <span class="${sBg} px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide flex items-center gap-1.5 shrink-0 ml-3">
+                            <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span> ${statusText}
                         </span>
                     </div>
-                    
-                    <div class="flex justify-between items-center mb-4 bg-gray-50/70 p-3 rounded-[16px] border border-gray-100">
-                        <p class="text-[12px] text-gray-600 font-medium line-clamp-2 pr-3 flex-1 leading-snug"><i class="fas fa-map-marker-alt text-gray-400 mr-1.5"></i> ${o.customerAddress || 'Address not provided'}</p>
-                        <a href="${mapUrl}" target="_blank" class="shrink-0 bg-blue-50 text-blue-600 border border-blue-100 px-3 py-2 rounded-[12px] text-[10px] font-bold flex items-center gap-1 active:scale-95 transition shadow-sm">
-                            <i class="fas fa-location-arrow"></i> Map
-                        </a>
-                    </div>
 
-                    <div class="bg-white rounded-[16px] p-4 mb-5 border border-gray-200/60 shadow-sm">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2.5">Order Items</p>
-                        <div class="space-y-1">
+                    <!-- iOS Grouped Content Box (Address & Items) -->
+                    <div class="p-4 sm:p-5 bg-[#F9FAFB] flex flex-col gap-4 border-b border-gray-100">
+                        
+                        <!-- Address Block -->
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-start gap-2.5 min-w-0">
+                                <i class="fas fa-map-marker-alt text-gray-400 mt-1 text-[14px]"></i>
+                                <p class="text-[13px] text-gray-700 font-medium leading-relaxed line-clamp-2">${o.customerAddress || 'No address provided'}</p>
+                            </div>
+                            <a href="${mapUrl}" target="_blank" class="w-9 h-9 bg-white border border-gray-200 rounded-full flex items-center justify-center text-blue-500 shadow-sm active:scale-95 transition shrink-0">
+                                <i class="fas fa-location-arrow text-[13px]"></i>
+                            </a>
+                        </div>
+
+                        <!-- Minimal Divider -->
+                        <div class="h-px w-full bg-gray-200/60"></div>
+
+                        <!-- Items List -->
+                        <div class="flex flex-col">
                             ${itemsHtml}
                         </div>
                     </div>
 
-                    <div class="flex flex-col gap-4">
-                        <div class="flex justify-between items-end px-1">
-                            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Grand Total</span>
-                            <span class="font-black text-gray-900 text-[26px] tracking-tight leading-none">₹${o.totalAmount}</span>
+                    <!-- Footer (Total & Actions) -->
+                    <div class="p-4 sm:p-5 bg-white flex flex-col gap-5">
+                        <div class="flex justify-between items-center px-1">
+                            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Grand Total</span>
+                            <span class="font-black text-gray-900 text-[24px] tracking-tight">₹${o.totalAmount}</span>
                         </div>
-                        <div class="flex gap-2 w-full mt-1">
-                            <a href="tel:${o.customerPhone}" class="w-12 h-12 bg-white text-gray-600 hover:bg-gray-50 rounded-[14px] flex items-center justify-center transition active:scale-95 shrink-0 border border-gray-200 shadow-sm">
+                        
+                        <div class="flex items-center gap-3 w-full">
+                            <a href="tel:${o.customerPhone}" class="w-12 h-12 bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 rounded-[16px] flex items-center justify-center transition active:scale-95 shrink-0">
                                 <i class="fas fa-phone-alt"></i>
                             </a>
-                            <div class="flex-1 flex gap-2">
+                            <div class="flex-1 flex gap-3">
                                 ${btns}
                             </div>
                         </div>
@@ -2276,8 +2278,19 @@
         }
 
         // ✨ NAYA LOGIC: Order Delivered hote hi Bill banega aur Sales me judega ✨
-        async function updateLiveOrderStatus(orderId, newStatus, custPhone, custName) {
-            if(!confirm(`Are you sure you want to mark this order as ${newStatus}?`)) return;
+          async function updateLiveOrderStatus(orderId, newStatus, custPhone, custName) {
+            // ✨ NAYA: Premium iOS Confirm Popup ✨
+            let actionColor = (newStatus === 'cancelled') ? 'text-[#FF3B30]' : 'text-[#007AFF]';
+            let actionText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1); // "accepted" ko "Accepted" banane ke liye
+
+            const isConfirmed = await iosConfirm(
+                "Update Order", 
+                `Are you sure you want to mark this order as ${newStatus}?`, 
+                "Mark " + actionText, 
+                actionColor
+            );
+            
+            if(!isConfirmed) return; // Agar user cancel dabaye toh wahi ruk jao
 
             try {
                 let billIdToSave = null;
