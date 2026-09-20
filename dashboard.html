@@ -2224,7 +2224,8 @@
                 let mapUrl = (o.lat && o.lng) ? `https://www.google.com/maps/dir/?api=1&destination=$${o.lat},${o.lng}` : `https://www.google.com/maps/dir/?api=1&destination=$${encodeURIComponent(o.customerAddress || '')}`;
 
                 html += `
-                <div class="bg-white rounded-[24px] p-5 mb-4 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 relative overflow-hidden animate-slide-up" style="animation-delay: ${delay}s">
+                <div class="bg-white rounded-[24px] p-5 mb-4 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 relative overflow-hidden animate-slide-up shrink-0" style="animation-delay: ${delay}s">
+
 
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center gap-3">
@@ -2538,7 +2539,8 @@
         async function addMaterialBatch() {
             let nInp = document.getElementById('batch-name'); let cInp = document.getElementById('batch-cost');
             let name = nInp.value.trim(); let cost = parseInt(cInp.value);
-            if (!name || isNaN(cost) || cost <= 0) return alert("Valid name & cost required.");
+           if (!name || isNaN(cost) || cost <= 0) return iosAlert("Missing Info", "Valid name & cost required.");
+
             try {
                 let nb = { name, cost, recovered: 0, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
                 let doc = await db.collection('shops').doc(currentShopId).collection('materialTracker').add(nb);
@@ -2680,7 +2682,8 @@
                     m += `%0A`; if(disc>0) m+=`Discount: -₹${disc}%0A`; if(del>0) m+=`Delivery: +₹${del}%0A`;
                     m += `*GRAND TOTAL: ₹${gt}*%0A%0AStatus: ${st}%0AMode: ${nb.payMode}%0A%0AThank you!`;
                     window.open(`https://wa.me/91${p}?text=${m}`, '_blank');
-                } else alert("✅ Bill Saved!");
+              } else iosAlert("Success", "✅ Bill Saved Successfully!");
+
             } catch(e) { alert("Error: " + e.message); }
             finally { btn.innerHTML = orig; btn.disabled = false; }
         }
@@ -3905,7 +3908,7 @@
                     setTimeout(() => { window.location.href = `dashboard.html?shop=${currentShopId}`; }, 2000);
                 }
             } catch (error) { 
-                alert("Error: " + error.message); 
+                iosAlert("Oops! Something went wrong", error.message); 
             } finally {
                 btn.innerHTML = origHtml; btn.disabled = false; 
             }
@@ -8740,7 +8743,7 @@ const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 iosAlert("Success!", "Your eye-catching offer is now LIVE on your store.");
                 closeOfferModal();
             } catch(error) {
-                alert("Error: " + error.message);
+                iosAlert("Oops! Something went wrong", error.message);
             }
             btn.innerHTML = orig; btn.disabled = false;
         }
