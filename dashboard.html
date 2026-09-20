@@ -2152,8 +2152,8 @@
             renderAdminBills(); 
             renderInsights(); 
         }
-           // ==========================================
-        // ✨ ULTRA-PREMIUM iOS STYLE LIVE ORDERS ✨
+                   // ==========================================
+        // ✨ ULTRA-PREMIUM iOS STYLE LIVE ORDERS (WITH COLORED BORDERS) ✨
         // ==========================================
         function renderLiveOrders(orders) {
             const list = document.getElementById('merchant-orders-list');
@@ -2181,16 +2181,22 @@
                     </div>
                 `).join('') : '<p class="text-[13px] text-gray-500">Items not found</p>';
 
-                // ✨ Ultra-clean Status Badges with Dots
-                let sBg, statusText, statusDot;
+                // ✨ Status Badges & DYNAMIC COLORED BORDERS
+                let sBg, statusText, statusDot, cardBorder;
                 if (o.status === 'pending') {
                     sBg = "bg-blue-50 text-blue-600"; statusText = "New Order"; statusDot = "bg-blue-500";
+                    cardBorder = "border-[2px] border-blue-400 shadow-[0_8px_20px_rgba(59,130,246,0.15)]"; // Blue Outline
                 } else if (o.status === 'accepted') {
                     sBg = "bg-purple-50 text-purple-600"; statusText = "Preparing"; statusDot = "bg-purple-500";
+                    cardBorder = "border-[2px] border-purple-400 shadow-[0_8px_20px_rgba(168,85,247,0.15)]"; // Purple Outline
                 } else if (o.status === 'delivered') {
                     sBg = "bg-green-50 text-green-600"; statusText = "Delivered"; statusDot = "bg-green-500";
+                    cardBorder = "border-[2px] border-green-400 shadow-[0_8px_20px_rgba(34,197,94,0.15)]"; // Green Outline
                 } else if (o.status === 'cancelled') {
                     sBg = "bg-red-50 text-red-600"; statusText = "Cancelled"; statusDot = "bg-red-500";
+                    cardBorder = "border-[2px] border-red-400 shadow-[0_8px_20px_rgba(239,68,68,0.15)]"; // Red Outline
+                } else {
+                    cardBorder = "border border-gray-200/60 shadow-sm";
                 }
 
                 // ✨ Refined Action Buttons
@@ -2213,8 +2219,9 @@
                 let ini = (o.customerName || 'C').charAt(0).toUpperCase();
                 let mapUrl = (o.lat && o.lng) ? `https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lng}` : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(o.customerAddress || '')}`;
 
+                // Yahan Card Border aur Animation apply ho rahi hai
                 html += `
-                <div class="bg-white rounded-[24px] mb-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-200/60 overflow-hidden shrink-0 flex flex-col animate-slide-up" style="animation-delay: ${delay}s">
+                <div class="bg-white rounded-[24px] mb-5 overflow-hidden shrink-0 flex flex-col animate-slide-up transition-all duration-300 ${cardBorder}" style="animation-delay: ${delay}s">
                     
                     <!-- iOS Style Header -->
                     <div class="p-4 sm:p-5 border-b border-gray-100 flex justify-between items-start bg-white">
@@ -2276,6 +2283,7 @@
             });
             list.innerHTML = html;
         }
+
 
         // ✨ NAYA LOGIC: Order Delivered hote hi Bill banega aur Sales me judega ✨
           async function updateLiveOrderStatus(orderId, newStatus, custPhone, custName) {
