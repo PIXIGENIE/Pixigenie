@@ -2039,40 +2039,46 @@
             }
 
 
-                             // ✨ REAL-TIME LIVE ORDERS FETCHING (WITH BADGE LOGIC) ✨
+                                    // ✨ REAL-TIME LIVE ORDERS FETCHING (WITH BADGE LOGIC) ✨
             if(liveOrdersUnsubscribe) liveOrdersUnsubscribe();
             liveOrdersUnsubscribe = db.collection('orders')
                 .where('shopPhone', '==', globalShopData.phone) 
-                .orderBy('createdAt', 'desc') // NAYA: Naye orders upar aayenge
-                .limit(50)                    // NAYA: Sirf aakhri 50 orders hi track honge
+                .orderBy('createdAt', 'desc') 
+                .limit(50)                    
                 .onSnapshot(snapshot => {
 
                     let live = [];
-                    let pendingCount = 0; // 🔔 Naya Order count karne ke liye
+                    let pendingCount = 0; 
                     
                     snapshot.forEach(doc => {
                         let data = doc.data();
-                        // Agar order pending hai toh count badhao
                         if(data.status === 'pending') pendingCount++; 
                         live.push({id: doc.id, ...data});
                     });
                     
-                                                                                live.sort((a,b) => (b.createdAt?.toMillis()||0) - (a.createdAt?.toMillis()||0));
+                    live.sort((a,b) => (b.createdAt?.toMillis()||0) - (a.createdAt?.toMillis()||0));
                     
-                    // ✨ NAYA: Window object me save kiya taaki hamesha available rahe ✨
                     window.globalLiveOrders = live;
                     window.filterLiveOrders();
 
-                    // 🔔 Badge Update Logic
                     const badge = document.getElementById('live-orders-badge');
                     if(badge) {
                         if(pendingCount > 0) {
                             badge.innerText = pendingCount;
-                            badge.classList.remove('hidden'); // Badge dikhao
+                            badge.classList.remove('hidden'); 
                         } else {
-                            badge.classList.add('hidden'); // Zero ho toh chhupa do
+                            badge.classList.add('hidden'); 
                         }
                     }
+                }, error => {
+                    // ✨ ERROR HANDLER ADDED HERE ✨
+                    console.error("Firebase Index Error:", error);
+                    document.getElementById('merchant-orders-list').innerHTML = `
+                        <div class="text-center py-10 bg-red-50 rounded-2xl border border-red-100 mx-2">
+                            <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
+                            <p class="text-red-700 font-bold text-sm">Database Index Missing</p>
+                            <p class="text-red-500 text-xs mt-1">Open browser console (F12) and click the Firebase link to generate the index.</p>
+                        </div>`;
                 });
 
                     // ==========================================
@@ -9928,6 +9934,84 @@ function trackEvent(eventType) {
             }
         });
 
+        // ==========================================
+        // ✨ PREMIUM ANALYTICS ENGINE (FIXED) ✨
+        // ==========================================
+        window.initPremiumAnalytics = function() {
+            if (!globalShopData) return;
+
+            // 1. Map Base Stats (Views & Impressions)
+            document.getElementById('metric-views').innerText = globalShopData.profileViews || 0;
+            document.getElementById('metric-visits').innerText = globalShopData.searchImpressions || 0;
+            
+            // 2. Map Enquiries (WhatsApp Clicks + Map Direction Clicks)
+            let totalEnquiries = (globalShopData.whatsappClicks || 0) + (globalShopData.directionClicks || 0);
+            document.getElementById('metric-enquiries').innerText = totalEnquiries;
+            
+            // Update bottom mini-cards
+            if(document.getElementById('activity-whatsapp')) document.getElementById('activity-whatsapp').innerText = globalShopData.whatsappClicks || 0;
+            if(document.getElementById('activity-directions')) document.getElementById('activity-directions').innerText = globalShopData.directionClicks || 0;
+
+            // 3. Calculate Orders & Revenue based on selected period
+            let periodDropdown = document.getElementById('performance-period');
+            let daysToLookBack = periodDropdown ? parseInt(periodDropdown.value) : 30;
+            
+            let cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - daysToLookBack);
+
+            let periodOrdersCount = 0;
+            let periodRevenue = 0;
+            let totalItemsSold = 0;
+
+            if (window.adminBills && window.adminBills.length > 0) {
+                window.adminBills.forEach(bill => {
+                    // Convert Firestore timestamp to JS Date
+                    let billDate = null;
+                    if (bill.timestamp && typeof bill.timestamp.toDate === 'function') {
+                        billDate = bill.timestamp.toDate();
+                    } else if (bill.timestamp && bill.timestamp.seconds) {
+                        billDate = new Date(bill.timestamp.seconds * 1000);
+                    }
+
+                    // Check if bill is within the selected date range and not cancelled
+                    if (billDate && billDate >= cutoffDate && bill.deliveryStatus !== 'Cancelled') {
+                        periodOrdersCount++;
+                        periodRevenue += (bill.grandTotal || 0);
+                        
+                        if(bill.items) {
+                            bill.items.forEach(item => {
+                                totalItemsSold += parseInt(item.qty || 1);
+                            });
+                        }
+                    }
+                });
+            }
+
+            // 4. Update UI with calculated data
+            document.getElementById('metric-orders').innerText = periodOrdersCount;
+            document.getElementById('metric-revenue').innerText = "₹" + periodRevenue.toLocaleString('en-IN');
+            if(document.getElementById('activity-calls')) document.getElementById('activity-calls').innerText = totalItemsSold;
+
+            // 5. Calculate Conversion Rate (Orders / Profile Views)
+            let viewsCount = globalShopData.profileViews || 0;
+            let convRate = "0%";
+            if (viewsCount > 0) {
+                convRate = ((periodOrdersCount / viewsCount) * 100).toFixed(1) + "%";
+            }
+            document.getElementById('metric-conversion-rate').innerText = convRate;
+
+            // 6. Update Smart Store Health (Avg Bill Size)
+            if(document.getElementById('metric-avg-bill')) {
+                let avgBill = periodOrdersCount > 0 ? Math.round(periodRevenue / periodOrdersCount) : 0;
+                document.getElementById('metric-avg-bill').innerText = "₹" + avgBill;
+            }
+
+            // 7. Update Last Refreshed Time
+            if (document.getElementById('analytics-last-updated')) {
+                let time = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                document.getElementById('analytics-last-updated').innerHTML = `Last updated today at ${time}`;
+            }
+        };
 
     </script>
 
