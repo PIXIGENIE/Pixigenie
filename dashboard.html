@@ -398,7 +398,8 @@
                 </header>
 
                                       <!-- ✨ NAYA: Relative wrapper for Tabs and Animated Hint ✨ -->
-              <div class="relative w-full shrink-0 border-b border-[#E5E7EB] bg-white">
+             <div class="relative z-20 w-full shrink-0 border-b border-[#E5E7EB] bg-white">
+
                 <style>
                     /* Mast soft left-right bounce animation */
                     @keyframes nudgeRight {
@@ -9935,28 +9936,26 @@ function trackEvent(eventType) {
             }
         });
 
-        // ==========================================
-        // ✨ PREMIUM ANALYTICS ENGINE (FIXED) ✨
+                // ==========================================
+        // ✨ PREMIUM ANALYTICS ENGINE (100% FIXED) ✨
         // ==========================================
         window.initPremiumAnalytics = function() {
             if (!globalShopData) return;
 
-            // 1. Map Base Stats (Views & Impressions)
+            // 1. Views & Impressions
             document.getElementById('metric-views').innerText = globalShopData.profileViews || 0;
             document.getElementById('metric-visits').innerText = globalShopData.searchImpressions || 0;
             
-            // 2. Map Enquiries (WhatsApp Clicks + Map Direction Clicks)
+            // 2. Enquiries
             let totalEnquiries = (globalShopData.whatsappClicks || 0) + (globalShopData.directionClicks || 0);
             document.getElementById('metric-enquiries').innerText = totalEnquiries;
             
-            // Update bottom mini-cards
             if(document.getElementById('activity-whatsapp')) document.getElementById('activity-whatsapp').innerText = globalShopData.whatsappClicks || 0;
             if(document.getElementById('activity-directions')) document.getElementById('activity-directions').innerText = globalShopData.directionClicks || 0;
 
-            // 3. Calculate Orders & Revenue based on selected period
+            // 3. Date Range Setup
             let periodDropdown = document.getElementById('performance-period');
             let daysToLookBack = periodDropdown ? parseInt(periodDropdown.value) : 30;
-            
             let cutoffDate = new Date();
             cutoffDate.setDate(cutoffDate.getDate() - daysToLookBack);
 
@@ -9964,9 +9963,9 @@ function trackEvent(eventType) {
             let periodRevenue = 0;
             let totalItemsSold = 0;
 
-            if (window.adminBills && window.adminBills.length > 0) {
-                window.adminBills.forEach(bill => {
-                    // Convert Firestore timestamp to JS Date
+            // ✨ YAHAN FIX KIYA HAI: 'window.adminBills' ki jagah sirf 'adminBills' ✨
+            if (typeof adminBills !== 'undefined' && adminBills.length > 0) {
+                adminBills.forEach(bill => {
                     let billDate = null;
                     if (bill.timestamp && typeof bill.timestamp.toDate === 'function') {
                         billDate = bill.timestamp.toDate();
@@ -9974,7 +9973,6 @@ function trackEvent(eventType) {
                         billDate = new Date(bill.timestamp.seconds * 1000);
                     }
 
-                    // Check if bill is within the selected date range and not cancelled
                     if (billDate && billDate >= cutoffDate && bill.deliveryStatus !== 'Cancelled') {
                         periodOrdersCount++;
                         periodRevenue += (bill.grandTotal || 0);
@@ -9988,12 +9986,12 @@ function trackEvent(eventType) {
                 });
             }
 
-            // 4. Update UI with calculated data
+            // 4. Update UI Stats
             document.getElementById('metric-orders').innerText = periodOrdersCount;
             document.getElementById('metric-revenue').innerText = "₹" + periodRevenue.toLocaleString('en-IN');
             if(document.getElementById('activity-calls')) document.getElementById('activity-calls').innerText = totalItemsSold;
 
-            // 5. Calculate Conversion Rate (Orders / Profile Views)
+            // 5. Conversion Rate
             let viewsCount = globalShopData.profileViews || 0;
             let convRate = "0%";
             if (viewsCount > 0) {
@@ -10001,13 +9999,12 @@ function trackEvent(eventType) {
             }
             document.getElementById('metric-conversion-rate').innerText = convRate;
 
-            // 6. Update Smart Store Health (Avg Bill Size)
+            // 6. Avg Bill Size
             if(document.getElementById('metric-avg-bill')) {
                 let avgBill = periodOrdersCount > 0 ? Math.round(periodRevenue / periodOrdersCount) : 0;
                 document.getElementById('metric-avg-bill').innerText = "₹" + avgBill;
             }
 
-            // 7. Update Last Refreshed Time
             if (document.getElementById('analytics-last-updated')) {
                 let time = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
                 document.getElementById('analytics-last-updated').innerHTML = `Last updated today at ${time}`;
