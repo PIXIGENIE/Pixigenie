@@ -2043,7 +2043,7 @@
                                     // ✨ REAL-TIME LIVE ORDERS FETCHING (WITH BADGE LOGIC) ✨
             if(liveOrdersUnsubscribe) liveOrdersUnsubscribe();
             liveOrdersUnsubscribe = db.collection('orders')
-                .where('shopPhone', '==', globalShopData.phone) 
+                .where('shopId', '==', currentShopId) // ✨ NAYA: phone ki jagah shopId use kiya
                 .orderBy('createdAt', 'desc') 
                 .limit(50)                    
                 .onSnapshot(snapshot => {
