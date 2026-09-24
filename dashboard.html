@@ -2070,16 +2070,17 @@
                             badge.classList.add('hidden'); 
                         }
                     }
-                }, error => {
-                    // ✨ ERROR HANDLER ADDED HERE ✨
-                    console.error("Firebase Index Error:", error);
+                               }, error => {
+                    // ✨ REAL ERROR HANDLER ✨
+                    console.error("Firebase Error:", error);
                     document.getElementById('merchant-orders-list').innerHTML = `
                         <div class="text-center py-10 bg-red-50 rounded-2xl border border-red-100 mx-2">
                             <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
-                            <p class="text-red-700 font-bold text-sm">Database Index Missing</p>
-                            <p class="text-red-500 text-xs mt-1">Open browser console (F12) and click the Firebase link to generate the index.</p>
+                            <p class="text-red-700 font-bold text-sm">Error Loading Orders</p>
+                            <p class="text-red-500 text-xs mt-1">${error.message}</p>
                         </div>`;
                 });
+
 
                     // ==========================================
         // ✨ NAYA: 100% BULLETPROOF FILTER FUNCTION ✨
