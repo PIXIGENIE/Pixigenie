@@ -9936,34 +9936,48 @@ function trackEvent(eventType) {
             }
         });
 
-                // ==========================================
-        // ✨ PREMIUM ANALYTICS ENGINE (100% FIXED) ✨
+                     // ==========================================
+        // ✨ PREMIUM ANALYTICS ENGINE (100% FIXED & COMPLETE) ✨
         // ==========================================
         window.initPremiumAnalytics = function() {
             if (!globalShopData) return;
 
-            // 1. Views & Impressions
+            // 1. Basic Stats
             document.getElementById('metric-views').innerText = globalShopData.profileViews || 0;
             document.getElementById('metric-visits').innerText = globalShopData.searchImpressions || 0;
             
-            // 2. Enquiries
             let totalEnquiries = (globalShopData.whatsappClicks || 0) + (globalShopData.directionClicks || 0);
             document.getElementById('metric-enquiries').innerText = totalEnquiries;
             
             if(document.getElementById('activity-whatsapp')) document.getElementById('activity-whatsapp').innerText = globalShopData.whatsappClicks || 0;
             if(document.getElementById('activity-directions')) document.getElementById('activity-directions').innerText = globalShopData.directionClicks || 0;
 
-            // 3. Date Range Setup
+            // 2. Date Setup
             let periodDropdown = document.getElementById('performance-period');
             let daysToLookBack = periodDropdown ? parseInt(periodDropdown.value) : 30;
             let cutoffDate = new Date();
             cutoffDate.setDate(cutoffDate.getDate() - daysToLookBack);
+            cutoffDate.setHours(0,0,0,0);
 
             let periodOrdersCount = 0;
             let periodRevenue = 0;
             let totalItemsSold = 0;
 
-            // ✨ YAHAN FIX KIYA HAI: 'window.adminBills' ki jagah sirf 'adminBills' ✨
+            // 3. Analytics Trackers
+            let dailyData = {}; 
+            let custMap = {}; 
+            let hourMap = {}; 
+            let prodMap = {}; 
+
+            // ग्राफ के लिए पिछले कुछ दिनों के खाली डिब्बे तैयार करना
+            for(let i = daysToLookBack - 1; i >= 0; i--) {
+                let d = new Date();
+                d.setDate(d.getDate() - i);
+                let fmt = d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+                dailyData[fmt] = { orders: 0, revenue: 0 };
+            }
+
+            // 4. Processing Bills Data
             if (typeof adminBills !== 'undefined' && adminBills.length > 0) {
                 adminBills.forEach(bill => {
                     let billDate = null;
@@ -9977,29 +9991,45 @@ function trackEvent(eventType) {
                         periodOrdersCount++;
                         periodRevenue += (bill.grandTotal || 0);
                         
+                        // Graph Data (रोजाना का डेटा जोड़ना)
+                        let dayKey = billDate.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+                        if(dailyData[dayKey] !== undefined) {
+                            dailyData[dayKey].orders += 1;
+                            dailyData[dayKey].revenue += (bill.grandTotal || 0);
+                        }
+
+                        // Loyal Customers Data
+                        let phone = bill.customerPhone || bill.customerName;
+                        custMap[phone] = (custMap[phone] || 0) + 1;
+
+                        // Rush Hour Data (किस घंटे में आर्डर आया)
+                        let hr = billDate.getHours();
+                        hourMap[hr] = (hourMap[hr] || 0) + 1;
+
+                        // Top Products Data
                         if(bill.items) {
                             bill.items.forEach(item => {
-                                totalItemsSold += parseInt(item.qty || 1);
+                                let q = parseInt(item.qty || 1);
+                                totalItemsSold += q;
+                                if(!prodMap[item.name]) prodMap[item.name] = { qty: 0, rev: 0 };
+                                prodMap[item.name].qty += q;
+                                prodMap[item.name].rev += (item.price * q);
                             });
                         }
                     }
                 });
             }
 
-            // 4. Update UI Stats
+            // --- A. UPDATE TOP UI STATS ---
             document.getElementById('metric-orders').innerText = periodOrdersCount;
             document.getElementById('metric-revenue').innerText = "₹" + periodRevenue.toLocaleString('en-IN');
             if(document.getElementById('activity-calls')) document.getElementById('activity-calls').innerText = totalItemsSold;
 
-            // 5. Conversion Rate
             let viewsCount = globalShopData.profileViews || 0;
             let convRate = "0%";
-            if (viewsCount > 0) {
-                convRate = ((periodOrdersCount / viewsCount) * 100).toFixed(1) + "%";
-            }
+            if (viewsCount > 0) convRate = ((periodOrdersCount / viewsCount) * 100).toFixed(1) + "%";
             document.getElementById('metric-conversion-rate').innerText = convRate;
 
-            // 6. Avg Bill Size
             if(document.getElementById('metric-avg-bill')) {
                 let avgBill = periodOrdersCount > 0 ? Math.round(periodRevenue / periodOrdersCount) : 0;
                 document.getElementById('metric-avg-bill').innerText = "₹" + avgBill;
@@ -10009,7 +10039,109 @@ function trackEvent(eventType) {
                 let time = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
                 document.getElementById('analytics-last-updated').innerHTML = `Last updated today at ${time}`;
             }
+
+            // --- B. CALCULATE LOYAL CUST ---
+            let totalCust = Object.keys(custMap).length;
+            let repeatCust = Object.values(custMap).filter(v => v > 1).length;
+            let loyalPct = totalCust > 0 ? Math.round((repeatCust / totalCust) * 100) : 0;
+            document.getElementById('metric-repeat-cust').innerText = loyalPct + "%";
+
+            // --- C. CALCULATE RUSH HOUR ---
+            let peakHr = "...";
+            if(Object.keys(hourMap).length > 0) {
+                let bestHr = Object.keys(hourMap).reduce((a, b) => hourMap[a] > hourMap[b] ? a : b);
+                let hrNum = parseInt(bestHr);
+                let ampm = hrNum >= 12 ? 'PM' : 'AM';
+                let hr12 = hrNum % 12 || 12;
+                peakHr = `${hr12} ${ampm}`;
+            }
+            document.getElementById('metric-peak-hours').innerText = peakHr;
+
+            // --- D. RENDER TOP PRODUCTS ---
+            let prodArr = Object.entries(prodMap).map(([name, data]) => ({name, ...data})).sort((a,b) => b.qty - a.qty);
+            let prodHtml = "";
+            if(prodArr.length > 0) {
+                prodArr.slice(0,5).forEach((p, idx) => {
+                    prodHtml += `
+                    <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4 flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-500 font-bold flex items-center justify-center text-xs">${idx+1}</div>
+                            <div><p class="font-bold text-slate-800 text-sm truncate max-w-[200px]">${p.name}</p><p class="text-xs text-slate-500">Revenue: ₹${p.rev}</p></div>
+                        </div>
+                        <div class="text-right"><p class="font-black text-emerald-600 text-lg">${p.qty}</p><p class="text-[9px] uppercase font-bold text-slate-400">Sold</p></div>
+                    </div>`;
+                });
+            } else {
+                prodHtml = `<div class="text-center py-6 text-slate-400 text-sm">No product data available yet.</div>`;
+            }
+            document.getElementById('top-products-list').innerHTML = prodHtml;
+
+            // --- E. RENDER INSIGHTS ---
+            let insightsHtml = "";
+            if(periodOrdersCount === 0) {
+                insightsHtml = `<div class="rounded-2xl bg-slate-50 border border-slate-100 p-4 flex gap-3"><i class="fas fa-info-circle text-slate-400 mt-0.5"></i><div><p class="text-sm font-bold text-slate-700">Not enough data</p><p class="text-xs text-slate-500 mt-1">Get more orders to unlock smart insights.</p></div></div>`;
+            } else {
+                if(loyalPct > 20) insightsHtml += `<div class="rounded-2xl bg-rose-50 border border-rose-100 p-4 flex gap-3 mb-3"><i class="fas fa-heart text-rose-500 mt-0.5"></i><div><p class="text-sm font-bold text-rose-800">Great Customer Loyalty!</p><p class="text-xs text-rose-600 mt-1">${loyalPct}% of your customers came back to buy again.</p></div></div>`;
+                if(prodArr.length > 0) insightsHtml += `<div class="rounded-2xl bg-purple-50 border border-purple-100 p-4 flex gap-3"><i class="fas fa-fire text-purple-500 mt-0.5"></i><div><p class="text-sm font-bold text-purple-800">Hot Item: ${prodArr[0].name}</p><p class="text-xs text-purple-600 mt-1">Make sure you have enough stock for this top seller.</p></div></div>`;
+            }
+            document.getElementById('insights-list').innerHTML = insightsHtml || `<div class="text-center py-6 text-slate-400 text-sm">More activity needed for insights.</div>`;
+
+            // --- F. RENDER CHART.JS GRAPH ---
+            window.updateGrowthChart = function(metric) {
+                let ctx = document.getElementById('growthChart');
+                let emptyState = document.getElementById('growth-empty-state');
+                if(!ctx) return;
+                
+                if(periodOrdersCount === 0) {
+                    ctx.style.display = 'none';
+                    if(emptyState) { emptyState.classList.remove('hidden'); emptyState.classList.add('flex'); }
+                    return;
+                } else {
+                    ctx.style.display = 'block';
+                    if(emptyState) { emptyState.classList.add('hidden'); emptyState.classList.remove('flex'); }
+                }
+
+                // अगर पहले से कोई चार्ट है, तो उसे नष्ट करें (ताकि ओवरलैप ना हो)
+                if(window.myGrowthChart) window.myGrowthChart.destroy();
+                
+                let labels = Object.keys(dailyData);
+                let dataPoints = labels.map(date => metric === 'revenue' ? dailyData[date].revenue : dailyData[date].orders);
+                
+                window.myGrowthChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: metric === 'revenue' ? 'Revenue (₹)' : 'Orders',
+                            data: dataPoints,
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#10B981',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { font: {size: 9}, maxTicksLimit: 7 } },
+                            y: { border: { display: false }, grid: { color: '#f1f5f9' }, ticks: { font: {size: 10}, beginAtZero: true } }
+                        }
+                    }
+                });
+            };
+            
+            // Dropdown (Orders/Revenue) के अनुसार डिफ़ॉल्ट चार्ट लोड करना
+            let metricSelect = document.getElementById('growth-metric');
+            window.updateGrowthChart(metricSelect ? metricSelect.value : 'orders');
         };
+
 
     </script>
 
