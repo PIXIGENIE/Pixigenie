@@ -1707,6 +1707,7 @@
                         lat: document.getElementById('cart-lat').value || null,
                         lng: document.getElementById('cart-lng').value || null,
                         shopPhone: phone,
+                        shopId: currentShopId, // ✨ NAYA: shopId Add Kiya
                         shopName: orderData.shopName,
                         items: orderData.items,
                         totalAmount: orderData.total,
@@ -1849,6 +1850,7 @@
                     lat: document.getElementById('order-lat').value || null,
                     lng: document.getElementById('order-lng').value || null,
                     shopPhone: phone,
+                    shopId: currentShopId, // ✨ NAYA: shopId Add Kiya
                     shopName: currentOrder.shopName || 'Local Store',
                     items: [{ name: currentOrder.itemName, qty: parseInt(qty), price: parseInt(currentOrder.itemPrice) }],
                     totalAmount: total,
