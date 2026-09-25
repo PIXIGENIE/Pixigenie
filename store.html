@@ -2123,7 +2123,7 @@
             closeMapPicker();
         }
 
-                // ===============================================
+                      // ===============================================
         // ✨ AUTO ATTACH RATINGS TO CARDS ✨
         // ===============================================
         async function attachRatingsToCards() {
@@ -2168,7 +2168,7 @@
         }
 
         // ===============================================
-        // ✨ FIREBASE SYNCED LIKES & REVIEWS ✨
+        // ✨ SMART LIKES & REVIEWS (MULTI-ACCOUNT SYNC) ✨
         // ===============================================
         async function likeReview(orderId, btnElement) {
             const userEmail = localStorage.getItem('pixigenie_customer_phone');
@@ -2181,34 +2181,40 @@
             const countSpan = btnElement.querySelector('.like-count');
             let currentCount = parseInt(countSpan.innerText) || 0;
             
+            // 🔥 NAYA MAGIC: Har user ka apna personal storage key!
+            const storageKey = 'pixigenie_likes_' + userEmail;
+            let likedReviews = JSON.parse(localStorage.getItem(storageKey)) || [];
+
             try {
                 if (btnElement.dataset.liked === 'true') {
+                    // UNLIKE
                     btnElement.dataset.liked = 'false';
                     icon.classList.remove('fas', 'text-blue-600'); 
                     icon.classList.add('far', 'text-gray-400');
                     currentCount = Math.max(0, currentCount - 1); 
                     countSpan.innerText = currentCount;
                     
-                    await db.collection('customers').doc(userEmail).set({
-                        likedReviews: firebase.firestore.FieldValue.arrayRemove(orderId)
-                    }, { merge: true });
+                    likedReviews = likedReviews.filter(id => id !== orderId);
+                    localStorage.setItem(storageKey, JSON.stringify(likedReviews));
                     
                     await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(-1) });
                 } else {
+                    // LIKE
                     btnElement.dataset.liked = 'true';
                     icon.classList.remove('far', 'text-gray-400'); 
                     icon.classList.add('fas', 'text-blue-600');
                     currentCount += 1; 
                     countSpan.innerText = currentCount;
                     
-                    await db.collection('customers').doc(userEmail).set({
-                        likedReviews: firebase.firestore.FieldValue.arrayUnion(orderId)
-                    }, { merge: true });
+                    if (!likedReviews.includes(orderId)) {
+                        likedReviews.push(orderId);
+                    }
+                    localStorage.setItem(storageKey, JSON.stringify(likedReviews));
                     
                     await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(1) });
                 }
             } catch (error) { 
-                console.log("Like error:", error.message); 
+                console.log("Firebase block, but UI updated locally:", error.message); 
             }
         }
 
@@ -2219,24 +2225,15 @@
             document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>`;
             document.getElementById('product-reviews-list').innerHTML = '';
 
-            // 🔥 GHOST DATA CLEANUP (Ek baar purana kachra saaf karega)
-            localStorage.removeItem('pixigenie_liked_reviews');
-
             try {
                 const snapshot = await db.collection('orders').where('shopPhone', '==', shopPhone).where('status', '==', 'delivered').get(); 
                 let totalRating = 0; let reviewCount = 0; let reviewsHtml = '';
                 let seenCustomers = new Set(); 
                 
-                let likedReviews = [];
+                // 🔥 NAYA MAGIC: User ki personal ID se likes nikalna
                 const userEmail = localStorage.getItem('pixigenie_customer_phone');
-                if (userEmail) {
-                    try {
-                        const userDoc = await db.collection('customers').doc(userEmail).get();
-                        if (userDoc.exists && userDoc.data().likedReviews) {
-                            likedReviews = userDoc.data().likedReviews;
-                        }
-                    } catch(e) { console.log("Likes fetch error: ", e); }
-                }
+                const storageKey = 'pixigenie_likes_' + userEmail;
+                let likedReviews = JSON.parse(localStorage.getItem(storageKey)) || [];
 
                 snapshot.forEach(doc => {
                     const order = doc.data(); const orderId = doc.id;
@@ -2339,3 +2336,4 @@
     </script>
 </body>
 </html>
+
