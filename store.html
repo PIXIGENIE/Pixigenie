@@ -1514,11 +1514,16 @@
         function toggleDescription() { isDescExpanded = !isDescExpanded; renderDescription(); }
         function openWhatsApp() { if (!globalShopPhone) return; window.open(`https://wa.me/91${globalShopPhone}?text=Hi! I am visiting your Pixigenie store.`, '_blank'); }
 
+                // ==========================================
+        // 🛒 SMART CART LOGIC (MULTI-ACCOUNT SYNC)
         // ==========================================
-        // 🛒 CART RENDER & QUANTITY LOGIC
-        // ==========================================
+        function getCartKey() {
+            const user = localStorage.getItem('pixigenie_customer_phone');
+            return user ? 'pixigenie_cart_' + user : 'pixigenie_cart_guest';
+        }
+
         function renderCartItems() {
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             let container = document.getElementById('cart-items-container');
             let totalEl = document.getElementById('cart-total-price');
             let total = 0;
@@ -1557,17 +1562,17 @@
         }
 
         function updateCartQty(index, delta) {
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             if(cart[index]) {
                 cart[index].qty += delta;
                 if(cart[index].qty <= 0) { cart.splice(index, 1); }
-                localStorage.setItem('pixigenie_cart', JSON.stringify(cart));
+                localStorage.setItem(getCartKey(), JSON.stringify(cart));
                 renderCartItems(); updateCartBadge();
             }
         }
 
         function updateCartBadge() {
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             let mainBadge = document.getElementById('cart-badge');
             let detailBadge = document.getElementById('detail-cart-badge'); 
             
@@ -1581,95 +1586,39 @@
             }
         }
 
-        function goToCustomerLogin() {
-            localStorage.setItem('pixigenie_return_url', window.location.href);
-            window.location.href = 'index.html'; 
-        }
-
-        function enforceCustomerLogin() {
-            const isCustomerLoggedIn = localStorage.getItem('pixigenie_customer_phone'); 
-            if (!isCustomerLoggedIn) {
-                goToCustomerLogin();
-                return false;
-            }
-            return true;
-        }
-
-                              function addToCart(event, name, price, shopName, shopPhone) {
+        function addToCart(event, name, price, shopName, shopPhone) {
             event.stopPropagation(); 
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
             if (existingItem) {
                 existingItem.qty += 1; 
             } else {
                 cart.push({ name, price: parseInt(price), shopName, shopPhone, qty: 1 });
             }
-            localStorage.setItem('pixigenie_cart', JSON.stringify(cart));
+            localStorage.setItem(getCartKey(), JSON.stringify(cart));
             if (typeof updateCartBadge === 'function') updateCartBadge();
             
             let btn = event.currentTarget;
-
-            // Agar yeh Full-Screen modal ka bada button hai, toh isse bypass karo
             if (btn.id === 'detail-cart-btn') return;
-
-            // 🚀 DOUBLE CLICK BUG FIX
             if (btn.dataset.adding === "true") return;
             btn.dataset.adding = "true";
 
             let origHtml = `<i class="fas fa-cart-plus text-sm"></i> Cart`;
-
             btn.innerHTML = `<i class="fas fa-check text-lg"></i> Added`;
             
-            // ✨ NAYA FIX: Mobile hover color ko temporarily hata do taaki white text perfectly dikhe
             btn.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
             btn.classList.remove('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
 
             setTimeout(() => {
                 btn.innerHTML = origHtml;
-                // Animation khatam hone par wapas normal kar do
                 btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
                 btn.classList.add('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
-                btn.dataset.adding = "false"; // Lock khol do
+                btn.dataset.adding = "false"; 
             }, 1200);
         }
 
-
-
-        function toggleCartModal() {
-            const modal = document.getElementById('cart-modal');
-            const content = document.getElementById('cart-modal-content');
-            
-            if(modal.classList.contains('hidden')) {
-                renderCartItems();
-                
-                const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
-                let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
-                const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
-
-                if (savedPhone.includes('@')) savedPhone = ''; 
-                
-                if(!document.getElementById('cart-cust-name').value) document.getElementById('cart-cust-name').value = savedName;
-                if(!document.getElementById('cart-cust-phone').value) document.getElementById('cart-cust-phone').value = savedPhone;
-                if(!document.getElementById('cart-address').value && savedAddress) document.getElementById('cart-address').value = savedAddress;
-
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    content.classList.remove('translate-y-full', 'sm:scale-95');
-                }, 10);
-                document.body.style.overflow = 'hidden';
-            } else {
-                modal.classList.add('opacity-0');
-                content.classList.add('translate-y-full', 'sm:scale-95');
-                setTimeout(() => { 
-                    modal.classList.add('hidden'); 
-                    document.body.style.overflow = 'auto'; 
-                }, 300); 
-            }
-        }
-
         async function checkoutCartInApp() {
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             if(cart.length === 0) { alert("Cart is empty!"); return; }
             
             let address = document.getElementById('cart-address').value.trim();
@@ -1707,7 +1656,7 @@
                         lat: document.getElementById('cart-lat').value || null,
                         lng: document.getElementById('cart-lng').value || null,
                         shopPhone: phone,
-                        shopId: currentShopId, // ✨ NAYA: shopId Add Kiya
+                        shopId: typeof currentShopId !== 'undefined' ? currentShopId : null, 
                         shopName: orderData.shopName,
                         items: orderData.items,
                         totalAmount: orderData.total,
@@ -1716,7 +1665,7 @@
                     });
                 }
 
-                localStorage.setItem('pixigenie_cart', JSON.stringify([]));
+                localStorage.setItem(getCartKey(), JSON.stringify([]));
                 updateCartBadge();
                 toggleCartModal();
                 showOrderSuccessModal(); 
@@ -1730,7 +1679,7 @@
         }
 
         function checkoutCartWhatsApp() {
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             if(cart.length === 0) { alert("Cart is empty!"); return; }
             
             let address = document.getElementById('cart-address').value.trim();
@@ -1759,6 +1708,7 @@
                 setTimeout(() => { window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(waMessage)}`, '_blank'); }, i * 1000);
             }
         }
+
 
         let currentOrder = null;
 
