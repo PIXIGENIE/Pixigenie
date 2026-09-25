@@ -2121,8 +2121,7 @@ function getVIPBadge(isVerified, plan) {
 
                         function logoutUser() {
             if(confirm("Are you sure you want to logout?")) {
-                // ✨ Likes aur Cart ka data bacha lo
-                let savedLikes = localStorage.getItem('pixigenie_liked_reviews');
+               
                 let savedCart = localStorage.getItem('pixigenie_cart');
                 
                             localStorage.clear();
@@ -2822,8 +2821,7 @@ function getVIPBadge(isVerified, plan) {
         }
 
             function confirmLogoutAction() {
-            // 1. Sirf wahi data bachao jo customer ka personal hai (jaise cart aur likes)
-            let savedLikes = localStorage.getItem('pixigenie_liked_reviews');
+         
             let savedCart = localStorage.getItem('pixigenie_cart');
             
             // 2. Storage ka kachra saaf karo
@@ -2838,8 +2836,7 @@ function getVIPBadge(isVerified, plan) {
             localStorage.removeItem('pixigenie_saved_lat');
             localStorage.removeItem('pixigenie_saved_lng');
 
-            // 3. Bachaya hua data wapas daalo
-            if(savedLikes) localStorage.setItem('pixigenie_liked_reviews', savedLikes);
+        
             if(savedCart) localStorage.setItem('pixigenie_cart', savedCart);
             
             sessionStorage.clear();
@@ -3899,51 +3896,47 @@ function trackSearchImpression(shopIdToTrack) {
         // ✨ REVIEW LIKE/UNLIKE LOGIC (SMART FIX) ✨
         // ===============================================
         async function likeReview(orderId, btnElement) {
-            const icon = btnElement.querySelector('i');
-            const countSpan = btnElement.querySelector('.like-count');
-            let currentCount = parseInt(countSpan.innerText) || 0;
+    const userEmail = localStorage.getItem('pixigenie_customer_phone');
+    if (!userEmail) {
+        alert("Please login to like reviews!");
+        return;
+    }
+
+    const icon = btnElement.querySelector('i');
+    const countSpan = btnElement.querySelector('.like-count');
+    let currentCount = parseInt(countSpan.innerText) || 0;
+    
+    try {
+        if (btnElement.dataset.liked === 'true') {
+            btnElement.dataset.liked = 'false';
+            icon.classList.remove('fas', 'text-blue-600'); 
+            icon.classList.add('far', 'text-gray-400');
+            currentCount = Math.max(0, currentCount - 1); 
+            countSpan.innerText = currentCount;
             
-            let likedReviews = JSON.parse(localStorage.getItem('pixigenie_liked_reviews')) || [];
+            await db.collection('customers').doc(userEmail).set({
+                likedReviews: firebase.firestore.FieldValue.arrayRemove(orderId)
+            }, { merge: true });
             
-            try {
-                if (btnElement.dataset.liked === 'true') {
-                    // 👎 UNLIKE
-                    btnElement.dataset.liked = 'false';
-                    icon.classList.remove('fas', 'text-blue-600');
-                    icon.classList.add('far', 'text-gray-400');
-                    currentCount = Math.max(0, currentCount - 1);
-                    countSpan.innerText = currentCount;
-                    
-                    likedReviews = likedReviews.filter(id => id !== orderId);
-                    localStorage.setItem('pixigenie_liked_reviews', JSON.stringify(likedReviews));
-                    
-                    // Firebase update (Background)
-                    await db.collection('orders').doc(orderId).update({
-                        'review.likes': firebase.firestore.FieldValue.increment(-1)
-                    });
-                } else {
-                    // 👍 LIKE
-                    btnElement.dataset.liked = 'true';
-                    icon.classList.remove('far', 'text-gray-400');
-                    icon.classList.add('fas', 'text-blue-600');
-                    currentCount += 1;
-                    countSpan.innerText = currentCount;
-                    
-                    if (!likedReviews.includes(orderId)) {
-                        likedReviews.push(orderId);
-                    }
-                    localStorage.setItem('pixigenie_liked_reviews', JSON.stringify(likedReviews));
-                    
-                    // Firebase update (Background)
-                    await db.collection('orders').doc(orderId).update({
-                        'review.likes': firebase.firestore.FieldValue.increment(1)
-                    });
-                }
-            } catch (error) {
-                console.log("Firebase Update Blocked by Rules, but Local UI Updated:", error.message);
-                // Agar Firebase rules ki wajah se fail bhi hua, toh user ko pata nahi chalega, UI mast chalega!
-            }
+            await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(-1) });
+        } else {
+            btnElement.dataset.liked = 'true';
+            icon.classList.remove('far', 'text-gray-400'); 
+            icon.classList.add('fas', 'text-blue-600');
+            currentCount += 1; 
+            countSpan.innerText = currentCount;
+            
+            await db.collection('customers').doc(userEmail).set({
+                likedReviews: firebase.firestore.FieldValue.arrayUnion(orderId)
+            }, { merge: true });
+            
+            await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(1) });
         }
+    } catch (error) { 
+        console.log("Like error:", error.message); 
+    }
+}
+
         // ===============================================
         // ✨ RATING & REVIEW FIXES (AUTO-LOAD & LIKES) ✨
         // ===============================================
@@ -3989,29 +3982,46 @@ function trackSearchImpression(shopIdToTrack) {
         }
 
         async function likeReview(orderId, btnElement) {
-            const icon = btnElement.querySelector('i');
-            const countSpan = btnElement.querySelector('.like-count');
-            let currentCount = parseInt(countSpan.innerText) || 0;
-            let likedReviews = JSON.parse(localStorage.getItem('pixigenie_liked_reviews')) || [];
+    const userEmail = localStorage.getItem('pixigenie_customer_phone');
+    if (!userEmail) {
+        alert("Please login to like reviews!");
+        return;
+    }
+
+    const icon = btnElement.querySelector('i');
+    const countSpan = btnElement.querySelector('.like-count');
+    let currentCount = parseInt(countSpan.innerText) || 0;
+    
+    try {
+        if (btnElement.dataset.liked === 'true') {
+            btnElement.dataset.liked = 'false';
+            icon.classList.remove('fas', 'text-blue-600'); 
+            icon.classList.add('far', 'text-gray-400');
+            currentCount = Math.max(0, currentCount - 1); 
+            countSpan.innerText = currentCount;
             
-            try {
-                if (btnElement.dataset.liked === 'true') {
-                    btnElement.dataset.liked = 'false';
-                    icon.classList.remove('fas', 'text-blue-600'); icon.classList.add('far', 'text-gray-400');
-                    currentCount = Math.max(0, currentCount - 1); countSpan.innerText = currentCount;
-                    likedReviews = likedReviews.filter(id => id !== orderId);
-                    localStorage.setItem('pixigenie_liked_reviews', JSON.stringify(likedReviews));
-                    await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(-1) });
-                } else {
-                    btnElement.dataset.liked = 'true';
-                    icon.classList.remove('far', 'text-gray-400'); icon.classList.add('fas', 'text-blue-600');
-                    currentCount += 1; countSpan.innerText = currentCount;
-                    if (!likedReviews.includes(orderId)) likedReviews.push(orderId);
-                    localStorage.setItem('pixigenie_liked_reviews', JSON.stringify(likedReviews));
-                    await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(1) });
-                }
-            } catch (error) { console.log("Firebase Update Blocked by Rules, but Local UI Updated:", error.message); }
+            await db.collection('customers').doc(userEmail).set({
+                likedReviews: firebase.firestore.FieldValue.arrayRemove(orderId)
+            }, { merge: true });
+            
+            await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(-1) });
+        } else {
+            btnElement.dataset.liked = 'true';
+            icon.classList.remove('far', 'text-gray-400'); 
+            icon.classList.add('fas', 'text-blue-600');
+            currentCount += 1; 
+            countSpan.innerText = currentCount;
+            
+            await db.collection('customers').doc(userEmail).set({
+                likedReviews: firebase.firestore.FieldValue.arrayUnion(orderId)
+            }, { merge: true });
+            
+            await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(1) });
         }
+    } catch (error) { 
+        console.log("Like error:", error.message); 
+    }
+}
 
         async function fetchProductReviews(productName, shopPhone) {
             const badge = document.getElementById('product-rating-badge');
