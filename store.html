@@ -2167,8 +2167,86 @@
             });
         }
 
+   
+        setTimeout(() => {
+            if (typeof currentShopId !== 'undefined' && currentShopId) {
+                db.collection('shops').doc(currentShopId).update({
+                    profileViews: firebase.firestore.FieldValue.increment(1)
+                }).catch(err => console.log("View track error:", err));
+            }
+        }, 2500);
+
+        function trackEvent(eventType) {
+            if (typeof currentShopId !== 'undefined' && currentShopId) {
+                let updateData = {};
+                updateData[eventType] = firebase.firestore.FieldValue.increment(1);
+                db.collection('shops').doc(currentShopId).update(updateData)
+                  .catch(err => console.log("Event track error:", err));
+            }
+        }
+
         // ===============================================
-        // ✨ SMART LIKES & REVIEWS (MULTI-ACCOUNT SYNC) ✨
+        // ✨ FLASH OFFER MODAL CLOSE LOGIC ✨
+        // ===============================================
+        function closeFlashOffer() {
+            const m = document.getElementById('flash-offer-modal');
+            const c = document.getElementById('flash-offer-content');
+            if(m && c) {
+                m.classList.add('opacity-0'); 
+                c.classList.add('scale-90');
+                setTimeout(() => { 
+                    m.classList.add('hidden'); 
+                    document.body.style.overflow = 'auto'; 
+                }, 500);
+            }
+       
+      }
+              // ===============================================
+        // ✨ AUTO ATTACH RATINGS TO CARDS ✨
+        // ===============================================
+        async function attachRatingsToCards() {
+            const ratingElements = document.querySelectorAll('.card-rating-placeholder');
+            ratingElements.forEach(async (el) => {
+                if(el.dataset.fetched === 'true') return;
+                el.dataset.fetched = 'true';
+                
+                const shopPhone = el.dataset.phone;
+                const name = el.dataset.name;
+                if(!shopPhone || !name) return;
+
+                try {
+                    const snap = await db.collection('orders')
+                        .where('shopPhone', '==', shopPhone)
+                        .where('status', '==', 'delivered')
+                        .get();
+                    
+                    let total = 0, count = 0;
+                    let seenCust = new Set();
+                    
+                    snap.forEach(doc => {
+                        const order = doc.data();
+                        if(order.review && order.items && order.items.some(i => i.name === name)) {
+                            if(!seenCust.has(order.customerId)) {
+                                seenCust.add(order.customerId);
+                                total += order.review.rating;
+                                count++;
+                            }
+                        }
+                    });
+
+                    if(count > 0) {
+                        let avg = (total/count).toFixed(1);
+                        let color = avg >= 4 ? 'bg-green-600' : (avg >= 3 ? 'bg-yellow-500' : 'bg-red-500');
+                        el.innerHTML = `<span class="${color} text-white px-1.5 py-[2px] rounded-[4px] text-[10px] font-bold flex items-center gap-0.5 shadow-sm">${avg} <i class="fas fa-star text-[8px]"></i></span> <span class="text-gray-400 text-[10px] font-bold">(${count})</span>`;
+                        el.classList.remove('hidden');
+                        el.classList.add('flex');
+                    }
+                } catch(e){}
+            });
+        }
+
+        // ===============================================
+        // ✨ SMART LIKES & REVIEWS (100% SYNC & NO MINUS COUNT) ✨
         // ===============================================
         async function likeReview(orderId, btnElement) {
             const userEmail = localStorage.getItem('pixigenie_customer_phone');
@@ -2181,40 +2259,52 @@
             const countSpan = btnElement.querySelector('.like-count');
             let currentCount = parseInt(countSpan.innerText) || 0;
             
-            // 🔥 NAYA MAGIC: Har user ka apna personal storage key!
-            const storageKey = 'pixigenie_likes_' + userEmail;
+            // 🔥 NAYA MAGIC: Shared Local Storage Key for 100% Sync
+            const storageKey = 'pixigenie_user_likes_' + userEmail;
             let likedReviews = JSON.parse(localStorage.getItem(storageKey)) || [];
 
             try {
                 if (btnElement.dataset.liked === 'true') {
-                    // UNLIKE
+                    // --- UNLIKE ACTION ---
                     btnElement.dataset.liked = 'false';
                     icon.classList.remove('fas', 'text-blue-600'); 
                     icon.classList.add('far', 'text-gray-400');
+                    
+                    // Minus me nahi jane dega
                     currentCount = Math.max(0, currentCount - 1); 
                     countSpan.innerText = currentCount;
                     
+                    // Local Storage se remove
                     likedReviews = likedReviews.filter(id => id !== orderId);
                     localStorage.setItem(storageKey, JSON.stringify(likedReviews));
                     
-                    await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(-1) });
+                    // Firebase Update (Order Count) - Silent fail if blocked
+                    db.collection('orders').doc(orderId).update({ 
+                        'review.likes': firebase.firestore.FieldValue.increment(-1) 
+                    }).catch(e => console.log("Silent DB fail:", e));
+
                 } else {
-                    // LIKE
+                    // --- LIKE ACTION ---
                     btnElement.dataset.liked = 'true';
                     icon.classList.remove('far', 'text-gray-400'); 
                     icon.classList.add('fas', 'text-blue-600');
+                    
                     currentCount += 1; 
                     countSpan.innerText = currentCount;
                     
+                    // Local Storage me add
                     if (!likedReviews.includes(orderId)) {
                         likedReviews.push(orderId);
                     }
                     localStorage.setItem(storageKey, JSON.stringify(likedReviews));
                     
-                    await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(1) });
+                    // Firebase Update (Order Count) - Silent fail if blocked
+                    db.collection('orders').doc(orderId).update({ 
+                        'review.likes': firebase.firestore.FieldValue.increment(1) 
+                    }).catch(e => console.log("Silent DB fail:", e));
                 }
             } catch (error) { 
-                console.log("Firebase block, but UI updated locally:", error.message); 
+                console.log("Like error:", error.message); 
             }
         }
 
@@ -2230,9 +2320,9 @@
                 let totalRating = 0; let reviewCount = 0; let reviewsHtml = '';
                 let seenCustomers = new Set(); 
                 
-                // 🔥 NAYA MAGIC: User ki personal ID se likes nikalna
+                // 🔥 NAYA MAGIC: Directly read from Shared Local Storage
                 const userEmail = localStorage.getItem('pixigenie_customer_phone');
-                const storageKey = 'pixigenie_likes_' + userEmail;
+                const storageKey = 'pixigenie_user_likes_' + userEmail;
                 let likedReviews = JSON.parse(localStorage.getItem(storageKey)) || [];
 
                 snapshot.forEach(doc => {
@@ -2246,12 +2336,16 @@
 
                             let badgeColor = order.review.rating >= 4 ? "bg-green-600" : (order.review.rating === 3 ? "bg-yellow-500" : "bg-red-500");
                             let reviewTitle = order.review.rating >= 4 ? 'Highly Recommended' : (order.review.rating === 3 ? 'Good' : 'Average');
-                            let likesCount = order.review.likes || 0;
                             
+                            // Database se count lega, par 0 se neeche nahi jane dega
+                            let likesCount = Math.max(0, order.review.likes || 0);
+                            
+                            // Local storage se check karega ki user ne like kiya hai ya nahi
                             let isLiked = likedReviews.includes(orderId);
                             let likeIconClass = isLiked ? 'fas fa-thumbs-up text-blue-600' : 'far fa-thumbs-up text-gray-400';
                             let likeDataStatus = isLiked ? 'true' : 'false';
 
+                            // Agar user ne like kiya hai par DB refresh nahi hua, toh 1 show karega
                             if (isLiked && likesCount === 0) likesCount = 1;
 
                             reviewsHtml += `
@@ -2301,38 +2395,6 @@
             } catch(e) { console.log("Review fetch error: ", e); }
         }
 
-        setTimeout(() => {
-            if (typeof currentShopId !== 'undefined' && currentShopId) {
-                db.collection('shops').doc(currentShopId).update({
-                    profileViews: firebase.firestore.FieldValue.increment(1)
-                }).catch(err => console.log("View track error:", err));
-            }
-        }, 2500);
-
-        function trackEvent(eventType) {
-            if (typeof currentShopId !== 'undefined' && currentShopId) {
-                let updateData = {};
-                updateData[eventType] = firebase.firestore.FieldValue.increment(1);
-                db.collection('shops').doc(currentShopId).update(updateData)
-                  .catch(err => console.log("Event track error:", err));
-            }
-        }
-
-        // ===============================================
-        // ✨ FLASH OFFER MODAL CLOSE LOGIC ✨
-        // ===============================================
-        function closeFlashOffer() {
-            const m = document.getElementById('flash-offer-modal');
-            const c = document.getElementById('flash-offer-content');
-            if(m && c) {
-                m.classList.add('opacity-0'); 
-                c.classList.add('scale-90');
-                setTimeout(() => { 
-                    m.classList.add('hidden'); 
-                    document.body.style.overflow = 'auto'; 
-                }, 500);
-            }
-        }
     </script>
 </body>
 </html>
