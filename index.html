@@ -682,6 +682,7 @@
 
                                 window.addEventListener('DOMContentLoaded', () => {
             const isLoggedIn = updateUIBasedOnLogin();
+            updateCartBadge();
             if (!isLoggedIn) {
                 setTimeout(openAuthModal, 500); 
             }
@@ -791,6 +792,7 @@ function loginWithGoogle(event) {
             
             closeAuthModal();
             updateUIBasedOnLogin();
+            updateCartBadge();
             return;
         }
         
@@ -845,6 +847,7 @@ async function selectRole(role) {
             
             closeAuthModal(); 
             updateUIBasedOnLogin();
+            updateCartBadge();
         } catch (error) { 
             alert("Database Error: " + error.message); 
         }
