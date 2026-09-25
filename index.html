@@ -2122,7 +2122,7 @@ function getVIPBadge(isVerified, plan) {
                         function logoutUser() {
             if(confirm("Are you sure you want to logout?")) {
                
-                let savedCart = localStorage.getItem('pixigenie_cart');
+              
                 
                             localStorage.clear();
             sessionStorage.clear();
@@ -2822,7 +2822,7 @@ function getVIPBadge(isVerified, plan) {
 
             function confirmLogoutAction() {
          
-            let savedCart = localStorage.getItem('pixigenie_cart');
+       
             
             // 2. Storage ka kachra saaf karo
             localStorage.removeItem('pixigenie_active_shop');
@@ -2837,7 +2837,7 @@ function getVIPBadge(isVerified, plan) {
             localStorage.removeItem('pixigenie_saved_lng');
 
         
-            if(savedCart) localStorage.setItem('pixigenie_cart', savedCart);
+            
             
             sessionStorage.clear();
             
