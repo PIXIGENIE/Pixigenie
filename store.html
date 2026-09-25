@@ -1313,7 +1313,8 @@
         // ==========================================
         async function toggleFollow() {
             const custPhone = localStorage.getItem('pixigenie_customer_phone');
-            const custName = localStorage.getItem('pixigenie_customer_name'] || "Customer";
+            const custName = localStorage.getItem('pixigenie_customer_name') || "Customer";
+                
             if (!custPhone) { 
                 alert("Please log in as a customer to follow stores!"); 
                 return; 
