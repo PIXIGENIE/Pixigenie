@@ -3891,53 +3891,8 @@ function trackSearchImpression(shopIdToTrack) {
                 } catch(e){}
             });
         }
-                 // ===============================================
-        // ✨ REVIEW LIKE/UNLIKE LOGIC (SMART FIX) ✨
-        // ===============================================
-        async function likeReview(orderId, btnElement) {
-    const userEmail = localStorage.getItem('pixigenie_customer_phone');
-    if (!userEmail) {
-        alert("Please login to like reviews!");
-        return;
-    }
-
-    const icon = btnElement.querySelector('i');
-    const countSpan = btnElement.querySelector('.like-count');
-    let currentCount = parseInt(countSpan.innerText) || 0;
-    
-    try {
-        if (btnElement.dataset.liked === 'true') {
-            btnElement.dataset.liked = 'false';
-            icon.classList.remove('fas', 'text-blue-600'); 
-            icon.classList.add('far', 'text-gray-400');
-            currentCount = Math.max(0, currentCount - 1); 
-            countSpan.innerText = currentCount;
-            
-            await db.collection('customers').doc(userEmail).set({
-                likedReviews: firebase.firestore.FieldValue.arrayRemove(orderId)
-            }, { merge: true });
-            
-            await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(-1) });
-        } else {
-            btnElement.dataset.liked = 'true';
-            icon.classList.remove('far', 'text-gray-400'); 
-            icon.classList.add('fas', 'text-blue-600');
-            currentCount += 1; 
-            countSpan.innerText = currentCount;
-            
-            await db.collection('customers').doc(userEmail).set({
-                likedReviews: firebase.firestore.FieldValue.arrayUnion(orderId)
-            }, { merge: true });
-            
-            await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(1) });
-        }
-    } catch (error) { 
-        console.log("Like error:", error.message); 
-    }
-}
-
-        // ===============================================
-        // ✨ RATING & REVIEW FIXES (AUTO-LOAD & LIKES) ✨
+                    // ===============================================
+        // ✨ AUTO ATTACH RATINGS TO CARDS ✨
         // ===============================================
         async function attachRatingsToCards() {
             const ratingElements = document.querySelectorAll('.card-rating-placeholder');
@@ -3980,141 +3935,155 @@ function trackSearchImpression(shopIdToTrack) {
             });
         }
 
+        // ===============================================
+        // ✨ SMART LIKES & REVIEWS (100% SYNC & NO MINUS COUNT) ✨
+        // ===============================================
         async function likeReview(orderId, btnElement) {
-    const userEmail = localStorage.getItem('pixigenie_customer_phone');
-    if (!userEmail) {
-        alert("Please login to like reviews!");
-        return;
-    }
+            const userEmail = localStorage.getItem('pixigenie_customer_phone');
+            if (!userEmail) {
+                alert("Please login to like reviews!");
+                return;
+            }
 
-    const icon = btnElement.querySelector('i');
-    const countSpan = btnElement.querySelector('.like-count');
-    let currentCount = parseInt(countSpan.innerText) || 0;
-    
-    try {
-        if (btnElement.dataset.liked === 'true') {
-            btnElement.dataset.liked = 'false';
-            icon.classList.remove('fas', 'text-blue-600'); 
-            icon.classList.add('far', 'text-gray-400');
-            currentCount = Math.max(0, currentCount - 1); 
-            countSpan.innerText = currentCount;
+            const icon = btnElement.querySelector('i');
+            const countSpan = btnElement.querySelector('.like-count');
+            let currentCount = parseInt(countSpan.innerText) || 0;
             
-            await db.collection('customers').doc(userEmail).set({
-                likedReviews: firebase.firestore.FieldValue.arrayRemove(orderId)
-            }, { merge: true });
-            
-            await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(-1) });
-        } else {
-            btnElement.dataset.liked = 'true';
-            icon.classList.remove('far', 'text-gray-400'); 
-            icon.classList.add('fas', 'text-blue-600');
-            currentCount += 1; 
-            countSpan.innerText = currentCount;
-            
-            await db.collection('customers').doc(userEmail).set({
-                likedReviews: firebase.firestore.FieldValue.arrayUnion(orderId)
-            }, { merge: true });
-            
-            await db.collection('orders').doc(orderId).update({ 'review.likes': firebase.firestore.FieldValue.increment(1) });
-        }
-    } catch (error) { 
-        console.log("Like error:", error.message); 
-    }
-}
+            // 🔥 NAYA MAGIC: Shared Local Storage Key for 100% Sync
+            const storageKey = 'pixigenie_user_likes_' + userEmail;
+            let likedReviews = JSON.parse(localStorage.getItem(storageKey)) || [];
 
-    async function fetchProductReviews(productName, shopPhone) {
-    const badge = document.getElementById('product-rating-badge');
-    if(badge) { badge.classList.add('hidden'); badge.classList.remove('flex'); }
-    
-    document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>`;
-    document.getElementById('product-reviews-list').innerHTML = '';
-
-    // 🔥 GHOST DATA CLEANUP (Ye sabhi users ke phone se purana local kachra delete kar dega)
-    localStorage.removeItem('pixigenie_liked_reviews');
-
-    try {
-        const snapshot = await db.collection('orders').where('shopPhone', '==', shopPhone).where('status', '==', 'delivered').get(); 
-        let totalRating = 0; let reviewCount = 0; let reviewsHtml = '';
-        let seenCustomers = new Set(); 
-        
-        // 🔥 FIREBASE SE LIKES FETCH KARNE KA NAYA LOGIC
-        let likedReviews = [];
-        const userEmail = localStorage.getItem('pixigenie_customer_phone');
-        if (userEmail) {
             try {
-                const userDoc = await db.collection('customers').doc(userEmail).get();
-                if (userDoc.exists && userDoc.data().likedReviews) {
-                    likedReviews = userDoc.data().likedReviews;
-                }
-            } catch(e) { console.log("Likes fetch error: ", e); }
-        }
-
-        snapshot.forEach(doc => {
-            const order = doc.data(); const orderId = doc.id;
-            if (order.review) {
-                const hasProduct = order.items && order.items.some(item => item.name === productName);
-                if (hasProduct) {
-                    if (seenCustomers.has(order.customerId)) return;
-                    seenCustomers.add(order.customerId);
-                    reviewCount++; totalRating += order.review.rating;
-
-                    let badgeColor = order.review.rating >= 4 ? "bg-green-600" : (order.review.rating === 3 ? "bg-yellow-500" : "bg-red-500");
-                    let reviewTitle = order.review.rating >= 4 ? 'Highly Recommended' : (order.review.rating === 3 ? 'Good' : 'Average');
-                    let likesCount = order.review.likes || 0;
+                if (btnElement.dataset.liked === 'true') {
+                    // --- UNLIKE ACTION ---
+                    btnElement.dataset.liked = 'false';
+                    icon.classList.remove('fas', 'text-blue-600'); 
+                    icon.classList.add('far', 'text-gray-400');
                     
-                    // Firebase Array se check karega
-                    let isLiked = likedReviews.includes(orderId);
-                    let likeIconClass = isLiked ? 'fas fa-thumbs-up text-blue-600' : 'far fa-thumbs-up text-gray-400';
-                    let likeDataStatus = isLiked ? 'true' : 'false';
+                    // Minus me nahi jane dega
+                    currentCount = Math.max(0, currentCount - 1); 
+                    countSpan.innerText = currentCount;
+                    
+                    // Local Storage se remove
+                    likedReviews = likedReviews.filter(id => id !== orderId);
+                    localStorage.setItem(storageKey, JSON.stringify(likedReviews));
+                    
+                    // Firebase Update (Order Count) - Silent fail if blocked
+                    db.collection('orders').doc(orderId).update({ 
+                        'review.likes': firebase.firestore.FieldValue.increment(-1) 
+                    }).catch(e => console.log("Silent DB fail:", e));
 
-                    if (isLiked && likesCount === 0) likesCount = 1;
-
-                    reviewsHtml += `
-                    <div class="min-w-[260px] max-w-[260px] border border-gray-200 rounded-lg p-3.5 snap-center shrink-0 bg-white shadow-sm flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="${badgeColor} text-white text-[11px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">${order.review.rating} <i class="fas fa-star text-[8px]"></i></span>
-                                <span class="text-[12px] font-bold text-gray-800">${reviewTitle}</span>
-                            </div>
-                            <p class="text-[12px] text-gray-600 line-clamp-3 mb-3 leading-relaxed">${order.review.text || 'Good product.'}</p>
-                        </div>
-                        <div class="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-gray-100">
-                            <span class="flex items-center gap-1 text-gray-500 font-semibold"><i class="fas fa-check-circle text-gray-300"></i> ${order.customerName || 'Verified Buyer'}</span>
-                            <button onclick="likeReview('${orderId}', this)" data-liked="${likeDataStatus}" class="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 font-semibold active:scale-95 transition">
-                                <i class="${likeIconClass} transition-colors"></i> <span class="like-count text-[11px]">${likesCount}</span>
-                            </button>
-                        </div>
-                    </div>`;
+                } else {
+                    // --- LIKE ACTION ---
+                    btnElement.dataset.liked = 'true';
+                    icon.classList.remove('far', 'text-gray-400'); 
+                    icon.classList.add('fas', 'text-blue-600');
+                    
+                    currentCount += 1; 
+                    countSpan.innerText = currentCount;
+                    
+                    // Local Storage me add
+                    if (!likedReviews.includes(orderId)) {
+                        likedReviews.push(orderId);
+                    }
+                    localStorage.setItem(storageKey, JSON.stringify(likedReviews));
+                    
+                    // Firebase Update (Order Count) - Silent fail if blocked
+                    db.collection('orders').doc(orderId).update({ 
+                        'review.likes': firebase.firestore.FieldValue.increment(1) 
+                    }).catch(e => console.log("Silent DB fail:", e));
                 }
+            } catch (error) { 
+                console.log("Like error:", error.message); 
             }
-        });
-
-        if (reviewCount > 0) {
-            let avgRating = (totalRating / reviewCount).toFixed(1);
-            let avgBadgeColor = avgRating >= 4 ? "bg-green-600" : (avgRating >= 3 ? "bg-yellow-500" : "bg-red-500");
-            let avgTextColor = avgRating >= 4 ? "text-green-600" : (avgRating >= 3 ? "text-yellow-500" : "text-red-500");
-            
-            if(badge) {
-                badge.innerHTML = `<span class="bg-green-600 text-white px-1.5 py-0.5 rounded-[4px] flex items-center gap-0.5">${avgRating} <i class="fas fa-star text-[8px]"></i></span> <span class="text-gray-400 font-medium ml-0.5">${reviewCount}</span>`;
-                badge.classList.remove('hidden'); badge.classList.add('flex');
-            }
-
-            document.getElementById('overall-rating-container').innerHTML = `
-                <div class="text-3xl font-black text-gray-900 flex items-center gap-2">
-                    ${avgRating} <i class="fas fa-star text-2xl ${avgTextColor}"></i>
-                </div>
-                <div class="text-[12px] text-gray-500 font-medium flex flex-col">
-                    <span>${reviewCount} Ratings & Reviews</span>
-                    <span class="flex items-center gap-1 mt-0.5"><i class="fas fa-check-circle text-gray-400 text-[10px]"></i> Verified Buyers</span>
-                </div>
-            `;
-            document.getElementById('product-reviews-list').innerHTML = reviewsHtml;
-        } else {
-            document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium">No reviews yet for this product.</p>`;
         }
 
-    } catch(e) { console.log("Review fetch error: ", e); }
-}
+        async function fetchProductReviews(productName, shopPhone) {
+            const badge = document.getElementById('product-rating-badge');
+            if(badge) { badge.classList.add('hidden'); badge.classList.remove('flex'); }
+            
+            document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>`;
+            document.getElementById('product-reviews-list').innerHTML = '';
+
+            try {
+                const snapshot = await db.collection('orders').where('shopPhone', '==', shopPhone).where('status', '==', 'delivered').get(); 
+                let totalRating = 0; let reviewCount = 0; let reviewsHtml = '';
+                let seenCustomers = new Set(); 
+                
+                // 🔥 NAYA MAGIC: Directly read from Shared Local Storage
+                const userEmail = localStorage.getItem('pixigenie_customer_phone');
+                const storageKey = 'pixigenie_user_likes_' + userEmail;
+                let likedReviews = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+                snapshot.forEach(doc => {
+                    const order = doc.data(); const orderId = doc.id;
+                    if (order.review) {
+                        const hasProduct = order.items && order.items.some(item => item.name === productName);
+                        if (hasProduct) {
+                            if (seenCustomers.has(order.customerId)) return;
+                            seenCustomers.add(order.customerId);
+                            reviewCount++; totalRating += order.review.rating;
+
+                            let badgeColor = order.review.rating >= 4 ? "bg-green-600" : (order.review.rating === 3 ? "bg-yellow-500" : "bg-red-500");
+                            let reviewTitle = order.review.rating >= 4 ? 'Highly Recommended' : (order.review.rating === 3 ? 'Good' : 'Average');
+                            
+                            // Database se count lega, par 0 se neeche nahi jane dega
+                            let likesCount = Math.max(0, order.review.likes || 0);
+                            
+                            // Local storage se check karega ki user ne like kiya hai ya nahi
+                            let isLiked = likedReviews.includes(orderId);
+                            let likeIconClass = isLiked ? 'fas fa-thumbs-up text-blue-600' : 'far fa-thumbs-up text-gray-400';
+                            let likeDataStatus = isLiked ? 'true' : 'false';
+
+                            // Agar user ne like kiya hai par DB refresh nahi hua, toh 1 show karega
+                            if (isLiked && likesCount === 0) likesCount = 1;
+
+                            reviewsHtml += `
+                            <div class="min-w-[260px] max-w-[260px] border border-gray-200 rounded-lg p-3.5 snap-center shrink-0 bg-white shadow-sm flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="${badgeColor} text-white text-[11px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">${order.review.rating} <i class="fas fa-star text-[8px]"></i></span>
+                                        <span class="text-[12px] font-bold text-gray-800">${reviewTitle}</span>
+                                    </div>
+                                    <p class="text-[12px] text-gray-600 line-clamp-3 mb-3 leading-relaxed">${order.review.text || 'Good product.'}</p>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] text-gray-400 pt-2 border-t border-gray-100">
+                                    <span class="flex items-center gap-1 text-gray-500 font-semibold"><i class="fas fa-check-circle text-gray-300"></i> ${order.customerName || 'Verified Buyer'}</span>
+                                    <button onclick="likeReview('${orderId}', this)" data-liked="${likeDataStatus}" class="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 font-semibold active:scale-95 transition">
+                                        <i class="${likeIconClass} transition-colors"></i> <span class="like-count text-[11px]">${likesCount}</span>
+                                    </button>
+                                </div>
+                            </div>`;
+                        }
+                    }
+                });
+
+                if (reviewCount > 0) {
+                    let avgRating = (totalRating / reviewCount).toFixed(1);
+                    let avgBadgeColor = avgRating >= 4 ? "bg-green-600" : (avgRating >= 3 ? "bg-yellow-500" : "bg-red-500");
+                    let avgTextColor = avgRating >= 4 ? "text-green-600" : (avgRating >= 3 ? "text-yellow-500" : "text-red-500");
+                    
+                    if(badge) {
+                        badge.innerHTML = `<span class="bg-green-600 text-white px-1.5 py-0.5 rounded-[4px] flex items-center gap-0.5">${avgRating} <i class="fas fa-star text-[8px]"></i></span> <span class="text-gray-400 font-medium ml-0.5">${reviewCount}</span>`;
+                        badge.classList.remove('hidden'); badge.classList.add('flex');
+                    }
+
+                    document.getElementById('overall-rating-container').innerHTML = `
+                        <div class="text-3xl font-black text-gray-900 flex items-center gap-2">
+                            ${avgRating} <i class="fas fa-star text-2xl ${avgTextColor}"></i>
+                        </div>
+                        <div class="text-[12px] text-gray-500 font-medium flex flex-col">
+                            <span>${reviewCount} Ratings & Reviews</span>
+                            <span class="flex items-center gap-1 mt-0.5"><i class="fas fa-check-circle text-gray-400 text-[10px]"></i> Verified Buyers</span>
+                        </div>
+                    `;
+                    document.getElementById('product-reviews-list').innerHTML = reviewsHtml;
+                } else {
+                    document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium">No reviews yet for this product.</p>`;
+                }
+
+            } catch(e) { console.log("Review fetch error: ", e); }
+        }
 
     </script>
     <!-- ✨ iOS STYLE LOGOUT MODAL ✨ -->
