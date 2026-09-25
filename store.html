@@ -2123,7 +2123,7 @@
             closeMapPicker();
         }
 
-           // ===============================================
+                // ===============================================
         // ✨ AUTO ATTACH RATINGS TO CARDS ✨
         // ===============================================
         async function attachRatingsToCards() {
@@ -2219,6 +2219,7 @@
             document.getElementById('overall-rating-container').innerHTML = `<p class="text-[13px] text-gray-500 font-medium"><i class="fas fa-spinner fa-spin"></i> Loading reviews...</p>`;
             document.getElementById('product-reviews-list').innerHTML = '';
 
+            // 🔥 GHOST DATA CLEANUP (Ek baar purana kachra saaf karega)
             localStorage.removeItem('pixigenie_liked_reviews');
 
             try {
