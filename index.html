@@ -1807,15 +1807,71 @@ function getVIPBadge(isVerified, plan) {
             }
         }
 
+            // ==========================================
+        // 🛒 SMART CART LOGIC (MULTI-ACCOUNT SYNC)
+        // ==========================================
+        function getCartKey() {
+            const user = localStorage.getItem('pixigenie_customer_phone');
+            return user ? 'pixigenie_cart_' + user : 'pixigenie_cart_guest';
+        }
+
+        function updateCartBadge() {
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
+            let mainBadge = document.getElementById('cart-badge');
+            let detailBadge = document.getElementById('detail-cart-badge'); 
+            
+            if(cart.length > 0) {
+                let totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+                if(mainBadge) { mainBadge.innerText = totalItems; mainBadge.classList.remove('hidden'); }
+                if(detailBadge) { detailBadge.innerText = totalItems; detailBadge.classList.remove('hidden'); }
+            } else {
+                if(mainBadge) mainBadge.classList.add('hidden');
+                if(detailBadge) detailBadge.classList.add('hidden');
+            }
+        }
+
+        function addToCart(event, name, price, shopName, shopPhone) {
+            event.stopPropagation(); 
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
+            const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
+            if (existingItem) {
+                existingItem.qty += 1; 
+            } else {
+                cart.push({ name, price: parseInt(price), shopName, shopPhone, qty: 1 });
+            }
+            localStorage.setItem(getCartKey(), JSON.stringify(cart));
+            if (typeof updateCartBadge === 'function') updateCartBadge();
+            
+            let btn = event.currentTarget;
+            if (btn.id === 'detail-cart-btn') return;
+            if (btn.dataset.adding === "true") return;
+            btn.dataset.adding = "true";
+
+            let origHtml = `<i class="fas fa-cart-plus text-sm"></i> Cart`;
+            btn.innerHTML = `<i class="fas fa-check text-lg"></i> Added`;
+            
+            btn.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
+            btn.classList.remove('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
+
+            setTimeout(() => {
+                btn.innerHTML = origHtml;
+                btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
+                btn.classList.add('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
+                btn.dataset.adding = "false"; 
+            }, 1200);
+        }
+
         function renderCartItems() {
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             let container = document.getElementById('cart-items-container');
             let totalEl = document.getElementById('cart-total-price');
             let total = 0;
 
+            if(!container) return; 
+
             if(cart.length === 0) {
                 container.innerHTML = `<div class="text-center py-12"><i class="fas fa-shopping-cart text-5xl text-gray-200 mb-4"></i><p class="text-gray-500 font-bold">Your cart is empty.</p></div>`;
-                totalEl.innerText = `₹0`;
+                if(totalEl) totalEl.innerText = `₹0`;
                 return;
             }
 
@@ -1841,24 +1897,24 @@ function getVIPBadge(isVerified, plan) {
                 </div>`;
             });
             container.innerHTML = html;
-            totalEl.innerText = `₹${total}`;
+            if(totalEl) totalEl.innerText = `₹${total}`;
         }
 
         function updateCartQty(index, delta) {
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             if(cart[index]) {
                 cart[index].qty += delta;
                 if(cart[index].qty <= 0) {
-                    cart.splice(index, 1); // Remove item if qty is 0
+                    cart.splice(index, 1); 
                 }
-                localStorage.setItem('pixigenie_cart', JSON.stringify(cart));
+                localStorage.setItem(getCartKey(), JSON.stringify(cart));
                 renderCartItems();
                 updateCartBadge();
             }
         }
-                // ✨ IN-APP CART ORDER (FIXED FOR MY ORDERS) ✨
+
         async function checkoutCartInApp() {
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             if(cart.length === 0) { alert("Cart is empty!"); return; }
             
             let address = document.getElementById('cart-address').value.trim();
@@ -1868,7 +1924,6 @@ function getVIPBadge(isVerified, plan) {
             if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
             if(!address) { alert("Please enter delivery address!"); return; }
 
-            // ✨ ASLI ACCOUNT ID YAHAN SE NIKALO ✨
             const accountId = localStorage.getItem('pixigenie_customer_phone');
 
             const btn = document.getElementById('cart-main-btn');
@@ -1889,12 +1944,11 @@ function getVIPBadge(isVerified, plan) {
                     const phone = shopPhones[i];
                     const orderData = ordersByShop[phone];
                     
-                                     await db.collection('orders').add({
+                    await db.collection('orders').add({
                         customerId: accountId, 
                         customerName: custName,
                         customerPhone: custWhatsApp, 
                         customerAddress: address,
-                        // ✨ NAYA LOGIC: GPS Coordinates ✨
                         lat: document.getElementById('cart-lat').value || null,
                         lng: document.getElementById('cart-lng').value || null,
                         shopPhone: phone,
@@ -1904,10 +1958,9 @@ function getVIPBadge(isVerified, plan) {
                         status: 'pending',
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-
                 }
 
-                localStorage.setItem('pixigenie_cart', JSON.stringify([]));
+                localStorage.setItem(getCartKey(), JSON.stringify([]));
                 updateCartBadge();
                 toggleCartModal();
                 showOrderSuccessModal(); 
@@ -1920,10 +1973,8 @@ function getVIPBadge(isVerified, plan) {
             }
         }
 
-
-        // ✨ MANUAL WHATSAPP CART ORDER (Seedha WhatsApp khulega) ✨
         function checkoutCartWhatsApp() {
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             if(cart.length === 0) { alert("Cart is empty!"); return; }
             
             let address = document.getElementById('cart-address').value.trim();
@@ -1952,7 +2003,6 @@ function getVIPBadge(isVerified, plan) {
                 setTimeout(() => { window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(waMessage)}`, '_blank'); }, i * 1000);
             }
         }
-
 
 
 
