@@ -694,16 +694,25 @@
                     } catch(e) {}
 
                     try {
-                        const followersSnap = await db.collection('shops').doc(currentShopId).collection('followers').get();
-                        if (document.getElementById('stat-followers')) document.getElementById('stat-followers').innerText = followersSnap.size;
+    const followersSnap = await db.collection('shops').doc(currentShopId).collection('followers').get();
+    if (document.getElementById('stat-followers')) {
+        document.getElementById('stat-followers').innerText = followersSnap.size;
+    }
 
-                        const custPhone = localStorage.getItem('pixigenie_customer_phone');
-                        if (custPhone) {
-                            const followDoc = await db.collection('shops').doc(currentShopId).collection('followers').doc(custPhone).get();
-                            if (followDoc.exists) { isFollowing = true; updateFollowButtonUI(true); } 
-                            else { isFollowing = false; updateFollowButtonUI(false); }
-                        }
-                      } catch(e) {}
+    const custPhone = localStorage.getItem('pixigenie_customer_phone');
+    if (custPhone) {
+        const followDoc = await db.collection('shops').doc(currentShopId).collection('followers').doc(custPhone).get();
+        if (followDoc.exists) { 
+            isFollowing = true; 
+            updateFollowButtonUI(true); 
+        } else { 
+            isFollowing = false; 
+            updateFollowButtonUI(false); 
+        }
+    }
+} catch(e) { 
+    console.log("Followers load error:", e); 
+}
 
                     let totalOrders = 0;
                     let totalFollowers = 0;
@@ -1302,54 +1311,55 @@
                 // ==========================================
         // 🚀 TOGGLE FOLLOW BUTTON LOGIC (FOOLPROOF)
         // ==========================================
-        async function toggleFollow() {
-            const custPhone = localStorage.getItem('pixigenie_customer_phone');
-            const custName = localStorage.getItem('pixigenie_customer_name') || "Customer";
-            if (!custPhone) { 
-                alert("Please log in as a customer to follow stores!"); 
-                return; 
-            }
+    async function toggleFollow() {
+    const custPhone = localStorage.getItem('pixigenie_customer_phone');
+    const custName = localStorage.getItem('pixigenie_customer_name') || "Customer";
+    if (!custPhone) { 
+        alert("Please log in as a customer to follow stores!"); 
+        return; 
+    }
 
-            const mainBtn = document.getElementById('btn-follow');
-            const followersCountEl = document.getElementById('stat-followers');
-            
-            if (mainBtn) { 
-                mainBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Wait...`; 
-                mainBtn.disabled = true; 
-            }
+    const mainBtn = document.getElementById('btn-follow');
+    const followersCountEl = document.getElementById('stat-followers');
+    
+    if (mainBtn) { 
+        mainBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Wait...`; 
+        mainBtn.disabled = true; 
+    }
 
-            const followRef = db.collection('shops').doc(currentShopId).collection('followers').doc(custPhone);
-            
-            try {
-                const doc = await followRef.get();
-                let currentCount = parseInt(followersCountEl.innerText) || 0;
+    const followRef = db.collection('shops').doc(currentShopId).collection('followers').doc(custPhone);
+    
+    try {
+        let currentCount = parseInt(followersCountEl.innerText) || 0;
+        const doc = await followRef.get();
 
-                if (doc.exists) {
-                    // Unfollow
-                    await followRef.delete(); 
-                    isFollowing = false; 
-                    updateFollowButtonUI(false);
-                    followersCountEl.innerText = Math.max(0, currentCount - 1);
-                } else {
-                    // Follow
-                    await followRef.set({ 
-                        name: custName, 
-                        phone: custPhone, 
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp() 
-                    });
-                    isFollowing = true; 
-                    updateFollowButtonUI(true); 
-                    followersCountEl.innerText = currentCount + 1;
-                }
-            } catch (e) {
-                console.log("Database sync deferred:", e.message);
-                // ✨ MAGIC FALLBACK: Agar database ne block kiya, toh UI ko fir bhi toggle karke local chala do taaki user ko error na aaye
-                isFollowing = !isFollowing;
-                updateFollowButtonUI(isFollowing);
-            }
-            
-            if (mainBtn) mainBtn.disabled = false;
+        if (doc.exists) {
+            // --- UNFOLLOW ---
+            await followRef.delete(); 
+            isFollowing = false; 
+            updateFollowButtonUI(false);
+            followersCountEl.innerText = Math.max(0, currentCount - 1);
+        } else {
+            // --- FOLLOW ---
+            await followRef.set({ 
+                name: custName, 
+                phone: custPhone, 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            });
+            isFollowing = true; 
+            updateFollowButtonUI(true); 
+            followersCountEl.innerText = currentCount + 1;
         }
+    } catch (e) {
+        console.log("Follow error (Rules/Network):", e.message);
+        alert("Error updating follow status. Please check your connection.");
+        updateFollowButtonUI(isFollowing);
+    }
+    
+    if (mainBtn) mainBtn.disabled = false;
+}
+
+        
 
         function updateFollowButtonUI(isFollowingStatus) {
             const btn = document.getElementById('follow-btn');
