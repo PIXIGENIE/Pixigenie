@@ -1513,62 +1513,12 @@
 
         function toggleDescription() { isDescExpanded = !isDescExpanded; renderDescription(); }
         function openWhatsApp() { if (!globalShopPhone) return; window.open(`https://wa.me/91${globalShopPhone}?text=Hi! I am visiting your Pixigenie store.`, '_blank'); }
-
-                // ==========================================
+        // ==========================================
         // 🛒 SMART CART LOGIC (MULTI-ACCOUNT SYNC)
         // ==========================================
         function getCartKey() {
             const user = localStorage.getItem('pixigenie_customer_phone');
             return user ? 'pixigenie_cart_' + user : 'pixigenie_cart_guest';
-        }
-
-        function renderCartItems() {
-            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
-            let container = document.getElementById('cart-items-container');
-            let totalEl = document.getElementById('cart-total-price');
-            let total = 0;
-
-            if(!container) return; 
-
-            if(cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-12"><i class="fas fa-shopping-cart text-5xl text-gray-200 mb-4"></i><p class="text-gray-500 font-bold">Your cart is empty.</p></div>`;
-                if(totalEl) totalEl.innerText = `₹0`;
-                return;
-            }
-
-            let html = '';
-            cart.forEach((item, index) => {
-                let itemTotal = item.price * item.qty;
-                total += itemTotal;
-                html += `
-                <div class="flex items-center gap-4 bg-white border border-gray-100 p-3.5 rounded-2xl shadow-sm">
-                    <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center shrink-0"><i class="fas fa-box"></i></div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-gray-900 text-[13px] truncate">${item.name}</h4>
-                        <p class="text-[11px] text-gray-500 mt-0.5"><i class="fas fa-store text-gray-400"></i> ${item.shopName}</p>
-                        <p class="font-black text-gray-900 mt-1">₹${item.price}</p>
-                    </div>
-                    <div class="flex flex-col items-center gap-2 shrink-0">
-                        <div class="flex items-center bg-gray-50 rounded-lg border border-gray-200 p-1">
-                            <button onclick="updateCartQty(${index}, -1)" class="w-7 h-7 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-md active:scale-95 transition"><i class="fas fa-minus text-[10px]"></i></button>
-                            <span class="w-6 text-center text-xs font-bold">${item.qty}</span>
-                            <button onclick="updateCartQty(${index}, 1)" class="w-7 h-7 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-md active:scale-95 transition"><i class="fas fa-plus text-[10px]"></i></button>
-                        </div>
-                    </div>
-                </div>`;
-            });
-            container.innerHTML = html;
-            if(totalEl) totalEl.innerText = `₹${total}`;
-        }
-
-        function updateCartQty(index, delta) {
-            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
-            if(cart[index]) {
-                cart[index].qty += delta;
-                if(cart[index].qty <= 0) { cart.splice(index, 1); }
-                localStorage.setItem(getCartKey(), JSON.stringify(cart));
-                renderCartItems(); updateCartBadge();
-            }
         }
 
         function updateCartBadge() {
@@ -1617,6 +1567,126 @@
             }, 1200);
         }
 
+        function toggleCartModal() {
+            const modal = document.getElementById('cart-modal');
+            const content = document.getElementById('cart-modal-content');
+            
+            if(modal.classList.contains('hidden')) {
+                renderCartItems();
+                
+                const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
+                let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
+                const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
+                
+                const savedLat = localStorage.getItem('pixigenie_saved_lat') || '';
+                const savedLng = localStorage.getItem('pixigenie_saved_lng') || '';
+
+                if (savedPhone.includes('@')) {
+                    savedPhone = ''; 
+                }
+                
+                if(!document.getElementById('cart-cust-name').value) {
+                    document.getElementById('cart-cust-name').value = savedName;
+                }
+                if(!document.getElementById('cart-cust-phone').value) {
+                    document.getElementById('cart-cust-phone').value = savedPhone;
+                }
+                if(!document.getElementById('cart-address').value && savedAddress) {
+                    document.getElementById('cart-address').value = savedAddress;
+                    
+                    if(savedLat && savedLng) {
+                        if(document.getElementById('cart-lat')) document.getElementById('cart-lat').value = savedLat;
+                        if(document.getElementById('cart-lng')) document.getElementById('cart-lng').value = savedLng;
+                    }
+                }
+
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    content.classList.remove('translate-y-full', 'sm:scale-95');
+                }, 10);
+                document.body.style.overflow = 'hidden';
+            } else {
+                modal.classList.add('opacity-0');
+                content.classList.add('translate-y-full', 'sm:scale-95');
+                setTimeout(() => { 
+                    modal.classList.add('hidden'); 
+                    document.body.style.overflow = 'auto'; 
+                }, 300); 
+            }
+        }
+
+        function toggleSidebar() {
+            const overlay = document.getElementById('mobile-sidebar-overlay');
+            const sidebar = document.getElementById('mobile-sidebar');
+            
+            if (overlay.classList.contains('hidden')) {
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+                sidebar.classList.remove('translate-x-full');
+                document.body.style.overflow = 'hidden'; 
+            } else {
+                overlay.classList.add('opacity-0');
+                sidebar.classList.add('translate-x-full');
+                setTimeout(() => { 
+                    overlay.classList.add('hidden'); 
+                    document.body.style.overflow = 'auto'; 
+                }, 300);
+            }
+        }
+
+        function renderCartItems() {
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
+            let container = document.getElementById('cart-items-container');
+            let totalEl = document.getElementById('cart-total-price');
+            let total = 0;
+
+            if(!container) return; 
+
+            if(cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-12"><i class="fas fa-shopping-cart text-5xl text-gray-200 mb-4"></i><p class="text-gray-500 font-bold">Your cart is empty.</p></div>`;
+                if(totalEl) totalEl.innerText = `₹0`;
+                return;
+            }
+
+            let html = '';
+            cart.forEach((item, index) => {
+                let itemTotal = item.price * item.qty;
+                total += itemTotal;
+                html += `
+                <div class="flex items-center gap-4 bg-white border border-gray-100 p-3.5 rounded-2xl shadow-sm">
+                    <div class="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center shrink-0"><i class="fas fa-box"></i></div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-gray-900 text-[13px] truncate">${item.name}</h4>
+                        <p class="text-[11px] text-gray-500 mt-0.5"><i class="fas fa-store text-gray-400"></i> ${item.shopName}</p>
+                        <p class="font-black text-gray-900 mt-1">₹${item.price}</p>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 shrink-0">
+                        <div class="flex items-center bg-gray-50 rounded-lg border border-gray-200 p-1">
+                            <button onclick="updateCartQty(${index}, -1)" class="w-7 h-7 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-md active:scale-95 transition"><i class="fas fa-minus text-[10px]"></i></button>
+                            <span class="w-6 text-center text-xs font-bold">${item.qty}</span>
+                            <button onclick="updateCartQty(${index}, 1)" class="w-7 h-7 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-md active:scale-95 transition"><i class="fas fa-plus text-[10px]"></i></button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+            if(totalEl) totalEl.innerText = `₹${total}`;
+        }
+
+        function updateCartQty(index, delta) {
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
+            if(cart[index]) {
+                cart[index].qty += delta;
+                if(cart[index].qty <= 0) {
+                    cart.splice(index, 1); 
+                }
+                localStorage.setItem(getCartKey(), JSON.stringify(cart));
+                renderCartItems();
+                updateCartBadge();
+            }
+        }
+
         async function checkoutCartInApp() {
             let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             if(cart.length === 0) { alert("Cart is empty!"); return; }
@@ -1656,7 +1726,6 @@
                         lat: document.getElementById('cart-lat').value || null,
                         lng: document.getElementById('cart-lng').value || null,
                         shopPhone: phone,
-                        shopId: typeof currentShopId !== 'undefined' ? currentShopId : null, 
                         shopName: orderData.shopName,
                         items: orderData.items,
                         totalAmount: orderData.total,
