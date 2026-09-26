@@ -186,9 +186,8 @@
             }
             btn.innerHTML = `Assign Plan`; btn.disabled = false;
         }
-
-           // ==========================================
-        // 3. BANNER UPLOAD & MANAGEMENT LOGIC (AUTO-COMPRESS FIXED)
+        // ==========================================
+        // 3. BANNER UPLOAD & MANAGEMENT LOGIC (FAIL-PROOF)
         // ==========================================
         async function uploadBanner() {
             const fileInput = document.getElementById('banner-img-file');
@@ -199,29 +198,18 @@
             if (!redirectUrl) return alert("Please enter a redirect URL!");
 
             const file = fileInput.files[0];
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Compressing Image...`;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing Image...`;
             btn.disabled = true;
 
-            const reader = new FileReader();
-            reader.onerror = function() {
-                alert("Error reading file.");
-                btn.innerHTML = `Upload & Publish Banner`;
-                btn.disabled = false;
-            };
-
-            reader.onload = function(e) {
+            try {
+                // Direct Object URL se image load karna (FileReader error khatam)
+                const objectUrl = URL.createObjectURL(file);
                 const img = new Image();
-                img.onerror = function() {
-                    alert("Invalid image file.");
-                    btn.innerHTML = `Upload & Publish Banner`;
-                    btn.disabled = false;
-                };
 
                 img.onload = async function() {
                     try {
-                        // Canvas setup for fast auto-compression
                         const canvas = document.createElement('canvas');
-                        let maxWidth = 800; // Limit max width for light storage
+                        let maxWidth = 800;
                         let width = img.width;
                         let height = img.height;
 
@@ -236,8 +224,8 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // Convert to lightweight JPEG (70% quality for fast upload)
-                        const base64Image = canvas.toDataURL('image/jpeg', 0.7);
+                        // Convert to lightweight JPEG
+                        const base64Image = canvas.toDataURL('image/jpeg', 0.75);
 
                         btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Uploading to Database...`;
 
@@ -247,21 +235,36 @@
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
 
-                        alert("✅ Banner compressed and uploaded successfully!");
+                        // Memory clean up
+                        URL.revokeObjectURL(objectUrl);
+
+                        alert("✅ Banner uploaded successfully!");
                         fileInput.value = '';
                         document.getElementById('banner-redirect-url').value = '';
                         loadAdminBanners();
                     } catch (err) {
-                        alert("Error saving banner: " + err.message);
+                        alert("Database Error: " + err.message);
                     } finally {
                         btn.innerHTML = `Upload & Publish Banner`;
                         btn.disabled = false;
                     }
                 };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+
+                img.onerror = function() {
+                    alert("Could not load image file. Please try another image.");
+                    btn.innerHTML = `Upload & Publish Banner`;
+                    btn.disabled = false;
+                };
+
+                img.src = objectUrl;
+
+            } catch (err) {
+                alert("Error: " + err.message);
+                btn.innerHTML = `Upload & Publish Banner`;
+                btn.disabled = false;
+            }
         }
+
 
 
         async function loadAdminBanners() {
