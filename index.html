@@ -1157,19 +1157,20 @@ async function handleShopSubmit(e) {
                         </div>
                     </div>
 
-                    <!-- 🖼️ HD PROMO SLIDER (Edge-to-Edge with Inner Dots) -->
+                                     <!-- 🖼️ HD PROMO SLIDER (Fixed Height & Smooth Manual Swipe) -->
                     <div class="w-full relative z-0 bg-gray-100 border-b border-gray-200">
-                        <div id="promo-slider" class="w-full h-[150px] sm:h-[220px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth" style="-ms-overflow-style: none; scrollbar-width: none;">
+                        <!-- NAYI HEIGHT (h-[180px]) AUR 'scroll-smooth' HATA DIYA HAI YAHAN SE -->
+                        <div id="promo-slider" class="w-full h-[180px] sm:h-[240px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
                             <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 1">
                             <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 2">
                             <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 3">
                         </div>
                         
-                        <!-- Subtle shadow at bottom so dots are always visible -->
-                        <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-10"></div>
+                        <!-- Shadow thodi aur dark ki hai taaki dots hamesha chamken -->
+                        <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/50 to-transparent pointer-events-none z-10"></div>
                         
-                        <!-- ⚪ SLIDER DOTS OVER IMAGE -->
-                        <div id="promo-slider-dots" class="absolute bottom-2.5 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
+                        <!-- ⚪ SLIDER DOTS -->
+                        <div id="promo-slider-dots" class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
                         </div>
                     </div>
 
@@ -1288,21 +1289,23 @@ async function handleShopSubmit(e) {
                         </div>
                     </div>
 
-                    <!-- 🖼️ HD PROMO SLIDER (Edge-to-Edge with Inner Dots) -->
+                                  <!-- 🖼️ HD PROMO SLIDER (Fixed Height & Smooth Manual Swipe) -->
                     <div class="w-full relative z-0 bg-gray-100 border-b border-gray-200">
-                        <div id="promo-slider" class="w-full h-[150px] sm:h-[220px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth" style="-ms-overflow-style: none; scrollbar-width: none;">
+                        <!-- NAYI HEIGHT (h-[180px]) AUR 'scroll-smooth' HATA DIYA HAI YAHAN SE -->
+                        <div id="promo-slider" class="w-full h-[180px] sm:h-[240px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
                             <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 1">
                             <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 2">
                             <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 3">
                         </div>
                         
-                        <!-- Subtle shadow at bottom so dots are always visible -->
-                        <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-10"></div>
+                        <!-- Shadow thodi aur dark ki hai taaki dots hamesha chamken -->
+                        <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/50 to-transparent pointer-events-none z-10"></div>
                         
-                        <!-- ⚪ SLIDER DOTS OVER IMAGE -->
-                        <div id="promo-slider-dots" class="absolute bottom-2.5 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
+                        <!-- ⚪ SLIDER DOTS -->
+                        <div id="promo-slider-dots" class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
                         </div>
                     </div>
+
 
                     <!-- 🛍️ ADVANCED FLIPKART CATEGORY GRID -->
                     <div class="w-full bg-white px-1 py-4 shadow-sm border-b border-gray-200 relative z-10">
@@ -4428,8 +4431,8 @@ function trackSearchImpression(shopIdToTrack) {
             // Mic Start!
             recognition.start();
         }
-        // ===============================================
-        // ✨ AUTO-SLIDING PROMO BANNER ENGINE ✨
+              // ===============================================
+        // ✨ SMART AUTO-SLIDING BANNER ENGINE ✨
         // ===============================================
         function initPromoSlider() {
             const slider = document.getElementById('promo-slider');
@@ -4445,43 +4448,51 @@ function trackSearchImpression(shopIdToTrack) {
             dotsContainer.innerHTML = '';
             for (let i = 0; i < slideCount; i++) {
                 const dot = document.createElement('div');
-                // Pehle wale dot ko active (lamba white) banao
-                dot.className = `h-1.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-white w-4' : 'bg-white/50 w-1.5'}`;
+                dot.className = `h-1.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-white w-4 shadow-sm' : 'bg-white/60 w-1.5'}`;
                 dot.id = `promo-dot-${i}`;
                 dotsContainer.appendChild(dot);
             }
 
-            // 2. Scroll karne par dots update hon
+            // 2. Dots Update (Jab slide ho)
             slider.addEventListener('scroll', () => {
-                // Determine kaunsi image abhi screen par hai
                 const activeIdx = Math.round(slider.scrollLeft / slider.clientWidth);
-                
                 for (let i = 0; i < slideCount; i++) {
                     const dot = document.getElementById(`promo-dot-${i}`);
                     if (dot) {
-                        if (i === activeIdx) {
-                            dot.className = "w-4 h-1.5 rounded-full bg-white transition-all duration-300 shadow-sm";
-                        } else {
-                            dot.className = "w-1.5 h-1.5 rounded-full bg-white/50 transition-all duration-300";
-                        }
+                        dot.className = i === activeIdx 
+                            ? "w-4 h-1.5 rounded-full bg-white transition-all duration-300 shadow-sm" 
+                            : "w-1.5 h-1.5 rounded-full bg-white/60 transition-all duration-300";
                     }
                 }
             });
 
-            // 3. Har 3 Second me Auto-Slide (Loop back to start)
-            if(window.promoInterval) clearInterval(window.promoInterval);
+            // 3. Smart Auto-Slide (Touch Pause Feature ke sath)
+            let slideInterval;
             
-            window.promoInterval = setInterval(() => {
-                let activeIdx = Math.round(slider.scrollLeft / slider.clientWidth);
-                activeIdx++;
-                
-                if (activeIdx >= slideCount) {
-                    activeIdx = 0; // Wapas shuru mein jao
-                }
-                
-                slider.scrollTo({ left: activeIdx * slider.clientWidth, behavior: 'smooth' });
-            }, 3000); // 3000ms = 3 Seconds
+            function startAutoSlide() {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(() => {
+                    let activeIdx = Math.round(slider.scrollLeft / slider.clientWidth);
+                    activeIdx++;
+                    if (activeIdx >= slideCount) activeIdx = 0; // Wapas shuru mein
+                    
+                    // JS smooth scroll karega, par CSS manual swipe ko nahi rokega
+                    slider.scrollTo({ left: activeIdx * slider.clientWidth, behavior: 'smooth' });
+                }, 3000); // 3 Second timer
+            }
+
+            function stopAutoSlide() {
+                clearInterval(slideInterval);
+            }
+
+            // User finger lagaye toh timer roko, hataye toh wapas shuru karo
+            slider.addEventListener('touchstart', stopAutoSlide, {passive: true});
+            slider.addEventListener('touchend', startAutoSlide, {passive: true});
+            
+            // Pehli baar timer start karo
+            startAutoSlide();
         }
+
 
     </script>
 
