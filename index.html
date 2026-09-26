@@ -1139,9 +1139,10 @@ async function handleShopSubmit(e) {
                                 <i class="fas fa-search text-blue-600 text-[15px]"></i>
                             </div>
                             <input type="text" id="top-search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search for Products, Brands and More" autocomplete="off" class="w-full bg-transparent py-3 pr-3 outline-none text-[13.5px] font-semibold text-gray-800 placeholder-gray-500">
-                            <div class="pr-4 pl-2 flex items-center justify-center cursor-pointer bg-transparent active:opacity-50">
-                                <i class="fas fa-microphone text-blue-600 text-[16px]"></i>
-                            </div>
+                            <div onclick="startVoiceSearch()" class="pr-4 pl-2 flex items-center justify-center cursor-pointer bg-transparent active:opacity-50">
+    <i class="fas fa-microphone text-blue-600 text-[16px] transition-colors mic-icon"></i>
+</div>
+                            
                         </div>
 
                         <!-- 🌟 SEARCH SUGGESTIONS DROPDOWN YAHAN AAYEGA 🌟 -->
@@ -1249,9 +1250,10 @@ async function handleShopSubmit(e) {
                                 <i class="fas fa-search text-blue-600 text-[15px]"></i>
                             </div>
                             <input type="text" id="top-search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search for Products, Brands and More" autocomplete="off" class="w-full bg-transparent py-3 pr-3 outline-none text-[13.5px] font-semibold text-gray-800 placeholder-gray-500">
-                            <div class="pr-4 pl-2 flex items-center justify-center cursor-pointer bg-transparent active:opacity-50">
-                                <i class="fas fa-microphone text-blue-600 text-[16px]"></i>
-                            </div>
+                            <div onclick="startVoiceSearch()" class="pr-4 pl-2 flex items-center justify-center cursor-pointer bg-transparent active:opacity-50">
+    <i class="fas fa-microphone text-blue-600 text-[16px] transition-colors mic-icon"></i>
+</div>
+                            
                         </div>
                     </div>
 
@@ -4295,6 +4297,79 @@ function trackSearchImpression(shopIdToTrack) {
                 observer.observe(cartModal, { attributes: true });
             }
         });
+                // ===============================================
+        // ✨ SMART VOICE SEARCH (SPEECH TO TEXT) ✨
+        // ===============================================
+        function startVoiceSearch() {
+            // Check browser support
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                alert("Aapka browser Voice Search support nahi karta. Kripya Chrome ya Safari use karein.");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-IN'; // Indian English & Hindi support
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            const searchInput = document.getElementById('top-search-input');
+            const micIcons = document.querySelectorAll('.mic-icon'); // Saare mic icons
+
+            // Jab sunna shuru kare
+            recognition.onstart = function() {
+                if(searchInput) {
+                    searchInput.value = "";
+                    searchInput.placeholder = "Listening... Speak now 🎤";
+                }
+                
+                // Mic ko Laal aur Blink (Pulse) karao
+                micIcons.forEach(mic => {
+                    mic.classList.remove('text-blue-600');
+                    mic.classList.add('text-red-500', 'animate-pulse');
+                });
+            };
+
+            // Jab aawaz text mein convert ho jaye
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                
+                if(searchInput) {
+                    searchInput.value = transcript;
+                    // Automatic search trigger kardo
+                    handleGlobalSearch(transcript);
+                    
+                    // Dropdown show karne ke liye focus trigger karo
+                    searchInput.focus();
+                }
+            };
+
+            // Agar koi error aaye ya mic band ho jaye
+            recognition.onerror = function(event) {
+                console.log("Voice Search Error:", event.error);
+                resetMicUI();
+            };
+
+            recognition.onend = function() {
+                resetMicUI();
+            };
+
+            // UI ko wapas normal karne ka function
+            function resetMicUI() {
+                if(searchInput && !searchInput.value) {
+                    searchInput.placeholder = "Search for Products, Brands and More";
+                }
+                micIcons.forEach(mic => {
+                    mic.classList.remove('text-red-500', 'animate-pulse');
+                    mic.classList.add('text-blue-600');
+                });
+            }
+
+            // Mic Start!
+            recognition.start();
+        }
+
     </script>
 
    
