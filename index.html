@@ -1061,6 +1061,17 @@ async function handleShopSubmit(e) {
                 `;
 
                 heroContent.innerHTML = `
+<style>
+    /* Smooth Floating Animation for Icons */
+    @keyframes floatIcon {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+    .animate-float-1 { animation: floatIcon 3s ease-in-out infinite; }
+    .animate-float-2 { animation: floatIcon 3s ease-in-out infinite 1s; }
+    .animate-float-3 { animation: floatIcon 3s ease-in-out infinite 2s; }
+</style>
+
 <div class="w-full min-h-screen bg-white text-[#1D1D1F] font-sans selection:bg-blue-200">
 
     <!-- ================= SEARCH BAR (iOS Style) ================= -->
@@ -1168,36 +1179,54 @@ async function handleShopSubmit(e) {
 
         </div>
 
-        <!-- ================= BUSINESS SNAPSHOT (Minimal Gray Card) ================= -->
-        <div class="
-            mt-12
-            max-w-[340px]
-            mx-auto
-            bg-[#F5F5F7]
-            rounded-[24px]
-            p-6
-        ">
-            <div class="flex justify-between items-center px-4">
+        <!-- ================= FLOATING COLORED ICONS ================= -->
+        <div class="mt-14 max-w-[300px] mx-auto flex justify-between items-center px-2">
 
-                <!-- Orders -->
-                <div class="flex flex-col items-center gap-3">
-                    <i class="fas fa-box text-[24px] text-[#1D1D1F]"></i>
-                    <span class="text-[12px] font-medium text-[#86868B]">Orders</span>
+            <!-- Orders -->
+            <div class="flex flex-col items-center gap-2.5 cursor-default">
+                <div class="
+                    w-[46px] h-[46px] 
+                    rounded-full 
+                    bg-white 
+                    flex items-center justify-center 
+                    shadow-[0_10px_20px_rgba(0,113,227,0.15)] 
+                    animate-float-1
+                ">
+                    <i class="fas fa-box text-[18px] text-[#0071E3]"></i>
                 </div>
-
-                <!-- Billing -->
-                <div class="flex flex-col items-center gap-3">
-                    <i class="fas fa-file-invoice text-[24px] text-[#1D1D1F]"></i>
-                    <span class="text-[12px] font-medium text-[#86868B]">Billing</span>
-                </div>
-
-                <!-- Insights -->
-                <div class="flex flex-col items-center gap-3">
-                    <i class="fas fa-chart-pie text-[24px] text-[#1D1D1F]"></i>
-                    <span class="text-[12px] font-medium text-[#86868B]">Insights</span>
-                </div>
-
+                <span class="text-[12px] font-medium text-[#86868B]">Orders</span>
             </div>
+
+            <!-- Billing -->
+            <div class="flex flex-col items-center gap-2.5 cursor-default">
+                <div class="
+                    w-[46px] h-[46px] 
+                    rounded-full 
+                    bg-white 
+                    flex items-center justify-center 
+                    shadow-[0_10px_20px_rgba(94,92,230,0.15)] 
+                    animate-float-2
+                ">
+                    <i class="fas fa-file-invoice text-[18px] text-[#5E5CE6]"></i>
+                </div>
+                <span class="text-[12px] font-medium text-[#86868B]">Billing</span>
+            </div>
+
+            <!-- Insights -->
+            <div class="flex flex-col items-center gap-2.5 cursor-default">
+                <div class="
+                    w-[46px] h-[46px] 
+                    rounded-full 
+                    bg-white 
+                    flex items-center justify-center 
+                    shadow-[0_10px_20px_rgba(255,149,0,0.15)] 
+                    animate-float-3
+                ">
+                    <i class="fas fa-chart-pie text-[18px] text-[#FF9500]"></i>
+                </div>
+                <span class="text-[12px] font-medium text-[#86868B]">Insights</span>
+            </div>
+
         </div>
 
     </section>
