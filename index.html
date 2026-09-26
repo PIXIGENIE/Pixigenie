@@ -4493,7 +4493,19 @@ function trackSearchImpression(shopIdToTrack) {
             startAutoSlide();
         }
 
-        // 🌟 DYNAMIC BANNERS FETCHER FOR HOME PAGE 🌟
+             window.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = updateUIBasedOnLogin();
+            updateCartBadge();
+            
+            // 🚀 FIREBASE SE DYNAMIC BANNERS LOAD KAREGA AUR SLIDER CHALAYEGA
+            loadHomeBanners();
+
+            if (!isLoggedIn) {
+                setTimeout(openAuthModal, 500); 
+            }
+        });
+
+        // 🌟 DYNAMIC BANNERS FETCHER FUNCTION FOR HOME PAGE 🌟
         async function loadHomeBanners() {
             const slider = document.getElementById('promo-slider');
             if (!slider) return;
@@ -4503,12 +4515,20 @@ function trackSearchImpression(shopIdToTrack) {
                     let html = '';
                     snap.forEach(doc => {
                         const b = doc.data();
-                        html += `<img src="${b.imageUrl}" onclick="window.location.href='${b.redirectUrl}'" class="w-full h-full object-cover shrink-0 snap-center cursor-pointer" alt="Promo">`;
+                        html += `<img src="${b.imageUrl}" onclick="window.location.href='${b.redirectUrl}'" class="w-full h-full object-cover shrink-0 snap-center cursor-pointer" alt="Promo Banner">`;
                     });
                     slider.innerHTML = html;
-                    if (typeof initPromoSlider === 'function') initPromoSlider();
+                    
+                    // Slider aur Dots ko start karo
+                    if (typeof initPromoSlider === 'function') {
+                        initPromoSlider();
+                    }
+                } else {
+                    slider.innerHTML = `<div class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xs font-bold">No Banners Uploaded by Admin</div>`;
                 }
-            } catch(e) { console.log("Banner load error:", e); }
+            } catch(e) { 
+                console.log("Banner load error:", e); 
+            }
         }
 
     </script>
