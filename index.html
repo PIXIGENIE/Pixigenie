@@ -971,7 +971,6 @@ async function handleShopSubmit(e) {
             );
         }
 
-
         // --- ✨ UI UPDATER (WITH PREMIUM STORE ICONS & RATING) ✨ ---
         function updateUIBasedOnLogin() {
             const activeShop = localStorage.getItem('pixigenie_active_shop');
@@ -981,49 +980,6 @@ async function handleShopSubmit(e) {
             const authContainer = document.getElementById('auth-container');
             const heroContent = document.getElementById('hero-content');
             const searchInput = document.getElementById('search-input');
-
-            // --- 🍎 CUSTOMER "WHY CHOOSE US" SECTION 🍎 ---
-            const customerWhyChooseUsSection = `
-                <div class="relative z-20 reveal w-full max-w-5xl mx-auto mt-20 sm:mt-32 text-left px-4 sm:px-0">
-                    <div class="text-center mb-10 sm:mb-16">
-                        <h3 class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">Why Shop on Pixigenie?</h3>
-                        <p class="text-gray-500 mt-3 font-medium text-sm sm:text-lg">Your neighborhood shopping experience, completely upgraded.</p>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
-                        
-                        <div class="group glass-card hover:bg-white hover:shadow-[0_30px_60px_rgba(168,85,247,0.12)] hover:-translate-y-2 active:scale-95 transition-all duration-500 rounded-[2rem] p-8 cursor-pointer reveal delay-100">
-                            <div class="w-16 h-16 bg-purple-50 text-purple-600 border border-purple-100 rounded-[1.2rem] flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline>
-                                </svg>
-                            </div>
-                            <h4 class="font-black text-gray-900 text-xl mb-3">Verified Local Shops</h4>
-                            <p class="text-gray-500 text-sm leading-relaxed">We only onboard trusted businesses from your area so you get the best quality and reliability.</p>
-                        </div>
-
-                        <div class="group glass-card hover:bg-white hover:shadow-[0_30px_60px_rgba(236,72,153,0.12)] hover:-translate-y-2 active:scale-95 transition-all duration-500 rounded-[2rem] p-8 cursor-pointer reveal delay-200">
-                            <div class="w-16 h-16 bg-pink-50 text-pink-500 border border-pink-100 rounded-[1.2rem] flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                                </svg>
-                            </div>
-                            <h4 class="font-black text-gray-900 text-xl mb-3">Flexible Ordering</h4>
-                            <p class="text-gray-500 text-sm leading-relaxed">Order securely through our smooth in-app checkout, or connect directly with the seller on WhatsApp.</p>
-                        </div>
-
-                        <div class="group glass-card hover:bg-white hover:shadow-[0_30px_60px_rgba(34,197,94,0.12)] hover:-translate-y-2 active:scale-95 transition-all duration-500 rounded-[2rem] p-8 cursor-pointer reveal delay-300">
-                            <div class="w-16 h-16 bg-green-50 text-green-600 border border-green-100 rounded-[1.2rem] flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
-                                </svg>
-                            </div>
-                            <h4 class="font-black text-gray-900 text-xl mb-3">Superfast Fulfillment</h4>
-                            <p class="text-gray-500 text-sm leading-relaxed">Since you are buying locally, enjoy lightning-fast same day delivery or instant store pickup.</p>
-                        </div>
-
-                    </div>
-                </div>
-            `;
 
             // --- 🍎 SHOP OWNER "WHY SELL ON PIXIGENIE" SECTION 🍎 ---
             const merchantWhyChooseUsSection = `
@@ -1069,34 +1025,29 @@ async function handleShopSubmit(e) {
                 </div>
             `;
 
-                            if (activeShop) {
+            if (activeShop) {
                 // 🔹 SHOP OWNER
-// ✨ Sirf filter pills hide honge, search bar chalu rahega ✨
-    const filtersBox = document.getElementById('shopkeeper-filters-hide');
-    if (filtersBox) filtersBox.classList.add('hidden');
+                const filtersBox = document.getElementById('shopkeeper-filters-hide');
+                if (filtersBox) filtersBox.classList.add('hidden');
 
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) searchInput.placeholder = "Search shops...";
-                                          // ✨ NAYA CODE: Dukandar ko pricing dikhao aur category ke hisaab se features badlo
+                if (searchInput) searchInput.placeholder = "Search shops...";
+                
                 const pricingSec = document.getElementById('merchant-upgrade-plans');
                 if(pricingSec) {
                     pricingSec.classList.remove('hidden');
-                    // Firebase se dukaandar ki category fetch karo
                     db.collection('shops').doc(activeShop).get().then(doc => {
                         if(doc.exists) {
                             const bType = doc.data().businessType || 'Retailer';
-                            const shopPlan = doc.data().plan || 'starter'; // ✨ Asli Plan yahan read kiya
+                            const shopPlan = doc.data().plan || 'starter'; 
                             updateDynamicPricing(bType);
-                            updatePlanUI(shopPlan); // ✨ Naya UI updater call kiya
+                            updatePlanUI(shopPlan); 
                         }
                     });
                 }
 
-
                 const initials = getInitials(shopOwnerName || 'My Store');
-                const savedImg = localStorage.getItem('pixigenie_profile_img'); // ✨ Fetch saved image
+                const savedImg = localStorage.getItem('pixigenie_profile_img'); 
 
-                
                 authContainer.innerHTML = `
                     <button onclick="toggleProfileModal()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide relative overflow-hidden">
                         <span id="nav-initials" style="${savedImg ? 'display:none;' : ''}">${initials}</span>
@@ -1104,7 +1055,6 @@ async function handleShopSubmit(e) {
                     </button>
                     <div id="profile-dropdown-menu" class="hidden absolute right-0 top-12 mt-2 w-56 sm:w-64 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
                         <div class="p-5 bg-gray-50/50 border-b border-gray-100">
-
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Store Owner</p>
                             <h4 class="font-black text-gray-900 text-lg leading-tight truncate">${shopOwnerName || 'My Store'}</h4>
                         </div>
@@ -1135,15 +1085,11 @@ async function handleShopSubmit(e) {
                         <a href="dashboard.html?shop=${activeShop}" class="w-full bg-blue-600 text-white font-bold py-4 sm:py-5 rounded-2xl hover:bg-blue-700 hover:shadow-[0_15px_30px_rgba(37,99,235,0.3)] hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3 text-sm sm:text-base">
                             <i class="fas fa-chart-line text-blue-200"></i> Open Dashboard
                         </a>
-                      
-                        <!-- ✨ NAYA VISIT STORE BUTTON ✨ -->
                         <a href="store.html?shop=${activeShop}" class="mt-3 mx-auto w-fit text-[#007AFF] font-semibold text-[14px] tracking-wide flex items-center justify-center gap-1.5 active:opacity-50 transition-opacity px-4 py-2 rounded-full hover:bg-[#007AFF]/10">
                             Visit My Store <i class="fas fa-chevron-right text-[10px] mt-0.5"></i>
                         </a>
                     </div>
-                    </div>
                     
-                    <!-- Clean iOS Outline Tags -->
                     <div class="relative z-10 opacity-0 fade-in-up delay-300 mt-12 sm:mt-16 flex flex-wrap justify-center gap-4 sm:gap-6 text-[11px] sm:text-xs font-bold text-gray-600 tracking-wide px-4">
                         <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
                             <svg class="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -1157,7 +1103,6 @@ async function handleShopSubmit(e) {
                             </svg>
                             Smart Billing
                         </div>
-                        <!-- ✨ CLEAN PIE CHART FOR DEEP INSIGHTS ✨ -->
                         <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
                             <svg class="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path>
@@ -1171,33 +1116,48 @@ async function handleShopSubmit(e) {
                 
                 document.getElementById('section-title').innerText = "Live Local Shops";
                 document.getElementById('section-subtitle').innerText = "Other businesses on Pixigenie.";
-                searchInput.placeholder = "Search shops...";
+                if (searchInput) searchInput.placeholder = "Search shops...";
                 fetchLiveShops();
                 return true;
 
-                           } else if (customerName) {
-                               // 🔹 CUSTOMER
-                // ✨ NAYA FIX: Page load hote hi background me Firebase se address nikal lo ✨
-                // ... (Upar ka aapka pehle ka code waise hi rahega)
+            } else if (customerName) {
+                // 🔹 CUSTOMER LOGIC
                 
-                authContainer.innerHTML = `...`; // (Aapka login button code)
+                const initials = getInitials(customerName);
+                const savedImg = localStorage.getItem('pixigenie_profile_img'); 
+                
+                authContainer.innerHTML = `
+                    <button onclick="toggleProfileModal()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide relative overflow-hidden">
+                        <span id="nav-initials" style="${savedImg ? 'display:none;' : ''}">${initials}</span>
+                        <img id="nav-profile-img" src="${savedImg || ''}" class="absolute inset-0 w-full h-full object-cover ${savedImg ? '' : 'hidden'}">
+                    </button>
+                    <div id="profile-dropdown-menu" class="hidden absolute right-0 top-12 mt-2 w-56 sm:w-64 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
+                        <div class="p-5 bg-gray-50/50 border-b border-gray-100">
+                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Customer Profile</p>
+                            <h4 class="font-black text-gray-900 text-lg leading-tight truncate">${customerName}</h4>
+                            ${customerPhone ? `<p class="text-xs text-gray-500 mt-1.5 font-medium flex items-center gap-1.5"><i class="fas fa-phone-alt text-gray-400"></i> +91 ${customerPhone}</p>` : ''}
+                        </div>
+                        <div class="p-2">
+                            <button onclick="showLogoutModal()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                        </div>
+                    </div>
+                `;
 
-                // 👉 YAHAN SE REPLACE SHURU KAREIN 👈
-                                                              heroContent.innerHTML = `
-                    <!-- 🔍 PREMIUM SEARCH BAR (Zero Gap) -->
+                heroContent.innerHTML = `
+                    <!-- 🔍 PREMIUM SEARCH BAR -->
                     <div class="w-full bg-white px-3 py-3 border-b border-gray-100 shadow-sm z-30">
                         <div class="relative w-full bg-[#f0f5ff] rounded-[10px] flex items-center overflow-hidden border border-[#dbeafe]">
                             <div class="pl-3 pr-2 flex items-center justify-center">
                                 <i class="fas fa-search text-blue-600 text-[15px]"></i>
                             </div>
                             <input type="text" id="top-search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search for Products, Brands and More" autocomplete="off" class="w-full bg-transparent py-3 pr-3 outline-none text-[13.5px] font-semibold text-gray-800 placeholder-gray-500">
-                            <div class="pr-3 pl-3 flex items-center justify-center border-l border-[#dbeafe] cursor-pointer bg-white active:bg-gray-50">
-                                <i class="fas fa-microphone text-blue-600 text-[15px]"></i>
+                            <div class="pr-4 pl-2 flex items-center justify-center cursor-pointer bg-transparent active:opacity-50">
+                                <i class="fas fa-microphone text-blue-600 text-[16px]"></i>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 🖼️ HD PROMO SLIDER (Safe Unsplash Images) -->
+                    <!-- 🖼️ HD PROMO SLIDER -->
                     <div class="w-full bg-[#f8fafc] p-2 sm:p-3">
                         <div id="promo-slider" class="w-full h-[140px] sm:h-[180px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth rounded-[12px] shadow-sm border border-gray-200" style="-ms-overflow-style: none; scrollbar-width: none;">
                             <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 1">
@@ -1206,59 +1166,51 @@ async function handleShopSubmit(e) {
                         </div>
                     </div>
 
-                    <!-- 🛍️ PREMIUM FLIPKART CATEGORY GRID -->
+                    <!-- 🛍️ FLIPKART CATEGORY GRID -->
                     <div class="w-full bg-white px-2 py-5 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] border-b border-gray-200 rounded-t-[20px] relative z-10 -mt-3">
                         <div class="grid grid-cols-4 gap-y-6 gap-x-2">
-                            <!-- Item 1 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3014/3014498.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Grocery</span>
                             </div>
-                            <!-- Item 2 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3437/3437364.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Mobiles</span>
                             </div>
-                            <!-- Item 3 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3159/3159614.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Fashion</span>
                             </div>
-                            <!-- Item 4 -->
                             <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/1973/1973617.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Services</span>
                             </div>
-                            <!-- Item 5 -->
                             <div onclick="switchMarketTab('shops')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/1198/1198364.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Top Shops</span>
                             </div>
-                            <!-- Item 6 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/2652/2652218.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Electronics</span>
                             </div>
-                            <!-- Item 7 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/2590/2590514.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Home</span>
                             </div>
-                            <!-- Item 8 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3163/3163191.png" class="w-full h-full object-contain drop-shadow-sm">
@@ -1269,42 +1221,38 @@ async function handleShopSubmit(e) {
                     </div>
                 `;
 
-
-                // 👉 YAHAN TAK REPLACE KAREIN 👈
-
                 document.getElementById('section-title').innerText = "Trending Products";
-
-                document.getElementById('section-title').innerText = "Trending Products";
-document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
-
-searchInput.placeholder = "Search products, services, or shops...";
+                document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
+                if (searchInput) searchInput.placeholder = "Search products, services, or shops...";
                 fetchGlobalProducts(); 
                 return true;
 
-                   } else {
-                
-                           // 🔹 CUSTOMER
-                // ✨ NAYA FIX: Page load hote hi background me Firebase se address nikal lo ✨
-                // ... (Upar ka aapka pehle ka code waise hi rahega)
-                
-                authContainer.innerHTML = `...`; // (Aapka login button code)
+            } else {
+                // 🔹 GUEST LOGIC
+                const pricingSec = document.getElementById('merchant-upgrade-plans');
+                if(pricingSec) pricingSec.classList.add('hidden');
 
-                // 👉 YAHAN SE REPLACE SHURU KAREIN 👈
-                                                                heroContent.innerHTML = `
-                    <!-- 🔍 PREMIUM SEARCH BAR (Zero Gap) -->
+                authContainer.innerHTML = `
+                    <button onclick="openAuthModal()" class="w-9 h-9 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-full flex items-center justify-center transition border border-gray-200 shadow-sm active:scale-95">
+                        <i class="fas fa-user text-sm"></i>
+                    </button>
+                `;
+                
+                heroContent.innerHTML = `
+                    <!-- 🔍 PREMIUM SEARCH BAR -->
                     <div class="w-full bg-white px-3 py-3 border-b border-gray-100 shadow-sm z-30">
                         <div class="relative w-full bg-[#f0f5ff] rounded-[10px] flex items-center overflow-hidden border border-[#dbeafe]">
                             <div class="pl-3 pr-2 flex items-center justify-center">
                                 <i class="fas fa-search text-blue-600 text-[15px]"></i>
                             </div>
                             <input type="text" id="top-search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search for Products, Brands and More" autocomplete="off" class="w-full bg-transparent py-3 pr-3 outline-none text-[13.5px] font-semibold text-gray-800 placeholder-gray-500">
-                            <div class="pr-3 pl-3 flex items-center justify-center border-l border-[#dbeafe] cursor-pointer bg-white active:bg-gray-50">
-                                <i class="fas fa-microphone text-blue-600 text-[15px]"></i>
+                            <div class="pr-4 pl-2 flex items-center justify-center cursor-pointer bg-transparent active:opacity-50">
+                                <i class="fas fa-microphone text-blue-600 text-[16px]"></i>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 🖼️ HD PROMO SLIDER (Safe Unsplash Images) -->
+                    <!-- 🖼️ HD PROMO SLIDER -->
                     <div class="w-full bg-[#f8fafc] p-2 sm:p-3">
                         <div id="promo-slider" class="w-full h-[140px] sm:h-[180px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth rounded-[12px] shadow-sm border border-gray-200" style="-ms-overflow-style: none; scrollbar-width: none;">
                             <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 1">
@@ -1313,59 +1261,51 @@ searchInput.placeholder = "Search products, services, or shops...";
                         </div>
                     </div>
 
-                    <!-- 🛍️ PREMIUM FLIPKART CATEGORY GRID -->
+                    <!-- 🛍️ FLIPKART CATEGORY GRID -->
                     <div class="w-full bg-white px-2 py-5 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] border-b border-gray-200 rounded-t-[20px] relative z-10 -mt-3">
                         <div class="grid grid-cols-4 gap-y-6 gap-x-2">
-                            <!-- Item 1 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3014/3014498.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Grocery</span>
                             </div>
-                            <!-- Item 2 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3437/3437364.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Mobiles</span>
                             </div>
-                            <!-- Item 3 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3159/3159614.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Fashion</span>
                             </div>
-                            <!-- Item 4 -->
                             <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/1973/1973617.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Services</span>
                             </div>
-                            <!-- Item 5 -->
                             <div onclick="switchMarketTab('shops')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/1198/1198364.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Top Shops</span>
                             </div>
-                            <!-- Item 6 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/2652/2652218.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Electronics</span>
                             </div>
-                            <!-- Item 7 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/2590/2590514.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Home</span>
                             </div>
-                            <!-- Item 8 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3163/3163191.png" class="w-full h-full object-contain drop-shadow-sm">
@@ -1375,11 +1315,6 @@ searchInput.placeholder = "Search products, services, or shops...";
                         </div>
                     </div>
                 `;
-
-
-                // 👉 YAHAN TAK REPLACE KAREIN 👈
-
-                document.getElementById('section-title').innerText = "Trending Products";
 
                 return false;
             }
