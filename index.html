@@ -1060,66 +1060,51 @@ async function handleShopSubmit(e) {
                     </div>
                 `;
 
-            heroContent.innerHTML = `
-<!-- Injecting Custom Animations -->
+               heroContent.innerHTML = `
 <style>
-    @keyframes blob {
-        0% { transform: translate(0px, 0px) scale(1); }
-        33% { transform: translate(30px, -50px) scale(1.1); }
-        66% { transform: translate(-20px, 20px) scale(0.9); }
-        100% { transform: translate(0px, 0px) scale(1); }
+    /* Premium Dotted Background */
+    .bg-dotted {
+        background-color: #fcfcfd;
+        background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+        background-size: 24px 24px;
     }
-    .animate-blob { animation: blob 8s infinite ease-in-out; }
-    .animation-delay-2000 { animation-delay: 2s; }
-    .animation-delay-4000 { animation-delay: 4s; }
     
+    /* Smooth Fade In Animation */
     @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(25px); }
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
-    .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+    .fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
     
     .delay-100 { animation-delay: 0.1s; }
     .delay-200 { animation-delay: 0.2s; }
     .delay-300 { animation-delay: 0.3s; }
     .delay-400 { animation-delay: 0.4s; }
-    
-    @keyframes textGradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    .animate-gradient-text {
-        background-size: 200% auto;
-        animation: textGradient 4s linear infinite;
-    }
 </style>
 
-<div class="relative w-full min-h-screen bg-[#09090E] text-white overflow-hidden font-sans">
+<div class="relative w-full min-h-screen bg-dotted text-[#0f172a] font-sans">
 
-    <!-- ================= ANIMATED BACKGROUND AURORA ================= -->
-    <div class="absolute top-[-10%] left-[-10%] w-[350px] h-[350px] bg-blue-600/30 rounded-full mix-blend-screen filter blur-[100px] animate-blob pointer-events-none"></div>
-    <div class="absolute top-[20%] right-[-10%] w-[350px] h-[350px] bg-purple-600/30 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-2000 pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] left-[20%] w-[350px] h-[350px] bg-indigo-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-4000 pointer-events-none"></div>
+    <!-- Subtle Top Gradient to blend search bar -->
+    <div class="absolute top-0 left-0 w-full h-[150px] bg-gradient-to-b from-[#fcfcfd] to-transparent pointer-events-none z-0"></div>
 
-    <!-- ================= SEARCH BAR (Glassmorphism) ================= -->
+    <!-- ================= SEARCH BAR ================= -->
     <div class="px-4 pt-4 pb-2 sticky top-0 z-50 fade-in-up">
         <div class="
             relative
-            h-[52px]
-            rounded-[20px]
-            bg-white/10
-            backdrop-blur-2xl
-            border border-white/10
+            h-[50px]
+            rounded-[16px]
+            bg-white/80
+            backdrop-blur-xl
+            border border-[#e2e8f0]
+            shadow-[0_4px_20px_rgba(0,0,0,0.03)]
             flex items-center
             px-4
-            shadow-[0_8px_32px_rgba(0,0,0,0.2)]
             transition-all duration-300
-            focus-within:bg-white/15
-            focus-within:border-blue-500/50
-            focus-within:shadow-[0_0_20px_rgba(59,130,246,0.3)]
+            focus-within:bg-white
+            focus-within:border-blue-500/30
+            focus-within:shadow-[0_8px_30px_rgba(37,99,235,0.08)]
         ">
-            <i class="fas fa-search text-[16px] text-gray-400"></i>
+            <i class="fas fa-search text-[15px] text-[#94a3b8]"></i>
             
             <input
                 type="text"
@@ -1133,93 +1118,84 @@ async function handleShopSubmit(e) {
                     bg-transparent
                     px-3
                     outline-none
-                    text-[16px]
+                    text-[15px]
                     font-medium
-                    text-white
-                    placeholder:text-gray-400
+                    text-[#0f172a]
+                    placeholder:text-[#94a3b8]
                 "
             >
 
             <button
                 onclick="startVoiceSearch()"
                 class="
-                    w-[36px]
-                    h-[36px]
-                    rounded-full
-                    bg-white/10
+                    w-[34px]
+                    h-[34px]
+                    rounded-[10px]
+                    bg-[#f1f5f9]
                     flex
                     items-center
                     justify-center
-                    hover:bg-white/20
-                    active:scale-90
-                    transition-all
+                    active:scale-95
+                    transition-transform
                 "
             >
-                <i class="fas fa-microphone text-[14px] text-blue-400 mic-icon"></i>
+                <i class="fas fa-microphone text-[14px] text-blue-600 mic-icon"></i>
             </button>
         </div>
 
         <!-- SEARCH DROPDOWN -->
-        <div id="search-dropdown" class="absolute left-4 right-4 mt-3 bg-[#1A1A24]/90 backdrop-blur-3xl rounded-[20px] shadow-2xl border border-white/10 hidden max-h-80 overflow-y-auto z-[100]"></div>
+        <div id="search-dropdown" class="absolute left-4 right-4 mt-2 bg-white rounded-[16px] shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-[#f1f5f9] hidden max-h-80 overflow-y-auto z-[100]"></div>
     </div>
 
 
     <!-- ================= HERO ================= -->
-    <section class="relative px-6 pt-10 pb-12 text-center z-10">
+    <section class="relative px-6 pt-12 pb-14 text-center z-10">
 
         <!-- LABEL -->
-        <div class="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md fade-in-up delay-100">
-            <span class="w-[8px] h-[8px] rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.8)]"></span>
-            <span class="text-[11px] font-bold tracking-[0.2em] text-gray-300">
+        <div class="inline-flex items-center gap-2 mb-6 px-3 py-1.5 bg-white border border-[#e2e8f0] rounded-full shadow-sm fade-in-up delay-100">
+            <span class="w-[6px] h-[6px] rounded-full bg-blue-600 animate-pulse"></span>
+            <span class="text-[10px] font-bold tracking-[0.18em] text-[#64748b]">
                 MERCHANT HUB
             </span>
         </div>
 
         <!-- HEADING -->
-        <h1 class="text-[44px] sm:text-6xl leading-[1.05] tracking-tight font-extrabold text-white mb-5 fade-in-up delay-200">
+        <h1 class="text-[42px] sm:text-6xl leading-[1.05] tracking-tight font-extrabold text-[#0f172a] mb-5 fade-in-up delay-200">
             Your Store.<br>
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 animate-gradient-text">
+            <span class="text-blue-600">
                 Smarter.
             </span>
         </h1>
 
         <!-- DESCRIPTION -->
-        <p class="text-[15px] leading-[1.5] text-gray-400 max-w-[300px] mx-auto mb-10 fade-in-up delay-300 font-medium">
-            Everything you need to manage your store, orders, billing, and insights.
+        <p class="text-[15px] leading-[1.6] text-[#64748b] max-w-[320px] mx-auto mb-10 fade-in-up delay-300 font-medium">
+            Everything you need to manage your store, orders, billing, and business insights.
         </p>
 
         <!-- ================= CTA BUTTONS ================= -->
-        <div class="flex flex-col items-center gap-5 max-w-[320px] mx-auto fade-in-up delay-400">
+        <div class="flex flex-col items-center gap-4 max-w-[320px] mx-auto fade-in-up delay-400">
             
             <a
                 href="dashboard.html?shop=${activeShop}"
                 class="
-                    group
-                    relative
                     w-full
-                    h-[56px]
-                    rounded-[18px]
-                    bg-gradient-to-r from-[#0066FF] to-[#5E5CE6]
+                    h-[54px]
+                    rounded-[16px]
+                    bg-[#0f172a]
                     text-white
                     flex
                     items-center
                     justify-center
-                    gap-3
-                    text-[17px]
+                    gap-2.5
+                    text-[16px]
                     font-semibold
-                    shadow-[0_10px_30px_rgba(0,102,255,0.3)]
-                    hover:shadow-[0_10px_40px_rgba(0,102,255,0.5)]
-                    hover:-translate-y-1
+                    shadow-[0_8px_20px_rgba(15,23,42,0.15)]
                     active:scale-95
-                    transition-all
-                    duration-300
-                    overflow-hidden
+                    transition-transform
+                    hover:bg-[#1e293b]
                 "
             >
-                <!-- Button Shine Effect -->
-                <div class="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"></div>
-                
-                <i class="fas fa-chart-line text-[15px]"></i>
+                <i class="fas fa-chart-line text-[14px] opacity-80"></i>
                 Open Dashboard
             </a>
 
@@ -1227,57 +1203,70 @@ async function handleShopSubmit(e) {
                 href="store.html?shop=${activeShop}"
                 class="
                     text-[14px]
-                    text-gray-300
-                    font-medium
+                    text-[#334155]
+                    font-semibold
                     flex
                     items-center
-                    gap-2
-                    hover:text-white
+                    gap-1.5
+                    hover:text-blue-600
                     active:opacity-50
                     transition-colors
                 "
             >
-                <div class="w-[28px] h-[28px] rounded-full bg-white/10 flex items-center justify-center">
-                    <i class="fas fa-store text-[11px] text-blue-400"></i>
-                </div>
                 Visit My Store 
-                <i class="fas fa-arrow-right text-[11px] opacity-70"></i>
+                <i class="fas fa-arrow-up-right-from-square text-[10px] opacity-70"></i>
             </a>
 
         </div>
 
-        <!-- ================= BUSINESS SNAPSHOT (Glass Cards) ================= -->
-        <div class="mt-12 grid grid-cols-3 gap-3 max-w-[360px] mx-auto fade-in-up delay-400">
+        <!-- ================= BUSINESS SNAPSHOT ================= -->
+        <div class="
+            relative
+            mt-12
+            max-w-[360px]
+            mx-auto
+            bg-white
+            border border-[#e2e8f0]
+            rounded-[20px]
+            p-5
+            shadow-[0_8px_30px_rgba(0,0,0,0.04)]
+            fade-in-up delay-400
+        ">
+            <div class="flex items-center justify-between px-2">
 
-            <!-- Orders -->
-            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[20px] p-4 flex flex-col items-center hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 cursor-default">
-                <div class="w-[42px] h-[42px] rounded-full bg-blue-500/20 flex items-center justify-center mb-2.5 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-                    <i class="fas fa-box text-[18px] text-blue-400"></i>
+                <!-- Orders -->
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-[42px] h-[42px] rounded-full bg-[#f1f5f9] flex items-center justify-center">
+                        <i class="fas fa-box text-[16px] text-blue-600"></i>
+                    </div>
+                    <span class="text-[11px] font-bold text-[#64748b] tracking-wide uppercase">Orders</span>
                 </div>
-                <span class="text-[11px] font-semibold text-gray-300 tracking-wide uppercase">Orders</span>
-            </div>
 
-            <!-- Billing -->
-            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[20px] p-4 flex flex-col items-center hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 cursor-default">
-                <div class="w-[42px] h-[42px] rounded-full bg-purple-500/20 flex items-center justify-center mb-2.5 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
-                    <i class="fas fa-file-invoice text-[18px] text-purple-400"></i>
+                <div class="w-[1px] h-[30px] bg-[#e2e8f0]"></div>
+
+                <!-- Billing -->
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-[42px] h-[42px] rounded-full bg-[#f1f5f9] flex items-center justify-center">
+                        <i class="fas fa-file-invoice text-[16px] text-[#6366f1]"></i>
+                    </div>
+                    <span class="text-[11px] font-bold text-[#64748b] tracking-wide uppercase">Billing</span>
                 </div>
-                <span class="text-[11px] font-semibold text-gray-300 tracking-wide uppercase">Billing</span>
-            </div>
 
-            <!-- Insights -->
-            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[20px] p-4 flex flex-col items-center hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 cursor-default">
-                <div class="w-[42px] h-[42px] rounded-full bg-indigo-500/20 flex items-center justify-center mb-2.5 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                    <i class="fas fa-chart-pie text-[18px] text-indigo-400"></i>
+                <div class="w-[1px] h-[30px] bg-[#e2e8f0]"></div>
+
+                <!-- Insights -->
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-[42px] h-[42px] rounded-full bg-[#f1f5f9] flex items-center justify-center">
+                        <i class="fas fa-chart-pie text-[16px] text-[#8b5cf6]"></i>
+                    </div>
+                    <span class="text-[11px] font-bold text-[#64748b] tracking-wide uppercase">Insights</span>
                 </div>
-                <span class="text-[11px] font-semibold text-gray-300 tracking-wide uppercase">Insights</span>
-            </div>
 
+            </div>
         </div>
 
     </section>
 
-    <!-- Rest of your section -->
     <div class="relative z-10 fade-in-up delay-400">
         ${merchantWhyChooseUsSection}
     </div>
