@@ -4493,6 +4493,23 @@ function trackSearchImpression(shopIdToTrack) {
             startAutoSlide();
         }
 
+        // 🌟 DYNAMIC BANNERS FETCHER FOR HOME PAGE 🌟
+        async function loadHomeBanners() {
+            const slider = document.getElementById('promo-slider');
+            if (!slider) return;
+            try {
+                const snap = await db.collection('banners').orderBy('createdAt', 'desc').get();
+                if (!snap.empty) {
+                    let html = '';
+                    snap.forEach(doc => {
+                        const b = doc.data();
+                        html += `<img src="${b.imageUrl}" onclick="window.location.href='${b.redirectUrl}'" class="w-full h-full object-cover shrink-0 snap-center cursor-pointer" alt="Promo">`;
+                    });
+                    slider.innerHTML = html;
+                    if (typeof initPromoSlider === 'function') initPromoSlider();
+                }
+            } catch(e) { console.log("Banner load error:", e); }
+        }
 
     </script>
 
