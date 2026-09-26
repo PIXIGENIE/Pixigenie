@@ -666,19 +666,19 @@
 
     
 
-        window.addEventListener('DOMContentLoaded', () => {
+                window.addEventListener('DOMContentLoaded', async () => {
+            // 1. Sabse pehle database se banners fetch karo taaki refresh ki zarurat na pade
+            await loadHomeBanners();
+            
+            // 2. Fir UI aur Login status check karo
             const isLoggedIn = updateUIBasedOnLogin();
             updateCartBadge();
             
-            // ✨ PROMO SLIDER START KARO YAHAN SE ✨
-            setTimeout(() => {
-                if(typeof initPromoSlider === 'function') initPromoSlider();
-            }, 300);
-
             if (!isLoggedIn) {
                 setTimeout(openAuthModal, 500); 
             }
         });
+
 
 
 
