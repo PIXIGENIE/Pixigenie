@@ -483,16 +483,19 @@
         <section id="marketplace" class="flex-1 py-16 sm:py-20 px-4 bg-white border-t border-gray-100 relative z-20 rounded-t-[2.5rem] shadow-[0_-5px_30px_rgba(0,0,0,0.02)]">
             <div class="max-w-6xl mx-auto">
                 
-                <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 reveal">
-                    <div class="flex-1">
-                        <h3 id="section-title" class="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">Live Local Shops</h3>
-                        <p id="section-subtitle" class="text-sm sm:text-base text-gray-500 mt-1.5 font-medium">Support neighborhood businesses around you.</p>
-                    </div>
-                    
-                    <button onclick="findNearbyShops(this)" class="shrink-0 bg-white hover:bg-gray-50 text-gray-800 px-5 py-3 rounded-2xl border border-gray-200 transition-all flex items-center gap-2 font-bold text-sm shadow-sm active:scale-95 cursor-pointer hover:shadow-md hover:-translate-y-0.5">
-                        <i class="fas fa-location-arrow text-blue-500"></i> Near Me
-                    </button>
-                </div>
+                <div class="mb-6 flex flex-row items-center justify-between gap-3 reveal">
+    <div class="flex-1 min-w-0">
+        <h3 id="section-title" class="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight truncate">Live Local Shops</h3>
+        <p id="section-subtitle" class="text-[12px] sm:text-base text-gray-500 mt-1 font-medium truncate">Support neighborhood businesses.</p>
+    </div>
+    
+    <button onclick="findNearbyShops(this)" class="shrink-0 bg-white hover:bg-gray-50 text-gray-800 px-3 sm:px-5 py-2.5 sm:py-3 rounded-[12px] sm:rounded-2xl border border-gray-200 transition-all flex items-center gap-1.5 font-bold text-xs sm:text-sm shadow-sm active:scale-95 cursor-pointer">
+        <i class="fas fa-location-arrow text-blue-500"></i> 
+        <span class="hidden sm:inline">Near Me</span>
+        <span class="sm:hidden">Locate</span>
+    </button>
+</div>
+
                 <!-- ✨ NAYA PARENT CONTAINER START ✨ -->
 <div id="filter-search-container">
                               <!-- ✨ COMPACT FILTER PILLS (Near Me ke bagal mein fit hone ke liye) ✨ -->
@@ -1592,31 +1595,41 @@ trackSearchImpression(shopId);
                             : '';
 
                         return `
-                        <div class="glass-card hover:bg-white rounded-[2rem] p-5 sm:p-6 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:-translate-y-2 transition-all duration-500 flex flex-col group relative overflow-hidden cursor-pointer active:scale-95 reveal">
-                            <div class="flex items-start gap-4 mb-5 relative z-10">
-                                <div class="relative shrink-0 group-hover:scale-110 transition-transform duration-500 mx-1 mt-1 mb-2">
-                                    <div class="w-14 h-14 bg-gray-50 text-blue-500 rounded-full flex items-center justify-center relative z-10 ring-2 ${ringColor} ring-offset-[2px] ring-offset-white shadow-sm overflow-hidden">
-                                        ${logoHtml}
-                                    </div>
-                                    ${bizBadgeHtml}
-                                </div>
+<div class="glass-card hover:bg-white rounded-[1.5rem] p-4 sm:p-6 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden cursor-pointer active:scale-95 reveal border border-gray-100">
+    
+    <!-- Image & Text Wrapper -->
+    <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-3 sm:gap-4 mb-4 relative z-10 w-full">
+        
+        <!-- Logo Section -->
+        <div class="relative shrink-0 group-hover:scale-105 transition-transform duration-500 mx-auto sm:mx-0">
+            <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 text-blue-500 rounded-full flex items-center justify-center relative z-10 ring-2 ${ringColor} ring-offset-[2px] ring-offset-white shadow-sm overflow-hidden">
+                ${logoHtml}
+            </div>
+            ${bizBadgeHtml}
+        </div>
 
-                                <div class="min-w-0 flex-1 mt-1">
-                                    <h4 class="text-gray-900 font-bold text-lg leading-tight flex items-center">
-                                        <span class="truncate">${shop.shopName}</span> 
-                                        ${verifiedTick}
-                                    </h4>
+        <!-- Content Section -->
+        <div class="min-w-0 flex-1 w-full mt-2 sm:mt-0">
+            <h4 class="text-gray-900 font-bold text-[15px] sm:text-lg leading-tight flex flex-wrap items-center justify-center sm:justify-start gap-1">
+                <span class="truncate max-w-[85%]">${shop.shopName}</span> 
+                ${verifiedTick}
+            </h4>
 
-                                    <div class="flex items-center gap-2 mt-1.5 text-xs text-gray-500">
-                                        <span class="flex items-center gap-1 font-bold text-gray-800"><i class="fas fa-star text-yellow-400 text-[10px]"></i> ${avgRating}</span>
-                                        <span class="text-gray-300">•</span>
-                                        ${distanceHtml}
-                                    </div>
-                                    ${shop.landmark ? `<p class="text-[11px] text-gray-500 mt-1.5 font-medium truncate"><i class="fas fa-location-dot text-purple-500 mr-1.5 text-[10px]"></i> ${shop.landmark}</p>` : ''}
-                                </div>
-                            </div>
-                            <a href="store.html?shop=${shopId}" class="mt-auto w-full bg-gray-50 text-blue-600 font-bold py-3.5 rounded-2xl text-center text-sm flex justify-center items-center gap-2 group-hover:bg-blue-50 transition-colors duration-300">Visit Store <i class="fas fa-arrow-right"></i></a>
-                        </div>`;
+            <div class="flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 mt-1.5 text-[10px] sm:text-xs text-gray-500 flex-wrap">
+                <span class="flex items-center gap-1 font-bold text-gray-800"><i class="fas fa-star text-yellow-400 text-[10px]"></i> ${avgRating}</span>
+                <span class="text-gray-300 hidden sm:inline">•</span>
+                ${distanceHtml}
+            </div>
+            ${shop.landmark ? `<p class="text-[10px] sm:text-[11px] text-gray-500 mt-1 sm:mt-1.5 font-medium truncate"><i class="fas fa-location-dot text-purple-500 mr-1 text-[10px]"></i> ${shop.landmark}</p>` : ''}
+        </div>
+    </div>
+    
+    <!-- Button -->
+    <a href="store.html?shop=${shopId}" class="mt-auto w-full bg-blue-50/50 hover:bg-blue-50 text-blue-600 font-bold py-2.5 sm:py-3.5 rounded-[12px] sm:rounded-2xl text-center text-[11px] sm:text-sm flex justify-center items-center gap-1.5 transition-colors duration-300">
+        Visit Store <i class="fas fa-arrow-right text-[10px]"></i>
+    </a>
+</div>`;
+
                     });
                     
                     grid.innerHTML = cardsHtmlArray.join('');
