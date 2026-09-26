@@ -666,13 +666,20 @@
 
     
 
-                                window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', () => {
             const isLoggedIn = updateUIBasedOnLogin();
             updateCartBadge();
+            
+            // ✨ PROMO SLIDER START KARO YAHAN SE ✨
+            setTimeout(() => {
+                if(typeof initPromoSlider === 'function') initPromoSlider();
+            }, 300);
+
             if (!isLoggedIn) {
                 setTimeout(openAuthModal, 500); 
             }
         });
+
 
 
          
@@ -1151,16 +1158,21 @@ async function handleShopSubmit(e) {
                         </div>
                     </div>
 
-                    <!-- 🖼️ HD PROMO SLIDER (Slider Size Badha Diya!) -->
+                                  <!-- 🖼️ HD PROMO SLIDER (With Dots Container) -->
                     <div class="w-full bg-[#f8fafc] p-2 sm:p-3 relative z-0">
-                        <div id="promo-slider" class="w-full h-[180px] sm:h-[220px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth rounded-[12px] shadow-sm border border-gray-200" style="-ms-overflow-style: none; scrollbar-width: none;">
-                            <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 1">
-                            <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 2">
-                            <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 3">
+                        <div class="relative w-full h-[140px] sm:h-[180px] rounded-[12px] shadow-sm border border-gray-200 overflow-hidden">
+                            <div id="promo-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth" style="-ms-overflow-style: none; scrollbar-width: none;">
+                                <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 1">
+                                <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 2">
+                                <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 3">
+                            </div>
+                            <!-- ⚪ SLIDER DOTS YAHAN AAYENGE -->
+                            <div id="promo-slider-dots" class="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none">
+                            </div>
                         </div>
                     </div>
 
-                                   <!-- 🛍️ ADVANCED FLIPKART CATEGORY GRID -->
+                    <!-- 🛍️ ADVANCED FLIPKART CATEGORY GRID -->
                     <div class="w-full bg-white px-1 py-4 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] border-b border-gray-200 rounded-t-[20px] relative z-10 -mt-2">
                         <div class="grid grid-cols-4 gap-y-5 gap-x-1 sm:gap-x-2">
                             <!-- Item 1: Grocery -->
@@ -1199,10 +1211,10 @@ async function handleShopSubmit(e) {
                                 <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Electronics</span>
                             </div>
                             
-                            <!-- Item 5: Home & Furniture -->
+                            <!-- Item 5: Home & Furniture (✨ FIXED TRANSPARENT ICON ✨) -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
                                 <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/ab7e2b022a4587dd.jpg?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 rounded-full group-hover:-translate-y-1 transition-transform">
+                                     <img src="https://cdn-icons-png.flaticon.com/512/2590/2590514.png" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform opacity-90">
                                      <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
                                 </div>
                                 <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Home</span>
@@ -1226,7 +1238,7 @@ async function handleShopSubmit(e) {
                                 <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Beauty</span>
                             </div>
 
-                            <!-- Item 8: Services (Custom for your app) -->
+                            <!-- Item 8: Offers -->
                             <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
                                 <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
                                      <img src="https://rukminim2.flixcart.com/flap/128/128/image/f15c02bfeb02d15d.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
@@ -1272,16 +1284,21 @@ async function handleShopSubmit(e) {
                         </div>
                     </div>
 
-                    <!-- 🖼️ HD PROMO SLIDER -->
-                    <div class="w-full bg-[#f8fafc] p-2 sm:p-3">
-                        <div id="promo-slider" class="w-full h-[140px] sm:h-[180px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth rounded-[12px] shadow-sm border border-gray-200" style="-ms-overflow-style: none; scrollbar-width: none;">
-                            <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 1">
-                            <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 2">
-                            <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 3">
+                                        <!-- 🖼️ HD PROMO SLIDER (With Dots Container) -->
+                    <div class="w-full bg-[#f8fafc] p-2 sm:p-3 relative z-0">
+                        <div class="relative w-full h-[140px] sm:h-[180px] rounded-[12px] shadow-sm border border-gray-200 overflow-hidden">
+                            <div id="promo-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth" style="-ms-overflow-style: none; scrollbar-width: none;">
+                                <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 1">
+                                <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 2">
+                                <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 3">
+                            </div>
+                            <!-- ⚪ SLIDER DOTS YAHAN AAYENGE -->
+                            <div id="promo-slider-dots" class="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none">
+                            </div>
                         </div>
                     </div>
 
-                                      <!-- 🛍️ ADVANCED FLIPKART CATEGORY GRID -->
+                    <!-- 🛍️ ADVANCED FLIPKART CATEGORY GRID -->
                     <div class="w-full bg-white px-1 py-4 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] border-b border-gray-200 rounded-t-[20px] relative z-10 -mt-2">
                         <div class="grid grid-cols-4 gap-y-5 gap-x-1 sm:gap-x-2">
                             <!-- Item 1: Grocery -->
@@ -1320,10 +1337,10 @@ async function handleShopSubmit(e) {
                                 <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Electronics</span>
                             </div>
                             
-                            <!-- Item 5: Home & Furniture -->
+                            <!-- Item 5: Home & Furniture (✨ FIXED TRANSPARENT ICON ✨) -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
                                 <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
-                                     <img src="https://rukminim2.flixcart.com/flap/128/128/image/ab7e2b022a4587dd.jpg?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 rounded-full group-hover:-translate-y-1 transition-transform">
+                                     <img src="https://cdn-icons-png.flaticon.com/512/2590/2590514.png" class="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform opacity-90">
                                      <div class="w-full h-4 bg-gradient-to-t from-blue-100 to-transparent rounded-b-[14px] absolute bottom-0 z-0"></div>
                                 </div>
                                 <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Home</span>
@@ -1347,7 +1364,7 @@ async function handleShopSubmit(e) {
                                 <span class="text-[10.5px] sm:text-xs font-semibold text-gray-800 text-center leading-tight">Beauty</span>
                             </div>
 
-                            <!-- Item 8: Services (Custom for your app) -->
+                            <!-- Item 8: Offers -->
                             <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-95 transition group">
                                 <div class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] bg-transparent rounded-full flex flex-col items-center justify-end relative overflow-visible">
                                      <img src="https://rukminim2.flixcart.com/flap/128/128/image/f15c02bfeb02d15d.png?q=100" class="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow-md z-10 -mb-1 group-hover:-translate-y-1 transition-transform">
@@ -4404,6 +4421,60 @@ function trackSearchImpression(shopIdToTrack) {
 
             // Mic Start!
             recognition.start();
+        }
+        // ===============================================
+        // ✨ AUTO-SLIDING PROMO BANNER ENGINE ✨
+        // ===============================================
+        function initPromoSlider() {
+            const slider = document.getElementById('promo-slider');
+            const dotsContainer = document.getElementById('promo-slider-dots');
+            
+            if (!slider || !dotsContainer) return;
+
+            const slides = slider.children;
+            const slideCount = slides.length;
+            if (slideCount === 0) return;
+
+            // 1. Dots Generate Karo
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < slideCount; i++) {
+                const dot = document.createElement('div');
+                // Pehle wale dot ko active (lamba white) banao
+                dot.className = `h-1.5 rounded-full transition-all duration-300 ${i === 0 ? 'bg-white w-4' : 'bg-white/50 w-1.5'}`;
+                dot.id = `promo-dot-${i}`;
+                dotsContainer.appendChild(dot);
+            }
+
+            // 2. Scroll karne par dots update hon
+            slider.addEventListener('scroll', () => {
+                // Determine kaunsi image abhi screen par hai
+                const activeIdx = Math.round(slider.scrollLeft / slider.clientWidth);
+                
+                for (let i = 0; i < slideCount; i++) {
+                    const dot = document.getElementById(`promo-dot-${i}`);
+                    if (dot) {
+                        if (i === activeIdx) {
+                            dot.className = "w-4 h-1.5 rounded-full bg-white transition-all duration-300 shadow-sm";
+                        } else {
+                            dot.className = "w-1.5 h-1.5 rounded-full bg-white/50 transition-all duration-300";
+                        }
+                    }
+                }
+            });
+
+            // 3. Har 3 Second me Auto-Slide (Loop back to start)
+            if(window.promoInterval) clearInterval(window.promoInterval);
+            
+            window.promoInterval = setInterval(() => {
+                let activeIdx = Math.round(slider.scrollLeft / slider.clientWidth);
+                activeIdx++;
+                
+                if (activeIdx >= slideCount) {
+                    activeIdx = 0; // Wapas shuru mein jao
+                }
+                
+                slider.scrollTo({ left: activeIdx * slider.clientWidth, behavior: 'smooth' });
+            }, 3000); // 3000ms = 3 Seconds
         }
 
     </script>
