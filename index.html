@@ -1706,41 +1706,40 @@ function getVIPBadge(isVerified, plan) {
 }
 
 
-                   function addToCart(event, name, price, shopName, shopPhone) {
+                        function addToCart(event, name, price, shopName, shopPhone) {
             event.stopPropagation(); 
-            let cart = JSON.parse(localStorage.getItem('pixigenie_cart')) || [];
+            let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
             if (existingItem) {
                 existingItem.qty += 1; 
             } else {
                 cart.push({ name, price: parseInt(price), shopName, shopPhone, qty: 1 });
             }
-            localStorage.setItem('pixigenie_cart', JSON.stringify(cart));
+            localStorage.setItem(getCartKey(), JSON.stringify(cart));
             if (typeof updateCartBadge === 'function') updateCartBadge();
             
             let btn = event.currentTarget;
-
-            // Agar yeh Full-Screen modal ka bada button hai, toh isse bypass karo
             if (btn.id === 'detail-cart-btn') return;
-
-            // 🚀 DOUBLE CLICK BUG FIX
             if (btn.dataset.adding === "true") return;
             btn.dataset.adding = "true";
 
-            let origHtml = `<i class="fas fa-cart-plus text-sm"></i> Cart`;
-
-            btn.innerHTML = `<i class="fas fa-check text-lg"></i> Added`;
+            // Flipkart style button ke liye Original HTML set karo
+            let origHtml = `<i class="fas fa-shopping-cart text-[10px]"></i> Add`;
             
-            // ✨ NAYA FIX: Mobile hover color ko temporarily hata do taaki white text perfectly dikhe
-            btn.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
-            btn.classList.remove('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
+            // Jab "Added" likha aaye toh thoda light green/grey background dikhao taaki white text chip na jaye
+            btn.innerHTML = `<i class="fas fa-check text-[10px]"></i> Added`;
+            
+            // Flipkart style button ki purani classes hatao
+            btn.classList.remove('bg-white', 'border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
+            // Success animation classes dalo
+            btn.classList.add('bg-green-50', 'border-green-200', 'text-green-700');
 
             setTimeout(() => {
+                // Wapas default Flipkart style karna
                 btn.innerHTML = origHtml;
-                // Animation khatam hone par wapas normal kar do
-                btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
-                btn.classList.add('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
-                btn.dataset.adding = "false"; // Lock khol do
+                btn.classList.remove('bg-green-50', 'border-green-200', 'text-green-700');
+                btn.classList.add('bg-white', 'border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
+                btn.dataset.adding = "false"; 
             }, 1200);
         }
 
@@ -1846,7 +1845,7 @@ function getVIPBadge(isVerified, plan) {
             }
         }
 
-        function addToCart(event, name, price, shopName, shopPhone) {
+             function addToCart(event, name, price, shopName, shopPhone) {
             event.stopPropagation(); 
             let cart = JSON.parse(localStorage.getItem(getCartKey())) || [];
             const existingItem = cart.find(item => item.name === name && item.shopPhone === shopPhone);
@@ -1863,16 +1862,22 @@ function getVIPBadge(isVerified, plan) {
             if (btn.dataset.adding === "true") return;
             btn.dataset.adding = "true";
 
-            let origHtml = `<i class="fas fa-cart-plus text-sm"></i> Cart`;
-            btn.innerHTML = `<i class="fas fa-check text-lg"></i> Added`;
+            // Flipkart style button ke liye Original HTML set karo
+            let origHtml = `<i class="fas fa-shopping-cart text-[10px]"></i> Add`;
             
-            btn.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
-            btn.classList.remove('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
+            // Jab "Added" likha aaye toh thoda light green/grey background dikhao taaki white text chip na jaye
+            btn.innerHTML = `<i class="fas fa-check text-[10px]"></i> Added`;
+            
+            // Flipkart style button ki purani classes hatao
+            btn.classList.remove('bg-white', 'border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
+            // Success animation classes dalo
+            btn.classList.add('bg-green-50', 'border-green-200', 'text-green-700');
 
             setTimeout(() => {
+                // Wapas default Flipkart style karna
                 btn.innerHTML = origHtml;
-                btn.classList.remove('bg-purple-600', 'text-white', 'shadow-md', 'border-purple-600');
-                btn.classList.add('bg-purple-50', 'text-purple-600', 'hover:bg-purple-100', 'border-purple-100');
+                btn.classList.remove('bg-green-50', 'border-green-200', 'text-green-700');
+                btn.classList.add('bg-white', 'border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
                 btn.dataset.adding = "false"; 
             }, 1200);
         }
