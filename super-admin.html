@@ -10,6 +10,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <script>
         // AAPKA FIREBASE CONFIG YAHAN AAYEGA
@@ -77,7 +78,33 @@
             </div>
         </div>
 
-        <!-- 3. SHOP CONTROL (LIST & SEARCH BY NAME) -->
+        <!-- 3. MANAGE PROMO BANNERS (NEW FEATURE) -->
+        <div class="glass-card border border-blue-100">
+            <h2 class="text-lg font-black text-gray-900 mb-1"><i class="fas fa-images text-blue-500 mr-2"></i> Home Slider Banner Control</h2>
+            <p class="text-xs text-gray-500 mb-5 font-semibold">Upload slider images and set where users will redirect on click.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">Banner Image File</label>
+                    <input type="file" id="banner-img-file" accept="image/*" class="ios-input pt-2.5 file:mr-4 file:py-1 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1">Redirect Link (URL)</label>
+                    <input type="text" id="banner-redirect-url" placeholder="e.g. store.html?shop=my-shop-123 or https://google.com" class="ios-input">
+                </div>
+                <button id="btn-upload-banner" onclick="uploadBanner()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl transition active:scale-95 shadow-sm">Upload & Publish Banner</button>
+            </div>
+
+            <!-- Active Banners List -->
+            <div class="mt-6 border-t border-gray-100 pt-4">
+                <h3 class="font-bold text-gray-800 text-sm mb-3">Active Banners</h3>
+                <div id="admin-banner-list" class="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+                    <p class="text-xs text-gray-400 text-center py-4">Loading banners...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. SHOP CONTROL (LIST & SEARCH BY NAME) -->
         <div class="glass-card border border-red-100">
             <h2 class="text-lg font-black text-gray-900 mb-1"><i class="fas fa-shield-alt text-red-500 mr-2"></i> Shop Control Center</h2>
             <p class="text-xs text-gray-500 mb-5 font-semibold">Search by Shop Name or view recently registered shops.</p>
@@ -104,9 +131,8 @@
 
     <!-- JS LOGIC -->
     <script>
-               // 🚨 REAL SECURITY CHECK: Firebase Auth से चेक करेगा कि असली एडमिन है या नहीं
+        // 🚨 REAL SECURITY CHECK: Firebase Auth से चेक करेगा कि असली एडमिन है या नहीं
         firebase.auth().onAuthStateChanged((user) => {
-            // अगर यूज़र लॉगिन नहीं है, या उसका ईमेल आपका एडमिन ईमेल नहीं है, तो बाहर निकाल दो
             if (!user || user.email !== 'pixigenie8750@gmail.com') {
                 alert("🚨 Access Denied! Unauthorized User.");
                 window.location.replace("index.html");
@@ -116,7 +142,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadDashboardStats();
-            loadAdminShops(false); // Page load hote hi pehli 5 shops load karega
+            loadAdminShops(false); 
+            loadAdminBanners(); // Banners load karega
         });
 
         // ==========================================
@@ -152,7 +179,7 @@
                     await db.collection('shops').doc(shopDoc.id).update({ plan: selectedPlan });
                     alert(`✅ Plan successfully updated to '${selectedPlan.toUpperCase()}' for: ${shopEmail}`);
                     document.getElementById('plan-shop-id').value = ''; 
-                    loadAdminShops(false); // Update hone ke baad list refresh kar do
+                    loadAdminShops(false); 
                 }
             } catch (error) {
                 alert("Error updating plan: " + error.message);
@@ -161,7 +188,95 @@
         }
 
         // ==========================================
-        // 3. ADMIN SHOP LIST & PAGINATION
+        // 3. BANNER UPLOAD & MANAGEMENT LOGIC
+        // ==========================================
+        async function uploadBanner() {
+            const fileInput = document.getElementById('banner-img-file');
+            const redirectUrl = document.getElementById('banner-redirect-url').value.trim();
+            const btn = document.getElementById('btn-upload-banner');
+
+            if (fileInput.files.length === 0) return alert("Please select an image file for the banner!");
+            if (!redirectUrl) return alert("Please enter a redirect URL!");
+
+            const file = fileInput.files[0];
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing Image...`;
+            btn.disabled = true;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const img = new Image();
+                img.onload = async function() {
+                    // Compress image to fit nicely in slider
+                    const canvas = document.createElement('canvas');
+                    let maxWidth = 1000;
+                    let scaleSize = maxWidth / img.width;
+                    canvas.width = maxWidth;
+                    canvas.height = img.height * scaleSize;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const base64Image = canvas.toDataURL('image/jpeg', 0.85);
+
+                    try {
+                        await db.collection('banners').add({
+                            imageUrl: base64Image,
+                            redirectUrl: redirectUrl,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        alert("✅ Banner uploaded successfully!");
+                        fileInput.value = '';
+                        document.getElementById('banner-redirect-url').value = '';
+                        loadAdminBanners();
+                    } catch (err) {
+                        alert("Error saving banner: " + err.message);
+                    } finally {
+                        btn.innerHTML = `Upload & Publish Banner`;
+                        btn.disabled = false;
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function loadAdminBanners() {
+            const container = document.getElementById('admin-banner-list');
+            try {
+                const snap = await db.collection('banners').orderBy('createdAt', 'desc').get();
+                if (snap.empty) {
+                    container.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">No banners added yet.</p>`;
+                    return;
+                }
+
+                let html = '';
+                snap.forEach(doc => {
+                    const b = doc.data();
+                    html += `
+                    <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 p-3 rounded-xl">
+                        <img src="${b.imageUrl}" class="w-20 h-10 object-cover rounded-lg border">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-bold text-gray-800 truncate">Link: <span class="text-blue-600 font-normal">${b.redirectUrl}</span></p>
+                        </div>
+                        <button onclick="deleteBanner('${doc.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-lg text-xs font-bold transition"><i class="fas fa-trash"></i></button>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            } catch(e) {
+                container.innerHTML = `<p class="text-xs text-red-500 text-center py-4">Error loading banners.</p>`;
+            }
+        }
+
+        async function deleteBanner(bannerId) {
+            if (!confirm("Are you sure you want to delete this banner?")) return;
+            try {
+                await db.collection('banners').doc(bannerId).delete();
+                loadAdminBanners();
+            } catch(e) { alert("Error deleting banner: " + e.message); }
+        }
+
+        // ==========================================
+        // 4. ADMIN SHOP LIST & PAGINATION
         // ==========================================
         let adminLastShopDoc = null;
         let adminHasMoreShops = true;
@@ -184,7 +299,6 @@
             }
 
             try {
-                // Latest bani hui shop sabse upar ayegi, 5 ki limit
                 let query = db.collection('shops').orderBy('createdAt', 'desc').limit(5);
                 if (isLoadMore && adminLastShopDoc) { query = query.startAfter(adminLastShopDoc); }
 
@@ -219,12 +333,12 @@
 
             } catch (error) {
                 console.error("Error loading shops:", error);
-                if (!isLoadMore) listContainer.innerHTML = `<p class="text-center text-red-500 text-sm py-4">Error loading shops. Ensure 'createdAt' index exists in Firebase.</p>`;
+                if (!isLoadMore) listContainer.innerHTML = `<p class="text-center text-red-500 text-sm py-4">Error loading shops.</p>`;
             }
         }
 
         // ==========================================
-        // 4. SEARCH SHOP BY NAME
+        // 5. SEARCH SHOP BY NAME
         // ==========================================
         async function adminSearchShop() {
             let searchVal = document.getElementById('admin-search-shop').value.trim();
@@ -232,15 +346,14 @@
             const loadMoreBtn = document.getElementById('load-more-shops-btn');
 
             if (!searchVal) {
-                loadAdminShops(false); // Box khali hone par wapas sab dikha do
+                loadAdminShops(false); 
                 return;
             }
 
             listContainer.innerHTML = '<div class="text-center py-6"><i class="fas fa-spinner fa-spin text-2xl text-blue-500 mb-2"></i><p class="text-sm text-gray-500">Searching...</p></div>';
-            if (loadMoreBtn) loadMoreBtn.classList.add('hidden'); // Search me pagination band
+            if (loadMoreBtn) loadMoreBtn.classList.add('hidden'); 
 
             try {
-                // Name based search using startAt and endAt
                 const snapshot = await db.collection('shops')
                     .orderBy('shopName')
                     .startAt(searchVal)
@@ -259,12 +372,12 @@
 
             } catch (error) {
                 console.error("Error searching:", error);
-                listContainer.innerHTML = `<p class="text-center text-red-500 text-[11px] py-4">Error: Need index for shopName. Check Firebase Console.</p>`;
+                listContainer.innerHTML = `<p class="text-center text-red-500 text-[11px] py-4">Error: Need index for shopName.</p>`;
             }
         }
 
         // ==========================================
-        // 5. GENERATE SHOP CARD HTML (For Admin)
+        // 6. GENERATE SHOP CARD HTML (For Admin)
         // ==========================================
         function generateAdminShopCard(shopId, data) {
             const isBanned = data.status === 'banned';
@@ -295,20 +408,17 @@
         }
 
         // ==========================================
-        // 6. BAN / UNBAN LOGIC (Now dynamic per card)
+        // 7. BAN / UNBAN LOGIC
         // ==========================================
         async function toggleBanShop(shopId, currentStatus) {
             const isBanning = currentStatus !== 'banned';
-            const confirmMsg = isBanning ? "Ban this shop? They won't be able to log in or sell." : "Unban this shop? They will be restored.";
-            
+            const confirmMsg = isBanning ? "Ban this shop?" : "Unban this shop?";
             if (!confirm(confirmMsg)) return;
             const newStatus = isBanning ? "banned" : "active";
 
             try {
                 await db.collection('shops').doc(shopId).update({ status: newStatus });
                 alert(`Shop successfully ${newStatus}!`);
-                
-                // Agar search box me kuch tha toh search refresh karo, warna normal list
                 if (document.getElementById('admin-search-shop').value.trim()) {
                     adminSearchShop();
                 } else {
@@ -318,17 +428,14 @@
         }
 
         // ==========================================
-        // 7. DELETE SHOP LOGIC
+        // 8. DELETE SHOP LOGIC
         // ==========================================
         async function deleteShop(shopId) {
-            if (!confirm("🚨 WARNING: This will permanently delete the shop. Are you 100% sure?")) return;
-
+            if (!confirm("🚨 WARNING: This will permanently delete the shop.")) return;
             try {
                 await db.collection('shops').doc(shopId).delete();
                 alert("🗑️ Shop deleted permanently.");
-                
-                loadDashboardStats(); // Numbers update karega
-
+                loadDashboardStats(); 
                 if (document.getElementById('admin-search-shop').value.trim()) {
                     adminSearchShop();
                 } else {
@@ -338,7 +445,7 @@
         }
 
         // ==========================================
-        // 8. LOGOUT ADMIN
+        // 9. LOGOUT ADMIN
         // ==========================================
         function logoutAdmin() {
             localStorage.removeItem('pixigenie_super_admin');
