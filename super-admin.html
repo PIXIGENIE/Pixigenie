@@ -294,11 +294,14 @@
             }
         }
 
-        async function deleteBanner(bannerId) {
+                async function deleteBanner(bannerId) {
             if (!confirm("Are you sure you want to delete this banner?")) return;
             try {
+                await db.collection('banners').doc.delete ? await db.collection('banners').doc(bannerId).delete() : null;
+                // Direct delete line
                 await db.collection('banners').doc(bannerId).delete();
-                loadAdminBanners();
+                alert("🗑️ Banner deleted successfully!");
+                loadAdminBanners(); // 👈 Ye list ko turant refresh kar dega aur purana banner gayab ho jayega
             } catch(e) { alert("Error deleting banner: " + e.message); }
         }
 
