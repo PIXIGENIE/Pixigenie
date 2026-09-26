@@ -1113,6 +1113,7 @@ async function handleShopSubmit(e) {
                 document.getElementById('section-subtitle').innerText = "Other businesses on Pixigenie.";
                 if (searchInput) searchInput.placeholder = "Search shops...";
                 fetchLiveShops();
+                loadHomeBanners();
                 return true;
 
             } else if (customerName) {
@@ -1161,10 +1162,9 @@ async function handleShopSubmit(e) {
                     <div class="w-full relative z-0 bg-gray-100 border-b border-gray-200">
                         <!-- NAYI HEIGHT (h-[180px]) AUR 'scroll-smooth' HATA DIYA HAI YAHAN SE -->
                         <div id="promo-slider" class="w-full h-[180px] sm:h-[240px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
-                            <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 1">
-                            <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 2">
-                            <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 3">
-                        </div>
+    <!-- Yahan images khali rahengi, Firebase se aayengi -->
+</div>
+
                         
                         <!-- Shadow thodi aur dark ki hai taaki dots hamesha chamken -->
                         <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/50 to-transparent pointer-events-none z-10"></div>
@@ -1257,6 +1257,7 @@ async function handleShopSubmit(e) {
                 document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
                 if (searchInput) searchInput.placeholder = "Search products, services, or shops...";
                 fetchGlobalProducts(); 
+                loadHomeBanners();
                 return true;
 
             } else {
@@ -1293,10 +1294,8 @@ async function handleShopSubmit(e) {
                     <div class="w-full relative z-0 bg-gray-100 border-b border-gray-200">
                         <!-- NAYI HEIGHT (h-[180px]) AUR 'scroll-smooth' HATA DIYA HAI YAHAN SE -->
                         <div id="promo-slider" class="w-full h-[180px] sm:h-[240px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
-                            <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 1">
-                            <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 2">
-                            <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 3">
-                        </div>
+    <!-- Yahan images khali rahengi, Firebase se aayengi -->
+</div>
                         
                         <!-- Shadow thodi aur dark ki hai taaki dots hamesha chamken -->
                         <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/50 to-transparent pointer-events-none z-10"></div>
@@ -1385,7 +1384,7 @@ async function handleShopSubmit(e) {
                     </div>
                 `;
 
-
+loadHomeBanners();
                 return false;
             }
         }
