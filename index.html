@@ -471,15 +471,13 @@
 
     <!-- Main Wrapper -->
     <main class="flex-1 w-full flex flex-col pt-16">
-        
-        <!-- ✨ HERO SECTION ✨ -->
-        <section class="relative w-full overflow-hidden bg-transparent pt-16 pb-16 sm:pt-28 sm:pb-28 px-4 flex flex-col items-center justify-center shrink-0 min-h-[70vh]">
-            <div class="absolute inset-0 bg-grid-pattern opacity-50 z-0 mask-image:linear-gradient(to_bottom,white,transparent)"></div>
-            
-            <div id="hero-content" class="relative z-10 w-full flex flex-col items-center text-center">
-                <!-- Dynamically populated -->
-            </div>
-        </section>
+      <!-- ✨ AMAZON/FLIPKART STYLE COMPACT HERO SECTION ✨ -->
+<section class="relative w-full bg-gray-50 pt-[60px] flex flex-col shrink-0 min-h-0 border-b border-gray-200">
+    <div id="hero-content" class="relative z-10 w-full flex flex-col">
+        <!-- JS dynamically inject karega yahan -->
+    </div>
+</section>
+
 
         <!-- ✨ MARKETPLACE / PRODUCTS SECTION ✨ -->
         <section id="marketplace" class="flex-1 py-16 sm:py-20 px-4 bg-white border-t border-gray-100 relative z-20 rounded-t-[2.5rem] shadow-[0_-5px_30px_rgba(0,0,0,0.02)]">
@@ -1178,98 +1176,60 @@ async function handleShopSubmit(e) {
                 return true;
 
                            } else if (customerName) {
-                // 🔹 CUSTOMER
+                               // 🔹 CUSTOMER
                 // ✨ NAYA FIX: Page load hote hi background me Firebase se address nikal lo ✨
-                const custPhoneOrEmail = localStorage.getItem('pixigenie_customer_phone');
-                if (custPhoneOrEmail && !localStorage.getItem('pixigenie_saved_address')) {
-                    db.collection('customers').doc(custPhoneOrEmail).get().then(doc => {
-                        if (doc.exists && doc.data().savedAddress) {
-                            const d = doc.data();
-                            localStorage.setItem('pixigenie_saved_name', d.savedName || '');
-                            localStorage.setItem('pixigenie_saved_phone', d.savedPhone || '');
-                            localStorage.setItem('pixigenie_saved_landmark', d.savedLandmark || '');
-                            localStorage.setItem('pixigenie_saved_address', d.savedAddress || '');
-                            if (d.savedLat && d.savedLng) {
-                                localStorage.setItem('pixigenie_saved_lat', d.savedLat);
-                                localStorage.setItem('pixigenie_saved_lng', d.savedLng);
-                            }
-                        }
-                    }).catch(e => console.log("Background fetch error:", e));
-                }
-                // ✨ FIX END ✨
-
-
-                // ✨ NAYA CODE: Customer se Pricing chhupa lo
-                const pricingSec = document.getElementById('merchant-upgrade-plans');
-                if(pricingSec) pricingSec.classList.add('hidden');
-
-                const initials = getInitials(customerName);
-                const savedImg = localStorage.getItem('pixigenie_profile_img'); // ✨ Fetch saved image
-
+                // ... (Upar ka aapka pehle ka code waise hi rahega)
                 
-                authContainer.innerHTML = `
-                    <button onclick="toggleProfileModal()" class="w-9 h-9 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full flex items-center justify-center transition shadow-sm border border-gray-200 active:scale-95 focus:outline-none font-semibold text-[13px] tracking-wide relative overflow-hidden">
-                        <span id="nav-initials" style="${savedImg ? 'display:none;' : ''}">${initials}</span>
-                        <img id="nav-profile-img" src="${savedImg || ''}" class="absolute inset-0 w-full h-full object-cover ${savedImg ? '' : 'hidden'}">
-                    </button>
-                    <div id="profile-dropdown-menu" class="hidden absolute right-0 top-12 mt-2 w-56 sm:w-64 bg-white/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
-                        <div class="p-5 bg-gray-50/50 border-b border-gray-100">
+                authContainer.innerHTML = `...`; // (Aapka login button code)
 
-                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Customer Profile</p>
-                            <h4 class="font-black text-gray-900 text-lg leading-tight truncate">${customerName}</h4>
-                            ${customerPhone ? `<p class="text-xs text-gray-500 mt-1.5 font-medium flex items-center gap-1.5"><i class="fas fa-phone-alt text-gray-400"></i> +91 ${customerPhone}</p>` : ''}
-                        </div>
-                        <div class="p-2">
-                            <button onclick="showLogoutModal()" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-2xl font-bold text-sm transition-all"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                        </div>
-                    </div>
-                `;
-
+                // 👉 YAHAN SE REPLACE SHURU KAREIN 👈
                 heroContent.innerHTML = `
-                    <div class="opacity-0 fade-in-up inline-flex items-center gap-2 glass-card text-gray-800 rounded-full px-5 py-2 text-[11px] sm:text-xs font-bold tracking-widest mb-8 z-10 hover:scale-105 transition-transform duration-300">
-                        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span> DIGITAL MALL
-                    </div>
-                    
-                    <div class="relative w-full flex flex-col items-center justify-center z-10">
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] z-0 pointer-events-none flex items-center justify-center">
-                            <div class="w-full h-full bg-gradient-to-tr from-purple-300 via-fuchsia-200 to-pink-300 rounded-full filter blur-[90px] sm:blur-[120px] opacity-40 animate-pulse"></div>
+                    <!-- 🔍 TOP SEARCH BAR -->
+                    <div class="w-full px-3 pt-3 pb-3 bg-gradient-to-r from-purple-600 to-indigo-600">
+                        <div class="relative w-full">
+                            <i class="fas fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm"></i>
+                            <input type="text" id="top-search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search products, brands and shops" autocomplete="off" class="w-full bg-white px-10 py-2.5 rounded-[8px] outline-none text-[13px] font-semibold shadow-sm text-gray-900 border-none focus:ring-2 focus:ring-purple-300 transition-all">
                         </div>
-
-                        <h1 class="relative z-10 opacity-0 fade-in-up delay-100 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter mb-2 sm:mb-4 hover:scale-[1.02] transition-transform duration-300">Everything You Need.</h1>
-                        <h2 class="relative z-10 opacity-0 fade-in-up delay-200 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 mb-6 sm:mb-8 pb-2 hover:scale-[1.02] transition-transform duration-300">Right Around You.</h2>
                     </div>
 
-                    <p class="relative z-10 opacity-0 fade-in-up delay-300 text-gray-500 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed font-medium px-4">Discover trusted local stores, explore their products, and order effortlessly — all from one simple place.</p>
-                    
-                    <div class="relative z-10 opacity-0 fade-in-up delay-300 w-full px-4 sm:px-0 max-w-xs mx-auto">
-                        <button onclick="document.getElementById('marketplace').scrollIntoView()" class="w-full bg-gray-900 text-white font-bold py-4 sm:py-5 rounded-2xl hover:bg-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3 text-sm sm:text-base">
-                            Start Shopping
-                        </button>
+                    <!-- 🛍️ CATEGORIES ROW -->
+                    <div class="w-full bg-white px-3 py-4 flex overflow-x-auto gap-6 custom-scrollbar snap-x border-b border-gray-100 shadow-sm">
+                        <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 shrink-0 snap-center cursor-pointer active:scale-95 transition">
+                            <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center border border-orange-100"><img src="https://cdn-icons-png.flaticon.com/512/3014/3014498.png" class="w-7 h-7 object-contain"></div>
+                            <span class="text-[10px] font-bold text-gray-700">Grocery</span>
+                        </div>
+                        <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 shrink-0 snap-center cursor-pointer active:scale-95 transition">
+                            <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center border border-blue-100"><img src="https://cdn-icons-png.flaticon.com/512/3437/3437364.png" class="w-7 h-7 object-contain"></div>
+                            <span class="text-[10px] font-bold text-gray-700">Mobiles</span>
+                        </div>
+                        <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 shrink-0 snap-center cursor-pointer active:scale-95 transition">
+                            <div class="w-12 h-12 bg-pink-50 rounded-full flex items-center justify-center border border-pink-100"><img src="https://cdn-icons-png.flaticon.com/512/3159/3159614.png" class="w-7 h-7 object-contain"></div>
+                            <span class="text-[10px] font-bold text-gray-700">Fashion</span>
+                        </div>
+                        <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-1.5 shrink-0 snap-center cursor-pointer active:scale-95 transition">
+                            <div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center border border-purple-100"><img src="https://cdn-icons-png.flaticon.com/512/1973/1973617.png" class="w-7 h-7 object-contain"></div>
+                            <span class="text-[10px] font-bold text-gray-700">Services</span>
+                        </div>
+                        <div onclick="switchMarketTab('shops')" class="flex flex-col items-center gap-1.5 shrink-0 snap-center cursor-pointer active:scale-95 transition">
+                            <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center border border-green-100"><img src="https://cdn-icons-png.flaticon.com/512/1198/1198364.png" class="w-7 h-7 object-contain"></div>
+                            <span class="text-[10px] font-bold text-gray-700">Top Shops</span>
+                        </div>
                     </div>
 
-                    <div class="relative z-10 opacity-0 fade-in-up delay-300 mt-12 sm:mt-16 flex flex-wrap justify-center gap-4 sm:gap-6 text-[11px] sm:text-xs font-bold text-gray-600 tracking-wide px-4">
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-purple-600 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline>
-                            </svg>
-                            Verified Stores
-                        </div>
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-pink-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                            </svg>
-                            Fast Delivery
-                        </div>
-                        <div class="group flex items-center gap-3 glass-card px-5 py-3 rounded-full hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(0,0,0,0.06)] active:scale-95 transition-all duration-300 cursor-default">
-                            <svg class="w-5 h-5 text-green-500 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            Direct Chat
+                    <!-- 🖼️ DYNAMIC PHOTO SLIDER -->
+                    <div class="w-full bg-gray-100 p-2">
+                        <div class="w-full h-32 sm:h-48 rounded-[12px] overflow-hidden relative shadow-sm border border-gray-200">
+                            <div id="promo-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth">
+                                <!-- Example Banner Images -->
+                                <img src="https://rukminim2.flixcart.com/fk-p-flap/1600/270/image/bd23bc4edfa51d45.jpg" class="w-full h-full object-cover shrink-0 snap-center">
+                                <img src="https://rukminim2.flixcart.com/fk-p-flap/1600/270/image/a56cc5db537eef53.jpg" class="w-full h-full object-cover shrink-0 snap-center">
+                            </div>
                         </div>
                     </div>
-                    
-                    ${customerWhyChooseUsSection}
                 `;
+                // 👉 YAHAN TAK REPLACE KAREIN 👈
+
+                document.getElementById('section-title').innerText = "Trending Products";
 
                 document.getElementById('section-title').innerText = "Trending Products";
 document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
@@ -1280,45 +1240,61 @@ searchInput.placeholder = "Search products, services, or shops...";
 
                    } else {
                 
-                // 🔹 NOT LOGGED IN DEFAULT
-
-                // ✨ NAYA CODE: Guest se bhi Pricing chhupa lo
-                const pricingSec = document.getElementById('merchant-upgrade-plans');
-                if(pricingSec) pricingSec.classList.add('hidden');
-
-                authContainer.innerHTML = `
-                    <button onclick="openAuthModal()" class="w-9 h-9 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-full flex items-center justify-center transition border border-gray-200 shadow-sm active:scale-95">
-
-                        <i class="fas fa-user text-sm"></i>
-                    </button>
-                `;
+                           // 🔹 CUSTOMER
+                // ✨ NAYA FIX: Page load hote hi background me Firebase se address nikal lo ✨
+                // ... (Upar ka aapka pehle ka code waise hi rahega)
                 
+                authContainer.innerHTML = `...`; // (Aapka login button code)
+
+                // 👉 YAHAN SE REPLACE SHURU KAREIN 👈
                 heroContent.innerHTML = `
-                    <div class="opacity-0 fade-in-up inline-flex items-center gap-2 glass-card text-gray-800 rounded-full px-5 py-2 text-[11px] sm:text-xs font-bold tracking-widest mb-8 z-10 hover:scale-105 hover:shadow-md transition-all duration-300 cursor-default">
-                        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span> DIGITAL MALL
-                    </div>
-
-                    <div class="relative w-full flex flex-col items-center justify-center z-10">
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] z-0 pointer-events-none flex items-center justify-center">
-                            <div class="w-full h-full bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 rounded-full filter blur-[90px] sm:blur-[120px] opacity-40 animate-pulse"></div>
+                    <!-- 🔍 TOP SEARCH BAR -->
+                    <div class="w-full px-3 pt-3 pb-3 bg-gradient-to-r from-purple-600 to-indigo-600">
+                        <div class="relative w-full">
+                            <i class="fas fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm"></i>
+                            <input type="text" id="top-search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search products, brands and shops" autocomplete="off" class="w-full bg-white px-10 py-2.5 rounded-[8px] outline-none text-[13px] font-semibold shadow-sm text-gray-900 border-none focus:ring-2 focus:ring-purple-300 transition-all">
                         </div>
-                        
-                        <!-- 🎯 NEW TITLE -->
-                        <h1 class="relative z-10 opacity-0 fade-in-up delay-100 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-gray-900 tracking-tighter mb-2 sm:mb-4 hover:scale-[1.02] transition-transform duration-300">Everything You Need.</h1>
-                        <h2 class="relative z-10 opacity-0 fade-in-up delay-200 text-[48px] leading-[1.05] sm:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 mb-6 sm:mb-8 pb-2 hover:scale-[1.02] transition-transform duration-300">Right Around You.</h2>
                     </div>
 
-                    <!-- 🎯 NEW DESCRIPTION -->
-                    <p class="relative z-10 opacity-0 fade-in-up delay-300 text-gray-500 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed font-medium px-4">Discover trusted local stores, explore their products, and order effortlessly — all from one simple place.</p>
-                    
-                    <div class="relative z-10 opacity-0 fade-in-up delay-300 w-full px-4 sm:px-0 max-w-xs mx-auto">
-                        <button onclick="openAuthModal()" class="w-full bg-gray-900 text-white font-bold py-4 sm:py-5 rounded-2xl hover:bg-black hover:shadow-[0_15px_30px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center gap-3 text-sm sm:text-base">
-                            Start Shopping
-                        </button>
+                    <!-- 🛍️ CATEGORIES ROW -->
+                    <div class="w-full bg-white px-3 py-4 flex overflow-x-auto gap-6 custom-scrollbar snap-x border-b border-gray-100 shadow-sm">
+                        <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 shrink-0 snap-center cursor-pointer active:scale-95 transition">
+                            <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center border border-orange-100"><img src="https://cdn-icons-png.flaticon.com/512/3014/3014498.png" class="w-7 h-7 object-contain"></div>
+                            <span class="text-[10px] font-bold text-gray-700">Grocery</span>
+                        </div>
+                        <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 shrink-0 snap-center cursor-pointer active:scale-95 transition">
+                            <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center border border-blue-100"><img src="https://cdn-icons-png.flaticon.com/512/3437/3437364.png" class="w-7 h-7 object-contain"></div>
+                            <span class="text-[10px] font-bold text-gray-700">Mobiles</span>
+                        </div>
+                        <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 shrink-0 snap-center cursor-pointer active:scale-95 transition">
+                            <div class="w-12 h-12 bg-pink-50 rounded-full flex items-center justify-center border border-pink-100"><img src="https://cdn-icons-png.flaticon.com/512/3159/3159614.png" class="w-7 h-7 object-contain"></div>
+                            <span class="text-[10px] font-bold text-gray-700">Fashion</span>
+                        </div>
+                        <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-1.5 shrink-0 snap-center cursor-pointer active:scale-95 transition">
+                            <div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center border border-purple-100"><img src="https://cdn-icons-png.flaticon.com/512/1973/1973617.png" class="w-7 h-7 object-contain"></div>
+                            <span class="text-[10px] font-bold text-gray-700">Services</span>
+                        </div>
+                        <div onclick="switchMarketTab('shops')" class="flex flex-col items-center gap-1.5 shrink-0 snap-center cursor-pointer active:scale-95 transition">
+                            <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center border border-green-100"><img src="https://cdn-icons-png.flaticon.com/512/1198/1198364.png" class="w-7 h-7 object-contain"></div>
+                            <span class="text-[10px] font-bold text-gray-700">Top Shops</span>
+                        </div>
                     </div>
-                    
-                    ${customerWhyChooseUsSection}
+
+                    <!-- 🖼️ DYNAMIC PHOTO SLIDER -->
+                    <div class="w-full bg-gray-100 p-2">
+                        <div class="w-full h-32 sm:h-48 rounded-[12px] overflow-hidden relative shadow-sm border border-gray-200">
+                            <div id="promo-slider" class="w-full h-full flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth">
+                                <!-- Example Banner Images -->
+                                <img src="https://rukminim2.flixcart.com/fk-p-flap/1600/270/image/bd23bc4edfa51d45.jpg" class="w-full h-full object-cover shrink-0 snap-center">
+                                <img src="https://rukminim2.flixcart.com/fk-p-flap/1600/270/image/a56cc5db537eef53.jpg" class="w-full h-full object-cover shrink-0 snap-center">
+                            </div>
+                        </div>
+                    </div>
                 `;
+                // 👉 YAHAN TAK REPLACE KAREIN 👈
+
+                document.getElementById('section-title').innerText = "Trending Products";
+
                 return false;
             }
         }
