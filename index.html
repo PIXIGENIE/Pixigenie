@@ -516,20 +516,7 @@
     </button>
 </div>
 
-                <!-- ✨ NAYA: UNIVERSAL SEARCH BAR WITH DROPDOWN ✨ -->
-                <div class="relative w-full mb-10 sm:mb-12 reveal delay-100 z-[60]">
-                    <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
-                    
-                    <!-- Search Input (Ab ye dropdown ko trigger karega) -->
-                    <input type="text" id="search-input" oninput="handleGlobalSearch(this.value)" onfocus="handleGlobalSearch(this.value)" placeholder="Search products, services, or shops..." autocomplete="off" class="w-full bg-white hover:bg-gray-50 focus:bg-white px-5 py-4 pl-14 rounded-2xl border border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none text-base font-semibold transition-all shadow-sm">
-                    
-                    
-                    <!-- Search Dropdown Box -->
-                    <div id="search-dropdown" class="absolute w-full bg-white mt-2 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden hidden max-h-80 overflow-y-auto custom-scrollbar flex-col divide-y divide-gray-100 z-[100]">
-                        <!-- JS se results yahan aayenge -->
-                    </div>
-                </div>
-
+              
                 </div>
                 <div id="dynamic-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                     <div class="col-span-full text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
@@ -1143,9 +1130,9 @@ async function handleShopSubmit(e) {
                     </div>
                 `;
 
-                heroContent.innerHTML = `
-                    <!-- 🔍 PREMIUM SEARCH BAR -->
-                    <div class="w-full bg-white px-3 py-3 border-b border-gray-100 shadow-sm z-30">
+                             heroContent.innerHTML = `
+                    <!-- 🔍 PREMIUM SEARCH BAR (Zero Gap + Dropdown) -->
+                    <div class="w-full bg-white px-3 py-3 border-b border-gray-100 shadow-sm z-50 relative">
                         <div class="relative w-full bg-[#f0f5ff] rounded-[10px] flex items-center overflow-hidden border border-[#dbeafe]">
                             <div class="pl-3 pr-2 flex items-center justify-center">
                                 <i class="fas fa-search text-blue-600 text-[15px]"></i>
@@ -1155,62 +1142,76 @@ async function handleShopSubmit(e) {
                                 <i class="fas fa-microphone text-blue-600 text-[16px]"></i>
                             </div>
                         </div>
+
+                        <!-- 🌟 SEARCH SUGGESTIONS DROPDOWN YAHAN AAYEGA 🌟 -->
+                        <div id="search-dropdown" class="absolute left-3 right-3 top-[65px] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden hidden max-h-80 overflow-y-auto custom-scrollbar flex-col divide-y divide-gray-100 z-[100]">
+                            <!-- JS se results yahan aayenge -->
+                        </div>
                     </div>
 
-                    <!-- 🖼️ HD PROMO SLIDER -->
-                    <div class="w-full bg-[#f8fafc] p-2 sm:p-3">
-                        <div id="promo-slider" class="w-full h-[140px] sm:h-[180px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth rounded-[12px] shadow-sm border border-gray-200" style="-ms-overflow-style: none; scrollbar-width: none;">
+                    <!-- 🖼️ HD PROMO SLIDER (Slider Size Badha Diya!) -->
+                    <div class="w-full bg-[#f8fafc] p-2 sm:p-3 relative z-0">
+                        <div id="promo-slider" class="w-full h-[180px] sm:h-[220px] flex overflow-x-auto snap-x snap-mandatory hide-scrollbar scroll-smooth rounded-[12px] shadow-sm border border-gray-200" style="-ms-overflow-style: none; scrollbar-width: none;">
                             <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 1">
                             <img src="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 2">
                             <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover shrink-0 snap-center" alt="Sale 3">
                         </div>
                     </div>
 
-                    <!-- 🛍️ FLIPKART CATEGORY GRID -->
-                    <div class="w-full bg-white px-2 py-5 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] border-b border-gray-200 rounded-t-[20px] relative z-10 -mt-3">
+                    <!-- 🛍️ PREMIUM FLIPKART CATEGORY GRID -->
+                  <div class="w-full bg-white px-2 py-4 shadow-sm border-b border-gray-200">
+
                         <div class="grid grid-cols-4 gap-y-6 gap-x-2">
+                            <!-- Item 1 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3014/3014498.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Grocery</span>
                             </div>
+                            <!-- Item 2 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3437/3437364.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Mobiles</span>
                             </div>
+                            <!-- Item 3 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3159/3159614.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Fashion</span>
                             </div>
+                            <!-- Item 4 -->
                             <div onclick="switchMarketTab('services')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/1973/1973617.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Services</span>
                             </div>
+                            <!-- Item 5 -->
                             <div onclick="switchMarketTab('shops')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/1198/1198364.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Top Shops</span>
                             </div>
+                            <!-- Item 6 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/2652/2652218.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Electronics</span>
                             </div>
+                            <!-- Item 7 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/2590/2590514.png" class="w-full h-full object-contain drop-shadow-sm">
                                 </div>
                                 <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">Home</span>
                             </div>
+                            <!-- Item 8 -->
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
                                     <img src="https://cdn-icons-png.flaticon.com/512/3163/3163191.png" class="w-full h-full object-contain drop-shadow-sm">
@@ -1220,6 +1221,7 @@ async function handleShopSubmit(e) {
                         </div>
                     </div>
                 `;
+
 
                 document.getElementById('section-title').innerText = "Trending Products";
                 document.getElementById('section-subtitle').innerText = "Explore and buy directly from your local stores.";
@@ -1262,7 +1264,10 @@ async function handleShopSubmit(e) {
                     </div>
 
                     <!-- 🛍️ FLIPKART CATEGORY GRID -->
-                    <div class="w-full bg-white px-2 py-5 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] border-b border-gray-200 rounded-t-[20px] relative z-10 -mt-3">
+                    <div class="w-full bg-white px-2 py-4 shadow-sm border-b border-gray-200">
+
+
+
                         <div class="grid grid-cols-4 gap-y-6 gap-x-2">
                             <div onclick="switchMarketTab('products')" class="flex flex-col items-center gap-1.5 cursor-pointer active:scale-95 transition">
                                 <div class="w-[52px] h-[52px] bg-[#f0f5ff] rounded-[14px] flex items-center justify-center p-2.5 border border-[#e0e7ff] shadow-sm">
@@ -3353,9 +3358,9 @@ function handleGlobalSearch(query) {
 }
 
 
-        // Screen par kahin bhi click karne par dropdown band ho jaye
+              // Screen par kahin bhi click karne par dropdown band ho jaye
         document.addEventListener('click', function(e) {
-            const searchInput = document.getElementById('search-input');
+            const searchInput = document.getElementById('top-search-input'); // Nayi ID lagai hai yahan
             const dropdown = document.getElementById('search-dropdown');
             if (searchInput && dropdown) {
                 if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
@@ -3363,6 +3368,7 @@ function handleGlobalSearch(query) {
                 }
             }
         });
+
 
         // Background data loader ko trigger karna
         document.addEventListener('DOMContentLoaded', () => {
