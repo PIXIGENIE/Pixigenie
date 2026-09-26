@@ -1061,50 +1061,18 @@ async function handleShopSubmit(e) {
                 `;
 
                 heroContent.innerHTML = `
-<style>
-    /* Premium Dotted Background */
-    .bg-dotted {
-        background-color: #fcfcfd;
-        background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-        background-size: 24px 24px;
-    }
-    
-    /* Smooth Fade In Animation */
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
-    
-    .delay-100 { animation-delay: 0.1s; }
-    .delay-200 { animation-delay: 0.2s; }
-    .delay-300 { animation-delay: 0.3s; }
-    .delay-400 { animation-delay: 0.4s; }
-</style>
+<div class="w-full min-h-screen bg-white text-[#1D1D1F] font-sans selection:bg-blue-200">
 
-<div class="relative w-full min-h-screen bg-dotted text-[#0f172a] font-sans overflow-hidden">
-
-    <!-- Subtle Top Gradient to blend search bar -->
-    <div class="absolute top-0 left-0 w-full h-[150px] bg-gradient-to-b from-[#fcfcfd] to-transparent pointer-events-none z-0"></div>
-
-    <!-- ================= SEARCH BAR ================= -->
-    <div class="px-4 pt-4 pb-2 sticky top-0 z-50 fade-in-up relative">
+    <!-- ================= SEARCH BAR (iOS Style) ================= -->
+    <div class="px-4 pt-3 pb-2 sticky top-0 z-50 bg-white/90 backdrop-blur-xl">
         <div class="
-            relative
-            h-[50px]
-            rounded-[16px]
-            bg-white/80
-            backdrop-blur-xl
-            border border-[#e2e8f0]
-            shadow-[0_4px_20px_rgba(0,0,0,0.03)]
+            h-[44px]
+            rounded-[12px]
+            bg-[#F2F2F7]
             flex items-center
-            px-4
-            transition-all duration-300
-            focus-within:bg-white
-            focus-within:border-blue-500/30
-            focus-within:shadow-[0_8px_30px_rgba(37,99,235,0.08)]
+            px-3
         ">
-            <i class="fas fa-search text-[15px] text-[#94a3b8]"></i>
+            <i class="fas fa-search text-[16px] text-[#8E8E93]"></i>
             
             <input
                 type="text"
@@ -1116,68 +1084,49 @@ async function handleShopSubmit(e) {
                 class="
                     w-full
                     bg-transparent
-                    px-3
+                    px-2.5
                     outline-none
-                    text-[15px]
-                    font-medium
-                    text-[#0f172a]
-                    placeholder:text-[#94a3b8]
+                    text-[17px]
+                    font-normal
+                    text-[#1D1D1F]
+                    placeholder:text-[#8E8E93]
                 "
             >
 
             <button
                 onclick="startVoiceSearch()"
-                class="
-                    w-[34px]
-                    h-[34px]
-                    rounded-[10px]
-                    bg-[#f1f5f9]
-                    flex
-                    items-center
-                    justify-center
-                    active:scale-95
-                    transition-transform
-                "
+                class="flex items-center justify-center active:opacity-50 transition-opacity"
             >
-                <i class="fas fa-microphone text-[14px] text-blue-600 mic-icon"></i>
+                <i class="fas fa-microphone text-[16px] text-[#0071E3] mic-icon"></i>
             </button>
         </div>
 
         <!-- SEARCH DROPDOWN -->
-        <div id="search-dropdown" class="absolute left-4 right-4 mt-2 bg-white rounded-[16px] shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-[#f1f5f9] hidden max-h-80 overflow-y-auto z-[100]"></div>
+        <div id="search-dropdown" class="absolute left-4 right-4 mt-2 bg-white rounded-[16px] shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E5E5EA] hidden max-h-80 overflow-y-auto z-[100]"></div>
     </div>
 
 
     <!-- ================= HERO ================= -->
-    <section class="relative px-6 pt-16 pb-14 text-center z-10">
+    <section class="px-6 pt-12 pb-10 text-center">
 
-        <!-- ================= TITLE GLOW (Pink & Purple) ================= -->
-        <!-- Ab ye exactly title ke piche fixed hai -->
-        <div class="absolute top-[25%] left-1/2 -translate-x-1/2 w-[350px] h-[200px] bg-gradient-to-r from-pink-300/40 via-purple-300/40 to-blue-300/40 rounded-full blur-[80px] pointer-events-none z-[-1]"></div>
-
-        <!-- LABEL -->
-        <div class="relative inline-flex items-center gap-2 mb-6 px-3 py-1.5 bg-white/60 backdrop-blur-md border border-[#e2e8f0] rounded-full shadow-sm fade-in-up delay-100">
-            <span class="w-[6px] h-[6px] rounded-full bg-blue-600 animate-pulse"></span>
-            <span class="text-[10px] font-bold tracking-[0.18em] text-[#64748b]">
-                MERCHANT HUB
-            </span>
+        <!-- SUBTITLE -->
+        <div class="text-[12px] font-semibold tracking-widest text-[#8E8E93] uppercase mb-3">
+            Merchant Hub
         </div>
 
         <!-- HEADING -->
-        <h1 class="relative text-[42px] sm:text-6xl leading-[1.05] tracking-tight font-extrabold text-[#0f172a] mb-5 fade-in-up delay-200">
+        <h1 class="text-[44px] sm:text-5xl leading-[1.05] tracking-tight font-bold text-[#1D1D1F] mb-4">
             Your Store.<br>
-            <span class="text-blue-600">
-                Smarter.
-            </span>
+            <span class="text-[#0071E3]">Smarter.</span>
         </h1>
 
         <!-- DESCRIPTION -->
-        <p class="relative text-[15px] leading-[1.6] text-[#64748b] max-w-[320px] mx-auto mb-10 fade-in-up delay-300 font-medium">
-            Everything you need to manage your store, orders, billing, and business insights.
+        <p class="text-[17px] leading-[1.4] text-[#86868B] max-w-[300px] mx-auto mb-10">
+            Everything you need to manage your store, orders, billing, and insights.
         </p>
 
         <!-- ================= CTA BUTTONS ================= -->
-        <div class="relative flex flex-col items-center gap-4 max-w-[320px] mx-auto fade-in-up delay-400">
+        <div class="flex flex-col items-center gap-5 max-w-[320px] mx-auto">
             
             <a
                 href="dashboard.html?shop=${activeShop}"
@@ -1185,86 +1134,67 @@ async function handleShopSubmit(e) {
                     w-full
                     h-[54px]
                     rounded-[16px]
-                    bg-[#0f172a]
+                    bg-[#0071E3]
                     text-white
                     flex
                     items-center
                     justify-center
-                    gap-2.5
-                    text-[16px]
+                    text-[17px]
                     font-semibold
-                    shadow-[0_8px_20px_rgba(15,23,42,0.15)]
-                    active:scale-95
-                    transition-transform
-                    hover:bg-[#1e293b]
+                    active:bg-[#005BB5]
+                    active:scale-[0.98]
+                    transition-all
                 "
             >
-                <i class="fas fa-chart-line text-[14px] opacity-80"></i>
                 Open Dashboard
             </a>
 
             <a
                 href="store.html?shop=${activeShop}"
                 class="
-                    text-[14px]
-                    text-[#334155]
-                    font-semibold
+                    text-[15px]
+                    text-[#0071E3]
+                    font-medium
                     flex
                     items-center
-                    gap-1.5
-                    hover:text-blue-600
+                    gap-1
                     active:opacity-50
-                    transition-colors
+                    transition-opacity
                 "
             >
                 Visit My Store 
-                <i class="fas fa-arrow-up-right-from-square text-[10px] opacity-70"></i>
+                <i class="fas fa-chevron-right text-[11px] mt-[2px]"></i>
             </a>
 
         </div>
 
-        <!-- ================= BUSINESS SNAPSHOT ================= -->
+        <!-- ================= BUSINESS SNAPSHOT (Minimal Gray Card) ================= -->
         <div class="
-            relative
             mt-12
-            max-w-[360px]
+            max-w-[340px]
             mx-auto
-            bg-white/90
-            backdrop-blur-xl
-            border border-[#e2e8f0]
+            bg-[#F5F5F7]
             rounded-[24px]
-            p-5
-            shadow-[0_8px_40px_rgba(0,0,0,0.05)]
-            fade-in-up delay-400
+            p-6
         ">
-            <div class="flex items-center justify-between px-2">
+            <div class="flex justify-between items-center px-4">
 
                 <!-- Orders -->
-                <div class="flex flex-col items-center gap-2.5">
-                    <div class="w-[44px] h-[44px] rounded-full bg-[#f1f5f9] flex items-center justify-center">
-                        <i class="fas fa-box text-[16px] text-blue-600"></i>
-                    </div>
-                    <span class="text-[11px] font-bold text-[#64748b] tracking-wide uppercase">Orders</span>
+                <div class="flex flex-col items-center gap-3">
+                    <i class="fas fa-box text-[24px] text-[#1D1D1F]"></i>
+                    <span class="text-[12px] font-medium text-[#86868B]">Orders</span>
                 </div>
-
-                <div class="w-[1px] h-[36px] bg-[#e2e8f0]"></div>
 
                 <!-- Billing -->
-                <div class="flex flex-col items-center gap-2.5">
-                    <div class="w-[44px] h-[44px] rounded-full bg-[#f1f5f9] flex items-center justify-center">
-                        <i class="fas fa-file-invoice text-[16px] text-[#6366f1]"></i>
-                    </div>
-                    <span class="text-[11px] font-bold text-[#64748b] tracking-wide uppercase">Billing</span>
+                <div class="flex flex-col items-center gap-3">
+                    <i class="fas fa-file-invoice text-[24px] text-[#1D1D1F]"></i>
+                    <span class="text-[12px] font-medium text-[#86868B]">Billing</span>
                 </div>
 
-                <div class="w-[1px] h-[36px] bg-[#e2e8f0]"></div>
-
                 <!-- Insights -->
-                <div class="flex flex-col items-center gap-2.5">
-                    <div class="w-[44px] h-[44px] rounded-full bg-[#f1f5f9] flex items-center justify-center">
-                        <i class="fas fa-chart-pie text-[16px] text-[#8b5cf6]"></i>
-                    </div>
-                    <span class="text-[11px] font-bold text-[#64748b] tracking-wide uppercase">Insights</span>
+                <div class="flex flex-col items-center gap-3">
+                    <i class="fas fa-chart-pie text-[24px] text-[#1D1D1F]"></i>
+                    <span class="text-[12px] font-medium text-[#86868B]">Insights</span>
                 </div>
 
             </div>
@@ -1272,7 +1202,8 @@ async function handleShopSubmit(e) {
 
     </section>
 
-    <div class="relative z-10 fade-in-up delay-400">
+    <!-- OTHER SECTIONS -->
+    <div class="mt-4">
         ${merchantWhyChooseUsSection}
     </div>
 
