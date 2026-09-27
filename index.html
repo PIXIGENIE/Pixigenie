@@ -1767,17 +1767,26 @@ trackSearchImpression(shopId);
 
 
 
-       function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopId = "", isVerified = false, plan = "", isService = false, desc = "", qtySize = 1, unit = "pcs", safeImages = "") {
-    const verifiedTick = typeof getVIPBadge === 'function' ? getVIPBadge(isVerified, plan) : '';
-    let discountImageBadge = '';
-    let discountText = '';
-
+    function generateProductCard(name, mrp, price, shopName, shopPhone, image, shopId = "", isVerified = false, plan = "", isService = false, desc = "", qtySize = 1, unit = "pcs", safeImages = "") {
+    
+    // ✨ RED DISCOUNT BADGE (Top-Right Chipka Hua) ✨
+    let discountBadgeHtml = '';
+    let priceDisplayHtml = `<span class="text-[13px] font-black text-gray-900 leading-none">₹${price}</span>`;
+    
     if (mrp && mrp > price) {
         const discountPercent = Math.round(((mrp - price) / mrp) * 100);
-        // Image ke upar right corner ka Red Badge
-        discountImageBadge = `<div class="absolute top-0 right-0 bg-[#E11D48] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg z-10 uppercase tracking-wide">${discountPercent}% OFF</div>`;
-        // Price ke side me green text
-        discountText = `<span class="text-[10px] font-bold text-green-600 mb-[1px] ml-1">${discountPercent}% off</span>`;
+        discountBadgeHtml = `
+            <div class="absolute top-0 right-0 bg-[#E11D48] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-bl-[6px] z-10 uppercase tracking-wide">
+                ${discountPercent}% OFF
+            </div>
+        `;
+        priceDisplayHtml = `
+            <div class="flex items-center gap-1 mt-[2px] flex-wrap">
+                <span class="text-[14px] font-black text-gray-900 leading-none">₹${price}</span>
+                <span class="text-[10px] text-gray-400 line-through">₹${mrp}</span>
+                <span class="text-[9px] font-bold text-[#16A34A]">${discountPercent}% off</span>
+            </div>
+        `;
     }
 
     const buttonText = isService ? "Book" : "Buy";
@@ -1790,48 +1799,42 @@ trackSearchImpression(shopId);
     let firstImg = image;
     try { const dec = JSON.parse(decodeURIComponent(safeImages)); if(dec.length > 0 && dec[0]) firstImg = dec[0]; } catch(e){}
 
+    const verifiedTick = typeof getVIPBadge === 'function' ? getVIPBadge(isVerified, plan) : '';
+
     return `
-    <div onclick="openProductDetails('${safeName}', '${mrp || 0}', '${price}', '${safeShopName}', '${shopPhone}', '${safeImages}', '${shopId}', ${isService}, '${safeDesc}', '${qtySize}', '${safeUnit}')" class="bg-white rounded-[12px] border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col cursor-pointer pb-2.5 shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
+    <div onclick="openProductDetails('${safeName}', '${mrp || 0}', '${price}', '${safeShopName}', '${shopPhone}', '${safeImages}', '${shopId}', ${isService}, '${safeDesc}', '${qtySize}', '${safeUnit}')" class="bg-white rounded-[10px] border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col cursor-pointer pb-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] m-1">
         
-        <!-- 🖼️ Compact Image Area -->
-        <div class="w-full aspect-square relative p-2 pb-0">
-            <div class="w-full h-full relative rounded-[8px] overflow-hidden bg-gray-50 border border-gray-100/50">
-                ${firstImg ? `<img src="${firstImg}" class="w-full h-full object-cover mix-blend-multiply">` : `<div class="w-full h-full flex items-center justify-center"><i class="fas fa-box-open text-3xl text-gray-200"></i></div>`}
+        <!-- 🖼️ Image Area -->
+        <div class="w-full aspect-[4/5] sm:aspect-square relative p-2 pb-1">
+            <div class="w-full h-full relative rounded-[8px] overflow-hidden bg-gray-50 border border-gray-100">
+                ${firstImg ? `<img src="${firstImg}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center"><i class="fas fa-box-open text-2xl text-gray-200"></i></div>`}
+                
+                ${discountBadgeHtml}
                 
                 <!-- 📦 Top Left Qty Badge -->
-                <div class="absolute top-0 left-0 bg-white/95 px-1.5 py-0.5 rounded-br-lg text-[9px] font-bold text-gray-700 z-10 shadow-[2px_2px_5px_rgba(0,0,0,0.05)]">
+                <div class="absolute top-0 left-0 bg-white px-1.5 py-0.5 rounded-br-[6px] text-[8px] font-bold text-gray-700 shadow-sm z-10 border-b border-r border-gray-100">
                     ${qtySize} ${unit}
                 </div>
-                
-                <!-- 🔴 Top Right Discount Badge -->
-                ${discountImageBadge}
             </div>
         </div>
 
         <!-- 📝 Content Area -->
-        <div class="px-2.5 pt-2.5 flex flex-col flex-1">
-            <!-- Title -->
-            <h4 class="text-gray-900 font-bold text-[11px] leading-snug line-clamp-2 mb-1.5 uppercase tracking-wide">${name}</h4>
+        <div class="px-2 pt-1.5 flex flex-col flex-1">
             
-            <!-- Ratings Placeholder -->
+            <h4 class="text-gray-900 font-bold text-[10.5px] leading-tight line-clamp-2 mb-1 uppercase tracking-wide">${name}</h4>
+            
             <div class="card-rating-placeholder hidden items-center gap-1 mb-1.5" data-phone="${shopPhone}" data-name="${name}"></div>
             
-            <!-- 💰 Price Row -->
-            <div class="flex items-end gap-1 mb-1.5 flex-wrap">
-                <span class="text-[14px] font-black text-gray-900 leading-none">₹${price}</span>
-                ${mrp && mrp > price ? `<span class="text-[10px] text-gray-400 line-through mb-[1px]">₹${mrp}</span>` : ''}
-                ${discountText}
-            </div>
+            ${priceDisplayHtml}
             
-            <!-- Shop Name -->
-            <p class="text-[9.5px] text-gray-500 truncate mb-2.5 mt-auto flex items-center gap-1">By ${shopName} ${verifiedTick}</p>
+            <p class="text-[8.5px] text-gray-500 truncate mb-2.5 mt-auto pt-1 flex items-center gap-1">By ${shopName} ${verifiedTick}</p>
 
-            <!-- 👆 Buttons -->
+            <!-- 👆 Action Buttons -->
             <div class="flex gap-1.5 mt-auto">
-                <button onclick="event.stopPropagation(); addToCart(event, '${name}', '${price}', '${shopName}', '${shopPhone}')" class="flex-1 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold py-1.5 rounded-md text-[10px] transition-colors flex justify-center items-center gap-1">
-                    <i class="fas fa-shopping-cart text-[10px]"></i> Add
+                <button onclick="event.stopPropagation(); addToCart(event, '${name}', '${price}', '${shopName}', '${shopPhone}')" class="flex-1 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold py-1.5 rounded-[6px] text-[9.5px] transition-colors flex justify-center items-center gap-1 shadow-sm">
+                    <i class="fas fa-shopping-cart text-[9px]"></i> Add
                 </button>
-                <button onclick="event.stopPropagation(); openOrderModal('${name}', '${price}', '${shopName}', '${shopPhone}')" class="flex-1 bg-[#8B5CF6] hover:bg-purple-600 text-white font-bold py-1.5 rounded-md text-[10px] transition-colors flex justify-center items-center">
+                <button onclick="event.stopPropagation(); openOrderModal('${name}', '${price}', '${shopName}', '${shopPhone}')" class="flex-1 bg-[#8B5CF6] hover:bg-purple-600 text-white font-bold py-1.5 rounded-[6px] text-[9.5px] transition-colors flex justify-center items-center shadow-sm">
                     ${buttonText}
                 </button>
             </div>
