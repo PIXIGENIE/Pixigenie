@@ -21,26 +21,30 @@
                <!-- Chart.js for Performance Graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <!-- Firebase SDKs -->
+       <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <!-- 👇 YE LINE AAPKE CODE MEIN MISSING HAI 👇 -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <script>
-              const firebaseConfig = {
-          apiKey: "AIzaSyAdJsThwv9E7zp6Mff4XUCm6hVNQCYCLyo",
-          authDomain: "pixigenie-ee9f5.firebaseapp.com",
-          projectId: "pixigenie-ee9f5",
-          storageBucket: "pixigenie-ee9f5.firebasestorage.app",
-          messagingSenderId: "727128884439",
-          appId: "1:727128884439:web:8a521d0308347ddcccdc92",
-          measurementId: "G-QTBJS03LTF"
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdJsThwv9E7zp6Mff4XUCm6hVNQCYCLyo",
+            authDomain: "pixigenie-ee9f5.firebaseapp.com",
+            projectId: "pixigenie-ee9f5",
+            storageBucket: "pixigenie-ee9f5.firebasestorage.app",
+            messagingSenderId: "727128884439",
+            appId: "1:727128884439:web:8a521d0308347ddcccdc92",
+            measurementId: "G-QTBJS03LTF"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) { 
+            firebase.initializeApp(firebaseConfig); 
+        }
         const db = firebase.firestore();
-   const auth = firebase.auth();
+        const auth = firebase.auth();
     </script>
-    
+
 
     <style>
         :root { --ios-spring: cubic-bezier(0.25, 1, 0.5, 1); }
