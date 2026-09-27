@@ -3821,7 +3821,7 @@
             }
         }
 
-        // Final Save Data to Firebase
+              // Final Save Data to Firebase (100% FOOLPROOF FIX)
         async function submitFinalStore(event) {
             const tempName = (typeof authTemp !== 'undefined' && authTemp.name) ? authTemp.name : "";
             
@@ -3829,7 +3829,6 @@
             const ownerName = document.getElementById('setup-owner-name').value.trim() || tempName || "Store Owner";
             const desc = document.getElementById('setup-desc').value.trim();
             
-            // ✨ Naye Fields Get Karo
             const storePhone = document.getElementById('setup-phone').value.trim();
             const storeEmail = document.getElementById('setup-email').value.trim();
             const businessType = document.getElementById('selected-business-type').value;
@@ -3839,17 +3838,13 @@
             const landmark = document.getElementById('setup-landmark') ? document.getElementById('setup-landmark').value.trim() : "";
             const mapLink = document.getElementById('setup-map-link') ? document.getElementById('setup-map-link').value.trim() : "";
                      
-
             if(category === 'Other') category = document.getElementById('other-category-input').value.trim();
-         if(!address) { showIOSAlert("Missing Address", "Please add your store address!"); return; }
+            if(!address) { showIOSAlert("Missing Address", "Please add your store address!"); return; }
 
-
-                              // ✨ DELIVERY DATA NIKALO ✨
             const offersDeliveryElement = document.querySelector('input[name="home_delivery"]:checked');
             const offersDelivery = offersDeliveryElement ? (offersDeliveryElement.value === 'yes') : false;
             const deliveryRangeElement = document.querySelector('input[name="delivery_area"]:checked');
             
-            // ✨ FIX: Service walo ko range select nahi karni hoti, unke liye by default 'Available' jayega ✨
             let deliveryRange = 'No Delivery';
             if (offersDelivery) {
                 if (businessType === 'Service Provider') {
@@ -3861,26 +3856,22 @@
                 }
             }
 
-
-            
             const btn = event ? event.currentTarget : document.getElementById('final-launch-btn');
             const origHtml = btn.innerHTML;
             btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> ${isEditMode ? 'Saving...' : 'Launching...'}`;
             btn.disabled = true;
 
             try {
-                // ✨ NAYA LOGIC: Plan ke hisaab se Search Rank set karna ✨
                 let currentPlan = (typeof globalShopData !== 'undefined' && globalShopData.plan) ? globalShopData.plan : 'basic';
                 let rankScore = 0; 
                 
-                // Admin aur Pro ko Rank 100
                 if (currentPlan === 'pro' || storeEmail === 'netajijhadustore@gmail.com') {
                     rankScore = 100; 
                 } else if (currentPlan === 'plus') {
                     rankScore = 50;  
                 }
 
-                          const updateData = {
+                const updateData = {
                     shopName: shopName, 
                     ownerName: ownerName,
                     phone: storePhone,         
@@ -3897,7 +3888,6 @@
                     searchRank: rankScore  
                 };
                 
-                // ✨ FIX: Sirf tabhi email update karo jab user manual type kare (werna purani bachao)
                 if (storeEmail && storeEmail.trim() !== '') {
                     updateData.email = storeEmail;
                 }
@@ -3905,6 +3895,19 @@
                 if(typeof shopLat !== 'undefined' && shopLat !== null) updateData.latitude = shopLat;
                 if(typeof shopLng !== 'undefined' && shopLng !== null) updateData.longitude = shopLng;
 
+                // 🔥 100% ERROR FIX: Ensure Auth is ready and UID is attached! 🔥
+                const currentUser = await new Promise(resolve => {
+                    const unsub = firebase.auth().onAuthStateChanged(user => {
+                        unsub(); resolve(user);
+                    });
+                });
+
+                if (currentUser) {
+                    updateData.uid = currentUser.uid;
+                    if (!updateData.email && currentUser.email) updateData.email = currentUser.email;
+                }
+
+                // Push to Firebase
                 await db.collection('shops').doc(currentShopId).set(updateData, { merge: true });
                 
                 if(!globalShopData) globalShopData = {};
@@ -3937,7 +3940,8 @@
                     setTimeout(() => { window.location.href = `dashboard.html?shop=${currentShopId}`; }, 2000);
                 }
             } catch (error) { 
-                iosAlert("Oops! Something went wrong", error.message); 
+                // Error ko ab native alert ki jagah apne iOS Alert me dikhayenge
+                showIOSAlert("Oops! Something went wrong", error.message); 
             } finally {
                 btn.innerHTML = origHtml; btn.disabled = false; 
             }
