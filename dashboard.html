@@ -3,14 +3,14 @@
 <head>
         <script>
         // 🚨 CRITICAL GATEKEEPER: Agar active shop ki ID nahi hai, toh dashboard kabhi mat kholne do!
-        if (!localStorage.getItem('pixigenie_active_shop')) {
+        if (!localStorage.getItem('BikriPage_active_shop')) {
             window.location.replace('index.html');
         }
     </script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Merchant Dashboard | Pixigenie</title>
+    <title>Merchant Dashboard | BikriPage</title>
     
     <!-- Tailwind, FontAwesome, Chart.js & HTML2Canvas -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -30,9 +30,9 @@
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAdJsThwv9E7zp6Mff4XUCm6hVNQCYCLyo",
-            authDomain: "pixigenie-ee9f5.firebaseapp.com",
-            projectId: "pixigenie-ee9f5",
-            storageBucket: "pixigenie-ee9f5.firebasestorage.app",
+            authDomain: "BikriPage-ee9f5.firebaseapp.com",
+            projectId: "BikriPage-ee9f5",
+            storageBucket: "BikriPage-ee9f5.firebasestorage.app",
             messagingSenderId: "727128884439",
             appId: "1:727128884439:web:8a521d0308347ddcccdc92",
             measurementId: "G-QTBJS03LTF"
@@ -348,7 +348,7 @@
                 <div class="h-[68px] flex items-center justify-between px-6 border-b border-[#E5E7EB] shrink-0">
                     <a href="index.html" class="flex items-center hover:opacity-80 transition">
                         <div class="w-8 h-8 bg-[#111827] rounded-xl flex items-center justify-center text-white mr-3"><i class="fas fa-magic text-xs"></i></div>
-                        <span class="text-xl font-black text-[#111827] tracking-tight">Pixigenie</span>
+                        <span class="text-xl font-black text-[#111827] tracking-tight">BikriPage</span>
                     </a>
                     <button onclick="toggleSidebar()" class="md:hidden text-[#6B7280] bg-[#F7F7F9] w-8 h-8 flex items-center justify-center rounded-full active:bg-[#E5E7EB] transition"><i class="fas fa-times"></i></button>
                 </div>
@@ -1635,9 +1635,9 @@
                     
                     <!-- Right: Watermark -->
                     <div class="relative z-10 text-right">
-                        <!-- ✨ BRANDED WATERMARK WITH PIXIGENIE LOGO ✨ -->
+                        <!-- ✨ BRANDED WATERMARK WITH BikriPage LOGO ✨ -->
                         <p class="text-[11px] text-gray-500 font-bold tracking-widest uppercase relative z-10 flex items-center justify-center gap-2">
-                            POWERED BY <span class="text-white font-black">Pixigenie</span> 
+                            POWERED BY <span class="text-white font-black">BikriPage</span> 
                         </p>
                     </div>
                 </div>
@@ -1650,7 +1650,7 @@
     <!-- FULL INTEGRATED JAVASCRIPT LOGIC -->
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        let currentShopId = urlParams.get('shop') || localStorage.getItem('pixigenie_active_shop');
+        let currentShopId = urlParams.get('shop') || localStorage.getItem('BikriPage_active_shop');
         let globalShopData = null; 
         let isEditMode = false;
 
@@ -1669,7 +1669,7 @@
         let globalLiveOrders = []; // ✨ NAYA: For filtering live orders
         
         if (currentShopId) {
-            localStorage.setItem('pixigenie_active_shop', currentShopId);
+            localStorage.setItem('BikriPage_active_shop', currentShopId);
             loadShopData();
         } else {
             window.location.href = "index.html";
@@ -1839,7 +1839,7 @@
                     longitude: shopLng !== null ? shopLng : (globalShopData.longitude || null)
                 });
 
-                localStorage.setItem('pixigenie_owner_name', updatedOwnerName);
+                localStorage.setItem('BikriPage_owner_name', updatedOwnerName);
                 closeSettings();
                 
                 if (isEditMode) {
@@ -1925,7 +1925,7 @@
                         if(document.getElementById('setup-map-link')) document.getElementById('setup-map-link').value = globalShopData.googleMapLink || '';
                         
                         // ✨ NAYA LOGIC: First time Setup me bhi email/phone autofill hoga ✨
-                        let userEmail = globalShopData.email || localStorage.getItem('pixigenie_customer_phone') || '';
+                        let userEmail = globalShopData.email || localStorage.getItem('BikriPage_customer_phone') || '';
                         if (!userEmail.includes('@')) userEmail = '';
                         if(document.getElementById('setup-email')) document.getElementById('setup-email').value = userEmail;
                                                 // ✨ FIX: Phone number me email aane se rokna ✨
@@ -1943,7 +1943,7 @@
                     document.getElementById('store-name-display').innerText = globalShopData.shopName;
                     document.getElementById('menu-owner-name').innerText = globalShopData.ownerName;
                                         // ✨ NAYA: Dashboard header me logo/photo lagane ka code ✨
-                    const savedLogo = globalShopData.storeLogo || localStorage.getItem('pixigenie_profile_img');
+                    const savedLogo = globalShopData.storeLogo || localStorage.getItem('BikriPage_profile_img');
                     if (savedLogo) {
                         const hImg = document.getElementById('header-profile-img');
                         const hIcon = document.getElementById('header-profile-icon');
@@ -3310,7 +3310,7 @@
                 }
             });
             const bL = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const a = document.createElement("a");
-            a.href = URL.createObjectURL(bL); a.download = `Pixigenie_Data_${mName}_${y}.csv`; a.click();
+            a.href = URL.createObjectURL(bL); a.download = `BikriPage_Data_${mName}_${y}.csv`; a.click();
         }
 
                           async function downloadBillImage(id) {
@@ -3417,7 +3417,7 @@
 
 
                 // 🚀 FIX 2: STRICT SAFE LOGO HANDLING (No DOMException) 🚀
-                const savedImg = localStorage.getItem('pixigenie_profile_img');
+                const savedImg = localStorage.getItem('BikriPage_profile_img');
                 const billLogo = document.getElementById('bill-store-logo');
                 const watermark = document.getElementById('default-invoice-watermark');
                 
@@ -3505,7 +3505,7 @@
             
             // Agar local phone me test kar raha hai, toh GitHub pages ka asil link bana do
             if (u.startsWith("file://")) {
-                u = "https://pixigenie.github.io/Pixigenie/store.html"; 
+                u = "https://BikriPage.github.io/BikriPage/store.html"; 
             }
             
             currentStoreUrlToShare = u + "?shop=" + currentShopId;
@@ -3607,8 +3607,8 @@
 
         function logout() { 
             if(confirm("Log out?")) { 
-                localStorage.removeItem('pixigenie_active_shop'); 
-                localStorage.removeItem('pixigenie_owner_name'); 
+                localStorage.removeItem('BikriPage_active_shop'); 
+                localStorage.removeItem('BikriPage_owner_name'); 
                 window.location.href = "index.html"; 
             } 
         }
@@ -3774,7 +3774,7 @@
 
             
             // ✨ NAYA LOGIC: Email Autofill (Firebase se ya Google Login se) ✨
-            let userEmail = globalShopData.email || localStorage.getItem('pixigenie_customer_phone') || '';
+            let userEmail = globalShopData.email || localStorage.getItem('BikriPage_customer_phone') || '';
             if (!userEmail.includes('@')) userEmail = ''; // Ye check karega ki wo number nahi, email hi ho
             if (document.getElementById('setup-email')) document.getElementById('setup-email').value = userEmail;
 
@@ -3918,7 +3918,7 @@
                 
                 if(!globalShopData) globalShopData = {};
                 Object.assign(globalShopData, updateData);
-                localStorage.setItem('pixigenie_owner_name', ownerName);
+                localStorage.setItem('BikriPage_owner_name', ownerName);
                 
                 const wizard = document.getElementById('store-setup-modal');
                 if (wizard) wizard.classList.add('hidden');
@@ -3985,14 +3985,14 @@
 
         // ✨ AUTO-VERIFY CHECKER FUNCTION ✨
         async function checkAndAwardVerification(totalOrders, totalFollowers) {
-            const userEmail = localStorage.getItem('pixigenie_user_email') || "";
+            const userEmail = localStorage.getItem('BikriPage_user_email') || "";
             
             // Criteria: 50+ Orders & 100+ Followers (OR if user is Netaji Jhadu Store)
             const isEligible = (totalOrders >= 50 && totalFollowers >= 100);
 
             if (isEligible) {
                 // Check in localStorage agar pehle se celebrate ho chuka hai ya nahi
-                const hasCelebrated = localStorage.getItem('pixigenie_verified_celebrated_' + currentShopId);
+                const hasCelebrated = localStorage.getItem('BikriPage_verified_celebrated_' + currentShopId);
                 
                 if (!hasCelebrated) {
                     // Firebase me isVerified ko true set kar do
@@ -4009,7 +4009,7 @@
                     }, 50);
                     
                     // Dobara popup na aaye isliye save kar do
-                    localStorage.setItem('pixigenie_verified_celebrated_' + currentShopId, 'true');
+                    localStorage.setItem('BikriPage_verified_celebrated_' + currentShopId, 'true');
                 }
             }
         }
@@ -8259,24 +8259,24 @@ td.mono {
         }
         function confirmLogoutAction() {
             // 1. Sirf wahi data bachao jo customer ka personal hai (jaise cart aur likes)
-            let savedLikes = localStorage.getItem('pixigenie_liked_reviews');
-            let savedCart = localStorage.getItem('pixigenie_cart');
+            let savedLikes = localStorage.getItem('BikriPage_liked_reviews');
+            let savedCart = localStorage.getItem('BikriPage_cart');
             
             // 2. Storage ka kachra saaf karo
-            localStorage.removeItem('pixigenie_active_shop');
-            localStorage.removeItem('pixigenie_owner_name');
-            localStorage.removeItem('pixigenie_customer_name');
-            localStorage.removeItem('pixigenie_customer_phone');
-            localStorage.removeItem('pixigenie_profile_img');
-            localStorage.removeItem('pixigenie_saved_name');
-            localStorage.removeItem('pixigenie_saved_phone');
-            localStorage.removeItem('pixigenie_saved_address');
-            localStorage.removeItem('pixigenie_saved_lat');
-            localStorage.removeItem('pixigenie_saved_lng');
+            localStorage.removeItem('BikriPage_active_shop');
+            localStorage.removeItem('BikriPage_owner_name');
+            localStorage.removeItem('BikriPage_customer_name');
+            localStorage.removeItem('BikriPage_customer_phone');
+            localStorage.removeItem('BikriPage_profile_img');
+            localStorage.removeItem('BikriPage_saved_name');
+            localStorage.removeItem('BikriPage_saved_phone');
+            localStorage.removeItem('BikriPage_saved_address');
+            localStorage.removeItem('BikriPage_saved_lat');
+            localStorage.removeItem('BikriPage_saved_lng');
 
             // 3. Bachaya hua data wapas daalo
-            if(savedLikes) localStorage.setItem('pixigenie_liked_reviews', savedLikes);
-            if(savedCart) localStorage.setItem('pixigenie_cart', savedCart);
+            if(savedLikes) localStorage.setItem('BikriPage_liked_reviews', savedLikes);
+            if(savedCart) localStorage.setItem('BikriPage_cart', savedCart);
             
             sessionStorage.clear();
             
@@ -8499,7 +8499,7 @@ const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             </div>
             
             <h3 class="text-2xl font-black text-gray-900 mb-2 tracking-tight">Congratulations! 🎉</h3>
-            <p class="text-[15px] text-gray-500 font-medium mb-8 leading-relaxed">Your store has reached 50+ Orders and 100+ Followers! You are now an <strong class="text-blue-600 font-bold">Officially Verified Store</strong> on Pixigenie.</p>
+            <p class="text-[15px] text-gray-500 font-medium mb-8 leading-relaxed">Your store has reached 50+ Orders and 100+ Followers! You are now an <strong class="text-blue-600 font-bold">Officially Verified Store</strong> on BikriPage.</p>
             
             <button onclick="closeVerifiedModal()" class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold py-4 rounded-[16px] transition active:scale-95 text-[15px] shadow-[0_8px_20px_rgba(59,130,246,0.3)]">
                 Claim My Badge
@@ -9747,13 +9747,13 @@ function trackEvent(eventType) {
         // ==========================================
         
         // 1. Agar koi bina dukaan (Customer) ke direct Dashboard kholta hai
-        if (!localStorage.getItem('pixigenie_active_shop')) {
+        if (!localStorage.getItem('BikriPage_active_shop')) {
             window.location.replace('index.html');
         }
 
         // 2. Agar koi Back Button daba kar cache se wapas Dashboard par aata hai
         window.addEventListener('pageshow', function(event) {
-            if (!localStorage.getItem('pixigenie_active_shop')) {
+            if (!localStorage.getItem('BikriPage_active_shop')) {
                 window.location.replace('index.html');
             }
         });
@@ -9788,7 +9788,7 @@ function trackEvent(eventType) {
             <div class="px-5 mb-6">
                 <div class="bg-white border border-gray-200/80 rounded-[16px] p-1.5 flex items-center shadow-sm">
                     <div class="flex-1 overflow-hidden px-3">
-                        <p id="share-store-url" class="text-[14px] text-[#007AFF] font-medium truncate select-all">pixigenie.com/store...</p>
+                        <p id="share-store-url" class="text-[14px] text-[#007AFF] font-medium truncate select-all">BikriPage.com/store...</p>
                     </div>
                     <button onclick="copyStoreLink()" class="bg-[#007AFF]/10 text-[#007AFF] px-4 py-2 rounded-[12px] font-semibold text-[13px] hover:bg-[#007AFF]/20 transition active:scale-95 shrink-0 flex gap-1.5 items-center">
                         <i class="fas fa-copy"></i> Copy
@@ -9836,8 +9836,8 @@ function trackEvent(eventType) {
         // ==========================================
         
         // Agar active shop ki ID nahi hai, ya user customer hai, toh dashboard bilkul mat kholne do
-        const activeShopId = localStorage.getItem('pixigenie_active_shop');
-        const customerPhone = localStorage.getItem('pixigenie_customer_phone');
+        const activeShopId = localStorage.getItem('BikriPage_active_shop');
+        const customerPhone = localStorage.getItem('BikriPage_customer_phone');
 
         if (!activeShopId || (customerPhone && customerPhone.includes('@') && !activeShopId)) {
             window.location.replace('index.html');
@@ -9845,7 +9845,7 @@ function trackEvent(eventType) {
 
         // Back button ya cache se aane par bhi turant phek do
         window.addEventListener('pageshow', function(event) {
-            if (!localStorage.getItem('pixigenie_active_shop')) {
+            if (!localStorage.getItem('BikriPage_active_shop')) {
                 window.location.replace('index.html');
             }
         });
@@ -9934,13 +9934,13 @@ function trackEvent(eventType) {
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const activeShopId = localStorage.getItem('pixigenie_active_shop');
+            const activeShopId = localStorage.getItem('BikriPage_active_shop');
             if (activeShopId) {
-                const hasSeenOffer = localStorage.getItem('pixigenie_welcome_shown_' + activeShopId);
+                const hasSeenOffer = localStorage.getItem('BikriPage_welcome_shown_' + activeShopId);
                 if (!hasSeenOffer) {
                     setTimeout(() => {
                         showWelcomeOfferModal();
-                        localStorage.setItem('pixigenie_welcome_shown_' + activeShopId, 'true');
+                        localStorage.setItem('BikriPage_welcome_shown_' + activeShopId, 'true');
                     }, 1500); 
                 }
             }
