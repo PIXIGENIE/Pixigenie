@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Orders | Pixigenie</title>
+    <title>My Orders | BikriPage</title>
     
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,9 +19,9 @@
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyAdJsThwv9E7zp6Mff4XUCm6hVNQCYCLyo",
-          authDomain: "pixigenie-ee9f5.firebaseapp.com",
-          projectId: "pixigenie-ee9f5",
-          storageBucket: "pixigenie-ee9f5.firebasestorage.app",
+          authDomain: "BikriPage-ee9f5.firebaseapp.com",
+          projectId: "BikriPage-ee9f5",
+          storageBucket: "BikriPage-ee9f5.firebasestorage.app",
           messagingSenderId: "727128884439",
           appId: "1:727128884439:web:8a521d0308347ddcccdc92",
           measurementId: "G-QTBJS03LTF"
@@ -86,7 +86,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const custPhone = localStorage.getItem('pixigenie_customer_phone');
+            const custPhone = localStorage.getItem('BikriPage_customer_phone');
             const container = document.getElementById('orders-container');
 
             // Clear instructions for Shop Owners vs Customers
@@ -116,7 +116,7 @@
                         <div class="text-center py-16 px-6 animate-slide-up mt-10">
                             <div class="w-24 h-24 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl"><i class="fas fa-box-open"></i></div>
                             <h3 class="font-bold text-gray-900 text-[22px] tracking-tight mb-2">No Orders Yet</h3>
-                            <p class="text-gray-500 text-[15px] mt-1 leading-relaxed mb-8">You haven't made any purchases on Pixigenie yet.</p>
+                            <p class="text-gray-500 text-[15px] mt-1 leading-relaxed mb-8">You haven't made any purchases on BikriPage yet.</p>
                             <a href="index.html" class="inline-block w-full bg-white text-blue-500 border border-gray-200 shadow-sm py-3.5 rounded-2xl font-semibold text-[17px] active:scale-95 transition-transform">Start Shopping</a>
                         </div>`;
                     return;
@@ -189,7 +189,7 @@
                                     <i class="fas fa-store text-gray-400 text-sm"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-semibold text-gray-900 text-[15px] tracking-tight leading-none">${order.shopName || 'Pixigenie Store'}</h4>
+                                    <h4 class="font-semibold text-gray-900 text-[15px] tracking-tight leading-none">${order.shopName || 'BikriPage Store'}</h4>
                                     <p class="text-[12px] text-gray-400 mt-1">#${order.id.slice(0, 6).toUpperCase()}</p>
                                 </div>
                             </div>
@@ -277,7 +277,7 @@
                 });
                 
                 // Status refresh karne ke liye
-                fetchMyOrders(localStorage.getItem('pixigenie_customer_phone'));
+                fetchMyOrders(localStorage.getItem('BikriPage_customer_phone'));
             } catch (error) {
                 alert("Could not cancel order: " + error.message);
                 btnElement.innerHTML = "Cancel";
@@ -294,7 +294,7 @@
 
             if (unreviewedOrder) {
                 // Check in localStorage if we already prompted the user for THIS specific order
-                const hasPrompted = localStorage.getItem('pixigenie_prompted_review_' + unreviewedOrder.id);
+                const hasPrompted = localStorage.getItem('BikriPage_prompted_review_' + unreviewedOrder.id);
 
                 if (!hasPrompted) {
                     // Update Modal Text
@@ -316,7 +316,7 @@
                     }, 800);
 
                     // Mark as prompted so they don't get annoyed every time they open the app
-                    localStorage.setItem('pixigenie_prompted_review_' + unreviewedOrder.id, 'true');
+                    localStorage.setItem('BikriPage_prompted_review_' + unreviewedOrder.id, 'true');
                 }
             }
         }
@@ -433,7 +433,7 @@
                     
                     <div class="relative z-10 text-right">
                         <p class="text-[11px] text-gray-500 font-bold tracking-widest uppercase relative z-10 flex items-center justify-center gap-2">
-                            POWERED BY <span class="text-white font-black">Pixigenie</span> 
+                            POWERED BY <span class="text-white font-black">BikriPage</span> 
                         </p>
                     </div>
                 </div>
@@ -504,7 +504,7 @@
                     const c = document.getElementById('receipt-container');
                     html2canvas(c, { scale: 2, backgroundColor: "#ffffff", useCORS: true, windowWidth: 800, width: 800, windowHeight: 1131, height: 1131, logging: false }).then(cv => {
                         let link = document.createElement('a'); 
-                        link.download = `Pixigenie_Bill_${order.id.substring(0,6)}.png`; 
+                        link.download = `BikriPage_Bill_${order.id.substring(0,6)}.png`; 
                         link.href = cv.toDataURL("image/png", 1.0); 
                         link.click();
                         btn.innerHTML = origHtml; btn.disabled = false;
@@ -689,7 +689,7 @@
                 showSuccessModal();
 
                 // Refresh orders
-                fetchMyOrders(localStorage.getItem('pixigenie_customer_phone'));
+                fetchMyOrders(localStorage.getItem('BikriPage_customer_phone'));
             } catch (error) {
                 alert("Could not post review: " + error.message);
                 btn.innerHTML = origHtml;
