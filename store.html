@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Store | Pixigenie</title>
+    <title>Store | BikriPage</title>
     
     <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,9 +20,9 @@
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAdJsThwv9E7zp6Mff4XUCm6hVNQCYCLyo",
-            authDomain: "pixigenie-ee9f5.firebaseapp.com",
-            projectId: "pixigenie-ee9f5",
-            storageBucket: "pixigenie-ee9f5.firebasestorage.app",
+            authDomain: "BikriPage-ee9f5.firebaseapp.com",
+            projectId: "BikriPage-ee9f5",
+            storageBucket: "BikriPage-ee9f5.firebasestorage.app",
             messagingSenderId: "727128884439",
             appId: "1:727128884439:web:8a521d0308347ddcccdc92",
             measurementId: "G-QTBJS03LTF"
@@ -169,7 +169,7 @@
 
         <!-- ✨ FOOTER ✨ -->
         <footer class="mt-12 pb-14 px-5 text-center bg-white">
-            <div class="flex justify-center items-center gap-1.5 text-gray-400 mb-2 opacity-80"><i class="fas fa-magic text-[10px]"></i><span class="font-bold text-[12px] tracking-wide">Pixigenie Storefront</span></div>
+            <div class="flex justify-center items-center gap-1.5 text-gray-400 mb-2 opacity-80"><i class="fas fa-magic text-[10px]"></i><span class="font-bold text-[12px] tracking-wide">BikriPage Storefront</span></div>
             <p class="text-[11px] font-semibold text-gray-400 opacity-80">&copy; 2026 <span id="footer-shop-name">Store</span></p>
             <p class="text-[9px] font-bold text-gray-400 mt-1 uppercase tracking-widest opacity-80">Proprietor: <span id="footer-owner-name">Owner</span></p>
         </footer>
@@ -186,7 +186,7 @@
             <button onclick="closeProductDetails()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-800 active:scale-95 transition">
                 <i class="fas fa-arrow-left"></i>
             </button>
-            <h2 class="font-black text-xl text-gray-900 tracking-tight text-center flex-1">Pixigenie</h2>
+            <h2 class="font-black text-xl text-gray-900 tracking-tight text-center flex-1">BikriPage</h2>
             <button class="w-10 h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center active:scale-95 transition relative" onclick="closeProductDetails(); setTimeout(toggleCartModal, 300);">
                 <i class="fas fa-shopping-cart"></i>
                 <span id="detail-cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full hidden border border-white shadow-sm">0</span>
@@ -477,7 +477,7 @@
         let globalShopPhone = "";
         let globalShopName = "";
         let globalBusinessType = "";
-        let currentShopId = new URLSearchParams(window.location.search).get('shop') || localStorage.getItem('pixigenie_active_shop');
+        let currentShopId = new URLSearchParams(window.location.search).get('shop') || localStorage.getItem('BikriPage_active_shop');
         
         let fullDesc = "";
         let isDescExpanded = false;
@@ -512,7 +512,7 @@
                     globalBusinessType = shopData.businessType || '';
                     const safeOwnerName = shopData.ownerName || "Shop Owner";
 
-                    document.title = `${shopData.shopName} | Pixigenie`;                                                                     
+                    document.title = `${shopData.shopName} | BikriPage`;                                                                     
                     
                     const bizType = shopData.businessType;
                     const profileBadgeEl = document.getElementById('premium-biz-badge');
@@ -555,7 +555,7 @@
                     
                     if (shopData.activeFlashOffer) {
                         const offer = shopData.activeFlashOffer;
-                        const hasSeen = localStorage.getItem(`pixigenie_seen_offer_${offer.offerId}`);
+                        const hasSeen = localStorage.getItem(`BikriPage_seen_offer_${offer.offerId}`);
                         
                         if (!hasSeen) {
                             document.getElementById('flash-msg-display').innerText = offer.message;
@@ -592,7 +592,7 @@
                                 document.body.style.overflow = 'hidden';
                             }, 1500); 
                             
-                            localStorage.setItem(`pixigenie_seen_offer_${offer.offerId}`, 'true');
+                            localStorage.setItem(`BikriPage_seen_offer_${offer.offerId}`, 'true');
                         }
                     }
 
@@ -672,7 +672,7 @@
                         }
                     }
 
-                    const loggedInOwner = localStorage.getItem('pixigenie_active_shop');
+                    const loggedInOwner = localStorage.getItem('BikriPage_active_shop');
                     const logoWrapper = document.getElementById('store-logo-wrapper');
                     const cameraOverlay = document.getElementById('camera-hover-overlay');
                     const fileInput = document.getElementById('logo-file-input');
@@ -699,7 +699,7 @@
         document.getElementById('stat-followers').innerText = followersSnap.size;
     }
 
-    const custPhone = localStorage.getItem('pixigenie_customer_phone');
+    const custPhone = localStorage.getItem('BikriPage_customer_phone');
     if (custPhone) {
         const followDoc = await db.collection('shops').doc(currentShopId).collection('followers').doc(custPhone).get();
         if (followDoc.exists) { 
@@ -1312,8 +1312,8 @@
         // 🚀 TOGGLE FOLLOW BUTTON LOGIC (AUTH AWARE)
         // ==========================================
         async function toggleFollow() {
-            const custPhone = localStorage.getItem('pixigenie_customer_phone');
-            const custName = localStorage.getItem('pixigenie_customer_name') || "Customer";
+            const custPhone = localStorage.getItem('BikriPage_customer_phone');
+            const custName = localStorage.getItem('BikriPage_customer_name') || "Customer";
                 
             if (!custPhone) { 
                 alert("Please log in as a customer to follow stores!"); 
@@ -1425,8 +1425,8 @@
         function setFormRating(val) { userRating = val; document.getElementById('star-input-container').innerHTML = renderStarsInput(val); }
 
         async function checkUserReview() {
-            const customerPhone = localStorage.getItem('pixigenie_customer_phone');
-            const customerName = localStorage.getItem('pixigenie_customer_name');
+            const customerPhone = localStorage.getItem('BikriPage_customer_phone');
+            const customerName = localStorage.getItem('BikriPage_customer_name');
             const formContainer = document.getElementById('review-form-container');
             const myReviewContainer = document.getElementById('my-review-container');
             
@@ -1484,8 +1484,8 @@
         function cancelEdit() { document.getElementById('review-form-container').classList.add('hidden'); document.getElementById('my-review-container').classList.remove('hidden'); }
 
         async function submitStoreReview() {
-            const customerPhone = localStorage.getItem('pixigenie_customer_phone');
-            const customerName = localStorage.getItem('pixigenie_customer_name');
+            const customerPhone = localStorage.getItem('BikriPage_customer_phone');
+            const customerName = localStorage.getItem('BikriPage_customer_name');
             if(!customerPhone) return;
             if (userRating === 0) { alert("Please select a star rating first!"); return; }
             
@@ -1502,7 +1502,7 @@
 
         async function loadReviews(isLoadMore = false) {
             if (!hasMoreReviews) return;
-            const customerPhone = localStorage.getItem('pixigenie_customer_phone');
+            const customerPhone = localStorage.getItem('BikriPage_customer_phone');
             const btn = document.getElementById('load-more-reviews-btn');
             if(isLoadMore) btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i>`;
             
@@ -1549,13 +1549,13 @@
         }
 
         function toggleDescription() { isDescExpanded = !isDescExpanded; renderDescription(); }
-        function openWhatsApp() { if (!globalShopPhone) return; window.open(`https://wa.me/91${globalShopPhone}?text=Hi! I am visiting your Pixigenie store.`, '_blank'); }
+        function openWhatsApp() { if (!globalShopPhone) return; window.open(`https://wa.me/91${globalShopPhone}?text=Hi! I am visiting your BikriPage store.`, '_blank'); }
         // ==========================================
         // 🛒 SMART CART LOGIC (MULTI-ACCOUNT SYNC)
         // ==========================================
         function getCartKey() {
-            const user = localStorage.getItem('pixigenie_customer_phone');
-            return user ? 'pixigenie_cart_' + user : 'pixigenie_cart_guest';
+            const user = localStorage.getItem('BikriPage_customer_phone');
+            return user ? 'BikriPage_cart_' + user : 'BikriPage_cart_guest';
         }
 
         function updateCartBadge() {
@@ -1611,12 +1611,12 @@
             if(modal.classList.contains('hidden')) {
                 renderCartItems();
                 
-                const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
-                let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
-                const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
+                const savedName = localStorage.getItem('BikriPage_saved_name') || localStorage.getItem('BikriPage_customer_name') || '';
+                let savedPhone = localStorage.getItem('BikriPage_saved_phone') || localStorage.getItem('BikriPage_customer_phone') || '';
+                const savedAddress = localStorage.getItem('BikriPage_saved_address') || '';
                 
-                const savedLat = localStorage.getItem('pixigenie_saved_lat') || '';
-                const savedLng = localStorage.getItem('pixigenie_saved_lng') || '';
+                const savedLat = localStorage.getItem('BikriPage_saved_lat') || '';
+                const savedLng = localStorage.getItem('BikriPage_saved_lng') || '';
 
                 if (savedPhone.includes('@')) {
                     savedPhone = ''; 
@@ -1735,7 +1735,7 @@
             if(!custName || !custWhatsApp) { alert("Please enter your name and WhatsApp number!"); return; }
             if(!address) { alert("Please enter delivery address!"); return; }
 
-            const accountId = localStorage.getItem('pixigenie_customer_phone');
+            const accountId = localStorage.getItem('BikriPage_customer_phone');
 
             const btn = document.getElementById('cart-main-btn');
             const origHTML = btn.innerHTML;
@@ -1807,7 +1807,7 @@
                 const phone = shopPhones[i];
                 const orderData = ordersByShop[phone];
                 
-                let waMessage = `🛍️ *CART ORDER via Pixigenie*\n\n`;
+                let waMessage = `🛍️ *CART ORDER via BikriPage*\n\n`;
                 orderData.items.forEach(item => { waMessage += `▪ ${item.name} (x${item.qty}) - ₹${item.price * item.qty}\n`; });
                 waMessage += `\n*Total:* ₹${orderData.total}\n\n*Customer Details:*\nName: ${custName}\nPhone: ${custPhone}\nAddress: ${address}\n\nPlease confirm my order!`;
                 
@@ -1845,9 +1845,9 @@
                     : `<i class="fab fa-whatsapp text-lg"></i> Order via WhatsApp`;
             }
             
-            const savedName = localStorage.getItem('pixigenie_saved_name') || localStorage.getItem('pixigenie_customer_name') || '';
-            let savedPhone = localStorage.getItem('pixigenie_saved_phone') || localStorage.getItem('pixigenie_customer_phone') || '';
-            const savedAddress = localStorage.getItem('pixigenie_saved_address') || '';
+            const savedName = localStorage.getItem('BikriPage_saved_name') || localStorage.getItem('BikriPage_customer_name') || '';
+            let savedPhone = localStorage.getItem('BikriPage_saved_phone') || localStorage.getItem('BikriPage_customer_phone') || '';
+            const savedAddress = localStorage.getItem('BikriPage_saved_address') || '';
 
             if (savedPhone.includes('@')) savedPhone = '';
 
@@ -1890,7 +1890,7 @@
             const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
             const phone = currentOrder.shopPhone || '9876543210';
             
-            const accountId = localStorage.getItem('pixigenie_customer_phone');
+            const accountId = localStorage.getItem('BikriPage_customer_phone');
 
             const btn = document.getElementById('main-order-btn');
             const origHtml = btn.innerHTML;
@@ -1934,7 +1934,7 @@
             const total = parseInt(currentOrder.itemPrice) * parseInt(qty);
             const phone = currentOrder.shopPhone || '9876543210';
             
-            const waMessage = `🛍️ *NEW ORDER via Pixigenie*\n\n*Item:* ${currentOrder.itemName}\n*Quantity:* ${qty}\n*Total Amount:* ₹${total}\n\n*Customer Details:*\nName: ${custName}\nPhone: ${custPhone}\nAddress: ${address}\n\nPlease confirm my order!`;
+            const waMessage = `🛍️ *NEW ORDER via BikriPage*\n\n*Item:* ${currentOrder.itemName}\n*Quantity:* ${qty}\n*Total Amount:* ₹${total}\n\n*Customer Details:*\nName: ${custName}\nPhone: ${custPhone}\nAddress: ${address}\n\nPlease confirm my order!`;
             window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(waMessage)}`, '_blank');
         }
 
@@ -1990,7 +1990,7 @@
         }
 
         async function uploadStoreLogo(event) {
-            const loggedInOwner = localStorage.getItem('pixigenie_active_shop');
+            const loggedInOwner = localStorage.getItem('BikriPage_active_shop');
             if (loggedInOwner !== currentShopId) {
                 alert("⚠️ Only the store owner can change this logo!");
                 return;
@@ -2305,7 +2305,7 @@
         // ✨ SMART LIKES & REVIEWS (100% SYNC & NO MINUS COUNT) ✨
         // ===============================================
         async function likeReview(orderId, btnElement) {
-            const userEmail = localStorage.getItem('pixigenie_customer_phone');
+            const userEmail = localStorage.getItem('BikriPage_customer_phone');
             if (!userEmail) {
                 alert("Please login to like reviews!");
                 return;
@@ -2316,7 +2316,7 @@
             let currentCount = parseInt(countSpan.innerText) || 0;
             
             // 🔥 NAYA MAGIC: Shared Local Storage Key for 100% Sync
-            const storageKey = 'pixigenie_user_likes_' + userEmail;
+            const storageKey = 'BikriPage_user_likes_' + userEmail;
             let likedReviews = JSON.parse(localStorage.getItem(storageKey)) || [];
 
             try {
@@ -2377,8 +2377,8 @@
                 let seenCustomers = new Set(); 
                 
                 // 🔥 NAYA MAGIC: Directly read from Shared Local Storage
-                const userEmail = localStorage.getItem('pixigenie_customer_phone');
-                const storageKey = 'pixigenie_user_likes_' + userEmail;
+                const userEmail = localStorage.getItem('BikriPage_customer_phone');
+                const storageKey = 'BikriPage_user_likes_' + userEmail;
                 let likedReviews = JSON.parse(localStorage.getItem(storageKey)) || [];
 
                 snapshot.forEach(doc => {
